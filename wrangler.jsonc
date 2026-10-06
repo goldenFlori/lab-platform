@@ -1,0 +1,17 @@
+// Cloudflare Worker: serves the React app (static assets) and the API under /api.
+// https://developers.cloudflare.com/workers/wrangler/configuration/
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "lab-platform",
+  "main": "./src/api/index.ts",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "upload_source_maps": true,
+  "assets": {
+    "directory": "./dist/client",
+    "not_found_handling": "single-page-application",
+    // API requests always reach the Worker; everything else is the app.
+    "run_worker_first": ["/api/*"]
+  }
+}
