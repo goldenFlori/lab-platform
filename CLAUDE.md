@@ -59,8 +59,8 @@ live in its git-ignored `zgjidhjet/`; never publish them.
 - `src/api`: the Hono API on the Cloudflare Worker. One Worker serves both; `/api/*` always reaches
   the Worker.
 - `src/api/db`: the Drizzle schema and database access; `migrations/`: the generated SQL for D1.
-- `test/`: Vitest tests that run inside workerd; `e2e/`: Playwright tests against the production
-  build.
+- `test/`: Vitest tests that run inside workerd, each on an empty migrated database (seed with
+  `test/api/fixtures.ts`); `e2e/`: Playwright tests against the production build.
 - Commands:
   - `npm install`: also generates the Worker types (`worker-configuration.d.ts`, git-ignored).
   - `npm run dev`: app and API on http://localhost:5173.
@@ -82,8 +82,10 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   or the tests fail to start.
 - **Vitest stays on 4.x** until `@cloudflare/vitest-pool-workers` supports 5.
 - **Static assets are public.** Protected content must come from `/api` after a permission check.
-- **Every tenant-owned query goes through the tenant-scoped data layer.** Each new resource gets a
-  cross-tenant isolation test.
+- **Every tenant-owned query goes through `forTenant()`** (`src/api/db/tenant.ts`); lint blocks
+  Drizzle and schema imports elsewhere in `src/api`. A new tenant table needs `org_id`,
+  `(parent_id, org_id)` foreign keys, `org_id` in every unique index, and an entry in
+  `test/api/tenant-isolation.test.ts`.
 - **Rerun `npm run cf-typegen`** after changing bindings in `wrangler.jsonc`.
 - **`src/web/routeTree.gen.ts` is generated and committed.** Never edit it; after adding or
   renaming a route, run `npm run dev` or `npm run build` and commit the result (CI checks).

@@ -151,6 +151,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-06 | Live coding with Pyodide in the browser; Live Labs on Durable Objects | Decided |
 | 2026-10-06 | AI designed in now, enabled in phase 4; never grades alone | Decided |
 | 2026-10-06 | Platform code in a new private repo; this course becomes the first tenant | Decided; repo created 2026-10-06 |
+| 2026-10-07 | Users are global accounts, one for life; organizations reach them only through memberships; usernames are unique platform-wide | Decided |
 
 Decisions were delegated to Claude ("you decide"). Record new ones here with the date.
 

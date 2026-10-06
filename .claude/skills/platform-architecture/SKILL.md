@@ -87,10 +87,20 @@ Verified 2026-10-06. Re-check before relying on them.
 
 ## Tenancy and permissions
 
-- **Every query goes through a data-access layer that requires a tenant context.** No raw queries
-  in route handlers.
-- **Cross-tenant isolation tests are mandatory:** for every resource, a user of org A gets 404
-  (not 403) for org B's resources.
+- **Every query goes through a data-access layer that requires a tenant context:**
+  `forTenant(db, orgId)` in `src/api/db/tenant.ts` adds the organization to every query. Biome
+  blocks Drizzle and schema imports in `src/api` outside `src/api/db`, so handlers cannot run raw
+  queries.
+- **The database enforces it too:**
+  - every tenant-owned table has `org_id`, and children reference parents by
+    `(parent_id, org_id)` → `(id, org_id)`, so a row can never link to another organization;
+  - every unique index on a tenant table includes `org_id`, so a uniqueness error never reveals
+    another organization's data.
+- **Another organization's resource looks missing:** reads return nothing, writes throw
+  `NotFoundError`, and the API answers the same 404 as for a route that does not exist.
+- **Cross-tenant isolation tests are mandatory:** every resource is listed in
+  `test/api/tenant-isolation.test.ts` (get, list, update, delete, and links to another
+  organization).
 - **IDs** are random (UUIDv7), never sequential.
 - **Permission model:**
   - Capabilities are strings; roles are named sets of capabilities.
@@ -103,25 +113,35 @@ Verified 2026-10-06. Re-check before relying on them.
 
 ## Data model sketch
 
+Built (#7; `src/api/db/schema.ts` is the source of truth):
+
 ```
-organizations(id, name, slug, branding, settings)
+organizations(id, name, slug)
+users(id, username, full_name, email?, password_hash?, status)   -- global, one account for life
+memberships(id, org_id, user_id, course_id?, group_id?, role)     -- scope: org, course or group
+course_templates(id, org_id, title, owner_user_id?, version)     -- the coordinator's program
+courses(id, org_id, template_id?, title, academic_year, archived_at?)
+groups(id, org_id, course_id, name)
+labs(id, org_id, course_id, n, title, week?, summary?, position)
+lab_access(id, org_id, lab_id, group_id?, visible_from?, visible_until?, solutions_from?)
+sessions(id = sha256(token), user_id, expires_at, last_seen_at, user_agent?)
+```
+
+Planned:
+
+```
+organizations + branding, settings
 org_domains(org_id, domain, kind: staff|student, verified_at)
-users(id, username, full_name, email?, password_hash?, status, created_at)
-memberships(user_id, org_id, scope_type: org|course|group, scope_id, role)
-course_templates(id, org_id, title, owner_user_id, version)   -- the coordinator's program
-courses(id, org_id, template_id?, title, year, join_code, archived_at)
-groups(id, course_id, name, join_code)
-labs(id, course_id, n, title, week, summary, position)
-lab_access(lab_id, group_id?, visible_from, visible_until, solutions_from)
+join codes on groups (#10)
 notebooks(id, lab_id, kind: student|solution|extra, source_ipynb_ref, rendered_ref, sha256)
 notebook_cells(notebook_id, idx, type, html, outputs_json, interactive, embed)  -- FTS5 index on text
 files(id, org_id, name, mime, size, chunk_count) + file_chunks(file_id, n, data)
 submissions, exercise_results, live_sessions, ai_logs, analytics_events (later phases)
-sessions(id_hash, user_id, expires_at, last_seen_at, user_agent)
 login_attempts(key, window_start, count)
 ```
 
-Every table except users and sessions carries `org_id`, directly or through its parent.
+Every table except users and sessions carries `org_id` directly. Organizations see users only
+through memberships, and never their password hashes.
 
 ## Auth and sessions
 
