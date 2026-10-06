@@ -30,6 +30,9 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   simplicity for a very small team. State the decision with a one-line reason. Revisit a settled
   decision only when new facts appear. Record product decisions in the `platform-vision` decision
   log.
+- **Explain plainly:** say what something does for teaching or for the business, not just the
+  tech. Write to the owner in English; student-facing text is Albanian.
+- **Work smart:** prefer the solution that lasts over the quick one, without overbuilding.
 - **Git:**
   - No AI attribution anywhere: no `Co-Authored-By` trailers, no "Generated with" lines, no
     `claude/` branch names, and no mention of AI tools in commit or PR text.
@@ -39,6 +42,8 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   - CI must be green before merging. Merge with a merge commit, not squash, and delete the branch
     after.
   - Never force-push or rewrite history without an explicit OK.
+  - The owner cares about their GitHub profile, so real work flows through issues and PRs. Never
+    create artificial PRs.
   - Commit or push only when asked.
 - **Re-verify volatile facts** (prices, free-tier limits, grant dates) before relying on them.
 - **Keep the always-loaded context small and true:**
