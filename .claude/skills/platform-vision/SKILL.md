@@ -13,7 +13,7 @@ move, and get help in Albanian, while the pedagog controls what each student see
 - **Multi-tenant from day one:** universities, faculties and schools each get their own space.
 - **Free to run for one course;** institutions pay for the advanced layer.
 - **Pitch:** "Classroom shares files. This platform teaches."
-- **First tenant:** the "Struktura Diskrete & Algoritme" labs (this repo's `site/`). The first
+- **First tenant:** the "Struktura Diskrete & Algoritme" labs (the course repo's `site/`). The first
   pilot runs there.
 
 Related skills:
@@ -126,9 +126,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 
 - **2026-10-06:** vision agreed through brainstorming.
 - **2026-10-06:** private repo `goldenFlori/lab-platform` created at `~/Desktop/lab-platform`.
-  - Merged: PR #1 (React + Hono on Cloudflare Workers) and PR #2 (Biome, Vitest in workerd, CI).
+  - Merged: PR #1 (React + Hono on Cloudflare Workers), PR #2 (Biome, Vitest in workerd, CI) and
+    PR #3 (project guide and decision notes).
   - Phase 1 is tracked as GitHub issues in the "Phase 1: Foundation" milestone.
-- The current static site (`site/`) stays in production until phase 1 replaces it.
+- **Next:** #4, the database foundation (D1, Drizzle, migrations).
+- The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
+  phase 1 replaces it.
 
 ## Decision log
 
@@ -141,7 +144,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-06 | Domain → institution automatically; role → approval or invitation | Decided |
 | 2026-10-06 | Live coding with Pyodide in the browser; Live Labs on Durable Objects | Decided |
 | 2026-10-06 | AI designed in now, enabled in phase 4; never grades alone | Decided |
-| 2026-10-06 | Platform code in a new private repo; this course becomes the first tenant | Decided; creating the GitHub repo needs the user |
+| 2026-10-06 | Platform code in a new private repo; this course becomes the first tenant | Decided; repo created 2026-10-06 |
 
 Decisions were delegated to Claude ("you decide"). Record new ones here with the date.
 
@@ -150,4 +153,3 @@ Decisions were delegated to Claude ("you decide"). Record new ones here with the
 - Product name and domain.
 - Which email domains FSHN uses for staff and for students.
 - The university's IP policy for software built for teaching (check before selling).
-- When to create the private GitHub repo (start of phase 1).
