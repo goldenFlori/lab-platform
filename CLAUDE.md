@@ -6,7 +6,7 @@ private and proprietary; "Lab Platform" is a working name.
 
 ## Read first
 
-How the project started, the owner's goals and preferences, and where work stands:
+How the project started and who it is for:
 @docs/founding-session.md
 
 The product and technical decisions live in `.claude/skills/`:
@@ -30,6 +30,9 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   simplicity for a very small team. State the decision with a one-line reason. Revisit a settled
   decision only when new facts appear. Record product decisions in the `platform-vision` decision
   log.
+- **Explain plainly:** say what something does for teaching or for the business, not just the
+  tech. Write to the owner in English; student-facing text is Albanian.
+- **Work smart:** prefer the solution that lasts over the quick one, without overbuilding.
 - **Git:**
   - No AI attribution anywhere: no `Co-Authored-By` trailers, no "Generated with" lines, no
     `claude/` branch names, and no mention of AI tools in commit or PR text.
@@ -39,17 +42,15 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   - CI must be green before merging. Merge with a merge commit, not squash, and delete the branch
     after.
   - Never force-push or rewrite history without an explicit OK.
+  - The owner cares about their GitHub profile, so real work flows through issues and PRs. Never
+    create artificial PRs.
   - Commit or push only when asked.
 - **Re-verify volatile facts** (prices, free-tier limits, grant dates) before relying on them.
 - **Keep the always-loaded context small and true:**
   - After every merged PR that closes an issue, update the "Status" section of `platform-vision`:
     what's merged and what's next.
-  - `docs/founding-session.md` is a temporary handoff. Clean it up once 3 issues of "Phase 1:
-    Foundation" are closed, or as soon as any line in it is no longer true:
-    1. Move what is still useful elsewhere: status and open items go to `platform-vision`,
-       preferences to this file.
-    2. Shrink the handoff to the background only, or delete it and remove its `@` import above.
-    3. Do this in its own `docs/…` PR, and tell the owner what moved.
+  - `docs/founding-session.md` holds background only. Status, open items and preferences never go
+    there. Fix or remove any line in it that stops being true.
 
 ## Layout and commands
 
