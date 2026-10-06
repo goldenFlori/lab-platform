@@ -1,11 +1,29 @@
 <!doctype html>
-<html lang="sq">
+<html lang="sq" class="light" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lab Platform</title>
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f7f7fb" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#14141f" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script>
+      // Applies the theme before the first paint, so it never flashes. Same rules as src/web/lib/theme.ts.
+      (() => {
+        let stored = null;
+        try {
+          stored = localStorage.getItem('theme');
+        } catch {}
+        const dark = stored === 'dark' || (stored !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+        const root = document.documentElement;
+        root.classList.remove('light', 'dark');
+        root.classList.add(dark ? 'dark' : 'light');
+        root.dataset.theme = dark ? 'dark' : 'light';
+      })();
+    </script>
   </head>
-  <body>
+  <body class="min-h-dvh">
     <div id="root"></div>
     <script type="module" src="/src/web/main.tsx"></script>
   </body>
