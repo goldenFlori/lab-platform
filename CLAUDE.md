@@ -44,6 +44,7 @@ live in its git-ignored `zgjidhjet/`; never publish them.
 - `src/web`: the React SPA (Vite).
 - `src/api`: the Hono API on the Cloudflare Worker. One Worker serves both; `/api/*` always reaches
   the Worker.
+- `src/api/db`: the Drizzle schema and database access; `migrations/`: the generated SQL for D1.
 - `test/`: Vitest tests that run inside workerd.
 - Commands:
   - `npm install`: also generates the Worker types (`worker-configuration.d.ts`, git-ignored).
@@ -52,6 +53,9 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   - `npm run typecheck`
   - `npm test`
   - `npm run build`
+  - `npm run db:generate`: writes a migration from schema changes.
+  - `npm run db:migrate`: applies the migrations to the local database (also needed before
+    `npm run dev` the first time). Tests apply them on their own.
 
 ## Rules that bite
 
@@ -65,3 +69,6 @@ live in its git-ignored `zgjidhjet/`; never publish them.
 - **Every tenant-owned query goes through the tenant-scoped data layer.** Each new resource gets a
   cross-tenant isolation test.
 - **Rerun `npm run cf-typegen`** after changing bindings in `wrangler.jsonc`.
+- **Migrations are append-only.** Change the schema, run `npm run db:generate`, commit the new SQL.
+  Never edit or delete a migration once it is merged. CI fails if the schema and the migrations
+  disagree.

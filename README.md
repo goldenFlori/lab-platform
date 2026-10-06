@@ -13,7 +13,7 @@ roles. It is multi-tenant: every university or school gets its own space.
 |---|---|
 | App | React 19 + Vite 8 (single-page app) |
 | API | Hono on Cloudflare Workers |
-| Database | Cloudflare D1 (SQLite), from phase 1 |
+| Database | Cloudflare D1 (SQLite) through Drizzle ORM |
 | Language | TypeScript |
 | Quality | Biome (lint and format), Vitest running inside the Workers runtime, GitHub Actions CI |
 
@@ -22,8 +22,9 @@ roles. It is multi-tenant: every university or school gets its own space.
 Requirements: Node 24 (see `.nvmrc`) and npm 11.19 or newer.
 
 ```bash
-npm install     # also generates the Worker types
-npm run dev     # app and API on http://localhost:5173
+npm install         # also generates the Worker types
+npm run db:migrate  # creates the local database
+npm run dev         # app and API on http://localhost:5173
 ```
 
 ## Scripts
@@ -36,14 +37,18 @@ npm run dev     # app and API on http://localhost:5173
 | `npm run typecheck` | TypeScript project check |
 | `npm test` | Tests inside the Workers runtime |
 | `npm run build` | Production build |
+| `npm run db:generate` | Write a migration after changing `src/api/db/schema.ts` |
+| `npm run db:migrate` | Apply the migrations to the local database |
 | `npm run deploy` | Build and deploy to Cloudflare (needs a configured account) |
 
 ## Layout
 
 ```
-src/web/   React app
-src/api/   API (Cloudflare Worker, Hono)
-test/      Tests that run inside the Workers runtime
+src/web/      React app
+src/api/      API (Cloudflare Worker, Hono)
+src/api/db/   Database schema and access (Drizzle)
+migrations/   SQL migrations for D1
+test/         Tests that run inside the Workers runtime
 ```
 
 ## License
