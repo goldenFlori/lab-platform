@@ -13,5 +13,14 @@
     "not_found_handling": "single-page-application",
     // API requests always reach the Worker; everything else is the app.
     "run_worker_first": ["/api/*"]
-  }
+  },
+  // One shared database for all tenants. Locally it lives in .wrangler/state;
+  // the real database_id is added when the Cloudflare account exists (#6).
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "lab-platform",
+      "migrations_dir": "migrations"
+    }
+  ]
 }
