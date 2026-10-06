@@ -16,7 +16,8 @@
     "deploy": "npm run build && wrangler deploy",
     "lint": "biome check .",
     "format": "biome check --write .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:e2e": "playwright test"
   },
   "devEngines": {
     "runtime": {
