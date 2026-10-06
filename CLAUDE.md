@@ -47,8 +47,8 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   - Commit or push only when asked.
 - **Re-verify volatile facts** (prices, free-tier limits, grant dates) before relying on them.
 - **Keep the always-loaded context small and true:**
-  - After every merged PR that closes an issue, update the "Status" section of `platform-vision`:
-    what's merged and what's next.
+  - Every PR that closes an issue updates the "Status" section of `platform-vision` in its last
+    commit: what it completes and what's next. The status is then true the moment it merges.
   - `docs/founding-session.md` holds background only. Status, open items and preferences never go
     there. Fix or remove any line in it that stops being true.
 
