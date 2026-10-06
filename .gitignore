@@ -1,0 +1,19 @@
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+
+# Cloudflare local state and secrets
+.wrangler/
+.dev.vars*
+.env*
+
+# Tests
+test-results/
+playwright-report/
+
+# Logs, editors, OS
+*.log
+.idea/
+.vscode/
+.DS_Store
