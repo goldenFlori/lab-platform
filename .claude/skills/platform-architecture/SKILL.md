@@ -1,0 +1,187 @@
+---
+name: platform-architecture
+description: Technical architecture of the multi-tenant lab platform. Covers the stack (React SPA + Hono on Cloudflare Workers, D1, Durable Objects), the verified free-tier limits and the design rules they force, tenancy and the capability-based permission model, data model, auth/sessions, the notebook content pipeline, search, testing, deploy, backups and portability. Use when writing, reviewing or planning platform code, schema, auth, APIs or deployment.
+---
+
+# Platform architecture
+
+Product decisions live in `platform-vision`; this skill covers how to build it.
+
+## Stack
+
+| Layer | Choice |
+|---|---|
+| Frontend | React + TypeScript SPA (Vite), TanStack Router, TanStack Query, HeroUI v3 + Tailwind v4, lucide-react |
+| Notebook display | markdown-it + KaTeX + Shiki (same as `site/scripts/notebook.mjs`), DOMPurify on display, Plotly lazy-loaded |
+| Visualizations | The 13 React visualizers + kit from `site/src/viz/`, reused as-is |
+| API | Hono on Cloudflare Workers; Zod validation; typed client (Hono RPC) |
+| Database | Cloudflare D1 (SQLite) through Drizzle ORM; migrations in git |
+| Real-time | Durable Objects (SQLite-backed, WebSocket Hibernation) |
+| Python | Pyodide in a Web Worker (see `platform-live-coding`) |
+| AI | Provider-agnostic layer (see `platform-ai`) |
+| Email (phase 5) | Resend (free: 3,000 a month, 100 a day) |
+| Tooling | Wrangler + `@cloudflare/vite-plugin`, Vitest (`@cloudflare/vitest-pool-workers`), Playwright, Biome, GitHub Actions |
+
+- One Worker serves both the SPA's static assets and `/api/*`. Same origin means no CORS and
+  simple cookies.
+- Language: TypeScript everywhere.
+- Repo layout (`goldenFlori/lab-platform`, private):
+  - `src/web` (React SPA)
+  - `src/api` (Hono Worker)
+  - `test/` (Vitest inside workerd)
+  - Planned: `src/shared` (Zod schemas, types, capabilities), `src/notebook` (converter),
+    `src/viz` (visualizers), `migrations/` (D1).
+- Version pins with a reason:
+  - **Vitest 4.x:** `@cloudflare/vitest-pool-workers` 0.22 does not support Vitest 5 yet.
+  - **TypeScript 5.9:** TypeScript 7 (the native compiler) is out; upgrade deliberately, not in
+    passing.
+  - **`compatibility_date`:** never newer than the test runtime's workerd supports
+    (2026-08-22 today), otherwise the tests fail to start.
+
+## Free-tier limits
+
+Verified 2026-10-06. Re-check before relying on them.
+
+- **Workers:**
+  - 100,000 requests a day;
+  - 10 ms of CPU per request;
+  - 50 subrequests per request.
+- **D1:**
+  - 500 MB per database, 10 databases;
+  - 2 MB per row or BLOB, 100 KB per SQL statement;
+  - 50 queries per invocation;
+  - 5M rows read and 100k rows written per day;
+  - Time Travel point-in-time restore for 7 days.
+
+  Limits return errors and never bill.
+- **Durable Objects:**
+  - available on the free plan, SQLite backend only;
+  - 100,000 requests a day, 13,000 GB-s a day, 5 GB storage;
+  - incoming WebSocket messages count at a 20:1 ratio;
+  - hibernation is supported.
+- **R2:** 10 GB free, but **enabling it requires a payment method**. Avoid it until the paid phase.
+- **Workers Paid:**
+  - $5/month;
+  - 10M requests a month and 30M CPU-ms a month;
+  - D1: 25B rows read a month and 50M written; 30-day Time Travel.
+
+## Design rules forced by those limits
+
+- **The server only checks and stores.** Anything CPU-heavy runs in the browser:
+  - notebook conversion (in the uploader's browser);
+  - Python (Pyodide);
+  - rendering.
+- **Static assets are public by design.** Never put protected content in static assets. Lab
+  content comes from `/api` after a permission check.
+- **Files live in D1** as chunks of 2 MB or less until R2 is enabled (paid phase).
+- **One shared D1 database for all tenants,** with `org_id` on every tenant-owned table. A
+  database per tenant is only an option later, for large customers.
+- **Batch writes:** stay under 50 queries per request.
+  - Bulk student import is chunked by the client.
+  - Passwords are generated and hashed in the pedagog's browser. The plaintext only goes onto the
+    printed slips and never reaches the server.
+
+## Tenancy and permissions
+
+- **Every query goes through a data-access layer that requires a tenant context.** No raw queries
+  in route handlers.
+- **Cross-tenant isolation tests are mandatory:** for every resource, a user of org A gets 404
+  (not 403) for org B's resources.
+- **IDs** are random (UUIDv7), never sequential.
+- **Permission model:**
+  - Capabilities are strings; roles are named sets of capabilities.
+  - Memberships bind a user to a scope (institution, course or group) with a role.
+  - Middleware resolves capabilities per request.
+  - Example capabilities: `org.manage`, `staff.approve`, `course.manage`, `course.template.edit`,
+    `lab.publish`, `lab.view`, `solution.view`, `student.manage`, `submission.review`,
+    `grade.edit`, `live.host`, `ai.configure`, `analytics.view`.
+- **The UI may hide what a user can't do, but the API always enforces it.**
+
+## Data model sketch
+
+```
+organizations(id, name, slug, branding, settings)
+org_domains(org_id, domain, kind: staff|student, verified_at)
+users(id, username, full_name, email?, password_hash?, status, created_at)
+memberships(user_id, org_id, scope_type: org|course|group, scope_id, role)
+course_templates(id, org_id, title, owner_user_id, version)   -- the coordinator's program
+courses(id, org_id, template_id?, title, year, join_code, archived_at)
+groups(id, course_id, name, join_code)
+labs(id, course_id, n, title, week, summary, position)
+lab_access(lab_id, group_id?, visible_from, visible_until, solutions_from)
+notebooks(id, lab_id, kind: student|solution|extra, source_ipynb_ref, rendered_ref, sha256)
+notebook_cells(notebook_id, idx, type, html, outputs_json, interactive, embed)  -- FTS5 index on text
+files(id, org_id, name, mime, size, chunk_count) + file_chunks(file_id, n, data)
+submissions, exercise_results, live_sessions, ai_logs, analytics_events (later phases)
+sessions(id_hash, user_id, expires_at, last_seen_at, user_agent)
+login_attempts(key, window_start, count)
+```
+
+Every table except users and sessions carries `org_id`, directly or through its parent.
+
+## Auth and sessions
+
+Own module built from standard parts, following the Lucia / "Copenhagen Book" approach.
+
+- **Session token:**
+  - 32 random bytes; only its SHA-256 is stored.
+  - Sent as an HttpOnly, Secure, SameSite=Lax cookie.
+  - 30-day sliding expiry.
+- **Passwords:**
+  - PBKDF2-SHA256 through WebCrypto, with a per-user salt.
+  - The iteration count is tuned to fit the 10 ms CPU budget. Store the parameters with the hash
+    so they can be upgraded later.
+  - Generated passwords are 12 or more characters from an unambiguous alphabet.
+- **CSRF:** SameSite=Lax plus an `Origin` check on every mutation.
+- **Rate limiting:** login attempts are rate-limited per username and per IP (D1 counters).
+- **Later:** email one-time codes (Resend); Google/Microsoft OAuth (Arctic); passkeys.
+
+## Content pipeline
+
+- **Upload:** a pedagog uploads a `.ipynb`.
+  - Their browser converts it with the same rules as `site/scripts/notebook.mjs`, ported to
+    isomorphic TypeScript in `src/notebook`. GUI cells (pygame, tkinter, subprocess, widgets)
+    keep no outputs; errors, stderr and `⏳` lines are dropped.
+  - Rendered cells and the original are stored.
+- **Display:**
+  - Cell HTML is sanitized with DOMPurify before it is shown.
+  - Solution notebooks are served only with `solution.view`, or after `solutions_from`.
+- **Embeds** (cell → visualization + props) are stored as data. The admin UI edits them.
+- **Re-render all:** an admin action that re-converts the originals when the converter improves.
+
+## Search
+
+D1 FTS5 over cell text, joined with `lab_access` and the user's memberships. Results only include
+what the user may see. Pagefind is not used in the platform.
+
+## Quality, deploy, backups
+
+- **Tests:**
+  - Vitest in the Workers runtime: API, permissions, tenant isolation.
+  - Playwright end-to-end, porting the ideas from `site/scripts/qa.mjs`: every lab renders,
+    visualizations respond, mobile at 375px has no overflow, hydration is clean.
+  - Biome for lint and format.
+- **CI/CD:**
+  - GitHub Actions runs typecheck + tests, then `wrangler deploy` on `main`.
+  - Branches get preview versions.
+  - Migrations run with `wrangler d1 migrations apply`.
+- **Backups:**
+  - D1 Time Travel.
+  - A weekly `wrangler d1 export`, kept private. Never commit it, because it contains student
+    data.
+- **Observability:** Workers logs; Sentry's free tier later.
+
+## Portability
+
+- Hono runs on Node, Bun and Deno.
+- Drizzle supports Postgres.
+- Keep Cloudflare-specific code (D1, Durable Objects, AI, assets) behind small adapters, so
+  leaving Cloudflare is a port, not a rewrite.
+
+## Privacy
+
+- **Minimal personal data:** full name, username, optional email.
+- **Institutions own their data:** per-org export and delete.
+- **Data sent to AI:** only the question and the code or output context, never names.
+- **Before selling:** check the Albanian data-protection law (aligned with GDPR) and offer
+  institutions a data processing agreement.
