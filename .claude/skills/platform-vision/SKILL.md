@@ -129,7 +129,10 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   - Merged: PR #1 (React + Hono on Cloudflare Workers), PR #2 (Biome, Vitest in workerd, CI) and
     PR #3 (project guide and decision notes).
   - Phase 1 is tracked as GitHub issues in the "Phase 1: Foundation" milestone.
-- **Next:** #4, the database foundation (D1, Drizzle, migrations).
+- **2026-10-06:** #4 done. D1 with Drizzle and migrations, `organizations` as the first table,
+  database status in `/api/health` (PR #21). The founding handoff is merged (PR #20).
+- **Next:** #5, the app shell and design system. #6 (deploy) waits for the owner's Cloudflare
+  account.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
@@ -148,8 +151,16 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 
 Decisions were delegated to Claude ("you decide"). Record new ones here with the date.
 
-## Open questions
+## Open items
 
-- Product name and domain.
-- Which email domains FSHN uses for staff and for students.
-- The university's IP policy for software built for teaching (check before selling).
+- **Questions:**
+  - Product name and domain.
+  - Which email domains FSHN uses for staff and for students.
+  - The university's IP policy for software built for teaching (check before selling).
+- **Owner actions:**
+  - Turn on "Include private contributions on my profile" in the GitHub settings.
+  - Create a free Cloudflare account before #6 (deploy).
+- **Course repo:**
+  - Execute `bellman-ford-animated.ipynb`, the only notebook never run (3 s, 5 graph images).
+    Needs the owner's OK and a `MANIFEST.json` update.
+  - Two early commits there show another author. Leave them: rewriting them needs a force-push.
