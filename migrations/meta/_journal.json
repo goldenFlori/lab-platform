@@ -8,6 +8,13 @@
       "when": 1791320152044,
       "tag": "0000_organizations",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1791324983080,
+      "tag": "0001_core_data_model",
+      "breakpoints": true
     }
   ]
 }
