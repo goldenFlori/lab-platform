@@ -6,7 +6,7 @@ private and proprietary; "Lab Platform" is a working name.
 
 ## Read first
 
-How the project started, the owner's goals and preferences, and where work stands:
+How the project started and who it is for:
 @docs/founding-session.md
 
 The product and technical decisions live in `.claude/skills/`:
@@ -49,12 +49,8 @@ live in its git-ignored `zgjidhjet/`; never publish them.
 - **Keep the always-loaded context small and true:**
   - After every merged PR that closes an issue, update the "Status" section of `platform-vision`:
     what's merged and what's next.
-  - `docs/founding-session.md` is a temporary handoff. Clean it up once 3 issues of "Phase 1:
-    Foundation" are closed, or as soon as any line in it is no longer true:
-    1. Move what is still useful elsewhere: status and open items go to `platform-vision`,
-       preferences to this file.
-    2. Shrink the handoff to the background only, or delete it and remove its `@` import above.
-    3. Do this in its own `docs/…` PR, and tell the owner what moved.
+  - `docs/founding-session.md` holds background only. Status, open items and preferences never go
+    there. Fix or remove any line in it that stops being true.
 
 ## Layout and commands
 
