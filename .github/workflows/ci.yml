@@ -1,4 +1,4 @@
-# Lint, typecheck, test and build on every pull request and on main.
+# Lint, typecheck, test, build and end-to-end tests on every pull request and on main.
 name: CI
 
 on:
@@ -47,3 +47,37 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Route tree is committed and up to date
+        run: |
+          if [ -n "$(git status --porcelain src/web/routeTree.gen.ts)" ]; then
+            echo "::error::src/web/routeTree.gen.ts is out of date. Run 'npm run build' and commit it."
+            exit 1
+          fi
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end tests
+        run: npm run test:e2e
+
+      - name: Upload the report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

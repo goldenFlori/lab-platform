@@ -47,24 +47,27 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   - Commit or push only when asked.
 - **Re-verify volatile facts** (prices, free-tier limits, grant dates) before relying on them.
 - **Keep the always-loaded context small and true:**
-  - After every merged PR that closes an issue, update the "Status" section of `platform-vision`:
-    what's merged and what's next.
+  - Every PR that closes an issue updates the "Status" section of `platform-vision` in its last
+    commit: what it completes and what's next. The status is then true the moment it merges.
   - `docs/founding-session.md` holds background only. Status, open items and preferences never go
     there. Fix or remove any line in it that stops being true.
 
 ## Layout and commands
 
-- `src/web`: the React SPA (Vite).
+- `src/web`: the React SPA (Vite). Pages are files in `src/web/routes/` (TanStack Router); the
+  design tokens are in `src/web/styles.css`.
 - `src/api`: the Hono API on the Cloudflare Worker. One Worker serves both; `/api/*` always reaches
   the Worker.
 - `src/api/db`: the Drizzle schema and database access; `migrations/`: the generated SQL for D1.
-- `test/`: Vitest tests that run inside workerd.
+- `test/`: Vitest tests that run inside workerd; `e2e/`: Playwright tests against the production
+  build.
 - Commands:
   - `npm install`: also generates the Worker types (`worker-configuration.d.ts`, git-ignored).
   - `npm run dev`: app and API on http://localhost:5173.
   - `npm run lint` / `npm run format`: Biome.
   - `npm run typecheck`
   - `npm test`
+  - `npm run test:e2e`: desktop and a 375px phone (`npx playwright install chromium` once).
   - `npm run build`
   - `npm run db:generate`: writes a migration from schema changes.
   - `npm run db:migrate`: applies the migrations to the local database (also needed before
@@ -82,6 +85,8 @@ live in its git-ignored `zgjidhjet/`; never publish them.
 - **Every tenant-owned query goes through the tenant-scoped data layer.** Each new resource gets a
   cross-tenant isolation test.
 - **Rerun `npm run cf-typegen`** after changing bindings in `wrangler.jsonc`.
+- **`src/web/routeTree.gen.ts` is generated and committed.** Never edit it; after adding or
+  renaming a route, run `npm run dev` or `npm run build` and commit the result (CI checks).
 - **Migrations are append-only.** Change the schema, run `npm run db:generate`, commit the new SQL.
   Never edit or delete a migration once it is merged. CI fails if the schema and the migrations
   disagree.

@@ -131,8 +131,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   - Phase 1 is tracked as GitHub issues in the "Phase 1: Foundation" milestone.
 - **2026-10-06:** #4 done. D1 with Drizzle and migrations, `organizations` as the first table,
   database status in `/api/health` (PR #21). The founding handoff is merged (PR #20).
-- **Next:** #5, the app shell and design system. #6 (deploy) waits for the owner's Cloudflare
-  account.
+- **2026-10-07:** #5 done. App shell with the course site's design system (light and dark),
+  TanStack Router and Query, home, labs, 404 and error pages, and Playwright end-to-end tests in
+  CI on desktop and a 375px phone (PR #23).
+- **Next:** #7, the core data model with tenant isolation. #6 (deploy) waits for the owner's
+  Cloudflare account.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
