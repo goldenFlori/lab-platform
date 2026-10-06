@@ -6,6 +6,9 @@ private and proprietary; "Lab Platform" is a working name.
 
 ## Read first
 
+How the project started, the owner's goals and preferences, and where work stands:
+@docs/founding-session.md
+
 The product and technical decisions live in `.claude/skills/`:
 
 - `platform-vision`: the hub. Roles, sign-in, roadmap, status and decision log. Read it before any
