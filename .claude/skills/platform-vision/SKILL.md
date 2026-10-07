@@ -140,7 +140,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-07:** #6 done. Live at https://lab-platform.florjanimema.workers.dev; merges to
   `main` deploy after every check passes, with migrations first. The database is in the EU
   jurisdiction, with weekly encrypted backups (PR #25).
-- **2026-10-08:** #8 done. Username and password sign-in with an Albanian login page, secure
+- **2026-10-07:** #8 done. Username and password sign-in with an Albanian login page, secure
   30-day sessions, brute-force limits and a script for an organization's first account
   (PR #26).
 - **Next:** #9, roles and capabilities.
