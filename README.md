@@ -43,6 +43,7 @@ For the end-to-end tests, install the browser once with `npx playwright install 
 | `npm run build` | Production build |
 | `npm run db:generate` | Write a migration after changing `src/api/db/schema.ts` |
 | `npm run db:migrate` | Apply the migrations to the local database |
+| `npm run account:create` | Create an organization's first account (see below) |
 | `npm run deploy` | Build and deploy from this machine (needs `npx wrangler login`); merges to `main` deploy on their own |
 
 ## Layout
@@ -55,6 +56,18 @@ migrations/   SQL migrations for D1
 test/         Tests that run inside the Workers runtime
 e2e/          End-to-end tests (Playwright, against the production build)
 ```
+
+## First account
+
+Everyone signs in with a username and password. An organization's first account is created from
+the command line. The password is generated, shown once, and only its hash is stored:
+
+```bash
+npm run account:create -- --org-slug fshn --org-name "FSHN" \
+  --username florjan.mema --full-name "Florjan Mema" --role admin --remote
+```
+
+Leave out `--remote` to create it in the local database for `npm run dev`.
 
 ## Deploy
 
