@@ -161,9 +161,12 @@ Built in #8: `src/api/auth/`, data access in `src/api/db/auth.ts`, routes in
   - PBKDF2-SHA256 through WebCrypto, 16-byte salt per hash, NFC-normalized input.
   - Stored as `pbkdf2-sha256$<iterations>$<salt>$<hash>`. A hash with old parameters is
     replaced at the next successful sign-in.
-  - 40,000 iterations: about 3 ms on an Apple M4 (100,000 would take about 7 ms, too close
-    to the 10 ms budget). Cloudflare caps PBKDF2 at 100,000. Strength comes mostly from the
-    passwords: generated ones are 12 or more characters from an unambiguous alphabet.
+  - 15,000 iterations. PBKDF2 runs about 3 times slower on Cloudflare than on an Apple M4: at
+    40,000, a login took 8-11 ms of CPU in production (20 ms cold), against the 10 ms budget.
+    15,000 keeps it near 4-5 ms. Cloudflare caps PBKDF2 at 100,000. Strength comes mostly from
+    the passwords: generated ones are 12 or more characters from an unambiguous alphabet.
+  - Check CPU time with `npx wrangler tail lab-platform --format json` (`cpuTime`) after
+    changing anything on the sign-in path.
   - Unknown usernames are checked against a decoy hash, so they cost the same time as a wrong
     password, and the answer is the same.
 - **CSRF:** SameSite=Lax plus an `Origin` check on every mutation (`sameOrigin` middleware).
