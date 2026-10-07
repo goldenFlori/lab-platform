@@ -120,6 +120,9 @@ Verified 2026-10-06. Re-check before relying on them.
     missing capability answers 403.
   - `GET /api/orgs/:org/access` gives the app the user's capabilities by scope, for hiding
     actions.
+  - Give teaching roles at course or group scope. An organization-wide role reaches every course:
+    an organization-wide student would see all of them. So students get group memberships, by
+    join code or by import (#11).
   - Built-in templates (the specification is `ROLES` in `test/api/roles.test.ts`):
 
     | Capability | admin | coordinator | pedagog | assistant | student |
@@ -132,6 +135,27 @@ Verified 2026-10-06. Re-check before relying on them.
     | `lab.view` | | ✓ | ✓ | ✓ | ✓ |
     | `submission.create` | | | | | ✓ |
 - **The UI may hide what a user can't do, but the API always enforces it.**
+
+## Courses, groups and joining
+
+Built in #10, under `/api/orgs/:org/courses` (`src/api/routes/courses.ts`).
+
+- **Seeing a course:** staff of the course (`lab.view` or `course.manage` in it) or a student of
+  one of its groups. Everyone else gets 404, as for a course that does not exist.
+- **Creating** needs `course.create`, and the creator becomes the course's pedagog.
+  `copyFromCourseId` copies last year's labs and template, but not its groups, members or
+  visibility. The course, its pedagog and its labs are written in one batch.
+- **Groups** (`course.manage`) each get a join code: 8 characters from an alphabet without
+  look-alikes, shown as `XXXX-XXXX` (`src/shared/join-code.ts`).
+  - Whoever may manage the group's students sees the code. They can replace it, which kills
+    the old one at once, or switch joining off (`join_code` null).
+  - Codes are unique across the platform: the code alone finds the group.
+- **Joining** (`POST /api/join`): a signed-in user with a valid code becomes a student of that
+  group, even in another organization, because the code is the invitation. Joining twice
+  changes nothing. Codes of archived courses stop working. 10 wrong codes per user in
+  15 minutes, then 429.
+- **Archiving** (`course.manage`) ends the year: the course stays readable and is listed after
+  the current ones. It can be undone.
 
 ## Data model sketch
 
