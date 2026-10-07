@@ -6,6 +6,8 @@
 export const LOGIN_WINDOW_SECONDS = 15 * 60;
 export const MAX_FAILURES_PER_USERNAME = 10;
 export const MAX_FAILURES_PER_IP = 100;
+/** Wrong join codes per user: plenty for typos, useless for guessing among 850 billion codes. */
+export const MAX_JOIN_FAILURES = 10;
 
 /** Windows that started at or before this moment have ended. */
 export function windowCutoff(now: Date) {
