@@ -137,8 +137,10 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-07:** #7 done. Core data model (global users, memberships, templates, courses,
   groups, labs, lab access, sessions), the tenant-scoped data layer `forTenant()`, and
   cross-tenant isolation enforced by the database and proven by tests (PR #24).
-- **Next:** #8, accounts and sessions (username and password login). #6 (deploy) waits for the
-  owner's Cloudflare account.
+- **2026-10-07:** #6 done. Live at https://lab-platform.florjanimema.workers.dev; merges to
+  `main` deploy after every check passes, with migrations first. The database is in the EU
+  jurisdiction, with weekly encrypted backups (PR #25).
+- **Next:** #8, accounts and sessions (username and password login).
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
