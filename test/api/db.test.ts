@@ -2,6 +2,16 @@ import { env } from 'cloudflare:workers';
 import { describe, expect, it } from 'vitest';
 import { seedOrganization } from './fixtures';
 
+/** The database's own message for a rejected query (Drizzle keeps it as the cause). */
+async function databaseError(query: Promise<unknown>) {
+  try {
+    await query;
+  } catch (error) {
+    return String((error as Error).cause ?? error);
+  }
+  throw new Error('The query was expected to fail');
+}
+
 describe('database', () => {
   it('applies the migrations inside workerd', async () => {
     const { results } = await env.DB.prepare('select name from d1_migrations order by id').all<{ name: string }>();
@@ -42,15 +52,19 @@ describe('users', () => {
 describe('memberships', () => {
   it('allows one role per user and scope', async () => {
     const { tenant, user, course } = await seedOrganization('fshn');
-    await expect(tenant.memberships.create({ userId: user.id, role: 'admin' })).rejects.toThrow();
-    await expect(tenant.memberships.create({ userId: user.id, courseId: course.id, role: 'x' })).rejects.toThrow();
+    expect(await databaseError(tenant.memberships.create({ userId: user.id, role: 'admin' }))).toMatch(/UNIQUE/);
+    expect(
+      await databaseError(tenant.memberships.create({ userId: user.id, courseId: course.id, role: 'coordinator' })),
+    ).toMatch(/UNIQUE/);
   });
 
   it('belongs to the organization, a course or a group, never both a course and a group', async () => {
     const { tenant, user, course, group } = await seedOrganization('fshn');
-    await expect(
-      tenant.memberships.create({ userId: user.id, courseId: course.id, groupId: group.id, role: 'x' }),
-    ).rejects.toThrow();
+    expect(
+      await databaseError(
+        tenant.memberships.create({ userId: user.id, courseId: course.id, groupId: group.id, role: 'assistant' }),
+      ),
+    ).toMatch(/CHECK/);
     expect(await tenant.memberships.create({ userId: user.id, groupId: group.id, role: 'assistant' })).toMatchObject({
       groupId: group.id,
       courseId: null,
