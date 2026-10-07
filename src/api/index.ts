@@ -5,6 +5,7 @@ import type { AppEnv } from './env';
 import { handleError, notFound } from './errors';
 import { sameOrigin } from './middleware/same-origin';
 import { authRoutes, meRoutes } from './routes/auth';
+import { orgRoutes } from './routes/orgs';
 
 export const app = new Hono<AppEnv>().basePath('/api');
 
@@ -20,6 +21,7 @@ app.get('/health', async (c) => {
 
 app.route('/auth', authRoutes);
 app.route('/me', meRoutes);
+app.route('/orgs', orgRoutes);
 
 export default {
   fetch: app.fetch,

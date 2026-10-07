@@ -102,13 +102,35 @@ Verified 2026-10-06. Re-check before relying on them.
   `test/api/tenant-isolation.test.ts` (get, list, update, delete, and links to another
   organization).
 - **IDs** are random (UUIDv7), never sequential.
-- **Permission model:**
-  - Capabilities are strings; roles are named sets of capabilities.
-  - Memberships bind a user to a scope (institution, course or group) with a role.
-  - Middleware resolves capabilities per request.
-  - Example capabilities: `org.manage`, `staff.approve`, `course.manage`, `course.template.edit`,
-    `lab.publish`, `lab.view`, `solution.view`, `student.manage`, `submission.review`,
-    `grade.edit`, `live.host`, `ai.configure`, `analytics.view`.
+- **Permission model** (built in #9):
+  - Capabilities are strings in `src/shared/capabilities.ts`: code checks them, so a new
+    capability needs code.
+  - Roles are rows in `roles` (key, name, capabilities as JSON), so a new role needs no code.
+    The built-in templates are seeded by migration 0003. Changing one means a new migration.
+  - A membership gives its role in one scope:
+    - the organization: everywhere in it;
+    - a course: that course and all its groups;
+    - a group: that group only.
+  - Organization routes live under `/api/orgs/:org` (the slug). The `tenantAccess` middleware
+    resolves the organization, `c.var.tenant` (`forTenant`) and `c.var.access` from the user's
+    memberships, read on every request. A non-member gets the same 404 as a missing
+    organization.
+  - Checks: `requireCapability(cap, target)`, or `c.var.access.can(cap, { courseId, groupId })`
+    once the resource is loaded. Always pass the course of a group, so course roles apply. A
+    missing capability answers 403.
+  - `GET /api/orgs/:org/access` gives the app the user's capabilities by scope, for hiding
+    actions.
+  - Built-in templates (the specification is `ROLES` in `test/api/roles.test.ts`):
+
+    | Capability | admin | coordinator | pedagog | assistant | student |
+    |---|---|---|---|---|---|
+    | `org.manage`, `staff.approve` | ✓ | | | | |
+    | `analytics.view`, `course.create` | ✓ | ✓ | ✓ | | |
+    | `course.template.edit` | | ✓ | | | |
+    | `course.manage`, `lab.publish`, `grade.edit`, `ai.configure` | | ✓ | ✓ | | |
+    | `solution.view`, `student.manage`, `submission.review`, `live.host` | | ✓ | ✓ | ✓ | |
+    | `lab.view` | | ✓ | ✓ | ✓ | ✓ |
+    | `submission.create` | | | | | ✓ |
 - **The UI may hide what a user can't do, but the API always enforces it.**
 
 ## Data model sketch

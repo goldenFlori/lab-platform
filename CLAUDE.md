@@ -92,6 +92,9 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   Drizzle and schema imports elsewhere in `src/api`. A new tenant table needs `org_id`,
   `(parent_id, org_id)` foreign keys, `org_id` in every unique index, and an entry in
   `test/api/tenant-isolation.test.ts`.
+- **Every organization route checks a capability.** It lives under `/api/orgs/:org` behind
+  `tenantAccess` and uses `requireCapability` or `c.var.access.can(…)`, passing the resource's
+  course and group. Add a test for who may and who may not.
 - **Rerun `npm run cf-typegen`** after changing bindings in `wrangler.jsonc`.
 - **`src/web/routeTree.gen.ts` is generated and committed.** Never edit it; after adding or
   renaming a route, run `npm run dev` or `npm run build` and commit the result (CI checks).

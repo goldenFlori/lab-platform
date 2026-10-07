@@ -55,7 +55,7 @@ Related skills:
 
 - Roles are templates over capabilities, so new roles (for example an observer) can be added
   without code changes.
-- See `platform-architecture` for the capability list.
+- See `platform-architecture` for the capabilities of each role (decided 2026-10-08).
 
 ## Getting in (decided)
 
@@ -143,7 +143,9 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-07:** #8 done. Username and password sign-in with an Albanian login page, secure
   30-day sessions, brute-force limits and a script for an organization's first account
   (PR #26).
-- **Next:** #9, roles and capabilities.
+- **2026-10-08:** #9 done. Role templates stored as data, capabilities resolved per request from
+  memberships in their scope, enforced by the API and proven per role by tests (PR #29).
+- **Next:** #10, courses and groups with join codes.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
@@ -162,6 +164,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-07 | Users are global accounts, one for life; organizations reach them only through memberships; usernames are unique platform-wide | Decided |
 | 2026-10-07 | Student data stays in the EU: the production database uses D1's EU jurisdiction (fixed at creation) | Decided |
 | 2026-10-07 | Weekly backups are encrypted with the owner's key before leaving Cloudflare; GitHub keeps only ciphertext, for 90 days | Decided |
+| 2026-10-08 | Capabilities of the built-in roles (matrix in platform-architecture): the admin runs the institution, not courses; teaching staff get course rights where they are assigned; students view labs and submit | Decided |
 
 Decisions were delegated to Claude ("you decide"). Record new ones here with the date.
 
