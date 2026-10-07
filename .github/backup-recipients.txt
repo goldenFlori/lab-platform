@@ -1,0 +1,4 @@
+# Public age key of the owner (Florjan Mema). Weekly backups are encrypted for it, so only the
+# matching private key, kept in the owner's password manager, can open them. Public keys are safe
+# to commit; the private key never goes anywhere near this repository.
+age1j303gwdcchvs2s4vn9m5aym7y05rddczwzhhpt68y20an2y65gmsw2l23z
