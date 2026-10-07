@@ -234,3 +234,16 @@ export const loginAttempts = sqliteTable(
   },
   (t) => [index('login_attempts_window_idx').on(t.windowStart)],
 );
+
+/**
+ * Role templates: a named set of capabilities (src/shared/capabilities.ts), referenced by
+ * memberships.role. Roles are data, so a new role is a new row, not new code. The built-in ones
+ * (admin, coordinator, pedagog, assistant, student) are seeded by migration 0003.
+ */
+export const roles = sqliteTable('roles', {
+  key: text('key').primaryKey(),
+  name: text('name').notNull(),
+  /** JSON array of capability strings. */
+  capabilities: text('capabilities', { mode: 'json' }).$type<string[]>().notNull(),
+  position: integer('position').notNull(),
+});
