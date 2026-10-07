@@ -1,5 +1,9 @@
-import { applyD1Migrations } from 'cloudflare:test';
+import { applyD1Migrations, reset } from 'cloudflare:test';
 import { env } from 'cloudflare:workers';
+import { beforeEach } from 'vitest';
 
-// Runs before every test file: brings the test database up to the latest migration.
-await applyD1Migrations(env.DB, env.TEST_MIGRATIONS);
+// Every test starts from an empty database at the latest migration, so tests never depend on each other.
+beforeEach(async () => {
+  await reset();
+  await applyD1Migrations(env.DB, env.TEST_MIGRATIONS);
+});

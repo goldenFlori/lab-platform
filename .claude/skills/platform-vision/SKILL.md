@@ -134,8 +134,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-07:** #5 done. App shell with the course site's design system (light and dark),
   TanStack Router and Query, home, labs, 404 and error pages, and Playwright end-to-end tests in
   CI on desktop and a 375px phone (PR #23).
-- **Next:** #7, the core data model with tenant isolation. #6 (deploy) waits for the owner's
-  Cloudflare account.
+- **2026-10-07:** #7 done. Core data model (global users, memberships, templates, courses,
+  groups, labs, lab access, sessions), the tenant-scoped data layer `forTenant()`, and
+  cross-tenant isolation enforced by the database and proven by tests (PR #24).
+- **Next:** #8, accounts and sessions (username and password login). #6 (deploy) waits for the
+  owner's Cloudflare account.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
@@ -151,6 +154,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-06 | Live coding with Pyodide in the browser; Live Labs on Durable Objects | Decided |
 | 2026-10-06 | AI designed in now, enabled in phase 4; never grades alone | Decided |
 | 2026-10-06 | Platform code in a new private repo; this course becomes the first tenant | Decided; repo created 2026-10-06 |
+| 2026-10-07 | Users are global accounts, one for life; organizations reach them only through memberships; usernames are unique platform-wide | Decided |
 
 Decisions were delegated to Claude ("you decide"). Record new ones here with the date.
 
