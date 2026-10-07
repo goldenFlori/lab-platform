@@ -59,6 +59,8 @@ live in its git-ignored `zgjidhjet/`; never publish them.
 - `src/api`: the Hono API on the Cloudflare Worker. One Worker serves both; `/api/*` always reaches
   the Worker.
 - `src/api/db`: the Drizzle schema and database access; `migrations/`: the generated SQL for D1.
+- `src/shared`: request and response shapes for both sides. The app imports only types, which
+  keeps Zod out of its bundle.
 - `test/`: Vitest tests that run inside workerd, each on an empty migrated database (seed with
   `test/api/fixtures.ts`); `e2e/`: Playwright tests against the production build.
 - Commands:
@@ -74,6 +76,8 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   - `npm run db:generate`: writes a migration from schema changes.
   - `npm run db:migrate`: applies the migrations to the local database (also needed before
     `npm run dev` the first time). Tests apply them on their own.
+  - `npm run account:create -- …`: an organization's first account; prints its password once
+    (see the README). The end-to-end tests use it on their own database in `.wrangler/e2e`.
 
 ## Rules that bite
 

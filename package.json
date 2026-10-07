@@ -13,6 +13,7 @@
     "cf-typegen": "wrangler types",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "wrangler d1 migrations apply DB --local",
+    "account:create": "node scripts/create-account.ts",
     "deploy": "npm run build && wrangler deploy",
     "lint": "biome check .",
     "format": "biome check --write .",
@@ -36,6 +37,7 @@
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@heroui/react": "^3.2.6",
     "@heroui/styles": "^3.2.6",
+    "@hono/zod-validator": "^0.9.1",
     "@internationalized/date": "^3.12.4",
     "@react-aria/ssr": "^3.10.1",
     "@react-aria/utils": "^3.34.1",
@@ -47,7 +49,8 @@
     "react": "^19.3.0",
     "react-aria": "^3.52.1",
     "react-aria-components": "^1.21.1",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",

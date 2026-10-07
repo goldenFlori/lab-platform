@@ -14,7 +14,7 @@ test('the home page shows the shell', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Kreu' })).toBeVisible();
 });
 
-test('navigation opens the labs page without a full reload', async ({ page, isMobile }) => {
+test('the labs link asks a signed-out visitor to sign in, without a full reload', async ({ page, isMobile }) => {
   await page.goto('/');
   await page.evaluate(() => {
     (window as unknown as { loadedOnce: boolean }).loadedOnce = true;
@@ -27,9 +27,9 @@ test('navigation opens the labs page without a full reload', async ({ page, isMo
     await page.getByRole('navigation', { name: 'Navigimi kryesor' }).getByRole('link', { name: 'Laboratorët' }).click();
   }
 
-  await expect(page).toHaveURL('/labs');
-  await expect(page.getByRole('heading', { level: 1, name: 'Laboratorët' })).toBeVisible();
-  await expect(page).toHaveTitle('Laboratorët · Lab Platform');
+  await expect(page).toHaveURL('/login?redirect=%2Flabs');
+  await expect(page.getByRole('heading', { level: 1, name: 'Hyr në llogari' })).toBeVisible();
+  await expect(page).toHaveTitle('Hyr · Lab Platform');
   expect(await page.evaluate(() => (window as unknown as { loadedOnce?: boolean }).loadedOnce)).toBe(true);
 });
 
@@ -60,7 +60,7 @@ test('the theme toggle switches the theme and remembers it', async ({ page }) =>
   await expect(html).toHaveAttribute('data-theme', 'dark');
 });
 
-for (const path of ['/', '/labs', '/does-not-exist']) {
+for (const path of ['/', '/login', '/does-not-exist']) {
   test(`no horizontal overflow on ${path}`, async ({ page }) => {
     await page.goto(path);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();

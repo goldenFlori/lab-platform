@@ -140,7 +140,10 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-07:** #6 done. Live at https://lab-platform.florjanimema.workers.dev; merges to
   `main` deploy after every check passes, with migrations first. The database is in the EU
   jurisdiction, with weekly encrypted backups (PR #25).
-- **Next:** #8, accounts and sessions (username and password login).
+- **2026-10-07:** #8 done. Username and password sign-in with an Albanian login page, secure
+  30-day sessions, brute-force limits and a script for an organization's first account
+  (PR #26).
+- **Next:** #9, roles and capabilities.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
