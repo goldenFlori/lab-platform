@@ -15,7 +15,8 @@ export default defineConfig({
     }),
     react(),
     tailwindcss(),
-    cloudflare(),
+    // LOCAL_STATE points dev or preview at another local database folder (the end-to-end tests use one).
+    cloudflare({ persistState: process.env.LOCAL_STATE ? { path: process.env.LOCAL_STATE } : true }),
   ],
   build: {
     // Budget for the app shell (React, React Aria, TanStack): about 540 kB today. Raise it deliberately.
