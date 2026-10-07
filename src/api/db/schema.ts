@@ -91,6 +91,12 @@ export const groups = sqliteTable(
     orgId: orgId(),
     courseId: text('course_id').notNull(),
     name: text('name').notNull(),
+    /**
+     * What students type (or scan) to join; null while joining is switched off. Unique across the
+     * platform, unlike other tenant indexes: the code alone finds the group. Codes are random and
+     * made by the server, so a collision reveals nothing anyone could choose to probe.
+     */
+    joinCode: text('join_code').unique(),
     createdAt: createdAt(),
   },
   (t) => [

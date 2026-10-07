@@ -1,4 +1,4 @@
-import { and, eq, type InferInsertModel, type InferSelectModel, inArray, type SQL } from 'drizzle-orm';
+import { and, asc, eq, type InferInsertModel, type InferSelectModel, inArray, type SQL } from 'drizzle-orm';
 import { roleExists } from './access';
 import { uuidv7 } from './ids';
 import type { Db } from './index';
@@ -175,6 +175,58 @@ function tenantMemberships(db: Db, orgId: string, members: ReturnType<typeof ten
   };
 }
 
+/** Courses, plus creating one together with its first pedagog and, when copying, last year's labs. */
+function tenantCourses(db: Db, orgId: string) {
+  const base = tenantTable(db, orgId, courses);
+  return {
+    ...base,
+    async createFor(creatorId: string, values: { title: string; academicYear: string }, copyFromId?: string) {
+      const source = copyFromId ? await base.get(copyFromId) : undefined;
+      if (copyFromId && !source) throw new NotFoundError('Course not found');
+      const sourceLabs = source
+        ? await db
+            .select()
+            .from(labs)
+            .where(and(eq(labs.orgId, orgId), eq(labs.courseId, source.id)))
+            .orderBy(asc(labs.position))
+        : [];
+
+      const id = uuidv7();
+      const course = db.insert(courses).values({ ...values, id, orgId, templateId: source?.templateId ?? null });
+      const creator = db
+        .insert(memberships)
+        .values({ id: uuidv7(), orgId, userId: creatorId, courseId: id, role: 'pedagog' });
+      const copiedLabs = sourceLabs.map(({ n, title, week, summary, position }) => ({
+        id: uuidv7(),
+        orgId,
+        courseId: id,
+        n,
+        title,
+        week,
+        summary,
+        position,
+      }));
+      // One batch: the course, its pedagog and its labs exist together or not at all.
+      if (copiedLabs.length > 0) await db.batch([course, creator, db.insert(labs).values(copiedLabs)]);
+      else await db.batch([course, creator]);
+
+      const created = await base.get(id);
+      if (!created) throw new Error('The new course could not be read back');
+      return created;
+    },
+  };
+}
+
+function tenantGroups(db: Db, orgId: string) {
+  const base = tenantTable(db, orgId, groups);
+  return {
+    ...base,
+    ofCourse(courseId: string) {
+      return base.list(eq(groups.courseId, courseId));
+    },
+  };
+}
+
 export function forTenant(db: Db, orgId: string) {
   const members = tenantUsers(db, orgId);
   return {
@@ -182,8 +234,8 @@ export function forTenant(db: Db, orgId: string) {
     users: members,
     memberships: tenantMemberships(db, orgId, members),
     courseTemplates: tenantTable(db, orgId, courseTemplates),
-    courses: tenantTable(db, orgId, courses),
-    groups: tenantTable(db, orgId, groups),
+    courses: tenantCourses(db, orgId),
+    groups: tenantGroups(db, orgId),
     labs: tenantTable(db, orgId, labs),
     labAccess: tenantTable(db, orgId, labAccess),
   };

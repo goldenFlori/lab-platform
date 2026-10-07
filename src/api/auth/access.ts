@@ -30,6 +30,13 @@ export class Access {
     );
   }
 
+  /** May the user do this in the course itself or in any of its groups (e.g. a student in their group)? */
+  canInCourse(capability: Capability, courseId: string, groupIds: readonly string[]): boolean {
+    return (
+      this.can(capability, { courseId }) || groupIds.some((groupId) => this.can(capability, { courseId, groupId }))
+    );
+  }
+
   /** May the user do this somewhere in the organization? For showing an entry point, not for allowing it. */
   canSomewhere(capability: Capability): boolean {
     return this.grants.some((grant) => grant.capabilities.includes(capability));
