@@ -143,7 +143,9 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-07:** #8 done. Username and password sign-in with an Albanian login page, secure
   30-day sessions, brute-force limits and a script for an organization's first account
   (PR #26).
-- **Next:** #9, roles and capabilities.
+- **2026-10-08:** #9 done. Role templates stored as data, capabilities resolved per request from
+  memberships in their scope, enforced by the API and proven per role by tests (PR #29).
+- **Next:** #10, courses and groups with join codes.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
