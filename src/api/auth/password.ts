@@ -4,9 +4,9 @@
 // Stored format: pbkdf2-sha256$<iterations>$<salt, base64>$<hash, base64>. The parameters travel
 // with each hash, so raising the iteration count later upgrades every account at its next login.
 //
-// Cost: the free plan allows 10 ms of CPU per request. On Cloudflare, 40,000 iterations made a
-// login take 8-11 ms (measured in production on 2026-10-08, about 3 times an Apple M4), so
-// 15,000 keeps a login near 4-5 ms. Strength comes mostly from the passwords themselves:
+// Cost: the free plan allows 10 ms of CPU per request. Measured in production (2026-10-08): a
+// warm login takes 5-7 ms of CPU at 15,000 iterations (8-11 ms at 40,000), most of it the rest
+// of the request rather than the hash. Strength comes mostly from the passwords themselves:
 // pedagog-issued passwords are 12+ random characters, far beyond any offline guessing.
 
 const ALGORITHM = 'pbkdf2-sha256';
