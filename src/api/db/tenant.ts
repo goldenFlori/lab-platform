@@ -1,4 +1,5 @@
 import { and, eq, type InferInsertModel, type InferSelectModel, inArray, type SQL } from 'drizzle-orm';
+import { roleExists } from './access';
 import { uuidv7 } from './ids';
 import type { Db } from './index';
 import { courses, courseTemplates, groups, labAccess, labs, memberships, users } from './schema';
@@ -13,6 +14,18 @@ export class NotFoundError extends Error {
     super(message);
     this.name = 'NotFoundError';
   }
+}
+
+/** The request asks for something impossible, such as a role that does not exist. Handlers answer 400. */
+export class InvalidInputError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'InvalidInputError';
+  }
+}
+
+async function assertRole(db: Db, role: string) {
+  if (!(await roleExists(db, role))) throw new InvalidInputError(`Unknown role: ${role}`);
 }
 
 type TenantTable =
@@ -132,6 +145,7 @@ function tenantUsers(db: Db, orgId: string) {
 
     /** Creates the account and its membership in this organization together. */
     async create(values: NewUser, role: string): Promise<TenantUser> {
+      await assertRole(db, role);
       const id = uuidv7();
       await db.batch([
         db.insert(users).values({ ...values, id, username: values.username.toLowerCase() }),
@@ -151,7 +165,12 @@ function tenantMemberships(db: Db, orgId: string, members: ReturnType<typeof ten
     ...base,
     async create(values: NewRow<typeof memberships>) {
       if (!(await members.get(values.userId))) throw new NotFoundError('User not found');
+      await assertRole(db, values.role);
       return base.create(values);
+    },
+    async update(id: string, changes: Changes<typeof memberships>) {
+      if (changes.role !== undefined) await assertRole(db, changes.role);
+      return base.update(id, changes);
     },
   };
 }
