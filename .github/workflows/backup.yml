@@ -1,0 +1,52 @@
+# Weekly backup of the production database, on top of D1's 7-day Time Travel.
+# The export is encrypted for the owner's age key before it leaves the runner, so GitHub only ever
+# stores a file it cannot read, and student data stays protected outside the EU. Restore: README.
+name: Backup
+
+on:
+  schedule:
+    - cron: '0 3 * * 1' # Mondays, 03:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install
+        run: |
+          npm ci
+          sudo apt-get update -qq && sudo apt-get install -y -qq age
+
+      - name: Export and encrypt
+        run: |
+          set -euo pipefail
+          umask 077
+          name="lab-platform-$(date -u +%Y-%m-%d).sql"
+          npx wrangler d1 export DB --remote --output "$RUNNER_TEMP/$name"
+          age --encrypt --recipients-file .github/backup-recipients.txt --output "$name.age" "$RUNNER_TEMP/$name"
+          rm "$RUNNER_TEMP/$name"
+          echo "BACKUP=$name.age" >> "$GITHUB_ENV"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BACKUP }}
+          path: ${{ env.BACKUP }}
+          retention-days: 90
+          if-no-files-found: error

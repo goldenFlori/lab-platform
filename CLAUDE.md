@@ -69,6 +69,8 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   - `npm test`
   - `npm run test:e2e`: desktop and a 375px phone (`npx playwright install chromium` once).
   - `npm run build`
+  - `npm run deploy`: only to create the Worker or in an emergency. Merges to `main` deploy on
+    their own after CI passes.
   - `npm run db:generate`: writes a migration from schema changes.
   - `npm run db:migrate`: applies the migrations to the local database (also needed before
     `npm run dev` the first time). Tests apply them on their own.
@@ -89,6 +91,9 @@ live in its git-ignored `zgjidhjet/`; never publish them.
 - **Rerun `npm run cf-typegen`** after changing bindings in `wrangler.jsonc`.
 - **`src/web/routeTree.gen.ts` is generated and committed.** Never edit it; after adding or
   renaming a route, run `npm run dev` or `npm run build` and commit the result (CI checks).
-- **Migrations are append-only.** Change the schema, run `npm run db:generate`, commit the new SQL.
-  Never edit or delete a migration once it is merged. CI fails if the schema and the migrations
-  disagree.
+- **Migrations are append-only and additive.** Change the schema, run `npm run db:generate`, commit
+  the new SQL. Never edit or delete a migration once it is merged. CI fails if the schema and the
+  migrations disagree. Production applies them before the new code is live, so never rename or
+  drop what the running code still uses in the same release.
+- **Student data stays in the EU or encrypted.** The production database has the EU jurisdiction;
+  backups are encrypted with the owner's key. Never commit, log or upload a plaintext export.
