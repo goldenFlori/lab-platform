@@ -186,13 +186,25 @@ what the user may see. Pagefind is not used in the platform.
     visualizations respond, mobile at 375px has no overflow, hydration is clean.
   - Biome for lint and format.
 - **CI/CD:**
-  - GitHub Actions runs typecheck + tests, then `wrangler deploy` on `main`.
-  - Branches get preview versions.
-  - Migrations run with `wrangler d1 migrations apply`.
+  - On every PR, GitHub Actions runs lint, typecheck, the migration and route-tree checks,
+    tests, the build and the end-to-end tests.
+  - On `main`, once all of that passes, it applies the D1 migrations (`--remote`), deploys
+    (`npm run deploy`) and checks `/api/health` on the live site. Runs on `main` are never
+    cancelled midway.
+  - Migrations run before the new code goes live, so they must be additive: never rename or
+    drop what the running code still uses in the same release.
+  - The GitHub token (Workers Editor, D1 Write, Workers Observability Write, Account Settings
+    Read) can deploy and migrate, but cannot create or delete Workers. A new Worker needs one
+    deploy with the owner's `wrangler login`.
+  - Live at https://lab-platform.florjanimema.workers.dev until the product has a domain.
+  - Later: preview versions for branches.
+- **Data location:** the production D1 database was created with the EU jurisdiction, so it is
+  stored and processed only in the EU. This cannot be changed after creation.
 - **Backups:**
-  - D1 Time Travel.
-  - A weekly `wrangler d1 export`, kept private. Never commit it, because it contains student
-    data.
+  - D1 Time Travel: restore to any minute of the last 7 days (30 on the paid plan).
+  - Weekly (`.github/workflows/backup.yml`): `wrangler d1 export`, encrypted with the owner's
+    age key before upload, kept 90 days as a private workflow artifact. GitHub never sees the
+    plaintext. Never commit an export: it contains student data.
 - **Observability:** Workers logs; Sentry's free tier later.
 
 ## Portability

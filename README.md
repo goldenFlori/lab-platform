@@ -43,7 +43,7 @@ For the end-to-end tests, install the browser once with `npx playwright install 
 | `npm run build` | Production build |
 | `npm run db:generate` | Write a migration after changing `src/api/db/schema.ts` |
 | `npm run db:migrate` | Apply the migrations to the local database |
-| `npm run deploy` | Build and deploy to Cloudflare (needs a configured account) |
+| `npm run deploy` | Build and deploy from this machine (needs `npx wrangler login`); merges to `main` deploy on their own |
 
 ## Layout
 
@@ -55,6 +55,26 @@ migrations/   SQL migrations for D1
 test/         Tests that run inside the Workers runtime
 e2e/          End-to-end tests (Playwright, against the production build)
 ```
+
+## Deploy
+
+Merging to `main` deploys automatically. Once every check passes, GitHub Actions applies the
+database migrations, deploys to Cloudflare and checks the live site:
+https://lab-platform.florjanimema.workers.dev
+
+`npm run deploy` deploys from your machine. Use it only to create the Worker the first time or in
+an emergency.
+
+## Backups
+
+- **Time Travel:** D1 can restore the database to any minute of the last 7 days
+  (`npx wrangler d1 time-travel restore DB --timestamp=<time>`).
+- **Weekly export:** every Monday the Backup workflow exports the database, encrypts it with the
+  owner's [age](https://age-encryption.org) key and keeps it for 90 days as a workflow artifact.
+  To restore one:
+  1. Download the artifact from the workflow run and unzip it.
+  2. `age --decrypt --identity ~/lab-platform-backup.key lab-platform-YYYY-MM-DD.sql.age > backup.sql`
+  3. Import it into a new, empty database: `npx wrangler d1 execute <database> --remote --file backup.sql`
 
 ## License
 

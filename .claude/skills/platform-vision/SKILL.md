@@ -155,6 +155,8 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-06 | AI designed in now, enabled in phase 4; never grades alone | Decided |
 | 2026-10-06 | Platform code in a new private repo; this course becomes the first tenant | Decided; repo created 2026-10-06 |
 | 2026-10-07 | Users are global accounts, one for life; organizations reach them only through memberships; usernames are unique platform-wide | Decided |
+| 2026-10-07 | Student data stays in the EU: the production database uses D1's EU jurisdiction (fixed at creation) | Decided |
+| 2026-10-07 | Weekly backups are encrypted with the owner's key before leaving Cloudflare; GitHub keeps only ciphertext, for 90 days | Decided |
 
 Decisions were delegated to Claude ("you decide"). Record new ones here with the date.
 
@@ -164,9 +166,6 @@ Decisions were delegated to Claude ("you decide"). Record new ones here with the
   - Product name and domain.
   - Which email domains FSHN uses for staff and for students.
   - The university's IP policy for software built for teaching (check before selling).
-- **Owner actions:**
-  - Turn on "Include private contributions on my profile" in the GitHub settings.
-  - Create a free Cloudflare account before #6 (deploy).
 - **Course repo:**
   - Execute `bellman-ford-animated.ipynb`, the only notebook never run (3 s, 5 graph images).
     Needs the owner's OK and a `MANIFEST.json` update.
