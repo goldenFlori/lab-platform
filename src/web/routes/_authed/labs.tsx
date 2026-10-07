@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { FlaskConical } from 'lucide-react';
-import { APP_NAME } from '../lib/brand';
+import { APP_NAME } from '../../lib/brand';
 
-export const Route = createFileRoute('/labs')({
+export const Route = createFileRoute('/_authed/labs')({
   head: () => ({ meta: [{ title: `Laboratorët · ${APP_NAME}` }] }),
   component: LabsPage,
 });
