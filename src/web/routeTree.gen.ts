@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as AuthedLabsRouteImport } from './routes/_authed/labs'
+import { Route as AuthedCoursesRouteImport } from './routes/_authed/courses'
+import { Route as AuthedJoinRouteImport } from './routes/_authed/join'
+import { Route as AuthedOOrgCoursesCourseIdRouteImport } from './routes/_authed/o/$org/courses/$courseId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +30,59 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthedLabsRoute = AuthedLabsRouteImport.update({
-  id: '/labs',
-  path: '/labs',
+const AuthedCoursesRoute = AuthedCoursesRouteImport.update({
+  id: '/courses',
+  path: '/courses',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedJoinRoute = AuthedJoinRouteImport.update({
+  id: '/join',
+  path: '/join',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedOOrgCoursesCourseIdRoute =
+  AuthedOOrgCoursesCourseIdRouteImport.update({
+    id: '/o/$org/courses/$courseId',
+    path: '/o/$org/courses/$courseId',
+    getParentRoute: () => AuthedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/labs': typeof AuthedLabsRoute
+  '/courses': typeof AuthedCoursesRoute
+  '/join': typeof AuthedJoinRoute
+  '/o/$org/courses/$courseId': typeof AuthedOOrgCoursesCourseIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/labs': typeof AuthedLabsRoute
+  '/courses': typeof AuthedCoursesRoute
+  '/join': typeof AuthedJoinRoute
+  '/o/$org/courses/$courseId': typeof AuthedOOrgCoursesCourseIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
   '/login': typeof LoginRoute
-  '/_authed/labs': typeof AuthedLabsRoute
+  '/_authed/courses': typeof AuthedCoursesRoute
+  '/_authed/join': typeof AuthedJoinRoute
+  '/_authed/o/$org/courses/$courseId': typeof AuthedOOrgCoursesCourseIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/labs'
+  fullPaths: '/' | '/login' | '/courses' | '/join' | '/o/$org/courses/$courseId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/labs'
-  id: '__root__' | '/' | '/_authed' | '/login' | '/_authed/labs'
+  to: '/' | '/login' | '/courses' | '/join' | '/o/$org/courses/$courseId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authed'
+    | '/login'
+    | '/_authed/courses'
+    | '/_authed/join'
+    | '/_authed/o/$org/courses/$courseId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -88,22 +114,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authed/labs': {
-      id: '/_authed/labs'
-      path: '/labs'
-      fullPath: '/labs'
-      preLoaderRoute: typeof AuthedLabsRouteImport
+    '/_authed/courses': {
+      id: '/_authed/courses'
+      path: '/courses'
+      fullPath: '/courses'
+      preLoaderRoute: typeof AuthedCoursesRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/join': {
+      id: '/_authed/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof AuthedJoinRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/o/$org/courses/$courseId': {
+      id: '/_authed/o/$org/courses/$courseId'
+      path: '/o/$org/courses/$courseId'
+      fullPath: '/o/$org/courses/$courseId'
+      preLoaderRoute: typeof AuthedOOrgCoursesCourseIdRouteImport
       parentRoute: typeof AuthedRoute
     }
   }
 }
 
 interface AuthedRouteChildren {
-  AuthedLabsRoute: typeof AuthedLabsRoute
+  AuthedCoursesRoute: typeof AuthedCoursesRoute
+  AuthedJoinRoute: typeof AuthedJoinRoute
+  AuthedOOrgCoursesCourseIdRoute: typeof AuthedOOrgCoursesCourseIdRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
-  AuthedLabsRoute: AuthedLabsRoute,
+  AuthedCoursesRoute: AuthedCoursesRoute,
+  AuthedJoinRoute: AuthedJoinRoute,
+  AuthedOOrgCoursesCourseIdRoute: AuthedOOrgCoursesCourseIdRoute,
 }
 
 const AuthedRouteWithChildren =

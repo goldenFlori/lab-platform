@@ -1,13 +1,13 @@
 import { Button, Dropdown, Label } from '@heroui/react';
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
-import { FlaskConical, LogOut, Menu } from 'lucide-react';
+import { GraduationCap, LogOut, Menu } from 'lucide-react';
 import type { Me } from '../../shared/auth';
 import { useLogout, useMe } from '../lib/auth';
 import { APP_NAME } from '../lib/brand';
 import { Logo } from './Logo';
 import { ThemeToggle } from './ThemeToggle';
 
-const links = [{ to: '/labs', label: 'Laboratorët', icon: FlaskConical }] as const;
+const links = [{ to: '/courses', label: 'Kurset', icon: GraduationCap }] as const;
 
 function initials(fullName: string) {
   return fullName
