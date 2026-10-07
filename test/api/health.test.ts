@@ -1,6 +1,6 @@
 import { exports } from 'cloudflare:workers';
 import { describe, expect, it } from 'vitest';
-import app from '../../src/api';
+import { app } from '../../src/api';
 
 describe('API routing', () => {
   it('reports health, including the database', async () => {

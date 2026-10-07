@@ -5,7 +5,8 @@ import { seedOrganization } from './fixtures';
 describe('database', () => {
   it('applies the migrations inside workerd', async () => {
     const { results } = await env.DB.prepare('select name from d1_migrations order by id').all<{ name: string }>();
-    expect(results.map((r) => r.name)).toEqual(['0000_organizations.sql', '0001_core_data_model.sql']);
+    expect(results.map((r) => r.name)).toEqual(env.TEST_MIGRATIONS.map((m) => m.name));
+    expect(results.length).toBeGreaterThan(2);
   });
 
   it('enforces foreign keys', async () => {
