@@ -13,13 +13,13 @@ async function signIn(page: Page, password = E2E_ACCOUNT.password) {
   await page.getByRole('button', { name: 'Hyr', exact: true }).click();
 }
 
-test('signs in, opens the labs, and signs out', async ({ page }) => {
-  await page.goto('/labs');
-  await expect(page).toHaveURL('/login?redirect=%2Flabs');
+test('signs in, opens my courses, and signs out', async ({ page }) => {
+  await page.goto('/courses');
+  await expect(page).toHaveURL('/login?redirect=%2Fcourses');
 
   await signIn(page);
-  await expect(page).toHaveURL('/labs');
-  await expect(page.getByRole('heading', { level: 1, name: 'Laboratorët' })).toBeVisible();
+  await expect(page).toHaveURL('/courses');
+  await expect(page.getByRole('heading', { level: 1, name: 'Kurset e mia' })).toBeVisible();
   const account = page.getByRole('button', { name: `Llogaria: ${E2E_ACCOUNT.fullName}` });
   await expect(account).toBeVisible();
 
@@ -37,8 +37,8 @@ test('signs in, opens the labs, and signs out', async ({ page }) => {
   await expect(page).toHaveURL('/');
   await expect(page.getByRole('link', { name: 'Hyr', exact: true })).toBeVisible();
 
-  await page.goto('/labs');
-  await expect(page).toHaveURL('/login?redirect=%2Flabs');
+  await page.goto('/courses');
+  await expect(page).toHaveURL('/login?redirect=%2Fcourses');
 });
 
 test('explains a wrong password in Albanian', async ({ page }) => {

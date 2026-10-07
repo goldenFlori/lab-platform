@@ -14,7 +14,7 @@ test('the home page shows the shell', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Kreu' })).toBeVisible();
 });
 
-test('the labs link asks a signed-out visitor to sign in, without a full reload', async ({ page, isMobile }) => {
+test('the courses link asks a signed-out visitor to sign in, without a full reload', async ({ page, isMobile }) => {
   await page.goto('/');
   await page.evaluate(() => {
     (window as unknown as { loadedOnce: boolean }).loadedOnce = true;
@@ -22,12 +22,12 @@ test('the labs link asks a signed-out visitor to sign in, without a full reload'
 
   if (isMobile) {
     await page.getByRole('button', { name: 'Menyja' }).click();
-    await page.getByRole('menuitem', { name: 'Laboratorët' }).click();
+    await page.getByRole('menuitem', { name: 'Kurset' }).click();
   } else {
-    await page.getByRole('navigation', { name: 'Navigimi kryesor' }).getByRole('link', { name: 'Laboratorët' }).click();
+    await page.getByRole('navigation', { name: 'Navigimi kryesor' }).getByRole('link', { name: 'Kurset' }).click();
   }
 
-  await expect(page).toHaveURL('/login?redirect=%2Flabs');
+  await expect(page).toHaveURL('/login?redirect=%2Fcourses');
   await expect(page.getByRole('heading', { level: 1, name: 'Hyr në llogari' })).toBeVisible();
   await expect(page).toHaveTitle('Hyr · Lab Platform');
   expect(await page.evaluate(() => (window as unknown as { loadedOnce?: boolean }).loadedOnce)).toBe(true);
