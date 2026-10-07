@@ -10,6 +10,8 @@
   "upload_source_maps": true,
   // The live address (lab-platform.<subdomain>.workers.dev) until the product has its own domain.
   "workers_dev": true,
+  // Daily housekeeping: expired sessions and old sign-in counters (src/api/auth/session.ts).
+  "triggers": { "crons": ["30 2 * * *"] },
   "assets": {
     "directory": "./dist/client",
     "not_found_handling": "single-page-application",
