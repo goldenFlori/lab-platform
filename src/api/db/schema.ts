@@ -220,3 +220,17 @@ export const sessions = sqliteTable(
   },
   (t) => [index('sessions_user_idx').on(t.userId), index('sessions_expires_idx').on(t.expiresAt)],
 );
+
+/**
+ * Failed sign-ins in fixed windows, per username ("user:<name>") and per IP ("ip:<address>"),
+ * to slow down password guessing (#8). Not tenant-owned.
+ */
+export const loginAttempts = sqliteTable(
+  'login_attempts',
+  {
+    key: text('key').primaryKey(),
+    windowStart: integer('window_start', { mode: 'timestamp' }).notNull(),
+    count: integer('count').notNull(),
+  },
+  (t) => [index('login_attempts_window_idx').on(t.windowStart)],
+);
