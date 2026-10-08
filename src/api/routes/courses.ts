@@ -9,6 +9,7 @@ import {
   updateCourseInput,
 } from '../../shared/courses';
 import { generateJoinCode } from '../../shared/join-code';
+import { type GroupStudent, importStudentsInput, resetPasswordInput } from '../../shared/students';
 import type { Access, TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
 
@@ -174,6 +175,34 @@ export const courseRoutes = new Hono<TenantEnv>()
     await c.var.tenant.groups.remove(group.id);
     return c.body(null, 204);
   })
+
+  .get('/:courseId/groups/:groupId/students', async (c) => {
+    const { course, groups } = await visibleCourse(c);
+    const group = groupOf(c, groups);
+    if (!c.var.access.can('student.manage', { courseId: course.id, groupId: group.id })) return forbidden(c);
+    return c.json((await c.var.tenant.students.ofGroup(group.id)) satisfies GroupStudent[]);
+  })
+
+  // Up to 25 students per request; the browser sends a long list in several. Only hashes arrive.
+  .post('/:courseId/groups/:groupId/students', zValidator('json', importStudentsInput, invalidRequest), async (c) => {
+    const { course, groups } = await visibleCourse(c);
+    const group = groupOf(c, groups);
+    if (!c.var.access.can('student.manage', { courseId: course.id, groupId: group.id })) return forbidden(c);
+    const students = await c.var.tenant.students.importInto(group.id, c.req.valid('json').students);
+    return c.json({ students: students satisfies GroupStudent[] }, 201);
+  })
+
+  .post(
+    '/:courseId/groups/:groupId/students/:userId/password',
+    zValidator('json', resetPasswordInput, invalidRequest),
+    async (c) => {
+      const { course, groups } = await visibleCourse(c);
+      const group = groupOf(c, groups);
+      if (!c.var.access.can('student.manage', { courseId: course.id, groupId: group.id })) return forbidden(c);
+      await c.var.tenant.students.setPassword(group.id, c.req.param('userId'), c.req.valid('json').passwordHash);
+      return c.body(null, 204);
+    },
+  )
 
   // A new code (the old one stops working at once), or none: joining is switched off.
   .post('/:courseId/groups/:groupId/join-code', zValidator('json', joinCodeSwitchInput, invalidRequest), async (c) => {
