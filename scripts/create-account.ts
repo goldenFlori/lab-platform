@@ -13,8 +13,8 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { parseArgs } from 'node:util';
-import { hashPassword } from '../src/api/auth/password.ts';
 import { uuidv7 } from '../src/api/db/ids.ts';
+import { hashPassword } from '../src/shared/password.ts';
 
 const ROLES = ['admin', 'coordinator', 'pedagog', 'assistant', 'student'];
 /** No 0/O, 1/l/I: easy to read off a printed slip. */

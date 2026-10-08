@@ -1,5 +1,5 @@
 import { exports } from 'cloudflare:workers';
-import { hashPassword } from '../../src/api/auth/password';
+import { hashPassword } from '../../src/shared/password';
 import type { Seeded } from './fixtures';
 
 export const ORIGIN = 'https://lab.test';

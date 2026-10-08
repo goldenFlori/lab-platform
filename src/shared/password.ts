@@ -1,5 +1,6 @@
 // Password hashing with PBKDF2-SHA256 through WebCrypto, so it runs in Workers and in Node.
-// No imports: scripts/create-account.ts uses this file directly.
+// No imports: the API, the app (which hashes generated passwords in the browser) and
+// scripts/create-account.ts all use this file directly.
 //
 // Stored format: pbkdf2-sha256$<iterations>$<salt, base64>$<hash, base64>. The parameters travel
 // with each hash, so raising the iteration count later upgrades every account at its next login.
@@ -21,11 +22,11 @@ function toBase64(bytes: Uint8Array) {
   return btoa(String.fromCharCode(...bytes));
 }
 
-function fromBase64(text: string) {
+function fromBase64(text: string): Uint8Array<ArrayBuffer> {
   return Uint8Array.from(atob(text), (c) => c.charCodeAt(0));
 }
 
-async function derive(password: string, salt: Uint8Array, iterations: number) {
+async function derive(password: string, salt: Uint8Array<ArrayBuffer>, iterations: number) {
   // NFC: "ë" typed as one character or as "e" plus a combining mark is the same password.
   const key = await crypto.subtle.importKey(
     'raw',
@@ -43,9 +44,13 @@ async function derive(password: string, salt: Uint8Array, iterations: number) {
 }
 
 function parse(stored: string) {
-  const [algorithm, iterations, salt, hash] = stored.split('$');
-  if (algorithm !== ALGORITHM || !iterations || !salt || !hash) return undefined;
-  return { iterations: Number(iterations), salt: fromBase64(salt), hash: fromBase64(hash) };
+  const [algorithm, iterations, salt, hash, ...rest] = stored.split('$');
+  if (algorithm !== ALGORITHM || !iterations || !salt || !hash || rest.length > 0) return undefined;
+  try {
+    return { iterations: Number(iterations), salt: fromBase64(salt), hash: fromBase64(hash) };
+  } catch {
+    return undefined; // not base64
+  }
 }
 
 /** Compares in constant time, so the response time reveals nothing about the hash. */
@@ -73,4 +78,20 @@ export async function verifyPassword(password: string, stored: string | null): P
 /** True when the hash was made with other parameters than today's, and should be replaced. */
 export function needsRehash(stored: string) {
   return parse(stored)?.iterations !== PASSWORD_ITERATIONS;
+}
+
+/**
+ * A hash the server may store when it comes from elsewhere (the pedagog's browser): today's
+ * algorithm, at least today's cost, and a salt and hash of the right size.
+ */
+export function isValidPasswordHash(stored: string) {
+  const parsed = parse(stored);
+  return (
+    parsed !== undefined &&
+    Number.isInteger(parsed.iterations) &&
+    parsed.iterations >= PASSWORD_ITERATIONS &&
+    parsed.iterations <= 100_000 &&
+    parsed.salt.length === SALT_BYTES &&
+    parsed.hash.length === HASH_BYTES
+  );
 }
