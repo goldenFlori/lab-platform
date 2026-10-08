@@ -16,7 +16,7 @@ function safeRedirect(value: unknown) {
 export const Route = createFileRoute('/login')({
   validateSearch: (search: Record<string, unknown>): LoginSearch => ({ redirect: safeRedirect(search.redirect) }),
   beforeLoad: async ({ context, search }) => {
-    if (await context.queryClient.ensureQueryData(meQuery)) throw redirect({ href: search.redirect ?? '/labs' });
+    if (await context.queryClient.ensureQueryData(meQuery)) throw redirect({ href: search.redirect ?? '/courses' });
   },
   head: () => ({ meta: [{ title: `Hyr · ${APP_NAME}` }] }),
   component: LoginPage,
@@ -49,7 +49,7 @@ function LoginPage() {
     const data = new FormData(event.currentTarget);
     login.mutate(
       { username: String(data.get('username') ?? ''), password: String(data.get('password') ?? '') },
-      { onSuccess: () => navigate({ href: target ?? '/labs' }) },
+      { onSuccess: () => navigate({ href: target ?? '/courses' }) },
     );
   }
 

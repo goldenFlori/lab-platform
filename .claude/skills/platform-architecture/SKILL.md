@@ -156,6 +156,11 @@ Built in #10, under `/api/orgs/:org/courses` (`src/api/routes/courses.ts`).
   15 minutes, then 429.
 - **Archiving** (`course.manage`) ends the year: the course stays readable and is listed after
   the current ones. It can be undone.
+- **Pages:**
+  - `/courses`: my courses in every organization, "new course" for those with `course.create`;
+  - `/o/:org/courses/:id`: the course; staff see each group's code, a full-screen QR view for
+    the projector (lean-qr, always dark on white), new code / close registration, and delete;
+  - `/join?code=…`: what the QR code opens. Signed-out students log in first and come back.
 
 ## Data model sketch
 

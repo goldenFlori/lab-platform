@@ -145,7 +145,9 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   (PR #26).
 - **2026-10-08:** #9 done. Role templates stored as data, capabilities resolved per request from
   memberships in their scope, enforced by the API and proven per role by tests (PR #29).
-- **Next:** #10, courses and groups with join codes.
+- **2026-10-08:** #10 done. Courses (create, copy last year's labs, archive), groups with join
+  codes and a QR view for the projector, and joining by code (PRs #30 and #31).
+- **Next:** #11, student import with generated passwords and printable slips.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 

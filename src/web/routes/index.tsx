@@ -21,8 +21,8 @@ function HomePage() {
           Fletore laboratori me rezultate reale, vizualizime interaktive dhe pedagogu që vendos çfarë hapet për klasën.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link to="/labs" className="button button--primary gap-2">
-            Shiko laboratorët <ArrowRight className="size-4" />
+          <Link to="/courses" className="button button--primary gap-2">
+            Kurset e mia <ArrowRight className="size-4" />
           </Link>
         </div>
       </div>
