@@ -399,8 +399,40 @@ Built in #8: `src/api/auth/`, data access in `src/api/db/auth.ts`, routes in
 
 ## Search
 
-D1 FTS5 over cell text, joined with `lab_access` and the user's memberships. Results only include
-what the user may see. Pagefind is not used in the platform.
+Built in #17. A ⌘K palette (also Ctrl+K, `/`, or the header's button) searches labs, notebook
+sections and the visualizations as you type.
+
+- **No FTS5:** D1 cannot export a database that has virtual tables, and the weekly encrypted
+  backup is an export. The course is small (19 notebooks: about 340 sections and 150 KB of
+  text), so plain rows and matching in the browser are enough. Pagefind is not used.
+- **Index** (`src/notebook/search.ts`): made where a notebook is converted (the pedagog's browser,
+  or the course import).
+  - One section per heading: its anchor, title, plain text (math as its TeX source, KaTeX's drawn
+    copy left out) and the functions and classes its code defines. Outputs are not indexed.
+  - Limits are in `src/shared/search-limits.ts`: at most 400 sections of 4,000 characters.
+  - Stored in `search_sections` with `PUT …/notebooks/:id/search` (staff), replaced as a whole in
+    one request (41 statements at most).
+  - Notebooks uploaded before #17 have no index until uploaded again. The course import rewrites
+    the index of every notebook it keeps.
+- **Who sees what:** `GET /api/orgs/:org/courses/:id/search` returns the labs, ready notebooks and
+  sections the user may see, by the lab pages' own rules (`labContext`, `openToViewer`,
+  `mayReadNotebook`).
+  - Students get only labs open to their groups now, and solutions only once open; staff get
+    every lab.
+  - A hidden lab's text never leaves the server, so the browser searches what it receives
+    without further checks.
+  - API tests prove it, with the schedule, solutions and other organizations.
+- **Matching** (`src/web/lib/search-text.ts`):
+  - case and Albanian accents are ignored (`fold` keeps every character in place, so matches are
+    marked in the original text);
+  - every term must start a word;
+  - a section's title weighs more than its function names, which weigh more than its text;
+  - a lab whose name matches comes first.
+- **Loading:** the palette is its own chunk (5 KB gzipped), loaded on first open. It fetches one
+  index per current course of each of the user's organizations, cached for 5 minutes, so typing
+  costs the database nothing.
+- **A section result** opens the lab at `?notebook=…#anchor`. The lab page scrolls to the hash
+  once the notebook has rendered, so shared links to a section work too.
 
 ## Quality, deploy, backups
 
