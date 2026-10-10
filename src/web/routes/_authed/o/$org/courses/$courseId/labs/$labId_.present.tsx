@@ -7,7 +7,7 @@ import { isSolutionOf, type Slide, slidesOf } from '../../../../../../../../note
 import type { Cell } from '../../../../../../../../notebook/types';
 import { isVisualizerId } from '../../../../../../../../shared/visualizers';
 import { CodeCell } from '../../../../../../../components/notebook/CodeCell';
-import { Markdown } from '../../../../../../../components/notebook/NotebookView';
+import { Markdown, SECTION_KINDS } from '../../../../../../../components/notebook/NotebookView';
 import { Output } from '../../../../../../../components/notebook/Output';
 import { VizEmbed } from '../../../../../../../components/VizEmbed';
 import { ApiError } from '../../../../../../../lib/api';
@@ -196,6 +196,17 @@ function Presenter() {
     stage.current?.focus({ preventScroll: true });
   }, [index]);
 
+  // An output just shown comes into view, even below long code; one already shown when coming back does not.
+  const outputsRef = useRef<HTMLDivElement>(null);
+  const shownAt = useRef({ index, isRevealed });
+  useEffect(() => {
+    const before = shownAt.current;
+    shownAt.current = { index, isRevealed };
+    if (before.index === index && !before.isRevealed && isRevealed) {
+      outputsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [index, isRevealed]);
+
   // The solution's images and figures are its own files.
   const fileUrl = (name: string) =>
     notebookFileUrl(showSolution && match ? { ...ref, notebookId: match.id } : ref, name);
@@ -213,7 +224,11 @@ function Presenter() {
           {current && <p className="truncate text-xs text-muted">{current.title}</p>}
         </div>
         {slides.length > 0 && (
-          <span className="shrink-0 font-mono text-sm text-muted tabular-nums" aria-live="polite">
+          <span
+            data-testid="presentation-step"
+            className="shrink-0 font-mono text-sm text-muted tabular-nums"
+            aria-live="polite"
+          >
             {index + 1} / {slides.length}
           </span>
         )}
@@ -221,6 +236,7 @@ function Presenter() {
           <Button
             size="sm"
             variant={showSolution ? 'primary' : 'secondary'}
+            aria-label="Zgjidhja"
             aria-pressed={showSolution}
             onPress={() => setSolved((on) => !on)}
           >
@@ -260,7 +276,7 @@ function Presenter() {
             <Step slide={slide} code={code} fileUrl={fileUrl} />
           )}
           {code?.type === 'code' && outputs.length > 0 && (
-            <div className="mt-6 flex flex-col gap-3">
+            <div ref={outputsRef} className="mt-6 flex scroll-mt-4 flex-col gap-3">
               {isRevealed ? (
                 outputs.map((out, i) => (
                   // biome-ignore lint/suspicious/noArrayIndexKey: a cell's outputs are fixed; i is their order
@@ -296,7 +312,35 @@ function Presenter() {
 }
 
 function Step({ slide, code, fileUrl }: { slide: Slide; code: Cell | undefined; fileUrl: (name: string) => string }) {
-  if (slide.kind === 'text') return <Markdown cell={slide.cell} />;
+  if (slide.kind === 'text') {
+    const { cell } = slide;
+    if (cell.html.trim() || !cell.heading) {
+      // Its headings grow with the larger text (see .notebook-step in styles.css).
+      return (
+        <div className="notebook-step">
+          <Markdown cell={cell} />
+        </div>
+      );
+    }
+    // A cell that only opens a section: a title slide.
+    const meta = SECTION_KINDS[cell.kind];
+    const Icon = meta?.icon;
+    return (
+      <div className="grid min-h-[55vh] place-content-center text-center">
+        {meta && Icon && (
+          <p
+            className="mb-4 flex items-center justify-center gap-2 text-sm font-semibold tracking-wider uppercase sm:text-base"
+            style={{ color: meta.color }}
+          >
+            <Icon className="size-5" aria-hidden="true" /> {meta.label}
+          </p>
+        )}
+        <h2 className="text-4xl leading-tight font-extrabold tracking-tight text-balance sm:text-6xl">
+          {cell.heading}
+        </h2>
+      </div>
+    );
+  }
   if (slide.kind === 'viz') {
     return isVisualizerId(slide.embed.viz) ? (
       <VizEmbed key={slide.at} viz={slide.embed.viz} props={slide.embed.props} label={slide.embed.title} />
