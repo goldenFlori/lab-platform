@@ -289,6 +289,8 @@
   font-size: 1.0625rem;
   line-height: 1.75;
   color: color-mix(in oklab, var(--foreground) 88%, var(--muted));
+  /* A long identifier or link breaks rather than widening the page on a phone. */
+  overflow-wrap: break-word;
 
   & > :first-child {
     margin-top: 0;
@@ -374,6 +376,7 @@
   }
 
   & :not(pre) > code {
+    overflow-wrap: anywhere;
     font-size: 0.86em;
     padding: 0.12em 0.4em;
     border-radius: 0.4em;
