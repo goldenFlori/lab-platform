@@ -5,6 +5,7 @@ import { ArrowLeft, FileUp, Printer, X } from 'lucide-react';
 import { type ChangeEvent, useEffect, useState } from 'react';
 import { parseNameList, usernameBase } from '../../../../../../../../../shared/student-names';
 import { CredentialSlips } from '../../../../../../../../components/CredentialSlips';
+import { t as messages, useT } from '../../../../../../../../i18n';
 import { ApiError } from '../../../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../../../lib/brand';
 import { courseQuery } from '../../../../../../../../lib/courses';
@@ -22,7 +23,9 @@ export const Route = createFileRoute('/_authed/o/$org/courses/$courseId/groups/$
       throw error;
     }
   },
-  head: ({ loaderData }) => ({ meta: [{ title: `Importo studentë · ${loaderData?.groupName ?? ''} · ${APP_NAME}` }] }),
+  head: ({ loaderData }) => ({
+    meta: [{ title: `${messages().importStudents.title} · ${loaderData?.groupName ?? ''} · ${APP_NAME}` }],
+  }),
   component: ImportPage,
 });
 
@@ -40,6 +43,7 @@ function ImportPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [printed, setPrinted] = useState(false);
   const queryClient = useQueryClient();
+  const t = useT();
 
   // The passwords exist only on this page: warn before leaving it unprinted.
   useEffect(() => {
@@ -57,14 +61,14 @@ function ImportPage() {
       setText(fromFile.join('\n'));
       setMessage(null);
     } catch {
-      setMessage('Skedari nuk u lexua. Përdorni CSV ose Excel (.xlsx), ose ngjitni listën.');
+      setMessage(t.importStudents.fileUnreadable);
     }
     event.target.value = '';
   }
 
   function toPreview() {
     const parsed = parseNameList(text);
-    if (parsed.length === 0) return setMessage('Nuk gjetëm asnjë emër. Ngjitni një emër për rresht.');
+    if (parsed.length === 0) return setMessage(t.importStudents.noNames);
     setMessage(null);
     setNames(parsed.map((name) => ({ id: crypto.randomUUID(), name })));
     setPhase({ step: 'preview' });
@@ -95,7 +99,7 @@ function ImportPage() {
   return (
     <section className="container-page py-10">
       {backToGroup}
-      <h1 className="mt-4 text-3xl font-bold tracking-tight">Importo studentë</h1>
+      <h1 className="mt-4 text-3xl font-bold tracking-tight">{t.importStudents.title}</h1>
       <p className="mt-1 text-muted">
         {courseTitle} · {groupName}
       </p>
@@ -103,7 +107,7 @@ function ImportPage() {
       {phase.step === 'input' && (
         <div className="mt-8 max-w-2xl">
           <label htmlFor="names" className="text-sm font-medium">
-            Lista e klasës
+            {t.importStudents.list}
           </label>
           <textarea
             id="names"
@@ -113,9 +117,7 @@ function ImportPage() {
             placeholder={'Arben Hoxha\nMira Kola\nËndrit Çela'}
             className="mt-1 block w-full rounded-2xl border border-border bg-surface p-4 font-mono text-sm"
           />
-          <p className="mt-2 text-sm text-muted">
-            Një emër për rresht. Nga Excel ose Google Sheets, zgjidhni kolonat e emrave dhe ngjitini këtu (Ctrl+V).
-          </p>
+          <p className="mt-2 text-sm text-muted">{t.importStudents.listHelp}</p>
           {message && (
             <Alert status="danger" className="mt-4">
               <Alert.Indicator />
@@ -126,10 +128,10 @@ function ImportPage() {
           )}
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <Button variant="primary" onPress={toPreview}>
-              Vazhdo
+              {t.importStudents.continue}
             </Button>
             <label className="button button--tertiary cursor-pointer gap-2">
-              <FileUp className="size-4" /> Ngarko CSV ose Excel
+              <FileUp className="size-4" /> {t.importStudents.upload}
               <input type="file" accept=".csv,.txt,.xlsx" className="sr-only" onChange={onFile} />
             </label>
           </div>
@@ -138,13 +140,8 @@ function ImportPage() {
 
       {phase.step === 'preview' && (
         <div className="mt-8 max-w-2xl">
-          <p className="font-medium">
-            {names.length} {names.length === 1 ? 'student' : 'studentë'}. Kontrolloni emrat para se të krijohen
-            llogaritë.
-          </p>
-          <p className="mt-1 text-sm text-muted">
-            Emri i përdoruesit merr një numër në fund kur është i zënë (p.sh. arben.hoxha2).
-          </p>
+          <p className="font-medium">{t.importStudents.check(names.length)}</p>
+          <p className="mt-1 text-sm text-muted">{t.importStudents.usernameNote}</p>
           <ol className="mt-4 divide-y divide-separator rounded-2xl border border-border bg-surface">
             {names.map(({ id, name }, i) => (
               <li key={id} className="flex items-center gap-3 px-4 py-2">
@@ -155,7 +152,7 @@ function ImportPage() {
                   isIconOnly
                   size="sm"
                   variant="ghost"
-                  aria-label={`Hiq ${name}`}
+                  aria-label={t.importStudents.remove(name)}
                   onPress={() => setNames((list) => list.filter((entry) => entry.id !== id))}
                 >
                   <X className="size-4" />
@@ -165,10 +162,10 @@ function ImportPage() {
           </ol>
           <div className="mt-6 flex flex-wrap gap-3">
             <Button variant="primary" isDisabled={names.length === 0} onPress={() => run(names.map((n) => n.name))}>
-              Importo {names.length} {names.length === 1 ? 'student' : 'studentë'}
+              {t.importStudents.importN(names.length)}
             </Button>
             <Button variant="ghost" onPress={() => setPhase({ step: 'input' })}>
-              Ndrysho listën
+              {t.importStudents.editList}
             </Button>
           </div>
         </div>
@@ -176,10 +173,8 @@ function ImportPage() {
 
       {phase.step === 'importing' && (
         <div className="mt-8 max-w-xl">
-          <ProgressBar aria-label="Duke krijuar llogaritë" value={phase.done} maxValue={names.length} />
-          <p className="mt-3 text-sm text-muted">
-            Duke krijuar llogaritë… {phase.done} nga {names.length}
-          </p>
+          <ProgressBar aria-label={t.importStudents.creating} value={phase.done} maxValue={names.length} />
+          <p className="mt-3 text-sm text-muted">{t.importStudents.progress(phase.done, names.length)}</p>
         </div>
       )}
 
@@ -189,12 +184,8 @@ function ImportPage() {
             <Alert status="accent">
               <Alert.Indicator />
               <Alert.Content>
-                <Alert.Title>
-                  {slips.length} {slips.length === 1 ? 'student u shtua' : 'studentë u shtuan'} në {groupName}.
-                </Alert.Title>
-                <Alert.Description>
-                  Fjalëkalimet shfaqen vetëm tani. Printoni fletët para se të largoheni nga kjo faqe.
-                </Alert.Description>
+                <Alert.Title>{t.importStudents.added(slips.length, groupName)}</Alert.Title>
+                <Alert.Description>{t.importStudents.addedNote}</Alert.Description>
               </Alert.Content>
             </Alert>
           )}
@@ -202,11 +193,7 @@ function ImportPage() {
             <Alert status="danger" className="mt-4">
               <Alert.Indicator />
               <Alert.Content>
-                <Alert.Description>
-                  {names.length - failedFrom}{' '}
-                  {names.length - failedFrom === 1 ? 'student nuk u shtua' : 'studentë nuk u shtuan'}. Provoni përsëri
-                  për ta.
-                </Alert.Description>
+                <Alert.Description>{t.importStudents.failed(names.length - failedFrom)}</Alert.Description>
               </Alert.Content>
             </Alert>
           )}
@@ -219,12 +206,12 @@ function ImportPage() {
                   setPrinted(true);
                 }}
               >
-                <Printer className="size-4" /> Printo fletët
+                <Printer className="size-4" /> {t.importStudents.print}
               </Button>
             )}
             {failedFrom !== null && (
               <Button variant="secondary" onPress={() => run(names.slice(failedFrom).map((n) => n.name))}>
-                Provo përsëri
+                {t.importStudents.retry}
               </Button>
             )}
           </div>
