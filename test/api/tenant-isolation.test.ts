@@ -29,6 +29,7 @@ const resources: Resource[] = [
   { name: 'labs', repo: (t) => t.labs, row: (s) => s.lab, changes: { title: 'X' } },
   { name: 'lab access', repo: (t) => t.labAccess, row: (s) => s.labAccess, changes: { visibleFrom: new Date() } },
   { name: 'memberships', repo: (t) => t.memberships, row: (s) => s.membership, changes: { role: 'student' } },
+  { name: 'notebooks', repo: (t) => t.notebooks, row: (s) => s.notebook, changes: { title: 'X' } },
 ];
 
 async function seedTwo() {

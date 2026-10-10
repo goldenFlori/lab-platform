@@ -1,45 +1,17 @@
 import { zValidator } from '@hono/zod-validator';
-import { type Context, Hono } from 'hono';
-import { type AccessRule, ruleForGroup, solutionsOpen, stateOf } from '../../shared/lab-visibility';
+import { Hono } from 'hono';
+import { ruleForGroup, solutionsOpen, stateOf } from '../../shared/lab-visibility';
 import { type LabList, type LabRule, type LabView, labAccessInput, labInput, updateLabInput } from '../../shared/labs';
 import type { TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
-import { forbidden, invalidRequest, visibleCourse } from './course-context';
+import { forbidden, invalidRequest } from './course-context';
+import { type Lab, type LabContext, labContext, openToViewer, visibleLab } from './lab-context';
+import { notebookRoutes } from './notebooks';
 
 // Labs of a course and when they are open (#12), under /api/orgs/:org/courses/:courseId/labs.
-// Staff (whoever may see solutions in the course) see every lab, hidden or not. Students see only
-// labs open to one of their groups right now; any other lab answers 404, also by direct link.
-
-type Lab = { id: string; n: number; title: string; week: number | null; summary: string | null };
-type StoredRule = AccessRule & { labId: string };
 
 const iso = (date: Date | null) => date?.toISOString() ?? null;
 const toDate = (value: string | null) => (value ? new Date(value) : null);
-
-/** Everything needed to show a course's labs to the user in this request. */
-async function labContext(c: Context<TenantEnv>) {
-  const { course, groups } = await visibleCourse(c);
-  const { access, tenant } = c.var;
-  const groupIds = groups.map((g) => g.id);
-  const [labs, rules] = await Promise.all([tenant.labs.ofCourse(course.id), tenant.labAccess.ofCourse(course.id)]);
-  return {
-    course,
-    groups,
-    labs,
-    rulesOf: (labId: string) => rules.filter((rule) => rule.labId === labId) as StoredRule[],
-    staff: access.canInCourse('solution.view', course.id, groupIds),
-    /** The groups whose labs the user sees as a student would. */
-    viewerGroups: groupIds.filter((groupId) => access.can('lab.view', { courseId: course.id, groupId })),
-    now: new Date(),
-  };
-}
-
-type LabContext = Awaited<ReturnType<typeof labContext>>;
-
-function openToViewer(ctx: LabContext, lab: Lab) {
-  const rules = ctx.rulesOf(lab.id);
-  return ctx.viewerGroups.some((groupId) => stateOf(ruleForGroup(rules, groupId), ctx.now) === 'open');
-}
 
 function view(ctx: LabContext, lab: Lab): LabView {
   const rules = ctx.rulesOf(lab.id);
@@ -71,13 +43,6 @@ function view(ctx: LabContext, lab: Lab): LabView {
       })),
     },
   };
-}
-
-/** The lab in the URL, or 404 when it is missing or not open to the user. */
-function visibleLab(c: Context<TenantEnv>, ctx: LabContext) {
-  const lab = ctx.labs.find((l) => l.id === c.req.param('labId'));
-  if (!lab || (!ctx.staff && !openToViewer(ctx, lab))) throw new NotFoundError();
-  return lab;
 }
 
 export const labRoutes = new Hono<TenantEnv>()
@@ -159,4 +124,6 @@ export const labRoutes = new Hono<TenantEnv>()
     if (!c.var.access.can('lab.publish', { courseId: ctx.course.id, groupId })) return forbidden(c);
     await c.var.tenant.labAccess.removeRule(lab.id, groupId);
     return c.json(view(await labContext(c), lab));
-  });
+  })
+
+  .route('/:labId/notebooks', notebookRoutes);
