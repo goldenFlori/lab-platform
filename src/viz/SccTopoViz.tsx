@@ -3,10 +3,12 @@ import { Eye, EyeOff, GitBranch, ListOrdered, Shuffle, Trash2, Undo2, Wand2 } fr
 import { useMemo, useState } from 'react';
 import { natural } from './algorithms/graphs';
 import { allOrders, available, hasCycle, layeredLayout, reach, type SccStep, sccSteps } from './algorithms/scc';
+import { SCC_TEXT } from './algorithms/scc.text';
 import { Choice, Field, PlayerBar, Segmented } from './kit/controls';
 import { fitLayout, type GEdge, type GNode, GraphCanvas, type NodeLook } from './kit/GraphCanvas';
 import { must } from './kit/must';
 import { Legend, Panel, Pseudocode, StepNote, TokenRow, VizShell } from './kit/shell';
+import { bilingual, useText } from './kit/text';
 import { playerKeys, usePlayer } from './kit/usePlayer';
 
 /* =====================================================================
@@ -27,7 +29,6 @@ const arcs = (list: string[][]): GEdge[] => list.map(([u, v]) => ({ u, v }));
 const SCC_PRESETS = [
   {
     id: 'lab',
-    name: 'Tre komponente',
     nodes: lay([
       ['a', 60, 60],
       ['b', 200, 150],
@@ -53,7 +54,6 @@ const SCC_PRESETS = [
   },
   {
     id: 'kater',
-    name: 'Katër komponente (slide 73)',
     nodes: lay([
       ['1', 60, 80],
       ['2', 200, 40],
@@ -82,7 +82,6 @@ const SCC_PRESETS = [
   },
   {
     id: 'cikel',
-    name: 'Një cikël — i lidhur fort',
     nodes: lay([
       ['A', 200, 60],
       ['B', 460, 60],
@@ -97,7 +96,7 @@ const SCC_PRESETS = [
       ['A', 'C'],
     ]),
   },
-  { id: 'bosh', name: 'Digraf bosh', nodes: [] as GNode[], edges: [] as GEdge[] },
+  { id: 'bosh', nodes: [] as GNode[], edges: [] as GEdge[] },
 ];
 
 const dag = (ids: string[], edges: string[][]) => {
@@ -108,8 +107,6 @@ const dag = (ids: string[], edges: string[][]) => {
 const TOPO_PRESETS = [
   {
     id: 'lendet',
-    name: 'Lëndët universitare',
-    desc: 'Cila lëndë kërkon cilën?',
     ...dag(
       ['MAT1', 'MAT2', 'ALG1', 'PRG1', 'PRG2', 'DB', 'OS', 'NET'],
       [
@@ -127,8 +124,6 @@ const TOPO_PRESETS = [
   },
   {
     id: 'shtepia',
-    name: 'Ndërto shtëpinë',
-    desc: 'Cilin hap para cilit?',
     ...dag(
       ['Themeli', 'Muret', 'Çatia', 'Elektrike', 'Hidraulike', 'Suvatim', 'Lyerja'],
       [
@@ -145,8 +140,6 @@ const TOPO_PRESETS = [
   },
   {
     id: 'pasta',
-    name: 'Gatuaj pastë',
-    desc: 'Cili hap vjen para cilit?',
     ...dag(
       ['Bli pastë', 'Ziej ujin', 'Shto pastën', 'Bëj salcën', 'Kulloje', 'Shto salcën', 'Shpërndaj'],
       [
@@ -173,8 +166,147 @@ const COMP_COLORS = [
 ];
 const soft = (c: string, p = 24) => `color-mix(in oklab, ${c} ${p}%, var(--surface))`;
 
+const TEXT = bilingual(
+  {
+    sccPresets: {
+      lab: 'Tre komponente',
+      kater: 'Katër komponente (slide 73)',
+      cikel: 'Një cikël — i lidhur fort',
+      bosh: 'Digraf bosh',
+    } as Record<string, string>,
+    topoPresets: {
+      lendet: { name: 'Lëndët universitare', desc: 'Cila lëndë kërkon cilën?' },
+      shtepia: { name: 'Ndërto shtëpinë', desc: 'Cilin hap para cilit?' },
+      pasta: { name: 'Gatuaj pastë', desc: 'Cili hap vjen para cilit?' },
+    } as Record<string, { name: string; desc: string }>,
+    /** Display names of the steps; the course codes (MAT1, PRG1…) are the same in both languages. */
+    steps: {} as Record<string, string>,
+    already: (id: string) => `**${id}** është vendosur tashmë.`,
+    notYet: (id: string, missing: string) => `**${id}** nuk mund të vendoset ende: kërkon më parë ${missing}.`,
+    sccTitle: 'Komponentet e lidhura fort (SCC)',
+    topoTitle: 'Renditjet topologjike',
+    sccSubtitle:
+      'Dy kulme janë në të njëjtën komponente kur secili arrin tjetrin. Ndërtoni digrafin tuaj ose zgjidhni një shembull.',
+    topoSubtitle: 'Vendosni kulmet me radhë: lejohet vetëm një kulm që i ka të gjithë paraardhësit të vendosur.',
+    mode: 'Mënyra',
+    topoMode: 'Renditja topologjike',
+    digraph: 'Digrafi',
+    scenario: 'Skenari',
+    valid: (order: string, mistakes: number, count: number) =>
+      `**Renditje e vlefshme!** ${order}. Gabime: ${mistakes}. Gjithsej ekzistojnë **${count}** renditje topologjike — provoni të gjeni një tjetër.`,
+    start: (desc: string) => `${desc} Kulmet me rreth lëvizës nuk kanë paraardhës të pavendosur — zgjidhni njërin.`,
+    available: (list: string, placed: number, total: number) =>
+      `Të disponueshme tani: **${list}**. Vendosur: ${placed}/${total}.`,
+    clear: 'Pastro',
+    editHelp: 'Klikoni në fushë → kulm · klikoni dy kulme → hark nga i pari te i dyti.',
+    sccGraph: 'Digraf për komponentet e lidhura fort',
+    reachForward: 'reach⁺ (arrihet nga v)',
+    reachBackward: 'reach⁻ (arrin v)',
+    both: 'Të dyja → e njëjta SCC',
+    auto: 'Hapi automatik',
+    undo: 'Zhbëj',
+    newOrder: 'Renditje e re',
+    hideOrders: 'Fshih renditjet',
+    showOrders: 'Shfaq të gjitha renditjet',
+    dag: (name: string) => `DAG: ${name}`,
+    availableNow: 'I disponueshëm tani',
+    placedLegend: 'I vendosur (me numrin e radhës)',
+    labAlgorithm: 'Algoritmi i laboratorit',
+    pseudo: ['për çdo kulm v të pacaktuar:', '  F = bfs_reach(v)', '  B = bfs_reach(v, mbrapa)', '  SCC(v) = F ∩ B'],
+    components: (n: number) => `Komponentet (${n})`,
+    none: 'Ende asnjë.',
+    reachTable: 'Tabela e arritshmërisë',
+    acyclic: 'Pa cikle: çdo kulm është komponente më vete.',
+    yourOrder: 'Renditja juaj',
+    result: 'Rezultati',
+    possible: (n: number) => `${n} renditje të mundshme`,
+    found: (n: number) => `gjetur: ${n}`,
+    mistakes: (n: number) => `gabime: ${n}`,
+    orders: (shown: number, total: number) => `Renditjet (${shown} nga ${total})`,
+  },
+  {
+    sccPresets: {
+      lab: 'Three components',
+      kater: 'Four components (slide 73)',
+      cikel: 'One cycle — strongly connected',
+      bosh: 'Empty digraph',
+    },
+    topoPresets: {
+      lendet: { name: 'University courses', desc: 'Which course requires which?' },
+      shtepia: { name: 'Build a house', desc: 'Which step comes before which?' },
+      pasta: { name: 'Cook pasta', desc: 'Which step comes before which?' },
+    },
+    steps: {
+      Themeli: 'Foundation',
+      Muret: 'Walls',
+      Çatia: 'Roof',
+      Elektrike: 'Electrics',
+      Hidraulike: 'Plumbing',
+      Suvatim: 'Plastering',
+      Lyerja: 'Painting',
+      'Bli pastë': 'Buy pasta',
+      'Ziej ujin': 'Boil water',
+      'Shto pastën': 'Add the pasta',
+      'Bëj salcën': 'Make the sauce',
+      Kulloje: 'Drain it',
+      'Shto salcën': 'Add the sauce',
+      Shpërndaj: 'Serve',
+    },
+    already: (id) => `**${id}** is already placed.`,
+    notYet: (id, missing) => `**${id}** cannot be placed yet: it needs ${missing} first.`,
+    sccTitle: 'Strongly connected components (SCC)',
+    topoTitle: 'Topological orders',
+    sccSubtitle:
+      'Two vertices are in the same component when each reaches the other. Build your own digraph or pick an example.',
+    topoSubtitle: 'Place the vertices in order: only a vertex whose predecessors are all placed is allowed.',
+    mode: 'Mode',
+    topoMode: 'Topological order',
+    digraph: 'Digraph',
+    scenario: 'Scenario',
+    valid: (order, mistakes, count) =>
+      `**A valid order!** ${order}. Mistakes: ${mistakes}. There are **${count}** topological orders in all — try to find another.`,
+    start: (desc) => `${desc} The vertices with a moving ring have no unplaced predecessors — choose one of them.`,
+    available: (list, placed, total) => `Available now: **${list}**. Placed: ${placed}/${total}.`,
+    clear: 'Clear',
+    editHelp: 'Click the canvas → vertex · click two vertices → an edge from the first to the second.',
+    sccGraph: 'Digraph for the strongly connected components',
+    reachForward: 'reach⁺ (reachable from v)',
+    reachBackward: 'reach⁻ (reaches v)',
+    both: 'Both → the same SCC',
+    auto: 'Automatic step',
+    undo: 'Undo',
+    newOrder: 'New order',
+    hideOrders: 'Hide the orders',
+    showOrders: 'Show all the orders',
+    dag: (name) => `DAG: ${name}`,
+    availableNow: 'Available now',
+    placedLegend: 'Placed (with its number in the order)',
+    labAlgorithm: 'The lab’s algorithm',
+    pseudo: [
+      'for every unassigned vertex v:',
+      '  F = bfs_reach(v)',
+      '  B = bfs_reach(v, backwards)',
+      '  SCC(v) = F ∩ B',
+    ],
+    components: (n) => `Components (${n})`,
+    none: 'None yet.',
+    reachTable: 'Reachability table',
+    acyclic: 'No cycles: every vertex is a component of its own.',
+    yourOrder: 'Your order',
+    result: 'Result',
+    possible: (n) => `${n} possible orders`,
+    found: (n) => `found: ${n}`,
+    mistakes: (n) => `mistakes: ${n}`,
+    orders: (shown, total) => `Orders (${shown} of ${total})`,
+  },
+);
+
 export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode?: 'scc' | 'topo'; preset?: string }) {
   const [mode, setMode] = useState<'scc' | 'topo'>(initialMode);
+  const X = useText(TEXT);
+  const S = useText(SCC_TEXT);
+  /** A vertex's name in the interface language. */
+  const name = (id: string) => X.steps[id] ?? id;
 
   /* ---------------- SCC state ---------------- */
   const s0 = SCC_PRESETS.find((p) => p.id === preset) ?? SCC_PRESETS[0];
@@ -185,7 +317,7 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
   const idsKey = nodes.map((n) => n.id).join(',');
   const edgesKey = edges.map((e) => `${e.u}>${e.v}`).join(',');
   // biome-ignore lint/correctness/useExhaustiveDependencies: keyed on the graph's structure, so dragging a vertex does not restart the animation
-  const steps = useMemo<SccStep[]>(() => sccSteps(nodes, edges), [idsKey, edgesKey]);
+  const steps = useMemo<SccStep[]>(() => sccSteps(nodes, edges, S), [idsKey, edgesKey, S]);
   const player = usePlayer(steps, 1100);
   const st = player.step;
   // biome-ignore lint/correctness/useExhaustiveDependencies: keyed on the graph's structure, so dragging a vertex does not restart the animation
@@ -229,11 +361,11 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
   };
   const place = (id: string) => {
     if (complete) return;
-    if (placed.includes(id)) return setFlash(`**${id}** është vendosur tashmë.`);
+    if (placed.includes(id)) return setFlash(X.already(name(id)));
     if (!avail.includes(id)) {
       const missing = topo.edges.filter((e) => e.v === id && !placed.includes(e.u)).map((e) => e.u);
       setMistakes((m) => m + 1);
-      return setFlash(`**${id}** nuk mund të vendoset ende: kërkon më parë ${missing.join(', ')}.`);
+      return setFlash(X.notYet(name(id), missing.map(name).join(', ')));
     }
     const next = [...placed, id];
     setPlaced(next);
@@ -323,44 +455,40 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
 
   return (
     <VizShell
-      title={mode === 'scc' ? 'Komponentet e lidhura fort (SCC)' : 'Renditjet topologjike'}
-      subtitle={
-        mode === 'scc'
-          ? 'Dy kulme janë në të njëjtën komponente kur secili arrin tjetrin. Ndërtoni digrafin tuaj ose zgjidhni një shembull.'
-          : 'Vendosni kulmet me radhë: lejohet vetëm një kulm që i ka të gjithë paraardhësit të vendosur.'
-      }
+      title={mode === 'scc' ? X.sccTitle : X.topoTitle}
+      subtitle={mode === 'scc' ? X.sccSubtitle : X.topoSubtitle}
       icon={<GitBranch />}
       onKeyDown={mode === 'scc' ? playerKeys(player) : undefined}
       toolbar={
         <>
-          <Field label="Mënyra">
+          <Field label={X.mode}>
             <Segmented
-              label="Mënyra"
+              label={X.mode}
               value={mode}
               onChange={setMode}
               options={[
                 { value: 'scc', label: 'SCC — reach⁺ ∩ reach⁻', icon: <GitBranch className="size-4" /> },
-                { value: 'topo', label: 'Renditja topologjike', icon: <ListOrdered className="size-4" /> },
+                { value: 'topo', label: X.topoMode, icon: <ListOrdered className="size-4" /> },
               ]}
             />
           </Field>
           {mode === 'scc' ? (
-            <Field label="Digrafi">
+            <Field label={X.digraph}>
               <Choice
-                label="Digrafi"
+                label={X.digraph}
                 value={sccPreset}
                 onChange={loadScc}
-                options={SCC_PRESETS.map((p) => ({ value: p.id, label: p.name }))}
+                options={SCC_PRESETS.map((p) => ({ value: p.id, label: X.sccPresets[p.id] ?? p.id }))}
                 className="w-60"
               />
             </Field>
           ) : (
-            <Field label="Skenari">
+            <Field label={X.scenario}>
               <Choice
-                label="Skenari"
+                label={X.scenario}
                 value={topoPreset}
                 onChange={loadTopo}
-                options={TOPO_PRESETS.map((p) => ({ value: p.id, label: p.name }))}
+                options={TOPO_PRESETS.map((p) => ({ value: p.id, label: X.topoPresets[p.id]?.name ?? p.id }))}
                 className="w-52"
               />
             </Field>
@@ -379,10 +507,10 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
             text={
               flash ??
               (complete
-                ? `**Renditje e vlefshme!** ${placed.join(' → ')}. Gabime: ${mistakes}. Gjithsej ekzistojnë **${orders.count}** renditje topologjike — provoni të gjeni një tjetër.`
+                ? X.valid(placed.map(name).join(' → '), mistakes, orders.count)
                 : placed.length === 0
-                  ? `${topo.desc} Kulmet me rreth lëvizës nuk kanë paraardhës të pavendosur — zgjidhni njërin.`
-                  : `Të disponueshme tani: **${avail.join(', ')}**. Vendosur: ${placed.length}/${tNodes.length}.`)
+                  ? X.start(X.topoPresets[topo.id]?.desc ?? '')
+                  : X.available(avail.map(name).join(', '), placed.length, tNodes.length))
             }
           />
         )
@@ -402,11 +530,9 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
                     setPending(null);
                   }}
                 >
-                  <Trash2 /> Pastro
+                  <Trash2 /> {X.clear}
                 </Button>
-                <span className="text-xs text-muted">
-                  Klikoni në fushë → kulm · klikoni dy kulme → hark nga i pari te i dyti.
-                </span>
+                <span className="text-xs text-muted">{X.editHelp}</span>
               </div>
               <div className="rounded-2xl border border-border bg-[var(--viz-canvas)] bg-grid">
                 <GraphCanvas
@@ -420,14 +546,14 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
                   onBackgroundClick={addNode}
                   onNodeClick={clickScc}
                   onNodeMove={(id, x, y) => setNodes((ns) => ns.map((n) => (n.id === id ? { ...n, x, y } : n)))}
-                  ariaLabel="Digraf për komponentet e lidhura fort"
+                  ariaLabel={X.sccGraph}
                 />
               </div>
               <Legend
                 items={[
-                  { color: 'var(--viz-path)', label: 'reach⁺ (arrihet nga v)' },
-                  { color: 'var(--viz-compare)', label: 'reach⁻ (arrin v)' },
-                  { color: 'var(--viz-active)', label: 'Të dyja → e njëjta SCC' },
+                  { color: 'var(--viz-path)', label: X.reachForward },
+                  { color: 'var(--viz-compare)', label: X.reachBackward },
+                  { color: 'var(--viz-active)', label: X.both },
                 ]}
               />
             </>
@@ -440,7 +566,7 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
                   isDisabled={complete || !avail.length}
                   onPress={() => place(avail[0])}
                 >
-                  <Wand2 /> Hapi automatik
+                  <Wand2 /> {X.auto}
                 </Button>
                 <Button
                   size="sm"
@@ -451,7 +577,7 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
                     setFlash(null);
                   }}
                 >
-                  <Undo2 /> Zhbëj
+                  <Undo2 /> {X.undo}
                 </Button>
                 <Button
                   size="sm"
@@ -461,15 +587,15 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
                     setFlash(null);
                   }}
                 >
-                  <Shuffle /> Renditje e re
+                  <Shuffle /> {X.newOrder}
                 </Button>
                 <Button size="sm" variant="ghost" onPress={() => setShowAll(!showAll)}>
-                  {showAll ? <EyeOff /> : <Eye />} {showAll ? 'Fshih renditjet' : 'Shfaq të gjitha renditjet'}
+                  {showAll ? <EyeOff /> : <Eye />} {showAll ? X.hideOrders : X.showOrders}
                 </Button>
               </div>
               <div className="rounded-2xl border border-border bg-[var(--viz-canvas)] bg-grid">
                 <GraphCanvas
-                  nodes={tNodes}
+                  nodes={tNodes.map((n) => ({ ...n, label: name(n.id) }))}
                   edges={topo.edges}
                   directed
                   width={W}
@@ -479,13 +605,13 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
                   edgeLook={topoEdge}
                   onNodeClick={place}
                   onNodeMove={(id, x, y) => setTNodes((ns) => ns.map((n) => (n.id === id ? { ...n, x, y } : n)))}
-                  ariaLabel={`DAG: ${topo.name}`}
+                  ariaLabel={X.dag(X.topoPresets[topo.id]?.name ?? topo.id)}
                 />
               </div>
               <Legend
                 items={[
-                  { color: 'var(--viz-active)', label: 'I disponueshëm tani', shape: 'ring' },
-                  { color: 'var(--viz-done)', label: 'I vendosur (me numrin e radhës)' },
+                  { color: 'var(--viz-active)', label: X.availableNow, shape: 'ring' },
+                  { color: 'var(--viz-done)', label: X.placedLegend },
                 ]}
               />
             </>
@@ -495,20 +621,12 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
         <div className="grid min-w-0 content-start gap-3">
           {mode === 'scc' ? (
             <>
-              <Panel title="Algoritmi i laboratorit">
-                <Pseudocode
-                  lines={[
-                    'për çdo kulm v të pacaktuar:',
-                    '  F = bfs_reach(v)',
-                    '  B = bfs_reach(v, mbrapa)',
-                    '  SCC(v) = F ∩ B',
-                  ]}
-                  active={st.line}
-                />
+              <Panel title={X.labAlgorithm}>
+                <Pseudocode lines={X.pseudo} active={st.line} />
               </Panel>
-              <Panel title={`Komponentet (${st.comps.length})`}>
+              <Panel title={X.components(st.comps.length)}>
                 {st.comps.length === 0 ? (
-                  <p className="text-sm text-muted">Ende asnjë.</p>
+                  <p className="text-sm text-muted">{X.none}</p>
                 ) : (
                   <ul className="space-y-1.5">
                     {st.comps.map((c, i) => (
@@ -529,7 +647,7 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
                   </ul>
                 )}
               </Panel>
-              <Panel title="Tabela e arritshmërisë">
+              <Panel title={X.reachTable}>
                 <ul className="space-y-1 font-mono text-[0.78rem]">
                   {reachTable.map((r) => (
                     <li key={r.id} className="flex gap-2">
@@ -539,31 +657,29 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
                     </li>
                   ))}
                 </ul>
-                {!cyclic && nodes.length > 0 && (
-                  <p className="mt-2 text-xs text-muted">Pa cikle: çdo kulm është komponente më vete.</p>
-                )}
+                {!cyclic && nodes.length > 0 && <p className="mt-2 text-xs text-muted">{X.acyclic}</p>}
               </Panel>
             </>
           ) : (
             <>
-              <Panel title="Renditja juaj">
-                <TokenRow items={placed} tone="success" empty="—" />
+              <Panel title={X.yourOrder}>
+                <TokenRow items={placed.map(name)} tone="success" empty="—" />
               </Panel>
-              <Panel title="Rezultati">
+              <Panel title={X.result}>
                 <div className="flex flex-wrap gap-1.5">
                   <Chip size="sm" variant="soft" color="accent">
-                    {orders.count} renditje të mundshme
+                    {X.possible(orders.count)}
                   </Chip>
                   <Chip size="sm" variant="soft" color={found.length ? 'success' : 'default'}>
-                    gjetur: {found.length}
+                    {X.found(found.length)}
                   </Chip>
                   <Chip size="sm" variant="soft" color={mistakes ? 'danger' : 'default'}>
-                    gabime: {mistakes}
+                    {X.mistakes(mistakes)}
                   </Chip>
                 </div>
               </Panel>
               {showAll && (
-                <Panel title={`Renditjet (${Math.min(orders.list.length, orders.count)} nga ${orders.count})`}>
+                <Panel title={X.orders(Math.min(orders.list.length, orders.count), orders.count)}>
                   <ol className="max-h-64 space-y-1 overflow-y-auto font-mono text-[0.72rem] text-muted">
                     {orders.list.map((o, i) => (
                       <li
@@ -571,7 +687,7 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
                         key={i}
                         className={found.includes(o.join(' → ')) ? 'font-semibold text-success' : ''}
                       >
-                        {i + 1}. {o.join(' → ')}
+                        {i + 1}. {o.map(name).join(' → ')}
                       </li>
                     ))}
                   </ol>
