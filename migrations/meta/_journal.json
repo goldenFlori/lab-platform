@@ -57,6 +57,13 @@
       "when": 1791653194286,
       "tag": "0007_lab_activity",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1791654534495,
+      "tag": "0008_locales",
+      "breakpoints": true
     }
   ]
 }

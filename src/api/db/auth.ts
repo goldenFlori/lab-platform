@@ -1,11 +1,12 @@
 import { and, eq, gt, inArray, lt, lte, sql } from 'drizzle-orm';
+import type { Locale } from '../../shared/locale';
 import type { Db } from './index';
 import { loginAttempts, memberships, organizations, sessions, users } from './schema';
 
 // Data access for signing in. Accounts and sessions belong to a person, not to a tenant, so this
 // lives beside forTenant() rather than inside it.
 
-export type SessionUser = { id: string; username: string; fullName: string };
+export type SessionUser = { id: string; username: string; fullName: string; locale: Locale | null };
 
 /** Unix seconds, as timestamp columns store them; raw SQL fragments need them spelled out. */
 const seconds = (date: Date) => Math.floor(date.getTime() / 1000);
@@ -17,6 +18,7 @@ export async function findAccount(db: Db, username: string) {
       id: users.id,
       username: users.username,
       fullName: users.fullName,
+      locale: users.locale,
       passwordHash: users.passwordHash,
       status: users.status,
     })
@@ -24,6 +26,11 @@ export async function findAccount(db: Db, username: string) {
     .where(eq(users.username, username.toLowerCase()))
     .limit(1);
   return account;
+}
+
+/** The user's interface language, or null to follow the course and the default (#19). */
+export async function setLocale(db: Db, userId: string, locale: Locale | null) {
+  await db.update(users).set({ locale }).where(eq(users.id, userId));
 }
 
 export async function setPasswordHash(db: Db, userId: string, passwordHash: string) {
@@ -53,7 +60,7 @@ export async function findSession(db: Db, id: string) {
     .select({
       id: sessions.id,
       expiresAt: sessions.expiresAt,
-      user: { id: users.id, username: users.username, fullName: users.fullName },
+      user: { id: users.id, username: users.username, fullName: users.fullName, locale: users.locale },
     })
     .from(sessions)
     .innerJoin(users, eq(users.id, sessions.userId))

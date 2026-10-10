@@ -56,7 +56,7 @@ function appFor(userId: string) {
   }
   return new Hono<TenantEnv>()
     .use(async (c, next) => {
-      c.set('user', { id: userId, username: 'test', fullName: 'Test' });
+      c.set('user', { id: userId, username: 'test', fullName: 'Test', locale: null });
       await next();
     })
     .route('/orgs', routes)

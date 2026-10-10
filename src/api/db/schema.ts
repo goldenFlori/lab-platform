@@ -62,6 +62,8 @@ export const users = sqliteTable('users', {
   status: text('status', { enum: ['active', 'disabled'] })
     .notNull()
     .default('active'),
+  /** The interface language the user chose (#19); null follows the course or the default. */
+  locale: text('locale', { enum: ['sq', 'en'] }),
   createdAt: createdAt(),
 });
 
@@ -90,6 +92,8 @@ export const courses = sqliteTable(
     /** For example "2026/27". */
     academicYear: text('academic_year').notNull(),
     archivedAt: integer('archived_at', { mode: 'timestamp' }),
+    /** The interface language for those who have not chosen one (#19); null is the default. */
+    locale: text('locale', { enum: ['sq', 'en'] }),
     createdAt: createdAt(),
   },
   (t) => [
