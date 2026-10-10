@@ -12,6 +12,7 @@ import { type GroupStudent, importStudentsInput, resetPasswordInput } from '../.
 import type { TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
 import { forbidden, groupOf, invalidRequest, seesCourse, summary, visibleCourse } from './course-context';
+import { labRoutes } from './labs';
 
 // Courses and their groups, under /api/orgs/:org/courses (#10).
 
@@ -166,4 +167,6 @@ export const courseRoutes = new Hono<TenantEnv>()
     const joinCode = c.req.valid('json').enabled ? generateJoinCode() : null;
     await c.var.tenant.groups.update(group.id, { joinCode });
     return c.json({ joinCode });
-  });
+  })
+
+  .route('/:courseId/labs', labRoutes);

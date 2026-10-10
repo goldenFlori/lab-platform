@@ -1,4 +1,15 @@
-import { and, asc, eq, type InferInsertModel, type InferSelectModel, inArray, like, or, type SQL } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  eq,
+  type InferInsertModel,
+  type InferSelectModel,
+  inArray,
+  isNull,
+  like,
+  or,
+  type SQL,
+} from 'drizzle-orm';
 import { roleExists } from './access';
 import { uuidv7 } from './ids';
 import type { Db } from './index';
@@ -227,6 +238,55 @@ function tenantGroups(db: Db, orgId: string) {
   };
 }
 
+function tenantLabs(db: Db, orgId: string) {
+  const base = tenantTable(db, orgId, labs);
+  return {
+    ...base,
+    async ofCourse(courseId: string) {
+      const rows = await base.list(eq(labs.courseId, courseId));
+      return rows.sort((a, b) => a.position - b.position || a.n - b.n);
+    },
+  };
+}
+
+type Rule = { visibleFrom: Date | null; visibleUntil: Date | null; solutionsFrom: Date | null };
+
+/** When labs are open (#12): one rule per lab and group, or per lab for the whole course. */
+function tenantLabAccess(db: Db, orgId: string) {
+  const base = tenantTable(db, orgId, labAccess);
+  const ruleOf = (labId: string, groupId: string | null) =>
+    and(eq(labAccess.labId, labId), groupId === null ? isNull(labAccess.groupId) : eq(labAccess.groupId, groupId));
+  return {
+    ...base,
+    /** Every rule of a course's labs, in one query (by course, so the parameter count stays fixed). */
+    ofCourse(courseId: string) {
+      return db
+        .select({
+          labId: labAccess.labId,
+          groupId: labAccess.groupId,
+          visibleFrom: labAccess.visibleFrom,
+          visibleUntil: labAccess.visibleUntil,
+          solutionsFrom: labAccess.solutionsFrom,
+        })
+        .from(labAccess)
+        .innerJoin(labs, and(eq(labs.id, labAccess.labId), eq(labs.orgId, labAccess.orgId)))
+        .where(and(eq(labAccess.orgId, orgId), eq(labs.courseId, courseId)));
+    },
+
+    async setRule(labId: string, groupId: string | null, rule: Rule) {
+      const [existing] = await base.list(ruleOf(labId, groupId));
+      if (existing) return base.update(existing.id, rule);
+      return base.create({ labId, groupId, ...rule });
+    },
+
+    /** Back to the course-wide rule for this group. */
+    async removeRule(labId: string, groupId: string) {
+      const [existing] = await base.list(ruleOf(labId, groupId));
+      if (existing) await base.remove(existing.id);
+    },
+  };
+}
+
 /** Rows per multi-row insert, so each statement stays under D1's 100 bound parameters. */
 export const ROWS_PER_INSERT = 10;
 
@@ -325,8 +385,8 @@ export function forTenant(db: Db, orgId: string) {
     courseTemplates: tenantTable(db, orgId, courseTemplates),
     courses: tenantCourses(db, orgId),
     groups: tenantGroups(db, orgId),
-    labs: tenantTable(db, orgId, labs),
-    labAccess: tenantTable(db, orgId, labAccess),
+    labs: tenantLabs(db, orgId),
+    labAccess: tenantLabAccess(db, orgId),
     students: tenantStudents(db, orgId),
   };
 }
