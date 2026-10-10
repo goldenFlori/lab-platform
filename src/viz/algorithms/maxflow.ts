@@ -7,6 +7,7 @@
  * ===================================================================== */
 
 import type { GEdge, GNode } from '../kit/GraphCanvas';
+import { MAXFLOW_TEXT, type MaxflowText } from './maxflow.text';
 
 export type Strategy = 'ek' | 'ff' | 'greedy' | 'adversary';
 
@@ -130,6 +131,7 @@ export function maxflowSteps(
   maxAug = 400,
   initial?: number[],
   describe?: (path: RArc[], x: number) => string,
+  T: MaxflowText = MAXFLOW_TEXT.sq,
 ): FlowStep[] {
   const f = initial ? [...initial] : edges.map(() => 0);
   const steps: FlowStep[] = [];
@@ -141,16 +143,11 @@ export function maxflowSteps(
       : strategy === 'ff'
         ? 'Ford-Fulkerson (DFS)'
         : strategy === 'greedy'
-          ? 'algoritmi greedy'
-          : 'Ford-Fulkerson me rrugë të zgjedhura keq';
+          ? T.greedyName
+          : T.adversaryName;
   steps.push({
     phase: 'init',
-    note:
-      strategy === 'greedy'
-        ? `Algoritmi greedy (slide 26): nis me **f = 0** dhe shton rrjedhë vetëm përgjatë rrugëve ku **f(e) < c(e)** — pa brinjë kthyese.`
-        : initial
-          ? `**${name}** nis nga rrjedha e dhënë (v(f) = ${value}) dhe kërkon rrugë rritëse në G_f.`
-          : `**${name}**: nis me f = 0. Sa kohë ka një rrugë s → t në rrjetën mbetëse G_f, rrit rrjedhën përgjatë saj.`,
+    note: strategy === 'greedy' ? T.greedyStart : initial ? T.fromGiven(name, value) : T.start(name),
     flow: [...f],
     value,
     path: [],
@@ -171,9 +168,7 @@ export function maxflowSteps(
     const hasBack = path.some((a) => a.back);
     steps.push({
       phase: 'path',
-      note: describe
-        ? describe(path, x)
-        : `Iterimi ${it}: rruga rritëse **${label(path, s)}**${hasBack ? ' — kalon nëpër një **brinjë kthyese**' : ''}. Ngushtica x = min(${path.map((a) => a.cap).join(', ')}) = **${x}**.`,
+      note: describe ? describe(path, x) : T.path(it, label(path, s), hasBack, path.map((a) => a.cap).join(', '), x),
       flow: [...f],
       value,
       path,
@@ -187,9 +182,7 @@ export function maxflowSteps(
     history.push({ path: label(path, s), x });
     steps.push({
       phase: 'augment',
-      note: hasBack
-        ? `rritRrjedhë: +${x} në brinjët e drejta, **−${x} në brinjën kthyese** (zhbëjmë rrjedhë). v(f) = **${value}**.`
-        : `rritRrjedhë: +${x} në çdo brinjë të rrugës. v(f) = **${value}**.`,
+      note: hasBack ? T.augmentBack(x, value) : T.augment(x, value),
       flow: [...f],
       value,
       path,
@@ -217,7 +210,7 @@ export function maxflowSteps(
   if (strategy === 'greedy' && S.has(t)) {
     steps.push({
       phase: 'stuck',
-      note: `Greedy ngeci me **v(f) = ${value}**, por ende ka rrugë rritëse në G_f që kalon nëpër një brinjë kthyese. Pa mundësi për të "zhbërë" rrjedhë, greedy nuk e gjen maksimumin.`,
+      note: T.stuck(value),
       flow: [...f],
       value,
       path: [],
@@ -230,7 +223,7 @@ export function maxflowSteps(
   }
   steps.push({
     phase: 'done',
-    note: `Nuk ka më rrugë s → t në G_f. Kulmet e arritshme S = {${cutS.join(', ')}} japin prerjen me kapacitet **${cutCap} = v(f) = ${value}**. Sipas teoremës, kjo është **rrjedha maksimale** (${history.length} iterime).`,
+    note: T.done(cutS.join(', '), cutCap, value, history.length),
     flow: [...f],
     value,
     path: [],

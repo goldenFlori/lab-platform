@@ -2,9 +2,11 @@ import { Chip } from '@heroui/react';
 import { Flower2, Heart } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { type FlowStep, maxflowSteps, type RArc } from './algorithms/maxflow';
+import { MAXFLOW_TEXT } from './algorithms/maxflow.text';
 import { Field, PlayerBar, Segmented, Toggle } from './kit/controls';
 import { type EdgeLook, type GEdge, type GNode, GraphCanvas, type NodeLook } from './kit/GraphCanvas';
 import { Legend, Panel, Stat, StepNote, VizShell } from './kit/shell';
+import { bilingual, useText } from './kit/text';
 import { playerKeys, usePlayer } from './kit/usePlayer';
 
 /* =====================================================================
@@ -23,23 +25,159 @@ const PREFS: Record<string, string[]> = {
   Maja: ['Mace', 'Lulu'],
 };
 
-const FLOWERS: [string, number][] = [
-  ['Trëndafil i kuq', 10],
-  ['Trëndafil rozë', 15],
-  ['Trëndafil i bardhë', 15],
-  ['Zambak rozë', 15],
-  ['Tulipan i kuq', 15],
-  ['Zambak i bardhë', 15],
-  ['Tulipan rozë', 10],
+// Flowers and bouquets by key; their names, which also name the network's vertices, are in TEXT.
+type Flower = 'redRose' | 'pinkRose' | 'whiteRose' | 'pinkLily' | 'redTulip' | 'whiteLily' | 'pinkTulip';
+type Bouquet = 'red' | 'pink' | 'white' | 'roses' | 'tulips' | 'lilies';
+const FLOWERS: [Flower, number][] = [
+  ['redRose', 10],
+  ['pinkRose', 15],
+  ['whiteRose', 15],
+  ['pinkLily', 15],
+  ['redTulip', 15],
+  ['whiteLily', 15],
+  ['pinkTulip', 10],
 ];
-const BOUQUETS: [string, number, string[]][] = [
-  ['Buqetë e kuqe', 15, ['Trëndafil i kuq', 'Tulipan i kuq']],
-  ['Buqetë rozë', 15, ['Trëndafil rozë', 'Zambak rozë', 'Tulipan rozë']],
-  ['Buqetë e bardhë', 15, ['Trëndafil i bardhë', 'Zambak i bardhë']],
-  ['Vetëm trëndafila', 20, ['Trëndafil i kuq', 'Trëndafil rozë', 'Trëndafil i bardhë']],
-  ['Vetëm tulipanë', 15, ['Tulipan i kuq', 'Tulipan rozë']],
-  ['Vetëm zambakë', 15, ['Zambak rozë', 'Zambak i bardhë']],
+const BOUQUETS: [Bouquet, number, Flower[]][] = [
+  ['red', 15, ['redRose', 'redTulip']],
+  ['pink', 15, ['pinkRose', 'pinkLily', 'pinkTulip']],
+  ['white', 15, ['whiteRose', 'whiteLily']],
+  ['roses', 20, ['redRose', 'pinkRose', 'whiteRose']],
+  ['tulips', 15, ['redTulip', 'pinkTulip']],
+  ['lilies', 15, ['pinkLily', 'whiteLily']],
 ];
+
+const TEXT = bilingual(
+  {
+    flowers: {
+      redRose: 'Trëndafil i kuq',
+      pinkRose: 'Trëndafil rozë',
+      whiteRose: 'Trëndafil i bardhë',
+      pinkLily: 'Zambak rozë',
+      redTulip: 'Tulipan i kuq',
+      whiteLily: 'Zambak i bardhë',
+      pinkTulip: 'Tulipan rozë',
+    } as Record<Flower, string>,
+    bouquets: {
+      red: 'Buqetë e kuqe',
+      pink: 'Buqetë rozë',
+      white: 'Buqetë e bardhë',
+      roses: 'Vetëm trëndafila',
+      tulips: 'Vetëm tulipanë',
+      lilies: 'Vetëm zambakë',
+    } as Record<Bouquet, string>,
+    leaves: (who: string, what: string) => `**${who}** lëshon ${what}`,
+    takes: (who: string, what: string) => `**${who}** merr ${what}`,
+    augmenting: (path: string, parts: string, x: number) =>
+      `Rrugë rritëse: ${path}. Në gjuhën e çiftëzimit: ${parts}. Çiftëzimi rritet me ${x}.`,
+    problem: 'Problemi',
+    girlsKittens: 'Vajzat dhe kotelet',
+    flowersBouquets: 'Lulet dhe buqetat',
+    matchingTitle: 'Çiftëzimi maksimum me rrjedhë max',
+    matchingSubtitle:
+      'Çdo vajzë ka preferencat e saj. Si i bëjmë të lumtura sa më shumë vajza? Rrjeta rrjedhë me kapacitete 1 e zgjidh (slide 83).',
+    fromNaive: 'Nis nga zgjidhja naive',
+    showNetwork: 'Shfaq rrjetën (s, t)',
+    naive: (n: number) =>
+      `Zgjidhja **naive**: secila vajzë, me radhë, merr koteleten e parë të lirë → ${n} çifte. A mund të bëjmë më mirë?`,
+    empty: 'Nisim me çiftëzim bosh. Edmonds-Karp kërkon rrugë rritëse në rrjetën me kapacitete 1.',
+    maximum: (n: number, short: boolean) =>
+      `Çiftëzimi maksimum ka **${n} çifte** = vlera e rrjedhës max. ${short ? 'Nuk mund të jenë të gjitha të lumtura: shihni sa kotele të ndryshme pëlqejnë së bashku.' : ''}`,
+    bipartite: 'Graf dyanësor vajza–kotele',
+    inMatching: 'Në çiftëzim (rrjedhë 1)',
+    augmentingPath: 'Rruga rritëse',
+    changeMind: 'Brinjë kthyese — "ndërrim mendjeje"',
+    editPrefs: 'Ndryshoni preferencat: klikoni një vajzë, pastaj një kotele për të shtuar ose hequr pëlqimin.',
+    pairs: 'Çifte',
+    girls: 'Vajza',
+    matching: 'Çiftëzimi',
+    noKitten: 'pa kotele',
+    why: 'Pse funksionon (slide 85)',
+    whyPoints: [
+      'Kapacitetet janë të plota → rrjedhat janë 0 ose 1.',
+      'Ruajtja e rrjedhës → çdo vajzë merr të shumtën 1 kotele.',
+      'Brinjët me rrjedhë 1 formojnë një çiftëzim.',
+      'Vlera e rrjedhës = numri i çifteve.',
+    ],
+    assignmentTitle: 'Problemi i caktimit — lulet dhe buqetat',
+    assignmentSubtitle:
+      'c(x) = sa lule kemi, c(y) = sa lule mban buqeta, c(x, y) = 10 = të shumtën 10 lule të një lloji në një buqetë (slides 86–89).',
+    scarce: 'Vetëm 3 trëndafila të kuq (të tjerat me bollëk)',
+    allDone: (v: number, total: number) =>
+      `Të gjitha buqetat u realizuan: **${v} / ${total} lule**. Kontrolloni: buqeta e kuqe merr 10 trëndafila të kuq + 5 tulipanë të kuq (slide 89).`,
+    bottleneck: (v: number, total: number) =>
+      `Rrjedha max = **${v} / ${total}**. Prerja min (vijat e kuqe) tregon ngushticën: buqeta e kuqe merr të shumtën 3 + 10 = 13 lule.`,
+    flowerNetwork: 'Rrjeta e luleve dhe buqetave',
+    assigned: 'Lule të caktuara',
+    capacity: 'Kapaciteti',
+    filling: 'Mbushja e buqetave',
+  },
+  {
+    flowers: {
+      redRose: 'Red rose',
+      pinkRose: 'Pink rose',
+      whiteRose: 'White rose',
+      pinkLily: 'Pink lily',
+      redTulip: 'Red tulip',
+      whiteLily: 'White lily',
+      pinkTulip: 'Pink tulip',
+    },
+    bouquets: {
+      red: 'Red bouquet',
+      pink: 'Pink bouquet',
+      white: 'White bouquet',
+      roses: 'Roses only',
+      tulips: 'Tulips only',
+      lilies: 'Lilies only',
+    },
+    leaves: (who, what) => `**${who}** gives up ${what}`,
+    takes: (who, what) => `**${who}** takes ${what}`,
+    augmenting: (path, parts, x) =>
+      `Augmenting path: ${path}. In matching terms: ${parts}. The matching grows by ${x}.`,
+    problem: 'Problem',
+    girlsKittens: 'The girls and the kittens',
+    flowersBouquets: 'The flowers and the bouquets',
+    matchingTitle: 'Maximum matching with max flow',
+    matchingSubtitle:
+      'Each girl has her own preferences. How do we make as many girls happy as possible? A flow network with capacities 1 solves it (slide 83).',
+    fromNaive: 'Start from the naive solution',
+    showNetwork: 'Show the network (s, t)',
+    naive: (n) =>
+      `The **naive** solution: each girl in turn takes the first free kitten → ${n} pairs. Can we do better?`,
+    empty: 'Start with an empty matching. Edmonds-Karp looks for augmenting paths in the network with capacities 1.',
+    maximum: (n, short) =>
+      `The maximum matching has **${n} pairs** = the value of the max flow. ${short ? 'They cannot all be happy: look how many different kittens they like between them.' : ''}`,
+    bipartite: 'Bipartite graph of girls and kittens',
+    inMatching: 'In the matching (flow 1)',
+    augmentingPath: 'Augmenting path',
+    changeMind: 'Back edge — "a change of mind"',
+    editPrefs: 'Change the preferences: click a girl, then a kitten, to add or remove a like.',
+    pairs: 'Pairs',
+    girls: 'Girls',
+    matching: 'Matching',
+    noKitten: 'no kitten',
+    why: 'Why it works (slide 85)',
+    whyPoints: [
+      'The capacities are integers → the flows are 0 or 1.',
+      'Flow conservation → each girl gets at most 1 kitten.',
+      'The edges with flow 1 form a matching.',
+      'The value of the flow = the number of pairs.',
+    ],
+    assignmentTitle: 'The assignment problem — flowers and bouquets',
+    assignmentSubtitle:
+      'c(x) = how many flowers we have, c(y) = how many flowers a bouquet holds, c(x, y) = 10 = at most 10 flowers of one kind in a bouquet (slides 86–89).',
+    scarce: 'Only 3 red roses (plenty of the others)',
+    allDone: (v, total) =>
+      `Every bouquet was made: **${v} / ${total} flowers**. Check: the red bouquet gets 10 red roses + 5 red tulips (slide 89).`,
+    bottleneck: (v, total) =>
+      `Max flow = **${v} / ${total}**. The min cut (the red lines) shows the bottleneck: the red bouquet gets at most 3 + 10 = 13 flowers.`,
+    flowerNetwork: 'The network of flowers and bouquets',
+    assigned: 'Flowers assigned',
+    capacity: 'Capacity',
+    filling: 'Filling the bouquets',
+  },
+);
+
+type MatchingText = (typeof TEXT)['sq'];
 
 const soft = (c: string, p = 24) => `color-mix(in oklab, ${c} ${p}%, var(--surface))`;
 
@@ -52,12 +190,12 @@ function column(ids: string[], x: number, top: number, bottom: number): GNode[] 
 }
 
 /** A step of the augmenting-path search, told in matching terms. */
-function describeMatching(path: RArc[], x: number) {
+function describeMatching(L: MatchingText, path: RArc[], x: number) {
   const parts = path
     .filter((a) => GIRLS.includes(a.u) || GIRLS.includes(a.v))
     .filter((a) => a.u !== 's' && a.v !== 't')
-    .map((a) => (a.back ? `**${a.v}** lëshon ${a.u}` : `**${a.u}** merr ${a.v}`));
-  return `Rrugë rritëse: ${['s', ...path.map((a) => a.v)].join(' → ')}. Në gjuhën e çiftëzimit: ${parts.join(', ')}. Çiftëzimi rritet me ${x}.`;
+    .map((a) => (a.back ? L.leaves(a.v, a.u) : L.takes(a.u, a.v)));
+  return L.augmenting(['s', ...path.map((a) => a.v)].join(' → '), parts.join(', '), x);
 }
 
 export default function MatchingViz({ mode: initialMode = 'matching' }: { mode?: 'matching' | 'assignment' }) {
@@ -72,15 +210,16 @@ function ModeSwitch({
   mode: 'matching' | 'assignment';
   setMode: (m: 'matching' | 'assignment') => void;
 }) {
+  const L = useText(TEXT);
   return (
-    <Field label="Problemi">
+    <Field label={L.problem}>
       <Segmented
-        label="Problemi"
+        label={L.problem}
         value={mode}
         onChange={setMode}
         options={[
-          { value: 'matching', label: 'Vajzat dhe kotelet', icon: <Heart className="size-4" /> },
-          { value: 'assignment', label: 'Lulet dhe buqetat', icon: <Flower2 className="size-4" /> },
+          { value: 'matching', label: L.girlsKittens, icon: <Heart className="size-4" /> },
+          { value: 'assignment', label: L.flowersBouquets, icon: <Flower2 className="size-4" /> },
         ]}
       />
     </Field>
@@ -92,6 +231,8 @@ function ModeSwitch({
 /* ------------------------------------------------------------------ */
 
 function Matching({ setMode }: { setMode: (m: 'matching' | 'assignment') => void }) {
+  const L = useText(TEXT);
+  const M = useText(MAXFLOW_TEXT);
   const [prefs, setPrefs] = useState<Record<string, string[]>>(PREFS);
   const [fromNaive, setFromNaive] = useState(true);
   const [network, setNetwork] = useState(false);
@@ -126,8 +267,19 @@ function Matching({ setMode }: { setMode: (m: 'matching' | 'assignment') => void
   }, [edges, prefs]);
 
   const steps = useMemo<FlowStep[]>(
-    () => maxflowSteps([], edges, 's', 't', 'ek', 50, fromNaive ? naive : undefined, describeMatching),
-    [edges, fromNaive, naive],
+    () =>
+      maxflowSteps(
+        [],
+        edges,
+        's',
+        't',
+        'ek',
+        50,
+        fromNaive ? naive : undefined,
+        (p, x) => describeMatching(L, p, x),
+        M,
+      ),
+    [edges, fromNaive, naive, L, M],
   );
   const player = usePlayer(steps, 1300);
   const st = player.step;
@@ -194,16 +346,16 @@ function Matching({ setMode }: { setMode: (m: 'matching' | 'assignment') => void
   const done = st.phase === 'done';
   return (
     <VizShell
-      title="Çiftëzimi maksimum me rrjedhë max"
-      subtitle="Çdo vajzë ka preferencat e saj. Si i bëjmë të lumtura sa më shumë vajza? Rrjeta rrjedhë me kapacitete 1 e zgjidh (slide 83)."
+      title={L.matchingTitle}
+      subtitle={L.matchingSubtitle}
       icon={<Heart />}
       onKeyDown={playerKeys(player)}
       toolbar={
         <>
           <ModeSwitch mode="matching" setMode={setMode} />
           <div className="flex flex-wrap items-center gap-4 pb-1">
-            <Toggle label="Nis nga zgjidhja naive" value={fromNaive} onChange={setFromNaive} />
-            <Toggle label="Shfaq rrjetën (s, t)" value={network} onChange={setNetwork} />
+            <Toggle label={L.fromNaive} value={fromNaive} onChange={setFromNaive} />
+            <Toggle label={L.showNetwork} value={network} onChange={setNetwork} />
           </div>
         </>
       }
@@ -214,10 +366,10 @@ function Matching({ setMode }: { setMode: (m: 'matching' | 'assignment') => void
             text={
               st.phase === 'init'
                 ? fromNaive
-                  ? `Zgjidhja **naive**: secila vajzë, me radhë, merr koteleten e parë të lirë → ${size} çifte. A mund të bëjmë më mirë?`
-                  : 'Nisim me çiftëzim bosh. Edmonds-Karp kërkon rrugë rritëse në rrjetën me kapacitete 1.'
+                  ? L.naive(size)
+                  : L.empty
                 : done
-                  ? `Çiftëzimi maksimum ka **${size} çifte** = vlera e rrjedhës max. ${size < GIRLS.length ? 'Nuk mund të jenë të gjitha të lumtura: shihni sa kotele të ndryshme pëlqejnë së bashku.' : ''}`
+                  ? L.maximum(size, size < GIRLS.length)
                   : st.note
             }
           />
@@ -239,26 +391,24 @@ function Matching({ setMode }: { setMode: (m: 'matching' | 'assignment') => void
               edgeLook={edgeLook}
               showWeights={false}
               onNodeClick={togglePref}
-              ariaLabel="Graf dyanësor vajza–kotele"
+              ariaLabel={L.bipartite}
             />
           </div>
           <Legend
             items={[
-              { color: 'var(--viz-done)', label: 'Në çiftëzim (rrjedhë 1)', shape: 'line' },
-              { color: 'var(--viz-active)', label: 'Rruga rritëse', shape: 'line' },
-              { color: 'var(--viz-compare)', label: 'Brinjë kthyese — "ndërrim mendjeje"', shape: 'dash' },
+              { color: 'var(--viz-done)', label: L.inMatching, shape: 'line' },
+              { color: 'var(--viz-active)', label: L.augmentingPath, shape: 'line' },
+              { color: 'var(--viz-compare)', label: L.changeMind, shape: 'dash' },
             ]}
           />
-          <p className="text-xs text-muted">
-            Ndryshoni preferencat: klikoni një vajzë, pastaj një kotele për të shtuar ose hequr pëlqimin.
-          </p>
+          <p className="text-xs text-muted">{L.editPrefs}</p>
         </div>
         <div className="grid min-w-0 content-start gap-3">
           <div className="grid grid-cols-2 gap-3">
-            <Stat label="Çifte" value={size} tone="success" />
-            <Stat label="Vajza" value={GIRLS.length} />
+            <Stat label={L.pairs} value={size} tone="success" />
+            <Stat label={L.girls} value={GIRLS.length} />
           </div>
-          <Panel title="Çiftëzimi">
+          <Panel title={L.matching}>
             <ul className="space-y-1 text-sm">
               {GIRLS.map((g) => {
                 const m = matched.find(({ e }) => e.u === g);
@@ -270,19 +420,18 @@ function Matching({ setMode }: { setMode: (m: 'matching' | 'assignment') => void
                         {m.e.v}
                       </Chip>
                     ) : (
-                      <span className="text-xs text-muted">pa kotele</span>
+                      <span className="text-xs text-muted">{L.noKitten}</span>
                     )}
                   </li>
                 );
               })}
             </ul>
           </Panel>
-          <Panel title="Pse funksionon (slide 85)">
+          <Panel title={L.why}>
             <ol className="list-decimal space-y-1 pl-4 text-xs text-muted">
-              <li>Kapacitetet janë të plota → rrjedhat janë 0 ose 1.</li>
-              <li>Ruajtja e rrjedhës → çdo vajzë merr të shumtën 1 kotele.</li>
-              <li>Brinjët me rrjedhë 1 formojnë një çiftëzim.</li>
-              <li>Vlera e rrjedhës = numri i çifteve.</li>
+              {L.whyPoints.map((point) => (
+                <li key={point}>{point}</li>
+              ))}
             </ol>
           </Panel>
         </div>
@@ -297,17 +446,23 @@ function Matching({ setMode }: { setMode: (m: 'matching' | 'assignment') => void
 
 function Assignment({ setMode }: { setMode: (m: 'matching' | 'assignment') => void }) {
   const [scarce, setScarce] = useState(false);
+  const L = useText(TEXT);
+  const M = useText(MAXFLOW_TEXT);
+  // The vertices are named in the interface language, so the steps read in it too.
+  const flower = (key: Flower) => L.flowers[key];
+  const bouquet = (key: Bouquet) => L.bouquets[key];
   const supply = useMemo(
-    () => FLOWERS.map(([name, c]) => [name, scarce ? (name === 'Trëndafil i kuq' ? 3 : 30) : c] as [string, number]),
+    () => FLOWERS.map(([key, c]) => [key, scarce ? (key === 'redRose' ? 3 : 30) : c] as [Flower, number]),
     [scarce],
   );
   const edges = useMemo<GEdge[]>(() => {
-    const es: GEdge[] = supply.map(([f, c]) => ({ u: 's', v: f, w: c }));
-    for (const [b, , allowed] of BOUQUETS) for (const f of allowed) es.push({ u: f, v: b, w: 10 });
-    for (const [b, c] of BOUQUETS) es.push({ u: b, v: 't', w: c });
+    const es: GEdge[] = supply.map(([f, c]) => ({ u: 's', v: L.flowers[f], w: c }));
+    for (const [b, , allowed] of BOUQUETS)
+      for (const f of allowed) es.push({ u: L.flowers[f], v: L.bouquets[b], w: 10 });
+    for (const [b, c] of BOUQUETS) es.push({ u: L.bouquets[b], v: 't', w: c });
     return es;
-  }, [supply]);
-  const steps = useMemo(() => maxflowSteps([], edges, 's', 't', 'ek'), [edges]);
+  }, [supply, L]);
+  const steps = useMemo(() => maxflowSteps([], edges, 's', 't', 'ek', undefined, undefined, undefined, M), [edges, M]);
   const player = usePlayer(steps, 1000);
   const st = player.step;
   const total = BOUQUETS.reduce((s, [, c]) => s + c, 0);
@@ -320,13 +475,13 @@ function Assignment({ setMode }: { setMode: (m: 'matching' | 'assignment') => vo
     { id: 's', x: 40, y: H / 2 },
     { id: 't', x: W - 40, y: H / 2 },
     ...column(
-      FLOWERS.map((f) => f[0]),
+      FLOWERS.map((f) => flower(f[0])),
       230,
       40,
       H - 40,
     ),
     ...column(
-      BOUQUETS.map((b) => b[0]),
+      BOUQUETS.map((b) => bouquet(b[0])),
       610,
       60,
       H - 60,
@@ -354,15 +509,15 @@ function Assignment({ setMode }: { setMode: (m: 'matching' | 'assignment') => vo
 
   return (
     <VizShell
-      title="Problemi i caktimit — lulet dhe buqetat"
-      subtitle="c(x) = sa lule kemi, c(y) = sa lule mban buqeta, c(x, y) = 10 = të shumtën 10 lule të një lloji në një buqetë (slides 86–89)."
+      title={L.assignmentTitle}
+      subtitle={L.assignmentSubtitle}
       icon={<Flower2 />}
       onKeyDown={playerKeys(player)}
       toolbar={
         <>
           <ModeSwitch mode="assignment" setMode={setMode} />
           <div className="pb-1">
-            <Toggle label="Vetëm 3 trëndafila të kuq (të tjerat me bollëk)" value={scarce} onChange={setScarce} />
+            <Toggle label={L.scarce} value={scarce} onChange={setScarce} />
           </div>
         </>
       }
@@ -370,13 +525,7 @@ function Assignment({ setMode }: { setMode: (m: 'matching' | 'assignment') => vo
         <>
           <StepNote
             tone={done ? (st.value === total ? 'success' : 'warning') : 'accent'}
-            text={
-              done
-                ? st.value === total
-                  ? `Të gjitha buqetat u realizuan: **${st.value} / ${total} lule**. Kontrolloni: buqeta e kuqe merr 10 trëndafila të kuq + 5 tulipanë të kuq (slide 89).`
-                  : `Rrjedha max = **${st.value} / ${total}**. Prerja min (vijat e kuqe) tregon ngushticën: buqeta e kuqe merr të shumtën 3 + 10 = 13 lule.`
-                : st.note
-            }
+            text={done ? (st.value === total ? L.allDone(st.value, total) : L.bottleneck(st.value, total)) : st.note}
           />
           <PlayerBar player={player} />
         </>
@@ -403,23 +552,23 @@ function Assignment({ setMode }: { setMode: (m: 'matching' | 'assignment') => vo
             }
             edgeLook={edgeLook}
             maxHeight="620px"
-            ariaLabel="Rrjeta e luleve dhe buqetave"
+            ariaLabel={L.flowerNetwork}
           />
         </div>
         <div className="grid min-w-0 content-start gap-3">
           <div className="grid grid-cols-2 gap-3">
-            <Stat label="Lule të caktuara" value={st.value} tone="success" />
-            <Stat label="Kapaciteti" value={total} />
+            <Stat label={L.assigned} value={st.value} tone="success" />
+            <Stat label={L.capacity} value={total} />
           </div>
-          <Panel title="Mbushja e buqetave">
+          <Panel title={L.filling}>
             <ul className="space-y-2 text-sm">
               {BOUQUETS.map(([b, c]) => {
-                const i = edges.findIndex((e) => e.u === b && e.v === 't');
+                const i = edges.findIndex((e) => e.u === bouquet(b) && e.v === 't');
                 const f = st.flow[i];
                 return (
                   <li key={b}>
                     <div className="flex justify-between gap-2">
-                      <span>{b}</span>
+                      <span>{bouquet(b)}</span>
                       <span className="font-mono text-xs">
                         {f} / {c}
                       </span>
