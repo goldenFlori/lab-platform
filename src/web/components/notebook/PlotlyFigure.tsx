@@ -1,6 +1,7 @@
 import type { Data, Layout } from 'plotly.js-dist-min';
 import plotlyUrl from 'plotly.js-dist-min/plotly.min.js?url';
 import { useEffect, useRef, useState } from 'react';
+import { useT } from '../../i18n';
 import { useTheme } from '../../lib/theme';
 
 // A Plotly figure that the notebook produced, drawn again so it stays interactive. plotly.js is
@@ -47,6 +48,7 @@ export function PlotlyFigure({ src }: { src: string }) {
   const plotRef = useRef<HTMLDivElement>(null);
   const drawn = useRef<HTMLDivElement | null>(null);
   const [state, setState] = useState<'waiting' | 'loading' | 'ready' | 'failed'>('waiting');
+  const t = useT();
   const [figure, setFigure] = useState<Figure | null>(null);
   const { theme } = useTheme();
 
@@ -131,10 +133,10 @@ export function PlotlyFigure({ src }: { src: string }) {
           role={state === 'failed' ? 'alert' : undefined}
         >
           {state === 'failed'
-            ? 'Grafiku nuk u ngarkua. Rifreskoni faqen ose shkarkoni fletoren për ta parë.'
+            ? t.notebook.chartFailed
             : state === 'loading'
-              ? 'Duke ngarkuar grafikun…'
-              : 'Grafiku ngarkohet kur të shfaqet…'}
+              ? t.notebook.chartLoading
+              : t.notebook.chartLater}
         </p>
       )}
     </div>

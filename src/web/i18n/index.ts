@@ -31,6 +31,8 @@ export function storeLocale(locale: Locale) {
 }
 
 let current: Locale = typeof localStorage === 'undefined' ? DEFAULT_LOCALE : (storedLocale() ?? DEFAULT_LOCALE);
+// index.html says Albanian; correct it at once when this device chose otherwise.
+if (typeof document !== 'undefined') document.documentElement.lang = current;
 const listeners = new Set<() => void>();
 
 export const getLocale = () => current;

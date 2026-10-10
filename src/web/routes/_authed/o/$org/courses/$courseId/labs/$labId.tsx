@@ -21,6 +21,7 @@ import { EmbedsEditor } from '../../../../../../../components/notebook/EmbedsEdi
 import { NotebookUpload } from '../../../../../../../components/notebook/NotebookUpload';
 import { embedAnchor, NotebookView } from '../../../../../../../components/notebook/NotebookView';
 import { Toc } from '../../../../../../../components/notebook/Toc';
+import { t as messages, useT } from '../../../../../../../i18n';
 import { reportVisualizationUsed } from '../../../../../../../lib/activity';
 import { ApiError } from '../../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../../lib/brand';
@@ -54,7 +55,7 @@ export const Route = createFileRoute('/_authed/o/$org/courses/$courseId/labs/$la
       throw error;
     }
   },
-  head: ({ loaderData }) => ({ meta: [{ title: `${loaderData?.title ?? 'Laboratori'} · ${APP_NAME}` }] }),
+  head: ({ loaderData }) => ({ meta: [{ title: `${loaderData?.title ?? messages().lab.pageTitle} · ${APP_NAME}` }] }),
   component: LabPage,
 });
 
@@ -73,6 +74,7 @@ function LabPage() {
   const canManage = labList.permissions.manage;
   const changes = useNotebookChanges(org, courseId, labId);
   const navigate = Route.useNavigate();
+  const t = useT();
 
   const notebooks = [...list.notebooks].sort(
     (a, b) => KIND_ORDER[a.kind] - KIND_ORDER[b.kind] || a.position - b.position,
@@ -95,13 +97,13 @@ function LabPage() {
           aria-hidden="true"
         />
         <section className="container-page relative pt-8 pb-4">
-          <nav aria-label="Rruga" className="flex min-w-0 items-center gap-1.5 text-sm text-muted">
+          <nav aria-label={t.lab.breadcrumb} className="flex min-w-0 items-center gap-1.5 text-sm text-muted">
             <Link to="/o/$org/courses/$courseId" params={{ org, courseId }} className="truncate hover:text-foreground">
               {courseDetail.course.title}
             </Link>
             <ChevronRight className="size-3.5 shrink-0" aria-hidden="true" />
             <span className="shrink-0 text-foreground" aria-current="page">
-              Laboratori {lab.n}
+              {t.labs.lab(lab.n)}
             </span>
           </nav>
 
@@ -111,12 +113,12 @@ function LabPage() {
             </span>
             {lab.week && (
               <Chip size="sm" variant="secondary">
-                Java {lab.week}
+                {t.lab.week(lab.week)}
               </Chip>
             )}
             {lab.solutionsAvailable && notebooks.some((nb) => nb.kind === 'solution') && (
               <Chip size="sm" variant="soft" color="success">
-                Zgjidhjet janë të disponueshme
+                {t.labs.solutionsAvailable}
               </Chip>
             )}
           </div>
@@ -128,7 +130,7 @@ function LabPage() {
           {ref && current?.ready && (
             <div className="mt-7 flex flex-wrap gap-2.5">
               <a href={notebookFileUrl(ref, ORIGINAL_FILE)} download className="button button--primary gap-2">
-                <Download className="size-4" aria-hidden="true" /> Shkarko fletoren
+                <Download className="size-4" aria-hidden="true" /> {t.lab.download}
               </a>
               <Link
                 to="/o/$org/courses/$courseId/labs/$labId/present"
@@ -138,11 +140,11 @@ function LabPage() {
                 onClick={() => void document.documentElement.requestFullscreen?.().catch(() => undefined)}
                 className="button button--secondary gap-2"
               >
-                <Presentation className="size-4" aria-hidden="true" /> Prezanto
+                <Presentation className="size-4" aria-hidden="true" /> {t.lab.present}
               </Link>
               {firstEmbed && (
                 <a href={`#${embedAnchor(ref.notebookId, firstEmbed.cell)}`} className="button button--tertiary gap-2">
-                  <Sparkles className="size-4" aria-hidden="true" /> Te vizualizimi i parë
+                  <Sparkles className="size-4" aria-hidden="true" /> {t.lab.firstVisualization}
                 </a>
               )}
             </div>
@@ -171,7 +173,7 @@ function LabPage() {
           )}
 
           {notebooks.length > 1 && current && (
-            <nav aria-label="Fletoret e laboratorit" className="mt-8">
+            <nav aria-label={t.lab.notebooks} className="mt-8">
               <ul className="flex flex-wrap gap-2">
                 {notebooks.map((nb) => (
                   // Capped at the row's width, so a long title shortens with "…" on a phone.
@@ -189,15 +191,13 @@ function LabPage() {
         {!current || !ref ? (
           <div className="grid place-items-center rounded-2xl border border-dashed border-border px-6 py-16 text-center">
             <FileText className="size-8 text-muted" aria-hidden="true" />
-            <p className="mt-3 text-sm text-muted">Ky laborator nuk ka ende fletore.</p>
+            <p className="mt-3 text-sm text-muted">{t.lab.noNotebooks}</p>
           </div>
         ) : !current.ready ? (
           <Alert status="warning">
             <Alert.Indicator />
             <Alert.Content>
-              <Alert.Description>
-                Ngarkimi i kësaj fletoreje nuk ka përfunduar. Studentët nuk e shohin derisa të përfundojë.
-              </Alert.Description>
+              <Alert.Description>{t.lab.unfinished}</Alert.Description>
             </Alert.Content>
           </Alert>
         ) : (
@@ -226,6 +226,7 @@ function LabPage() {
 
 function NotebookTab({ nb, current }: { nb: NotebookSummary; current: boolean }) {
   const Icon = KIND_ICON[nb.kind];
+  const t = useT();
   return (
     <Link
       from={Route.fullPath}
@@ -239,8 +240,8 @@ function NotebookTab({ nb, current }: { nb: NotebookSummary; current: boolean })
     >
       <Icon className="size-4 shrink-0" aria-hidden="true" />
       <span className="truncate">
-        {nb.kind === 'solution' ? `Zgjidhja · ${nb.title}` : nb.title}
-        {nb.ready ? '' : ' · pa përfunduar'}
+        {nb.kind === 'solution' ? t.lab.solutionTab(nb.title) : nb.title}
+        {nb.ready ? '' : t.lab.unfinishedTab}
       </span>
     </Link>
   );
@@ -270,6 +271,7 @@ function NotebookSection({
     onVisualizationUsed();
   };
   const ready = Boolean(rendered.data && embeds);
+  const t = useT();
   const hash = useRouterState({ select: (state) => state.location.hash });
 
   // A link to a section (from search, or shared) lands on it once the notebook has rendered.
@@ -282,7 +284,7 @@ function NotebookSection({
       <Alert status="danger">
         <Alert.Indicator />
         <Alert.Content>
-          <Alert.Description>Fletorja nuk u ngarkua. Rifreskoni faqen dhe provoni sërish.</Alert.Description>
+          <Alert.Description>{t.lab.loadFailed}</Alert.Description>
         </Alert.Content>
       </Alert>
     );
@@ -290,7 +292,7 @@ function NotebookSection({
   if (!rendered.data || !embeds) {
     return (
       <p className="py-10 text-sm text-muted" aria-busy="true">
-        Duke ngarkuar fletoren…
+        {t.lab.loadingNotebook}
       </p>
     );
   }
@@ -335,6 +337,7 @@ function LabNeighbours({
   labId: string;
   labs: LabView[];
 }) {
+  const t = useT();
   const i = labs.findIndex((lab) => lab.id === labId);
   if (i < 0) return null;
   const previous = labs[i - 1];
@@ -343,7 +346,7 @@ function LabNeighbours({
   const card =
     'group block rounded-3xl border border-border bg-surface p-5 shadow-surface transition-colors hover:border-accent/50';
   return (
-    <nav className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-2" aria-label="Laboratorët e tjerë">
+    <nav className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-2" aria-label={t.lab.otherLabs}>
       {previous ? (
         <Link
           to="/o/$org/courses/$courseId/labs/$labId"
@@ -352,7 +355,7 @@ function LabNeighbours({
         >
           <span className="flex items-center gap-1.5 text-xs text-muted">
             <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-1" aria-hidden="true" />{' '}
-            Laboratori {previous.n}
+            {t.labs.lab(previous.n)}
           </span>
           <span className="mt-1.5 block font-semibold tracking-tight">{previous.title}</span>
         </Link>
@@ -366,7 +369,7 @@ function LabNeighbours({
           className={`${card} text-right`}
         >
           <span className="flex items-center justify-end gap-1.5 text-xs text-muted">
-            Laboratori {next.n}{' '}
+            {t.labs.lab(next.n)}{' '}
             <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" aria-hidden="true" />
           </span>
           <span className="mt-1.5 block font-semibold tracking-tight">{next.title}</span>

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { SectionKind, TocEntry } from '../../../notebook/types';
+import { useT } from '../../i18n';
 
 const DOT: Partial<Record<SectionKind, string>> = {
   exercise: 'var(--accent)',
@@ -14,6 +15,7 @@ const DOT: Partial<Record<SectionKind, string>> = {
 export function Toc({ entries }: { entries: TocEntry[] }) {
   const items = useMemo(() => entries.filter((entry) => entry.level <= 3), [entries]);
   const [active, setActive] = useState<string | null>(null);
+  const t = useT();
 
   useEffect(() => {
     const targets = items.map((item) => document.getElementById(item.id)).filter((el) => el !== null);
@@ -33,8 +35,8 @@ export function Toc({ entries }: { entries: TocEntry[] }) {
 
   if (items.length === 0) return null;
   return (
-    <nav className="sticky top-24 max-h-[calc(100dvh-8rem)] overflow-y-auto pr-1" aria-label="Përmbajtja">
-      <p className="mb-3 text-xs font-semibold tracking-wider text-muted uppercase">Përmbajtja</p>
+    <nav className="sticky top-24 max-h-[calc(100dvh-8rem)] overflow-y-auto pr-1" aria-label={t.notebook.contents}>
+      <p className="mb-3 text-xs font-semibold tracking-wider text-muted uppercase">{t.notebook.contents}</p>
       <ul className="space-y-0.5 border-l border-separator">
         {items.map((item) => {
           const on = item.id === active;

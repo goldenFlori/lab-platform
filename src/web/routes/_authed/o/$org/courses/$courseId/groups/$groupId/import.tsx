@@ -114,7 +114,7 @@ function ImportPage() {
             value={text}
             onChange={(event) => setText(event.target.value)}
             rows={12}
-            placeholder={'Arben Hoxha\nMira Kola\nËndrit Çela'}
+            placeholder={t.importStudents.listPlaceholder}
             className="mt-1 block w-full rounded-2xl border border-border bg-surface p-4 font-mono text-sm"
           />
           <p className="mt-2 text-sm text-muted">{t.importStudents.listHelp}</p>

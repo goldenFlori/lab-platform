@@ -1,5 +1,6 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { LabList, LabRule, LabView } from '../../shared/labs';
+import { t } from '../i18n';
 import { api } from './api';
 
 const labsPath = (org: string, courseId: string) =>
@@ -73,27 +74,13 @@ export function fromLocalInput(value: string) {
   return value ? new Date(value).toISOString() : null;
 }
 
-const MONTHS = [
-  'janar',
-  'shkurt',
-  'mars',
-  'prill',
-  'maj',
-  'qershor',
-  'korrik',
-  'gusht',
-  'shtator',
-  'tetor',
-  'nëntor',
-  'dhjetor',
-];
-
 /**
- * "11 tetor 2026, 10:00" in this browser's time zone. Spelled out here rather than through Intl,
- * because not every browser carries Albanian locale data.
+ * "11 tetor 2026, 10:00" (or "11 October 2026, 10:00") in this browser's time zone. Spelled out
+ * from the messages rather than through Intl, because not every browser carries Albanian locale data.
  */
 export function formatMoment(iso: string) {
   const date = new Date(iso);
   const time = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-  return `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}, ${time}`;
+  const { common, labs } = t();
+  return labs.moment(date.getDate(), common.months[date.getMonth()] ?? '', date.getFullYear(), time);
 }

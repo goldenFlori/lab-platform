@@ -7,9 +7,10 @@ import { isSolutionOf, type Slide, slidesOf } from '../../../../../../../../note
 import type { Cell } from '../../../../../../../../notebook/types';
 import { isVisualizerId } from '../../../../../../../../shared/visualizers';
 import { CodeCell } from '../../../../../../../components/notebook/CodeCell';
-import { Markdown, SECTION_KINDS } from '../../../../../../../components/notebook/NotebookView';
+import { Markdown, SECTION_KINDS, sectionLabel } from '../../../../../../../components/notebook/NotebookView';
 import { Output } from '../../../../../../../components/notebook/Output';
 import { VizEmbed } from '../../../../../../../components/VizEmbed';
+import { t as messages, useT } from '../../../../../../../i18n';
 import { ApiError } from '../../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../../lib/brand';
 import { labQuery } from '../../../../../../../lib/labs';
@@ -40,7 +41,13 @@ export const Route = createFileRoute('/_authed/o/$org/courses/$courseId/labs/$la
       throw error;
     }
   },
-  head: ({ loaderData }) => ({ meta: [{ title: `Prezantim · ${loaderData?.title ?? 'Laboratori'} · ${APP_NAME}` }] }),
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: `${messages().present.pageTitle} · ${loaderData?.title ?? messages().lab.pageTitle} · ${APP_NAME}`,
+      },
+    ],
+  }),
   component: Presenter,
 });
 
@@ -50,6 +57,7 @@ function Presenter() {
   const navigate = Route.useNavigate();
   const { data: lab } = useSuspenseQuery(labQuery(org, courseId, labId));
   const { data: list } = useSuspenseQuery(notebooksQuery(org, courseId, labId));
+  const t = useT();
   const ready = list.notebooks.filter((nb) => nb.ready);
   const current = ready.find((nb) => nb.id === chosen) ?? ready.find((nb) => nb.kind === 'main') ?? ready[0];
   const ref: NotebookRef = { org, courseId, labId, notebookId: current?.id ?? '' };
@@ -215,7 +223,7 @@ function Presenter() {
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={`Prezantimi: ${lab.title}`}
+      aria-label={t.present.dialog(lab.title)}
       className="presentation fixed inset-0 z-[70] flex flex-col bg-background text-foreground"
     >
       <header className="flex items-center gap-3 border-b border-separator px-4 py-2.5 sm:px-6">
@@ -236,23 +244,23 @@ function Presenter() {
           <Button
             size="sm"
             variant={showSolution ? 'primary' : 'secondary'}
-            aria-label="Zgjidhja"
+            aria-label={t.present.solution}
             aria-pressed={showSolution}
             onPress={() => setSolved((on) => !on)}
           >
-            <KeyRound className="size-4" /> <span className="hidden sm:inline">Zgjidhja</span>
+            <KeyRound className="size-4" /> <span className="hidden sm:inline">{t.present.solution}</span>
           </Button>
         )}
         <Button
           isIconOnly
           size="sm"
           variant="ghost"
-          aria-label={fullscreen ? 'Dil nga ekrani i plotë' : 'Ekran i plotë'}
+          aria-label={fullscreen ? t.present.exitFullscreen : t.present.fullscreen}
           onPress={toggleFullscreen}
         >
           {fullscreen ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
         </Button>
-        <Button isIconOnly size="sm" variant="ghost" aria-label="Dil nga prezantimi" onPress={exit}>
+        <Button isIconOnly size="sm" variant="ghost" aria-label={t.present.exit} onPress={exit}>
           <X className="size-4" />
         </Button>
       </header>
@@ -260,17 +268,12 @@ function Presenter() {
       <div ref={stage} tabIndex={-1} className="min-h-0 flex-1 overflow-y-auto outline-none">
         <div className={`mx-auto px-4 py-8 sm:px-8 sm:py-12 ${slide?.kind === 'viz' ? 'max-w-6xl' : 'max-w-5xl'}`}>
           {!current ? (
-            <Empty
-              text="Ky laborator nuk ka ende fletore për të prezantuar."
-              org={org}
-              courseId={courseId}
-              labId={labId}
-            />
+            <Empty text={t.present.nothing} org={org} courseId={courseId} labId={labId} />
           ) : rendered.isError || detail.isError ? (
-            <Empty text="Fletorja nuk u ngarkua. Provoni sërish." org={org} courseId={courseId} labId={labId} />
+            <Empty text={t.present.loadFailed} org={org} courseId={courseId} labId={labId} />
           ) : !slide ? (
             <p className="text-muted" aria-busy="true">
-              Duke ngarkuar fletoren…
+              {t.present.loading}
             </p>
           ) : (
             <Step slide={slide} code={code} fileUrl={fileUrl} />
@@ -288,7 +291,7 @@ function Presenter() {
                   onClick={toggleReveal}
                   className="flex items-center justify-center gap-2 rounded-2xl border border-dashed border-border px-4 py-6 text-muted transition-colors hover:border-accent/50 hover:text-foreground"
                 >
-                  <Eye className="size-5" aria-hidden="true" /> Shfaq rezultatin (Hapësira)
+                  <Eye className="size-5" aria-hidden="true" /> {t.present.reveal}
                 </button>
               )}
             </div>
@@ -303,15 +306,14 @@ function Presenter() {
             style={{ width: slides.length ? `${((index + 1) / slides.length) * 100}%` : 0 }}
           />
         </div>
-        <p className="hidden px-6 py-2 text-xs text-muted sm:block">
-          ← → lëviz · Hapësira shfaq rezultatin{solution ? ' · S zgjidhja' : ''} · Esc dil
-        </p>
+        <p className="hidden px-6 py-2 text-xs text-muted sm:block">{t.present.keys(Boolean(solution))}</p>
       </footer>
     </div>
   );
 }
 
 function Step({ slide, code, fileUrl }: { slide: Slide; code: Cell | undefined; fileUrl: (name: string) => string }) {
+  const t = useT();
   if (slide.kind === 'text') {
     const { cell } = slide;
     if (cell.html.trim() || !cell.heading) {
@@ -332,7 +334,7 @@ function Step({ slide, code, fileUrl }: { slide: Slide; code: Cell | undefined; 
             className="mb-4 flex items-center justify-center gap-2 text-sm font-semibold tracking-wider uppercase sm:text-base"
             style={{ color: meta.color }}
           >
-            <Icon className="size-5" aria-hidden="true" /> {meta.label}
+            <Icon className="size-5" aria-hidden="true" /> {sectionLabel(t, cell.kind)}
           </p>
         )}
         <h2 className="text-4xl leading-tight font-extrabold tracking-tight text-balance sm:text-6xl">
@@ -350,6 +352,7 @@ function Step({ slide, code, fileUrl }: { slide: Slide; code: Cell | undefined; 
 }
 
 function Empty({ text, org, courseId, labId }: { text: string; org: string; courseId: string; labId: string }) {
+  const t = useT();
   return (
     <div className="grid place-items-center gap-4 py-16 text-center">
       <p className="text-muted">{text}</p>
@@ -358,7 +361,7 @@ function Empty({ text, org, courseId, labId }: { text: string; org: string; cour
         params={{ org, courseId, labId }}
         className="button button--secondary"
       >
-        Kthehu te laboratori
+        {t.present.back}
       </Link>
     </div>
   );
