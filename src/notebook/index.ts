@@ -1,6 +1,6 @@
-import { highlightPython } from './highlight';
-import { classifyHeading, renderMarkdownBody, slug, splitIntoSections } from './markdown';
-import { cleanOutputs, codeFlags, isInteractiveCell, renderOutputs } from './outputs';
+import { highlightPython } from './highlight.ts';
+import { classifyHeading, renderMarkdownBody, slug, splitIntoSections } from './markdown.ts';
+import { cleanOutputs, codeFlags, isInteractiveCell, renderOutputs } from './outputs.ts';
 import type { Cell, RenderedNotebook, SectionKind, TocEntry } from './types';
 
 // Notebook → web representation (#13), in the browser of whoever uploads it. A TypeScript port of
