@@ -382,7 +382,8 @@ what the user may see. Pagefind is not used in the platform.
   - Vitest in the Workers runtime: API, permissions, tenant isolation.
   - Playwright end-to-end, porting the ideas from `site/scripts/qa.mjs`. Every one of the 19
     course notebooks is uploaded with the site's embeds and must show each visualization,
-    without errors or overflow at 375px; each visualization opens and steps; a pedagog's
+    without errors or overflow at 375px, even with every letter 0.25px wider (text renders a
+    little wider on CI's Linux than on a Mac); each visualization opens and steps; a pedagog's
     upload, embed editing and deletion run through the real UI.
   - Biome for lint and format.
 - **CI/CD:**

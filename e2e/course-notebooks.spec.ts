@@ -62,10 +62,13 @@ for (const file of files) {
       await expect(viz.getByRole('region')).toBeVisible();
     }
 
-    const overflow = await staff.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    );
-    expect(overflow).toBeLessThanOrEqual(0);
+    const overflow = () =>
+      staff.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(await overflow()).toBeLessThanOrEqual(0);
+    // Text comes out slightly wider on some systems (CI's Linux among them), so the page must still
+    // fit with every letter a little wider.
+    await staff.addStyleTag({ content: '* { letter-spacing: 0.25px !important; }' });
+    expect(await overflow()).toBeLessThanOrEqual(0);
     expect(errors.filter((text) => !text.startsWith('Failed to load resource'))).toEqual([]);
   });
 }
