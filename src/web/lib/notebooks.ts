@@ -1,10 +1,10 @@
-import { queryOptions } from '@tanstack/react-query';
+import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { StoredNotebook } from '../../notebook/stored';
 import { RENDERED_FILE } from '../../shared/notebook-files';
-import type { NotebookDetail, NotebookSummary } from '../../shared/notebooks';
+import type { Embed, NotebookDetail, NotebookSummary } from '../../shared/notebooks';
 import { api } from './api';
 
-const notebooksPath = (org: string, courseId: string, labId: string) =>
+export const notebooksPath = (org: string, courseId: string, labId: string) =>
   `/orgs/${encodeURIComponent(org)}/courses/${encodeURIComponent(courseId)}/labs/${encodeURIComponent(labId)}/notebooks`;
 
 export type NotebookRef = { org: string; courseId: string; labId: string; notebookId: string };
@@ -37,3 +37,32 @@ export const renderedQuery = (ref: NotebookRef) =>
     // A rendering changes only when the notebook is uploaded again, which gives it a new id.
     staleTime: Number.POSITIVE_INFINITY,
   });
+
+/** Staff changes to a lab's notebooks; each keeps what is shown in step with the server. */
+export function useNotebookChanges(org: string, courseId: string, labId: string) {
+  const queryClient = useQueryClient();
+  const base = notebooksPath(org, courseId, labId);
+  // Only the list: a notebook's rendering never changes, so it is not fetched again.
+  const refreshList = () =>
+    queryClient.invalidateQueries({ queryKey: notebooksQuery(org, courseId, labId).queryKey, exact: true });
+  const keep = (detail: NotebookDetail) =>
+    queryClient.setQueryData(notebookQuery({ org, courseId, labId, notebookId: detail.id }).queryKey, detail);
+
+  return {
+    base,
+    /** After an upload: show the new notebook at once. */
+    uploaded: (detail: NotebookDetail) => {
+      keep(detail);
+      return refreshList();
+    },
+    saveEmbeds: useMutation({
+      mutationFn: ({ notebookId, embeds }: { notebookId: string; embeds: Embed[] }) =>
+        api<NotebookDetail>(`${base}/${encodeURIComponent(notebookId)}/embeds`, { method: 'PUT', body: { embeds } }),
+      onSuccess: keep,
+    }),
+    deleteNotebook: useMutation({
+      mutationFn: (notebookId: string) => api<void>(`${base}/${encodeURIComponent(notebookId)}`, { method: 'DELETE' }),
+      onSuccess: refreshList,
+    }),
+  };
+}

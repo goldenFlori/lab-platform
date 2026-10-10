@@ -5,6 +5,9 @@ import { ArrowLeft, ArrowRight, BookMarked, ChevronRight, Download, FileText, Ke
 import type { LabView } from '../../../../../../../../shared/labs';
 import { ORIGINAL_FILE } from '../../../../../../../../shared/notebook-files';
 import type { Embed, NotebookKind, NotebookSummary } from '../../../../../../../../shared/notebooks';
+import { DeleteNotebook } from '../../../../../../../components/notebook/DeleteNotebook';
+import { EmbedsEditor } from '../../../../../../../components/notebook/EmbedsEditor';
+import { NotebookUpload } from '../../../../../../../components/notebook/NotebookUpload';
 import { embedAnchor, NotebookView } from '../../../../../../../components/notebook/NotebookView';
 import { Toc } from '../../../../../../../components/notebook/Toc';
 import { ApiError } from '../../../../../../../lib/api';
@@ -17,6 +20,7 @@ import {
   notebookQuery,
   notebooksQuery,
   renderedQuery,
+  useNotebookChanges,
 } from '../../../../../../../lib/notebooks';
 
 export const Route = createFileRoute('/_authed/o/$org/courses/$courseId/labs/$labId')({
@@ -29,6 +33,7 @@ export const Route = createFileRoute('/_authed/o/$org/courses/$courseId/labs/$la
         queryClient.ensureQueryData(labQuery(org, courseId, labId)),
         queryClient.ensureQueryData(courseQuery(org, courseId)),
         queryClient.ensureQueryData(notebooksQuery(org, courseId, labId)),
+        queryClient.ensureQueryData(labsQuery(org, courseId)),
       ]);
       return { title: lab.title };
     } catch (error) {
@@ -52,6 +57,10 @@ function LabPage() {
   const { data: lab } = useSuspenseQuery(labQuery(org, courseId, labId));
   const { data: courseDetail } = useSuspenseQuery(courseQuery(org, courseId));
   const { data: list } = useSuspenseQuery(notebooksQuery(org, courseId, labId));
+  const { data: labList } = useSuspenseQuery(labsQuery(org, courseId));
+  const canManage = labList.permissions.manage;
+  const changes = useNotebookChanges(org, courseId, labId);
+  const navigate = Route.useNavigate();
 
   const notebooks = [...list.notebooks].sort(
     (a, b) => KIND_ORDER[a.kind] - KIND_ORDER[b.kind] || a.position - b.position,
@@ -117,11 +126,34 @@ function LabPage() {
             </div>
           )}
 
+          {canManage && (
+            <div className="mt-7 flex flex-wrap items-start gap-2.5">
+              <NotebookUpload
+                base={changes.base}
+                hasMain={notebooks.some((nb) => nb.kind === 'main')}
+                onUploaded={async (nb) => {
+                  await changes.uploaded(nb);
+                  await navigate({ search: { notebook: nb.id } });
+                }}
+              />
+              {current && (
+                <DeleteNotebook
+                  title={current.title}
+                  isPending={changes.deleteNotebook.isPending}
+                  onDelete={() =>
+                    changes.deleteNotebook.mutate(current.id, { onSuccess: () => navigate({ search: {} }) })
+                  }
+                />
+              )}
+            </div>
+          )}
+
           {notebooks.length > 1 && current && (
             <nav aria-label="Fletoret e laboratorit" className="mt-8">
               <ul className="flex flex-wrap gap-2">
                 {notebooks.map((nb) => (
-                  <li key={nb.id}>
+                  // Capped at the row's width, so a long title shortens with "…" on a phone.
+                  <li key={nb.id} className="max-w-full">
                     <NotebookTab nb={nb} current={nb.id === current.id} />
                   </li>
                 ))}
@@ -147,9 +179,21 @@ function LabPage() {
             </Alert.Content>
           </Alert>
         ) : (
-          <NotebookSection notebookRef={ref} embeds={detail.data?.embeds} embedsFailed={detail.isError} />
+          <NotebookSection
+            notebookRef={ref}
+            embeds={detail.data?.embeds}
+            embedsFailed={detail.isError}
+            editor={
+              canManage
+                ? {
+                    isPending: changes.saveEmbeds.isPending,
+                    save: (embeds) => changes.saveEmbeds.mutateAsync({ notebookId: ref.notebookId, embeds }),
+                  }
+                : null
+            }
+          />
         )}
-        <LabNeighbours org={org} courseId={courseId} labId={labId} />
+        <LabNeighbours org={org} courseId={courseId} labId={labId} labs={labList.labs} />
       </section>
     </>
   );
@@ -181,10 +225,13 @@ function NotebookSection({
   notebookRef,
   embeds,
   embedsFailed,
+  editor,
 }: {
   notebookRef: NotebookRef;
   embeds: Embed[] | undefined;
   embedsFailed: boolean;
+  /** Staff who manage the course: where the visualizations go. */
+  editor: { isPending: boolean; save: (embeds: Embed[]) => Promise<unknown> } | null;
 }) {
   const rendered = useQuery(renderedQuery(notebookRef));
 
@@ -208,6 +255,17 @@ function NotebookSection({
   return (
     <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_14rem]">
       <article className="min-w-0">
+        {editor && (
+          <div className="mb-8">
+            <EmbedsEditor
+              key={notebookRef.notebookId}
+              notebook={rendered.data}
+              embeds={embeds}
+              isPending={editor.isPending}
+              onSave={editor.save}
+            />
+          </div>
+        )}
         <NotebookView
           id={notebookRef.notebookId}
           notebook={rendered.data}
@@ -223,13 +281,21 @@ function NotebookSection({
 }
 
 /** The previous and next labs this user may see. */
-function LabNeighbours({ org, courseId, labId }: { org: string; courseId: string; labId: string }) {
-  const labs = useQuery(labsQuery(org, courseId));
-  const list = labs.data?.labs ?? [];
-  const i = list.findIndex((lab) => lab.id === labId);
+function LabNeighbours({
+  org,
+  courseId,
+  labId,
+  labs,
+}: {
+  org: string;
+  courseId: string;
+  labId: string;
+  labs: LabView[];
+}) {
+  const i = labs.findIndex((lab) => lab.id === labId);
   if (i < 0) return null;
-  const previous = list[i - 1];
-  const next = list[i + 1];
+  const previous = labs[i - 1];
+  const next = labs[i + 1];
   if (!previous && !next) return null;
   const card =
     'group block rounded-3xl border border-border bg-surface p-5 shadow-surface transition-colors hover:border-accent/50';

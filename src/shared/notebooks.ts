@@ -7,10 +7,7 @@ import { isVisualizerId } from './visualizers';
 export const NOTEBOOK_KINDS = ['main', 'extra', 'solution'] as const;
 export type NotebookKind = (typeof NOTEBOOK_KINDS)[number];
 
-export { ORIGINAL_FILE, RENDERED_FILE } from './notebook-files';
-
-/** Largest file accepted in one request (stored in chunks; Workers accept 100 MB bodies). */
-export const MAX_FILE_BYTES = 10 * 1024 * 1024;
+export { MAX_FILE_BYTES, ORIGINAL_FILE, RENDERED_FILE } from './notebook-files';
 
 export const FILE_NAME = /^[A-Za-z0-9][\w.-]{0,99}$/;
 

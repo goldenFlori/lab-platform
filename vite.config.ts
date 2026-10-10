@@ -19,7 +19,9 @@ export default defineConfig({
     cloudflare({ persistState: process.env.LOCAL_STATE ? { path: process.env.LOCAL_STATE } : true }),
   ],
   build: {
-    // Budget for the app shell (React, React Aria, TanStack): about 540 kB today. Raise it deliberately.
-    chunkSizeWarningLimit: 600,
+    // Largest chunk: the converter's WebAssembly (about 620 kB), loaded only when staff upload a
+    // notebook. The app shell every visit loads (React, React Aria, TanStack) is about 425 kB.
+    // Raise this deliberately.
+    chunkSizeWarningLimit: 650,
   },
 });
