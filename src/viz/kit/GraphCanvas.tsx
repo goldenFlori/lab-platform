@@ -1,4 +1,5 @@
 import { type ReactNode, useMemo, useRef, useState } from 'react';
+import { KIT, useText } from './text';
 
 /* =====================================================================
  *  GraphCanvas — the one SVG renderer every graph visualizer uses.
@@ -140,6 +141,7 @@ export function GraphCanvas({
   maxHeight = '560px',
 }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
+  const k = useText(KIT);
   const drag = useRef<{ id: string; x0: number; y0: number; moved: boolean; pointer: number } | null>(null);
   const [dragging, setDragging] = useState<string | null>(null);
 
@@ -332,7 +334,7 @@ export function GraphCanvas({
               onClick={onEdgeClick ? () => onEdgeClick(i) : undefined}
               role={onEdgeClick ? 'button' : undefined}
               tabIndex={onEdgeClick ? 0 : undefined}
-              aria-label={onEdgeClick ? `Brinja ${e.u}–${e.v}` : undefined}
+              aria-label={onEdgeClick ? k.edge(String(e.u), String(e.v)) : undefined}
               onKeyDown={onEdgeClick ? pressKeys(() => onEdgeClick(i)) : undefined}
             >
               {onEdgeClick && <path d={g.d} stroke="transparent" strokeWidth={16} fill="none" />}
@@ -398,7 +400,7 @@ export function GraphCanvas({
               onPointerDown={clickable ? (e) => onNodeDown(e, n.id) : undefined}
               role={onNodeClick ? 'button' : undefined}
               tabIndex={onNodeClick ? 0 : undefined}
-              aria-label={onNodeClick ? `Kulmi ${label}` : undefined}
+              aria-label={onNodeClick ? k.vertex(label) : undefined}
               onKeyDown={onNodeClick ? pressKeys(() => onNodeClick(n.id)) : undefined}
               style={{ transition: 'opacity 0.25s' }}
             >

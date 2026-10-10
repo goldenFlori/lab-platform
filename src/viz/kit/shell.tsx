@@ -2,6 +2,7 @@ import { Maximize2, Minimize2 } from 'lucide-react';
 import { type ReactNode, useEffect, useId, useRef, useState } from 'react';
 import { IconButton } from './controls';
 import { RichText } from './RichText';
+import { KIT, useText } from './text';
 
 /* ------------------------------------------------------------------ */
 /* Frame shared by every visualizer                                    */
@@ -32,6 +33,7 @@ export function VizShell({
   const titleId = useId();
   const [full, setFull] = useState(false);
   const [canFull, setCanFull] = useState(false);
+  const k = useText(KIT);
 
   useEffect(() => {
     setCanFull(typeof document !== 'undefined' && !!document.fullscreenEnabled);
@@ -74,7 +76,7 @@ export function VizShell({
         <div className="flex shrink-0 items-center gap-2">
           {badges}
           {canFull && (
-            <IconButton label={full ? 'Dil nga ekrani i plotë' : 'Ekran i plotë'} onPress={toggleFull} variant="ghost">
+            <IconButton label={full ? k.exitFullscreen : k.fullscreen} onPress={toggleFull} variant="ghost">
               {full ? <Minimize2 /> : <Maximize2 />}
             </IconButton>
           )}

@@ -1,6 +1,7 @@
 import { Button, ListBox, Select, Slider, Switch, ToggleButton, ToggleButtonGroup, Tooltip } from '@heroui/react';
 import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw, SkipForward } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { KIT, useText } from './text';
 import type { Player } from './usePlayer';
 
 /* ------------------------------------------------------------------ */
@@ -112,13 +113,14 @@ const SPEEDS = [
 export function PlayerBar<S>({ player, compact = false }: { player: Player<S>; compact?: boolean }) {
   const { index, total, playing } = player;
   const single = total <= 1;
+  const k = useText(KIT);
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
       <div className="flex items-center gap-1.5">
-        <IconButton label="Rifillo (Home)" onPress={player.reset} isDisabled={player.atStart}>
+        <IconButton label={k.restart} onPress={player.reset} isDisabled={player.atStart}>
           <RotateCcw />
         </IconButton>
-        <IconButton label="Hapi i mëparshëm (←)" onPress={player.prev} isDisabled={player.atStart}>
+        <IconButton label={k.previous} onPress={player.prev} isDisabled={player.atStart}>
           <ChevronLeft />
         </IconButton>
         <Button
@@ -126,23 +128,23 @@ export function PlayerBar<S>({ player, compact = false }: { player: Player<S>; c
           variant="primary"
           onPress={player.toggle}
           isDisabled={single}
-          aria-label={playing ? 'Pauzë' : 'Luaj'}
+          aria-label={playing ? k.pause : k.play}
           className="min-w-[6.25rem]"
         >
           {playing ? <Pause /> : <Play />}
-          {playing ? 'Pauzë' : player.atEnd && !single ? 'Rishiko' : 'Luaj'}
+          {playing ? k.pause : player.atEnd && !single ? k.replay : k.play}
         </Button>
-        <IconButton label="Hapi tjetër (→)" onPress={player.next} isDisabled={player.atEnd}>
+        <IconButton label={k.next} onPress={player.next} isDisabled={player.atEnd}>
           <ChevronRight />
         </IconButton>
-        <IconButton label="Shko te fundi (End)" onPress={player.end} isDisabled={player.atEnd}>
+        <IconButton label={k.end} onPress={player.end} isDisabled={player.atEnd}>
           <SkipForward />
         </IconButton>
       </div>
 
       <div className="flex min-w-[10rem] flex-1 items-center gap-3">
         <Slider
-          aria-label="Hapi i algoritmit"
+          aria-label={k.step}
           className="flex-1"
           minValue={0}
           maxValue={single ? 1 : total - 1}
@@ -164,7 +166,7 @@ export function PlayerBar<S>({ player, compact = false }: { player: Player<S>; c
 
       {!compact && (
         <Segmented
-          label="Shpejtësia"
+          label={k.speed}
           value={String(player.speed)}
           onChange={(v) => player.setSpeed(Number(v))}
           options={SPEEDS}
