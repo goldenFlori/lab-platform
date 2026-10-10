@@ -4,7 +4,7 @@ import type { Page } from '@playwright/test';
 import type { StoredNotebook } from '../src/notebook/stored';
 import type { CourseSummary, GroupView } from '../src/shared/courses';
 import type { LabView } from '../src/shared/labs';
-import type { NotebookSummary } from '../src/shared/notebooks';
+import type { NotebookKind, NotebookSummary } from '../src/shared/notebooks';
 import { apiCall } from './sign-in';
 
 const MIME: Record<string, string> = { png: 'image/png', svg: 'image/svg+xml', json: 'application/json' };
@@ -35,7 +35,7 @@ export async function uploadNotebook(
   staff: Page,
   labPath: string,
   notebook: {
-    kind: 'main' | 'extra';
+    kind: NotebookKind;
     title: string;
     raw: string;
     stored: StoredNotebook;
