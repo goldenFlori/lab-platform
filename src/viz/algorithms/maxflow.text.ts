@@ -1,6 +1,6 @@
 import { bilingual } from '../kit/text';
 
-// What the maximum-flow steps say (#19). rritRrjedhë is the lecture's procedure name, kept in both.
+// What the maximum-flow steps say (#19). rritRrjedhë is the lecture's name for augment.
 
 const sq = {
   greedyName: 'algoritmi greedy',
@@ -36,8 +36,8 @@ export const MAXFLOW_TEXT = bilingual<MaxflowText>(sq, {
   path: (it, path, back, caps, x) =>
     `Iteration ${it}: augmenting path **${path}**${back ? ' — it uses a **back edge**' : ''}. Bottleneck x = min(${caps}) = **${x}**.`,
   augmentBack: (x, value) =>
-    `rritRrjedhë (augment): +${x} on the forward edges, **−${x} on the back edge** (undoing flow). v(f) = **${value}**.`,
-  augment: (x, value) => `rritRrjedhë (augment): +${x} on every edge of the path. v(f) = **${value}**.`,
+    `augment: +${x} on the forward edges, **−${x} on the back edge** (undoing flow). v(f) = **${value}**.`,
+  augment: (x, value) => `augment: +${x} on every edge of the path. v(f) = **${value}**.`,
   stuck: (value) =>
     `Greedy got stuck at **v(f) = ${value}**, yet G_f still has an augmenting path through a back edge. Unable to "undo" flow, greedy does not find the maximum.`,
   done: (cut, cap, value, iterations) =>

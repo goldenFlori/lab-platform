@@ -26,10 +26,12 @@ import {
   properties,
   type TraversalStep,
 } from './algorithms/graphs';
+import { GRAPHS_TEXT } from './algorithms/graphs.text';
 import { Choice, Field, PlayerBar, Segmented, Toggle } from './kit/controls';
 import { type EdgeLook, fitLayout, type GEdge, type GNode, GraphCanvas, type NodeLook } from './kit/GraphCanvas';
 import { must } from './kit/must';
 import { Legend, Panel, Pseudocode, Stat, StepNote, TokenRow, VizShell } from './kit/shell';
+import { bilingual, useText } from './kit/text';
 import { playerKeys, usePlayer } from './kit/usePlayer';
 
 /* =====================================================================
@@ -42,8 +44,6 @@ export type GraphMode = 'build' | 'repr' | 'analyze' | 'traverse' | 'mst';
 
 interface Preset {
   id: string;
-  name: string;
-  note: string;
   directed?: boolean;
   weighted?: boolean;
   multi?: boolean;
@@ -66,8 +66,6 @@ const E = (list: (string | number)[][]): GEdge[] =>
 export const GRAPH_PRESETS: Preset[] = [
   {
     id: 'shembull',
-    name: 'Shembull — 6 kulme',
-    note: 'Një graf i thjeshtë i padrejtuar.',
     nodes: lay([
       ['A', 120, 120],
       ['B', 300, 60],
@@ -88,8 +86,6 @@ export const GRAPH_PRESETS: Preset[] = [
   },
   {
     id: 'klase1',
-    name: 'Punë në Klasë 1 — BFS/DFS',
-    note: 'Grafi i Problemit 1 të Punës në Klasë, Laboratori 5.',
     nodes: lay([
       ['0', 300, 40],
       ['1', 170, 130],
@@ -110,8 +106,6 @@ export const GRAPH_PRESETS: Preset[] = [
   },
   {
     id: 'klase2',
-    name: 'Punë në Klasë 2 — Kruskal',
-    note: 'Grafi me pesha i Problemit 2 të Punës në Klasë, Laboratori 5.',
     weighted: true,
     nodes: lay([
       ['A', 300, 45],
@@ -132,8 +126,6 @@ export const GRAPH_PRESETS: Preset[] = [
   },
   {
     id: 'mst8',
-    name: 'Rrjet me pesha — 8 kulme',
-    note: 'Lidhni 8 qytete me kabllo me kosto minimale.',
     weighted: true,
     nodes: lay([
       ['A', 80, 200],
@@ -163,8 +155,6 @@ export const GRAPH_PRESETS: Preset[] = [
   },
   {
     id: 'k4',
-    name: 'Grafi i plotë K₄',
-    note: 'Çdo çift kulmesh është i lidhur: |E| = n(n−1)/2 = 6.',
     nodes: lay([
       ['A', 200, 80],
       ['B', 440, 80],
@@ -182,8 +172,6 @@ export const GRAPH_PRESETS: Preset[] = [
   },
   {
     id: 'konigsberg',
-    name: 'Urat e Königsbergut',
-    note: 'Multigraf: 4 pjesë qyteti, 7 ura (Leksioni 4, slides 2–3).',
     multi: true,
     nodes: lay([
       ['C', 200, 40],
@@ -203,8 +191,6 @@ export const GRAPH_PRESETS: Preset[] = [
   },
   {
     id: 'katror',
-    name: 'Katror C₄ — dyanësor',
-    note: 'Shtoni një diagonale dhe kontrolloni sërish dyanësinë.',
     nodes: lay([
       ['A', 220, 90],
       ['B', 480, 90],
@@ -220,8 +206,6 @@ export const GRAPH_PRESETS: Preset[] = [
   },
   {
     id: 'c5',
-    name: 'Cikël C₅ — cikël tek',
-    note: 'Një cikël me gjatësi tek nuk është kurrë dyanësor.',
     nodes: lay([
       ['A', 360, 40],
       ['B', 560, 170],
@@ -239,8 +223,6 @@ export const GRAPH_PRESETS: Preset[] = [
   },
   {
     id: 'digraf',
-    name: 'Digraf — lëndët',
-    note: 'Harqet tregojnë cila lëndë kërkohet para cilës.',
     directed: true,
     nodes: lay([
       ['MAT1', 80, 120],
@@ -259,34 +241,284 @@ export const GRAPH_PRESETS: Preset[] = [
       ['PRG2', 'DB'],
     ]),
   },
-  { id: 'bosh', name: 'Graf bosh', note: 'Klikoni në fushë për të shtuar kulme.', nodes: [], edges: [] },
+  { id: 'bosh', nodes: [], edges: [] },
 ];
 
-const MODES: { value: GraphMode; label: string; icon: React.ReactNode }[] = [
-  { value: 'build', label: 'Ndërto', icon: <MousePointerClick className="size-4" /> },
-  { value: 'repr', label: 'Paraqitjet', icon: <Table2 className="size-4" /> },
-  { value: 'analyze', label: 'Analizo', icon: <Boxes className="size-4" /> },
-  { value: 'traverse', label: 'BFS / DFS', icon: <Route className="size-4" /> },
-  { value: 'mst', label: 'Pema minimale', icon: <GitFork className="size-4" /> },
+const MODES: { value: GraphMode; icon: React.ReactNode }[] = [
+  { value: 'build', icon: <MousePointerClick className="size-4" /> },
+  { value: 'repr', icon: <Table2 className="size-4" /> },
+  { value: 'analyze', icon: <Boxes className="size-4" /> },
+  { value: 'traverse', icon: <Route className="size-4" /> },
+  { value: 'mst', icon: <GitFork className="size-4" /> },
 ];
 
-const PSEUDO = {
-  bfs: [
-    'shëno s; radha = [s]',
-    'ndërsa radha ≠ ∅:',
-    '  v = nxirr nga fillimi',
-    '  për çdo fqinj w i pavizituar:',
-    '    shëno w; fute në fund',
-  ],
-  dfs: ['stiva = [s]', 'ndërsa stiva ≠ ∅:', '  v = nxirr nga maja; vizito v', '  shty fqinjët e pavizituar'],
-  kruskal: [
-    'rendit brinjët sipas peshës',
-    'për çdo brinjë (u, v):',
-    '  find(u) ≠ find(v) → prano',
-    '  përndryshe → refuzo (cikël)',
-  ],
-  prim: ['T = {s}', 'gjej brinjën më të lehtë', '  që del nga T; shtoje në T'],
-};
+const TEXT = bilingual(
+  {
+    presets: {
+      shembull: { name: 'Shembull — 6 kulme', note: 'Një graf i thjeshtë i padrejtuar.' },
+      klase1: { name: 'Punë në Klasë 1 — BFS/DFS', note: 'Grafi i Problemit 1 të Punës në Klasë, Laboratori 5.' },
+      klase2: {
+        name: 'Punë në Klasë 2 — Kruskal',
+        note: 'Grafi me pesha i Problemit 2 të Punës në Klasë, Laboratori 5.',
+      },
+      mst8: { name: 'Rrjet me pesha — 8 kulme', note: 'Lidhni 8 qytete me kabllo me kosto minimale.' },
+      k4: { name: 'Grafi i plotë K₄', note: 'Çdo çift kulmesh është i lidhur: |E| = n(n−1)/2 = 6.' },
+      konigsberg: { name: 'Urat e Königsbergut', note: 'Multigraf: 4 pjesë qyteti, 7 ura (Leksioni 4, slides 2–3).' },
+      katror: { name: 'Katror C₄ — dyanësor', note: 'Shtoni një diagonale dhe kontrolloni sërish dyanësinë.' },
+      c5: { name: 'Cikël C₅ — cikël tek', note: 'Një cikël me gjatësi tek nuk është kurrë dyanësor.' },
+      digraf: { name: 'Digraf — lëndët', note: 'Harqet tregojnë cila lëndë kërkohet para cilës.' },
+      bosh: { name: 'Graf bosh', note: 'Klikoni në fushë për të shtuar kulme.' },
+    } as Record<string, { name: string; note: string }>,
+    modes: {
+      build: 'Ndërto',
+      repr: 'Paraqitjet',
+      analyze: 'Analizo',
+      traverse: 'BFS / DFS',
+      mst: 'Pema minimale',
+    } as Record<GraphMode, string>,
+    pseudo: {
+      bfs: [
+        'shëno s; radha = [s]',
+        'ndërsa radha ≠ ∅:',
+        '  v = nxirr nga fillimi',
+        '  për çdo fqinj w i pavizituar:',
+        '    shëno w; fute në fund',
+      ],
+      dfs: ['stiva = [s]', 'ndërsa stiva ≠ ∅:', '  v = nxirr nga maja; vizito v', '  shty fqinjët e pavizituar'],
+      kruskal: [
+        'rendit brinjët sipas peshës',
+        'për çdo brinjë (u, v):',
+        '  find(u) ≠ find(v) → prano',
+        '  përndryshe → refuzo (cikël)',
+      ],
+      prim: ['T = {s}', 'gjej brinjën më të lehtë', '  që del nga T; shtoje në T'],
+    },
+    addVertices: 'Shtoni kulme për të nisur.',
+    max: 'Maksimumi është 20 kulme.',
+    added: (id: string) => `U shtua kulmi **${id}**. Klikoni dy kulme radhazi për të shtuar një brinjë.`,
+    removed: (id: string) => `U fshi kulmi **${id}** bashkë me brinjët e tij.`,
+    picked: (id: string, multi: boolean) =>
+      `Zgjodhët **${id}**. Klikoni kulmin tjetër${multi ? ` (ose sërish ${id} për një lak)` : ''}.`,
+    loops: 'Laqet lejohen vetëm kur aktivizoni **Multigraf**.',
+    exists: (u: string, v: string) => `Brinja ${u}–${v} ekziston. Për brinjë paralele aktivizoni **Multigraf**.`,
+    loopAdded: (u: string) => `U shtua një **lak** te ${u}: fuqia e tij rritet me 2.`,
+    edgeAdded: (edge: string, w: number | null) => `U shtua brinja **${edge}**${w !== null ? ` me peshë ${w}` : ''}.`,
+    edgeRemoved: (u: string, v: string) => `U fshi brinja ${u}–${v}.`,
+    level: (n: number) => `niv ${n}`,
+    bipartite: 'Grafi **është dyanësor**: kulmet ndahen në X dhe Y dhe çdo brinjë lidh X me Y.',
+    loopNotBipartite: (v: string) => `**Nuk është dyanësor**: ka një lak te ${v}.`,
+    oddCycle: (cycle: string, first: string, n: number) =>
+      `**Nuk është dyanësor**: cikli tek ${cycle} – ${first} (gjatësia ${n}).`,
+    selectHint:
+      'Klikoni kulme për t’i zgjedhur. Kontrollojmë menjëherë nëse formojnë **bashkësi të pavarur** apo **klikë**.',
+    selection: (set: string, independent: boolean, clique: boolean) =>
+      `Zgjedhja {${set}}: ${independent ? '**bashkësi e pavarur** (asnjë brinjë brenda)' : 'jo e pavarur'} · ${clique ? '**klikë** (çdo çift i lidhur)' : 'jo klikë'}.`,
+    needWeights: 'Aktivizoni **Me pesha** për të parë pemën përfshirëse minimale.',
+    undirectedOnly: 'Kruskal dhe Prim punojnë me grafe të padrejtuara.',
+    title: 'Laboratori i grafeve',
+    subtitle:
+      'Ndërtoni një graf, lexoni vetitë dhe paraqitjet e tij, analizojeni, pastaj përshkojeni ose gjeni pemën minimale.',
+    mode: 'Mënyra',
+    graph: 'Grafi',
+    directed: 'I drejtuar',
+    weighted: 'Me pesha',
+    multigraph: 'Multigraf',
+    tool: 'Mjeti',
+    addConnect: 'Shto / lidh',
+    erase: 'Fshi',
+    newWeight: 'pesha e brinjës së re',
+    newWeightLabel: 'Pesha e brinjës së re',
+    cleared: 'Grafi u pastrua. Klikoni në fushë për të shtuar kulme.',
+    clear: 'Pastro',
+    hideBipartite: 'Fshih dyanësinë',
+    checkBipartite: 'Kontrollo dyanësinë',
+    maxClique: 'Klika maksimale',
+    maxIndependent: 'Bashkësia maksimale e pavarur',
+    clearSelection: 'Pastro zgjedhjen',
+    algorithm: 'Algoritmi',
+    bfsQueue: 'BFS — radhë',
+    dfsStack: 'DFS — stivë',
+    startVertex: 'Kulmi fillestar',
+    startFrom: (v: string) => `nis nga ${v}`,
+    graphLabel: (n: number, m: number) => `Graf me ${n} kulme dhe ${m} brinjë`,
+    editHelp: 'Klikoni në fushë → kulm i ri · klikoni dy kulme → brinjë · tërhiqni një kulm për ta zhvendosur.',
+    current: 'Kulmi aktual / brinjë e pemës',
+    inQueue: 'Në radhë',
+    inStack: 'Në stivë',
+    visited: 'I vizituar (me numrin e radhës)',
+    inTree: 'Në pemë',
+    considering: 'Po shqyrtohet',
+    rejected: 'Refuzuar (cikël)',
+    chosen: 'Zgjedhja',
+    independent: 'e pavarur',
+    clique: 'klikë',
+    pseudocode: 'Pseudokodi',
+    queue: 'Radha (FIFO)',
+    stack: 'Stiva (LIFO) — maja djathtas',
+    visitOrder: 'Rendi i vizitës',
+    treeWeight: 'Pesha w(T)',
+    treeEdges: 'Brinjë në pemë',
+    accepted: 'Brinjët e pranuara',
+    order: 'Rendi |V|',
+    size: 'Përmasa |E|',
+    handshake: 'Lema e shtrëngimit të duarve',
+    oddVertices: 'Kulme me fuqi tek:',
+    alwaysEven: '— gjithmonë një numër çift.',
+    kind: 'Lloji i grafit',
+    simple: 'Graf i thjeshtë',
+    loopsCount: (n: number) => `${n} lak`,
+    parallel: (n: number) => `${n} brinjë paralele`,
+    digraph: 'Digraf',
+    undirected: 'I padrejtuar',
+    complete: (n: number) => `I plotë K${n}`,
+    regular: (k: number) => `${k}-i rregullt`,
+    connected: 'I lidhur',
+    components: (n: number) => `${n} komponente`,
+    euler: 'Udhë Euleri (çdo brinjë një herë):',
+    exists2: 'ekziston',
+    notExists: 'nuk ekziston',
+    oddCount: (n: number) => `— ${n} kulme tek.`,
+    adjacencyList: 'Lista e fqinjësisë',
+    empty: 'Grafi është bosh.',
+    weightMatrix: 'Matrica e peshave',
+    adjacencyMatrix: 'Matrica e fqinjësisë',
+    directedMatrix: 'Rreshti = origjina, kolona = destinacioni — matrica nuk është simetrike.',
+    undirectedMatrix:
+      'Graf i padrejtuar → matricë simetrike. Laku numërohet 2 herë në diagonale, që shuma e rreshtit = fuqia.',
+    reminder: 'Kujtesa (Leksioni 4, slide 56)',
+    matrix: 'Matrica',
+    list: 'Lista',
+  },
+  {
+    presets: {
+      shembull: { name: 'Example — 6 vertices', note: 'A simple undirected graph.' },
+      klase1: { name: 'Class work 1 — BFS/DFS', note: 'The graph of Class work Problem 1, Lab 5.' },
+      klase2: { name: 'Class work 2 — Kruskal', note: 'The weighted graph of Class work Problem 2, Lab 5.' },
+      mst8: { name: 'Weighted network — 8 vertices', note: 'Connect 8 cities with cables at minimum cost.' },
+      k4: { name: 'The complete graph K₄', note: 'Every pair of vertices is connected: |E| = n(n−1)/2 = 6.' },
+      konigsberg: {
+        name: 'The bridges of Königsberg',
+        note: 'A multigraph: 4 parts of the city, 7 bridges (Lecture 4, slides 2–3).',
+      },
+      katror: { name: 'Square C₄ — bipartite', note: 'Add a diagonal and check bipartiteness again.' },
+      c5: { name: 'Cycle C₅ — an odd cycle', note: 'A cycle of odd length is never bipartite.' },
+      digraf: { name: 'Digraph — courses', note: 'The edges show which course is required before which.' },
+      bosh: { name: 'Empty graph', note: 'Click the canvas to add vertices.' },
+    },
+    modes: { build: 'Build', repr: 'Representations', analyze: 'Analyze', traverse: 'BFS / DFS', mst: 'Minimum tree' },
+    pseudo: {
+      bfs: [
+        'mark s; queue = [s]',
+        'while queue ≠ ∅:',
+        '  v = take from the front',
+        '  for each unvisited neighbour w:',
+        '    mark w; add it to the back',
+      ],
+      dfs: ['stack = [s]', 'while stack ≠ ∅:', '  v = pop from the top; visit v', '  push the unvisited neighbours'],
+      kruskal: [
+        'sort the edges by weight',
+        'for each edge (u, v):',
+        '  find(u) ≠ find(v) → accept',
+        '  otherwise → reject (cycle)',
+      ],
+      prim: ['T = {s}', 'find the lightest edge', '  leaving T; add it to T'],
+    },
+    addVertices: 'Add vertices to begin.',
+    max: 'The maximum is 20 vertices.',
+    added: (id) => `Added the vertex **${id}**. Click two vertices in turn to add an edge.`,
+    removed: (id) => `Deleted the vertex **${id}** together with its edges.`,
+    picked: (id, multi) =>
+      `You picked **${id}**. Click the other vertex${multi ? ` (or ${id} again for a loop)` : ''}.`,
+    loops: 'Loops are allowed only when **Multigraph** is on.',
+    exists: (u, v) => `The edge ${u}–${v} exists. For parallel edges turn on **Multigraph**.`,
+    loopAdded: (u) => `Added a **loop** at ${u}: its degree grows by 2.`,
+    edgeAdded: (edge, w) => `Added the edge **${edge}**${w !== null ? ` with weight ${w}` : ''}.`,
+    edgeRemoved: (u, v) => `Deleted the edge ${u}–${v}.`,
+    level: (n) => `lvl ${n}`,
+    bipartite: 'The graph **is bipartite**: the vertices split into X and Y and every edge joins X to Y.',
+    loopNotBipartite: (v) => `**Not bipartite**: there is a loop at ${v}.`,
+    oddCycle: (cycle, first, n) => `**Not bipartite**: the odd cycle ${cycle} – ${first} (length ${n}).`,
+    selectHint:
+      'Click vertices to select them. We check at once whether they form an **independent set** or a **clique**.',
+    selection: (set, independent, clique) =>
+      `Selection {${set}}: ${independent ? '**independent set** (no edge inside)' : 'not independent'} · ${clique ? '**clique** (every pair connected)' : 'not a clique'}.`,
+    needWeights: 'Turn on **Weighted** to see the minimum spanning tree.',
+    undirectedOnly: 'Kruskal and Prim work on undirected graphs.',
+    title: 'The graph lab',
+    subtitle:
+      'Build a graph, read its properties and representations, analyze it, then traverse it or find the minimum tree.',
+    mode: 'Mode',
+    graph: 'Graph',
+    directed: 'Directed',
+    weighted: 'Weighted',
+    multigraph: 'Multigraph',
+    tool: 'Tool',
+    addConnect: 'Add / connect',
+    erase: 'Delete',
+    newWeight: 'weight of the new edge',
+    newWeightLabel: 'Weight of the new edge',
+    cleared: 'The graph was cleared. Click the canvas to add vertices.',
+    clear: 'Clear',
+    hideBipartite: 'Hide bipartiteness',
+    checkBipartite: 'Check bipartiteness',
+    maxClique: 'Maximum clique',
+    maxIndependent: 'Maximum independent set',
+    clearSelection: 'Clear the selection',
+    algorithm: 'Algorithm',
+    bfsQueue: 'BFS — queue',
+    dfsStack: 'DFS — stack',
+    startVertex: 'Start vertex',
+    startFrom: (v) => `start from ${v}`,
+    graphLabel: (n, m) => `A graph with ${n} vertices and ${m} edges`,
+    editHelp: 'Click the canvas → new vertex · click two vertices → edge · drag a vertex to move it.',
+    current: 'Current vertex / tree edge',
+    inQueue: 'In the queue',
+    inStack: 'On the stack',
+    visited: 'Visited (with its number in the order)',
+    inTree: 'In the tree',
+    considering: 'Being considered',
+    rejected: 'Rejected (cycle)',
+    chosen: 'Selection',
+    independent: 'independent',
+    clique: 'clique',
+    pseudocode: 'Pseudocode',
+    queue: 'Queue (FIFO)',
+    stack: 'Stack (LIFO) — top on the right',
+    visitOrder: 'Visiting order',
+    treeWeight: 'Weight w(T)',
+    treeEdges: 'Edges in the tree',
+    accepted: 'Accepted edges',
+    order: 'Order |V|',
+    size: 'Size |E|',
+    handshake: 'The handshake lemma',
+    oddVertices: 'Vertices of odd degree:',
+    alwaysEven: '— always an even number.',
+    kind: 'Kind of graph',
+    simple: 'Simple graph',
+    loopsCount: (n) => `${n} ${n === 1 ? 'loop' : 'loops'}`,
+    parallel: (n) => `${n} parallel ${n === 1 ? 'edge' : 'edges'}`,
+    digraph: 'Digraph',
+    undirected: 'Undirected',
+    complete: (n) => `Complete K${n}`,
+    regular: (k) => `${k}-regular`,
+    connected: 'Connected',
+    components: (n) => `${n} components`,
+    euler: 'Euler trail (every edge once):',
+    exists2: 'exists',
+    notExists: 'does not exist',
+    oddCount: (n) => `— ${n} odd vertices.`,
+    adjacencyList: 'Adjacency list',
+    empty: 'The graph is empty.',
+    weightMatrix: 'Weight matrix',
+    adjacencyMatrix: 'Adjacency matrix',
+    directedMatrix: 'Row = origin, column = destination — the matrix is not symmetric.',
+    undirectedMatrix:
+      'Undirected graph → symmetric matrix. A loop counts 2 on the diagonal, so that the row sum = the degree.',
+    reminder: 'Reminder (Lecture 4, slide 56)',
+    matrix: 'Matrix',
+    list: 'List',
+  },
+);
 
 const soft = (c: string, p = 22) => `color-mix(in oklab, ${c} ${p}%, var(--surface))`;
 
@@ -310,6 +542,8 @@ export default function GraphLab({
   preset?: string;
   title?: string;
 }) {
+  const X = useText(TEXT);
+  const G = useText(GRAPHS_TEXT);
   const start = GRAPH_PRESETS.find((p) => p.id === initialPreset) ?? GRAPH_PRESETS[0];
   const [mode, setMode] = useState<GraphMode>(initialMode);
   const [presetId, setPresetId] = useState(start.id);
@@ -343,7 +577,7 @@ export default function GraphLab({
     setSelection([]);
     setShowBip(false);
     setStartId(p.nodes[0]?.id ?? '');
-    setHint(p.note);
+    setHint(X.presets[p.id]?.note ?? null);
   };
 
   /* ---- structure-only keys: dragging a vertex must not restart the animation ---- */
@@ -355,10 +589,10 @@ export default function GraphLab({
   const travSteps = useMemo<TraversalStep[]>(
     () =>
       startOk
-        ? (trav === 'bfs' ? bfsSteps : dfsSteps)(nodes, edges, directed, startOk)
+        ? (trav === 'bfs' ? bfsSteps : dfsSteps)(nodes, edges, directed, startOk, G)
         : [
             {
-              note: 'Shtoni kulme për të nisur.',
+              note: X.addVertices,
               current: null,
               visited: [],
               frontier: [],
@@ -373,11 +607,11 @@ export default function GraphLab({
   const mstSteps = useMemo<MstStep[]>(
     () =>
       nodes.length === 0
-        ? [{ note: 'Shtoni kulme për të nisur.', tree: [], rejected: [], considering: null, inTree: [], weight: 0 }]
+        ? [{ note: X.addVertices, tree: [], rejected: [], considering: null, inTree: [], weight: 0 }]
         : mstAlgo === 'kruskal'
-          ? kruskalSteps(nodes, edges)
-          : primSteps(nodes, edges, startOk),
-    [idsKey, edgesKey, mstAlgo, startOk],
+          ? kruskalSteps(nodes, edges, G)
+          : primSteps(nodes, edges, startOk, G),
+    [idsKey, edgesKey, mstAlgo, startOk, X, G],
   );
   const tp = usePlayer(travSteps, 950);
   const mp = usePlayer(mstSteps, 950);
@@ -388,10 +622,10 @@ export default function GraphLab({
   const editable = mode === 'build' || mode === 'repr';
   const addNode = (x: number, y: number) => {
     if (!editable || tool !== 'edit') return;
-    if (nodes.length >= 20) return setHint('Maksimumi është 20 kulme.');
+    if (nodes.length >= 20) return setHint(X.max);
     const id = nextLabel(nodes);
     setNodes([...nodes, { id, x, y }]);
-    setHint(`U shtua kulmi **${id}**. Klikoni dy kulme radhazi për të shtuar një brinjë.`);
+    setHint(X.added(id));
   };
   const clickNode = (id: string) => {
     if (mode === 'analyze') {
@@ -405,32 +639,28 @@ export default function GraphLab({
     if (tool === 'delete') {
       setNodes(nodes.filter((n) => n.id !== id));
       setEdges(edges.filter((e) => e.u !== id && e.v !== id));
-      setHint(`U fshi kulmi **${id}** bashkë me brinjët e tij.`);
+      setHint(X.removed(id));
       return;
     }
     if (!pending) {
       setPending(id);
-      setHint(`Zgjodhët **${id}**. Klikoni kulmin tjetër${multi ? ` (ose sërish ${id} për një lak)` : ''}.`);
+      setHint(X.picked(id, multi));
       return;
     }
     const u = pending;
     setPending(null);
-    if (u === id && !multi) return setHint('Laqet lejohen vetëm kur aktivizoni **Multigraf**.');
+    if (u === id && !multi) return setHint(X.loops);
     const exists = edges.some((e) => (e.u === u && e.v === id) || (!directed && e.u === id && e.v === u));
-    if (exists && !multi) return setHint(`Brinja ${u}–${id} ekziston. Për brinjë paralele aktivizoni **Multigraf**.`);
+    if (exists && !multi) return setHint(X.exists(u, id));
     const w = Math.max(-99, Math.min(999, Math.round(Number(newW) || 1)));
     setEdges([...edges, { u, v: id, ...(weighted ? { w } : {}) }]);
-    setHint(
-      u === id
-        ? `U shtua një **lak** te ${u}: fuqia e tij rritet me 2.`
-        : `U shtua brinja **${u}${directed ? '→' : '–'}${id}**${weighted ? ` me peshë ${w}` : ''}.`,
-    );
+    setHint(u === id ? X.loopAdded(u) : X.edgeAdded(`${u}${directed ? '→' : '–'}${id}`, weighted ? w : null));
   };
   const clickEdge = (i: number) => {
     if (!editable || tool !== 'delete') return;
     const e = edges[i];
     setEdges(edges.filter((_, k) => k !== i));
-    setHint(`U fshi brinja ${e.u}–${e.v}.`);
+    setHint(X.edgeRemoved(e.u, e.v));
   };
   const moveNode = (id: string, x: number, y: number) =>
     setNodes((ns) => ns.map((n) => (n.id === id ? { ...n, x, y } : n)));
@@ -479,7 +709,7 @@ export default function GraphLab({
         ring: n.id === ts.current ? 'var(--viz-active)' : undefined,
         badge: pos >= 0 ? String(pos + 1) : null,
         badgeColor: 'var(--viz-done)',
-        sub: trav === 'bfs' && ts.level && n.id in ts.level ? `niv ${ts.level[n.id]}` : null,
+        sub: trav === 'bfs' && ts.level && n.id in ts.level ? X.level(ts.level[n.id]) : null,
       };
     }
     if (mode === 'mst') {
@@ -545,42 +775,34 @@ export default function GraphLab({
   };
 
   /* ---- footer note ---- */
-  let note = hint ?? GRAPH_PRESETS.find((p) => p.id === presetId)?.note ?? '';
+  let note = hint ?? X.presets[presetId]?.note ?? '';
   if (mode === 'analyze') {
     if (bip)
       note = bip.ok
-        ? `Grafi **është dyanësor**: kulmet ndahen në X dhe Y dhe çdo brinjë lidh X me Y.`
+        ? X.bipartite
         : oddCycle.length === 1
-          ? `**Nuk është dyanësor**: ka një lak te ${oddCycle[0]}.`
-          : `**Nuk është dyanësor**: cikli tek ${oddCycle.join(' – ')} – ${oddCycle[0]} (gjatësia ${oddCycle.length}).`;
-    else if (!selection.length)
-      note =
-        'Klikoni kulme për t’i zgjedhur. Kontrollojmë menjëherë nëse formojnë **bashkësi të pavarur** apo **klikë**.';
-    else
-      note = `Zgjedhja {${selection.join(', ')}}: ${isIndependent(edges, selection) ? '**bashkësi e pavarur** (asnjë brinjë brenda)' : 'jo e pavarur'} · ${isClique(edges, selection) ? '**klikë** (çdo çift i lidhur)' : 'jo klikë'}.`;
+          ? X.loopNotBipartite(oddCycle[0])
+          : X.oddCycle(oddCycle.join(' – '), oddCycle[0], oddCycle.length);
+    else if (!selection.length) note = X.selectHint;
+    else note = X.selection(selection.join(', '), isIndependent(edges, selection), isClique(edges, selection));
   }
   if (mode === 'traverse') note = ts.note;
-  if (mode === 'mst')
-    note = !weighted
-      ? 'Aktivizoni **Me pesha** për të parë pemën përfshirëse minimale.'
-      : directed
-        ? 'Kruskal dhe Prim punojnë me grafe të padrejtuara.'
-        : ms.note;
+  if (mode === 'mst') note = !weighted ? X.needWeights : directed ? X.undirectedOnly : ms.note;
 
   const ids = [...nodes].map((n) => n.id).sort(natural);
   const playing = mode === 'traverse' ? tp : mp;
 
   return (
     <VizShell
-      title={title ?? 'Laboratori i grafeve'}
-      subtitle="Ndërtoni një graf, lexoni vetitë dhe paraqitjet e tij, analizojeni, pastaj përshkojeni ose gjeni pemën minimale."
+      title={title ?? X.title}
+      subtitle={X.subtitle}
       icon={<Network />}
       onKeyDown={mode === 'traverse' || mode === 'mst' ? playerKeys(playing) : undefined}
       toolbar={
         <>
-          <Field label="Mënyra">
+          <Field label={X.mode}>
             <Segmented
-              label="Mënyra"
+              label={X.mode}
               value={mode}
               onChange={(m) => {
                 setMode(m);
@@ -588,29 +810,29 @@ export default function GraphLab({
                 setShowBip(false);
                 setHint(null);
               }}
-              options={MODES}
+              options={MODES.map((m) => ({ ...m, label: X.modes[m.value] }))}
             />
           </Field>
-          <Field label="Grafi">
+          <Field label={X.graph}>
             <Choice
-              label="Grafi"
+              label={X.graph}
               value={presetId}
               onChange={loadPreset}
-              options={GRAPH_PRESETS.map((p) => ({ value: p.id, label: p.name }))}
+              options={GRAPH_PRESETS.map((p) => ({ value: p.id, label: X.presets[p.id]?.name ?? p.id }))}
               className="w-60"
             />
           </Field>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pb-1">
             <Toggle
-              label="I drejtuar"
+              label={X.directed}
               value={directed}
               onChange={(v) => {
                 setDirected(v);
                 setShowBip(false);
               }}
             />
-            <Toggle label="Me pesha" value={weighted} onChange={toggleWeighted} />
-            <Toggle label="Multigraf" value={multi} onChange={setMulti} />
+            <Toggle label={X.weighted} value={weighted} onChange={toggleWeighted} />
+            <Toggle label={X.multigraph} value={multi} onChange={setMulti} />
           </div>
         </>
       }
@@ -629,22 +851,22 @@ export default function GraphLab({
             {editable && (
               <>
                 <Segmented
-                  label="Mjeti"
+                  label={X.tool}
                   value={tool}
                   onChange={(t) => {
                     setTool(t);
                     setPending(null);
                   }}
                   options={[
-                    { value: 'edit', label: 'Shto / lidh', icon: <Waypoints className="size-4" /> },
-                    { value: 'delete', label: 'Fshi', icon: <Eraser className="size-4" /> },
+                    { value: 'edit', label: X.addConnect, icon: <Waypoints className="size-4" /> },
+                    { value: 'delete', label: X.erase, icon: <Eraser className="size-4" /> },
                   ]}
                 />
                 {weighted && (
                   <label className="flex items-center gap-2 text-sm text-muted">
-                    pesha e brinjës së re
+                    {X.newWeight}
                     <Input
-                      aria-label="Pesha e brinjës së re"
+                      aria-label={X.newWeightLabel}
                       type="number"
                       value={newW}
                       onChange={(e) => setNewW(e.target.value)}
@@ -659,10 +881,10 @@ export default function GraphLab({
                     setNodes([]);
                     setEdges([]);
                     setPending(null);
-                    setHint('Grafi u pastrua. Klikoni në fushë për të shtuar kulme.');
+                    setHint(X.cleared);
                   }}
                 >
-                  <Trash2 /> Pastro
+                  <Trash2 /> {X.clear}
                 </Button>
               </>
             )}
@@ -676,7 +898,7 @@ export default function GraphLab({
                     setSelection([]);
                   }}
                 >
-                  {showBip ? 'Fshih dyanësinë' : 'Kontrollo dyanësinë'}
+                  {showBip ? X.hideBipartite : X.checkBipartite}
                 </Button>
                 <Button
                   size="sm"
@@ -686,7 +908,7 @@ export default function GraphLab({
                     setSelection(largest(nodes, edges, 'clique'));
                   }}
                 >
-                  Klika maksimale
+                  {X.maxClique}
                 </Button>
                 <Button
                   size="sm"
@@ -696,11 +918,11 @@ export default function GraphLab({
                     setSelection(largest(nodes, edges, 'independent'));
                   }}
                 >
-                  Bashkësia maksimale e pavarur
+                  {X.maxIndependent}
                 </Button>
                 {selection.length > 0 && (
                   <Button size="sm" variant="ghost" onPress={() => setSelection([])}>
-                    Pastro zgjedhjen
+                    {X.clearSelection}
                   </Button>
                 )}
               </>
@@ -708,20 +930,20 @@ export default function GraphLab({
             {mode === 'traverse' && (
               <>
                 <Segmented
-                  label="Algoritmi"
+                  label={X.algorithm}
                   value={trav}
                   onChange={setTrav}
                   options={[
-                    { value: 'bfs', label: 'BFS — radhë' },
-                    { value: 'dfs', label: 'DFS — stivë' },
+                    { value: 'bfs', label: X.bfsQueue },
+                    { value: 'dfs', label: X.dfsStack },
                   ]}
                 />
                 {ids.length > 0 && (
                   <Choice
-                    label="Kulmi fillestar"
+                    label={X.startVertex}
                     value={startOk}
                     onChange={setStartId}
-                    options={ids.map((i) => ({ value: i, label: `nis nga ${i}` }))}
+                    options={ids.map((i) => ({ value: i, label: X.startFrom(i) }))}
                     className="w-36"
                   />
                 )}
@@ -730,7 +952,7 @@ export default function GraphLab({
             {mode === 'mst' && (
               <>
                 <Segmented
-                  label="Algoritmi"
+                  label={X.algorithm}
                   value={mstAlgo}
                   onChange={setMstAlgo}
                   options={[
@@ -740,10 +962,10 @@ export default function GraphLab({
                 />
                 {mstAlgo === 'prim' && ids.length > 0 && (
                   <Choice
-                    label="Kulmi fillestar"
+                    label={X.startVertex}
                     value={startOk}
                     onChange={setStartId}
-                    options={ids.map((i) => ({ value: i, label: `nis nga ${i}` }))}
+                    options={ids.map((i) => ({ value: i, label: X.startFrom(i) }))}
                     className="w-36"
                   />
                 )}
@@ -766,29 +988,25 @@ export default function GraphLab({
               onNodeClick={clickNode}
               onEdgeClick={editable && tool === 'delete' ? clickEdge : undefined}
               onNodeMove={moveNode}
-              ariaLabel={`Graf me ${nodes.length} kulme dhe ${edges.length} brinjë`}
+              ariaLabel={X.graphLabel(nodes.length, edges.length)}
             />
           </div>
-          {editable && (
-            <p className="text-xs text-muted">
-              Klikoni në fushë → kulm i ri · klikoni dy kulme → brinjë · tërhiqni një kulm për ta zhvendosur.
-            </p>
-          )}
+          {editable && <p className="text-xs text-muted">{X.editHelp}</p>}
           {mode === 'traverse' && (
             <Legend
               items={[
-                { color: 'var(--viz-active)', label: 'Kulmi aktual / brinjë e pemës' },
-                { color: 'var(--viz-compare)', label: trav === 'bfs' ? 'Në radhë' : 'Në stivë' },
-                { color: 'var(--viz-done)', label: 'I vizituar (me numrin e radhës)' },
+                { color: 'var(--viz-active)', label: X.current },
+                { color: 'var(--viz-compare)', label: trav === 'bfs' ? X.inQueue : X.inStack },
+                { color: 'var(--viz-done)', label: X.visited },
               ]}
             />
           )}
           {mode === 'mst' && (
             <Legend
               items={[
-                { color: 'var(--viz-done)', label: 'Në pemë', shape: 'line' },
-                { color: 'var(--viz-compare)', label: 'Po shqyrtohet', shape: 'line' },
-                { color: 'var(--viz-reject)', label: 'Refuzuar (cikël)', shape: 'dash' },
+                { color: 'var(--viz-done)', label: X.inTree, shape: 'line' },
+                { color: 'var(--viz-compare)', label: X.considering, shape: 'line' },
+                { color: 'var(--viz-reject)', label: X.rejected, shape: 'dash' },
               ]}
             />
           )}
@@ -800,27 +1018,27 @@ export default function GraphLab({
             <ReprPanel nodes={nodes} edges={edges} ids={ids} directed={directed} weighted={weighted} />
           )}
           {mode === 'analyze' && selection.length > 0 && !bip && (
-            <Panel title="Zgjedhja">
+            <Panel title={X.chosen}>
               <TokenRow items={selection} tone="accent" />
               <div className="mt-2.5 flex flex-wrap gap-1.5">
                 <Chip size="sm" variant="soft" color={isIndependent(edges, selection) ? 'success' : 'default'}>
-                  {isIndependent(edges, selection) ? '✓' : '✗'} e pavarur
+                  {isIndependent(edges, selection) ? '✓' : '✗'} {X.independent}
                 </Chip>
                 <Chip size="sm" variant="soft" color={isClique(edges, selection) ? 'success' : 'default'}>
-                  {isClique(edges, selection) ? '✓' : '✗'} klikë
+                  {isClique(edges, selection) ? '✓' : '✗'} {X.clique}
                 </Chip>
               </div>
             </Panel>
           )}
           {mode === 'traverse' && (
             <>
-              <Panel title="Pseudokodi">
-                <Pseudocode lines={PSEUDO[trav]} active={ts.line} />
+              <Panel title={X.pseudocode}>
+                <Pseudocode lines={X.pseudo[trav]} active={ts.line} />
               </Panel>
-              <Panel title={trav === 'bfs' ? 'Radha (FIFO)' : 'Stiva (LIFO) — maja djathtas'}>
+              <Panel title={trav === 'bfs' ? X.queue : X.stack}>
                 <TokenRow items={ts.frontier} tone="warning" />
               </Panel>
-              <Panel title="Rendi i vizitës">
+              <Panel title={X.visitOrder}>
                 <TokenRow items={ts.order} tone="success" />
               </Panel>
             </>
@@ -828,13 +1046,13 @@ export default function GraphLab({
           {mode === 'mst' && weighted && !directed && (
             <>
               <div className="grid grid-cols-2 gap-3">
-                <Stat label="Pesha w(T)" value={ms.weight} tone="success" />
-                <Stat label="Brinjë në pemë" value={`${ms.tree.length} / ${Math.max(0, nodes.length - 1)}`} />
+                <Stat label={X.treeWeight} value={ms.weight} tone="success" />
+                <Stat label={X.treeEdges} value={`${ms.tree.length} / ${Math.max(0, nodes.length - 1)}`} />
               </div>
-              <Panel title="Pseudokodi">
-                <Pseudocode lines={PSEUDO[mstAlgo]} active={ms.line} />
+              <Panel title={X.pseudocode}>
+                <Pseudocode lines={X.pseudo[mstAlgo]} active={ms.line} />
               </Panel>
-              <Panel title="Brinjët e pranuara">
+              <Panel title={X.accepted}>
                 <TokenRow items={ms.tree.map((i) => `${edges[i]?.u}–${edges[i]?.v} (${edges[i]?.w})`)} tone="success" />
               </Panel>
             </>
@@ -848,13 +1066,14 @@ export default function GraphLab({
 function PropertiesPanel({ props, directed }: { props: ReturnType<typeof properties>; directed: boolean }) {
   const simple = props.loops === 0 && props.parallel === 0;
   const connected = props.components.length <= 1;
+  const X = useText(TEXT);
   return (
     <>
       <div className="grid grid-cols-2 gap-3">
-        <Stat label="Rendi |V|" value={props.order} />
-        <Stat label="Përmasa |E|" value={props.size} />
+        <Stat label={X.order} value={props.order} />
+        <Stat label={X.size} value={props.size} />
       </div>
-      <Panel title="Lema e shtrëngimit të duarve" aside={<Sigma className="size-4 text-muted" />}>
+      <Panel title={X.handshake} aside={<Sigma className="size-4 text-muted" />}>
         <p className="font-mono text-sm">
           {directed ? (
             <>
@@ -869,50 +1088,50 @@ function PropertiesPanel({ props, directed }: { props: ReturnType<typeof propert
         </p>
         {!directed && props.order > 0 && (
           <p className="mt-1.5 text-sm text-muted">
-            Kulme me fuqi tek: <b className="text-foreground">{props.odd.length}</b>{' '}
-            {props.odd.length ? `(${props.odd.join(', ')})` : ''} — gjithmonë një numër çift.
+            {X.oddVertices} <b className="text-foreground">{props.odd.length}</b>{' '}
+            {props.odd.length ? `(${props.odd.join(', ')})` : ''} {X.alwaysEven}
           </p>
         )}
       </Panel>
-      <Panel title="Lloji i grafit">
+      <Panel title={X.kind}>
         <div className="flex flex-wrap gap-1.5">
           <Chip size="sm" variant="soft" color={simple ? 'accent' : 'warning'}>
-            {simple ? 'Graf i thjeshtë' : 'Multigraf'}
+            {simple ? X.simple : X.multigraph}
           </Chip>
           {props.loops > 0 && (
             <Chip size="sm" variant="soft" color="warning">
-              {props.loops} lak
+              {X.loopsCount(props.loops)}
             </Chip>
           )}
           {props.parallel > 0 && (
             <Chip size="sm" variant="soft" color="warning">
-              {props.parallel} brinjë paralele
+              {X.parallel(props.parallel)}
             </Chip>
           )}
           <Chip size="sm" variant="soft">
-            {directed ? 'Digraf' : 'I padrejtuar'}
+            {directed ? X.digraph : X.undirected}
           </Chip>
           {props.complete && (
             <Chip size="sm" variant="soft" color="success">
-              I plotë K{props.order}
+              {X.complete(props.order)}
             </Chip>
           )}
           {props.regular !== null && props.order > 1 && (
             <Chip size="sm" variant="soft" color="success">
-              {props.regular}-i rregullt
+              {X.regular(props.regular)}
             </Chip>
           )}
           <Chip size="sm" variant="soft" color={connected ? 'success' : 'danger'}>
-            {connected ? 'I lidhur' : `${props.components.length} komponente`}
+            {connected ? X.connected : X.components(props.components.length)}
           </Chip>
         </div>
         {!directed && props.order > 0 && connected && (
           <p className="mt-2.5 text-sm text-muted">
-            Udhë Euleri (çdo brinjë një herë):{' '}
+            {X.euler}{' '}
             <b className="text-foreground">
-              {props.odd.length === 0 || props.odd.length === 2 ? 'ekziston' : 'nuk ekziston'}
+              {props.odd.length === 0 || props.odd.length === 2 ? X.exists2 : X.notExists}
             </b>{' '}
-            — {props.odd.length} kulme tek.
+            {X.oddCount(props.odd.length)}
           </p>
         )}
       </Panel>
@@ -932,6 +1151,7 @@ function ReprPanel({
   directed: boolean;
   weighted: boolean;
 }) {
+  const X = useText(TEXT);
   const index = new Map(ids.map((id, i) => [id, i]));
   const n = ids.length;
   const M: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));
@@ -958,9 +1178,9 @@ function ReprPanel({
   const m = edges.length;
   return (
     <>
-      <Panel title="Lista e fqinjësisë">
+      <Panel title={X.adjacencyList}>
         {n === 0 ? (
-          <p className="text-sm text-muted">Grafi është bosh.</p>
+          <p className="text-sm text-muted">{X.empty}</p>
         ) : (
           <ul className="space-y-1 font-mono text-[0.8rem]">
             {ids.map((id) => (
@@ -974,7 +1194,7 @@ function ReprPanel({
         )}
       </Panel>
       {n > 0 && (
-        <Panel title={weighted ? 'Matrica e peshave' : 'Matrica e fqinjësisë'}>
+        <Panel title={weighted ? X.weightMatrix : X.adjacencyMatrix}>
           <div className="overflow-x-auto">
             <table className="mx-auto border-collapse font-mono text-[0.74rem]">
               <thead>
@@ -1008,21 +1228,17 @@ function ReprPanel({
               </tbody>
             </table>
           </div>
-          <p className="mt-2 text-xs text-muted">
-            {directed
-              ? 'Rreshti = origjina, kolona = destinacioni — matrica nuk është simetrike.'
-              : 'Graf i padrejtuar → matricë simetrike. Laku numërohet 2 herë në diagonale, që shuma e rreshtit = fuqia.'}
-          </p>
+          <p className="mt-2 text-xs text-muted">{directed ? X.directedMatrix : X.undirectedMatrix}</p>
         </Panel>
       )}
-      <Panel title="Kujtesa (Leksioni 4, slide 56)">
+      <Panel title={X.reminder}>
         <div className="grid grid-cols-2 gap-2 text-sm">
           <div>
-            <div className="text-xs text-muted">Matrica</div>
+            <div className="text-xs text-muted">{X.matrix}</div>
             <div className="font-mono font-semibold">n² = {n * n}</div>
           </div>
           <div>
-            <div className="text-xs text-muted">Lista</div>
+            <div className="text-xs text-muted">{X.list}</div>
             <div className="font-mono font-semibold">
               n + {directed ? 'm' : '2m'} = {n + (directed ? m : 2 * m)}
             </div>
