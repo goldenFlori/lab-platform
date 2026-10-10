@@ -1,19 +1,6 @@
-import { type Browser, expect, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { E2E_ACCOUNT, E2E_STAFF } from './account';
-
-async function signIn(browser: Browser, account: { username: string; password: string }, isMobile: boolean) {
-  const context = await browser.newContext(isMobile ? { viewport: { width: 375, height: 812 }, isMobile: true } : {});
-  const page = await context.newPage();
-  page.on('pageerror', (error) => {
-    throw error;
-  });
-  await page.goto('/login');
-  await page.getByLabel('Emri i përdoruesit').fill(account.username);
-  await page.getByLabel('Fjalëkalimi', { exact: true }).fill(account.password);
-  await page.getByRole('button', { name: 'Hyr', exact: true }).click();
-  await expect(page).toHaveURL('/courses');
-  return page;
-}
+import { signIn } from './sign-in';
 
 test('a pedagog opens and hides a lab; the student sees it change at once', async ({ browser, isMobile }) => {
   test.setTimeout(60_000);
