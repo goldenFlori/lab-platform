@@ -1,0 +1,743 @@
+{
+  "title": "Bellman-Ford Algorithm — Interactive Step-by-Step Notebook",
+  "toc": [
+    {
+      "id": "1-setup",
+      "title": "1. Setup",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "2-the-graph",
+      "title": "2. The Graph",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "3-node-positions-what-are-they",
+      "title": "3. Node Positions — What Are They?",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "4-bellman-ford-record-every-step",
+      "title": "4. Bellman-Ford — Record Every Step",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "how-the-algorithm-works",
+      "title": "How the algorithm works",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "why-v-1-iterations",
+      "title": "Why V - 1 iterations?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "what-to-watch-in-this-graph",
+      "title": "What to watch in this graph",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "5-frame-drawing-function",
+      "title": "5. Frame Drawing Function",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "6-step-by-step-interactive-walkthrough",
+      "title": "6. Step-by-Step Interactive Walkthrough",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "7-all-steps-at-a-glance",
+      "title": "7. All Steps at a Glance",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "8-final-distance-table-path-reconstruction",
+      "title": "8. Final Distance Table & Path Reconstruction",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "9-complexity",
+      "title": "9. Complexity",
+      "level": 2,
+      "kind": "complexity"
+    },
+    {
+      "id": "10-practice-exercises",
+      "title": "10. Practice Exercises",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "a-different-source",
+      "title": "A — Different source",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "b-negative-cycle-detection",
+      "title": "B — Negative cycle detection",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "c-count-relaxations-per-iteration",
+      "title": "C — Count relaxations per iteration",
+      "level": 3,
+      "kind": "normal"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "1-setup",
+      "title": "1. Setup",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "2-the-graph",
+      "title": "2. The Graph",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "3-node-positions-what-are-they",
+      "title": "3. Node Positions — What Are They?",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "4-bellman-ford-record-every-step",
+      "title": "4. Bellman-Ford — Record Every Step",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "how-the-algorithm-works",
+      "title": "How the algorithm works",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "why-v-1-iterations",
+      "title": "Why V - 1 iterations?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "what-to-watch-in-this-graph",
+      "title": "What to watch in this graph",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "5-frame-drawing-function",
+      "title": "5. Frame Drawing Function",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "6-step-by-step-interactive-walkthrough",
+      "title": "6. Step-by-Step Interactive Walkthrough",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "7-all-steps-at-a-glance",
+      "title": "7. All Steps at a Glance",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "8-final-distance-table-path-reconstruction",
+      "title": "8. Final Distance Table & Path Reconstruction",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "9-complexity",
+      "title": "9. Complexity",
+      "level": 2,
+      "kind": "complexity"
+    },
+    {
+      "id": "10-practice-exercises",
+      "title": "10. Practice Exercises",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "a-different-source",
+      "title": "A — Different source",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "b-negative-cycle-detection",
+      "title": "B — Negative cycle detection",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "c-count-relaxations-per-iteration",
+      "title": "C — Count relaxations per iteration",
+      "level": 3,
+      "kind": "normal"
+    }
+  ],
+  "sections": [
+    {
+      "id": "1-setup",
+      "title": "1. Setup",
+      "kind": "normal"
+    },
+    {
+      "id": "2-the-graph",
+      "title": "2. The Graph",
+      "kind": "normal"
+    },
+    {
+      "id": "3-node-positions-what-are-they",
+      "title": "3. Node Positions — What Are They?",
+      "kind": "normal"
+    },
+    {
+      "id": "4-bellman-ford-record-every-step",
+      "title": "4. Bellman-Ford — Record Every Step",
+      "kind": "normal"
+    },
+    {
+      "id": "how-the-algorithm-works",
+      "title": "How the algorithm works",
+      "kind": "normal"
+    },
+    {
+      "id": "why-v-1-iterations",
+      "title": "Why V - 1 iterations?",
+      "kind": "normal"
+    },
+    {
+      "id": "what-to-watch-in-this-graph",
+      "title": "What to watch in this graph",
+      "kind": "normal"
+    },
+    {
+      "id": "5-frame-drawing-function",
+      "title": "5. Frame Drawing Function",
+      "kind": "normal"
+    },
+    {
+      "id": "6-step-by-step-interactive-walkthrough",
+      "title": "6. Step-by-Step Interactive Walkthrough",
+      "kind": "normal"
+    },
+    {
+      "id": "7-all-steps-at-a-glance",
+      "title": "7. All Steps at a Glance",
+      "kind": "normal"
+    },
+    {
+      "id": "8-final-distance-table-path-reconstruction",
+      "title": "8. Final Distance Table & Path Reconstruction",
+      "kind": "normal"
+    },
+    {
+      "id": "9-complexity",
+      "title": "9. Complexity",
+      "kind": "complexity"
+    },
+    {
+      "id": "10-practice-exercises",
+      "title": "10. Practice Exercises",
+      "kind": "normal"
+    },
+    {
+      "id": "a-different-source",
+      "title": "A — Different source",
+      "kind": "normal"
+    },
+    {
+      "id": "b-negative-cycle-detection",
+      "title": "B — Negative cycle detection",
+      "kind": "normal"
+    },
+    {
+      "id": "c-count-relaxations-per-iteration",
+      "title": "C — Count relaxations per iteration",
+      "kind": "normal"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:38a3939e47df2194",
+      "srcIndex": 0,
+      "intro": true
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "1-setup",
+      "heading": "1. Setup",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 1
+    },
+    {
+      "type": "code",
+      "srcIndex": 2,
+      "interactive": false,
+      "html": "sha256:6aa549665f31906e",
+      "raw": "sha256:b1d9322e0f9b4dae",
+      "lines": 4,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": true
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "2-the-graph",
+      "heading": "2. The Graph",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:9e8e8217d1784945",
+      "srcIndex": 3
+    },
+    {
+      "type": "code",
+      "srcIndex": 4,
+      "interactive": false,
+      "html": "sha256:4752c75452c9d9a3",
+      "raw": "sha256:f2262f2ae3d3c2f0",
+      "lines": 15,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "3-node-positions-what-are-they",
+      "heading": "3. Node Positions — What Are They?",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:0c43a76c1d0a3247",
+      "srcIndex": 5
+    },
+    {
+      "type": "code",
+      "srcIndex": 6,
+      "interactive": false,
+      "html": "sha256:aa37a97e8b93b5b7",
+      "raw": "sha256:98f9267cb9fcbde4",
+      "lines": 35,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "4-bellman-ford-record-every-step",
+      "heading": "4. Bellman-Ford — Record Every Step",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "how-the-algorithm-works",
+      "heading": "How the algorithm works",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:79d2d3985fcacbb5",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "why-v-1-iterations",
+      "heading": "Why V - 1 iterations?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:3d18cfc7bf492cc9",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "what-to-watch-in-this-graph",
+      "heading": "What to watch in this graph",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:b1f6c83b11c2ef16",
+      "srcIndex": 7
+    },
+    {
+      "type": "code",
+      "srcIndex": 8,
+      "interactive": false,
+      "html": "sha256:f6e8837b8e17d52a",
+      "raw": "sha256:464842dc84d40d03",
+      "lines": 68,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "bellman_ford_steps"
+        },
+        {
+          "t": "def",
+          "n": "snap"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "5-frame-drawing-function",
+      "heading": "5. Frame Drawing Function",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:7a8e6b803edae21c",
+      "srcIndex": 9
+    },
+    {
+      "type": "code",
+      "srcIndex": 10,
+      "interactive": false,
+      "html": "sha256:cfb33912379ec5b0",
+      "raw": "sha256:fdf941e4db29b38e",
+      "lines": 85,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "draw_frame"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "6-step-by-step-interactive-walkthrough",
+      "heading": "6. Step-by-Step Interactive Walkthrough",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:d28e9f161a2c9647",
+      "srcIndex": 11
+    },
+    {
+      "type": "code",
+      "srcIndex": 12,
+      "interactive": true,
+      "html": "sha256:fd64f1f7d08b6ef8",
+      "raw": "sha256:fd7ddf39e5c1dbe1",
+      "lines": 6,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": true,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": ["bellmanford_pygame.py"],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "7-all-steps-at-a-glance",
+      "heading": "7. All Steps at a Glance",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:128401af063c9049",
+      "srcIndex": 13
+    },
+    {
+      "type": "code",
+      "srcIndex": 14,
+      "interactive": false,
+      "html": "sha256:93b1f88c6a1f482d",
+      "raw": "sha256:0411c2a80d370867",
+      "lines": 17,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "8-final-distance-table-path-reconstruction",
+      "heading": "8. Final Distance Table & Path Reconstruction",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 15
+    },
+    {
+      "type": "code",
+      "srcIndex": 16,
+      "interactive": false,
+      "html": "sha256:898b9e23fc520b37",
+      "raw": "sha256:ea702f5a05b0ba09",
+      "lines": 15,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "complexity",
+      "label": "Kompleksiteti",
+      "id": "9-complexity",
+      "heading": "9. Complexity",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:4364ab4c394e8366",
+      "srcIndex": 17
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "10-practice-exercises",
+      "heading": "10. Practice Exercises",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 18
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "a-different-source",
+      "heading": "A — Different source",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:0690c0dad293fe94",
+      "srcIndex": 18
+    },
+    {
+      "type": "code",
+      "srcIndex": 19,
+      "interactive": false,
+      "html": "sha256:e0448046c9de4c24",
+      "raw": "sha256:dc38c7de3ca6d265",
+      "lines": 21,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "b-negative-cycle-detection",
+      "heading": "B — Negative cycle detection",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:316e99e0976fde4d",
+      "srcIndex": 20
+    },
+    {
+      "type": "code",
+      "srcIndex": 21,
+      "interactive": false,
+      "html": "sha256:5a396a4045c8cced",
+      "raw": "sha256:dea0c0e4297c6d48",
+      "lines": 12,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "c-count-relaxations-per-iteration",
+      "heading": "C — Count relaxations per iteration",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:c40b0abb05285933",
+      "srcIndex": 22
+    },
+    {
+      "type": "code",
+      "srcIndex": 23,
+      "interactive": false,
+      "html": "sha256:afb2165c532a1dd0",
+      "raw": "sha256:8b628c58a38b84c0",
+      "lines": 11,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    }
+  ],
+  "imports": ["copy", "math", "matplotlib", "subprocess"],
+  "dependencies": ["matplotlib"],
+  "flags": {
+    "pygame": false,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": false,
+    "matplotlib": true,
+    "networkx": false,
+    "numpy": false
+  },
+  "missingScripts": ["bellmanford_pygame.py"],
+  "stats": {
+    "cells": 24,
+    "markdown": 13,
+    "code": 11,
+    "codeLines": 289
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": false,
+  "assets": []
+}

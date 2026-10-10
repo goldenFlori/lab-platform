@@ -1,0 +1,397 @@
+{
+  "title": "Laboratori 2 — Kompleksiteti Kohor dhe Merge Sort",
+  "toc": [
+    {
+      "id": "1-teoria",
+      "title": "1. Teoria",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "cfare-eshte-kompleksiteti-kohor",
+      "title": "Çfarë është Kompleksiteti Kohor?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "notacioni-big-o-o-n",
+      "title": "Notacioni Big O — O(n)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "rregulla-e-arte-n",
+      "title": "Rregulla e artë: n₀",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "merge-sort-renditja-me-bashkim",
+      "title": "Merge Sort — Renditja me Bashkim",
+      "level": 2,
+      "kind": "normal"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "1-teoria",
+      "title": "1. Teoria",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "cfare-eshte-kompleksiteti-kohor",
+      "title": "Çfarë është Kompleksiteti Kohor?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "notacioni-big-o-o-n",
+      "title": "Notacioni Big O — O(n)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "rregulla-e-arte-n",
+      "title": "Rregulla e artë: n₀",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "merge-sort-renditja-me-bashkim",
+      "title": "Merge Sort — Renditja me Bashkim",
+      "level": 2,
+      "kind": "normal"
+    }
+  ],
+  "sections": [
+    {
+      "id": "1-teoria",
+      "title": "1. Teoria",
+      "kind": "theory"
+    },
+    {
+      "id": "cfare-eshte-kompleksiteti-kohor",
+      "title": "Çfarë është Kompleksiteti Kohor?",
+      "kind": "normal"
+    },
+    {
+      "id": "notacioni-big-o-o-n",
+      "title": "Notacioni Big O — O(n)",
+      "kind": "normal"
+    },
+    {
+      "id": "rregulla-e-arte-n",
+      "title": "Rregulla e artë: n₀",
+      "kind": "normal"
+    },
+    {
+      "id": "merge-sort-renditja-me-bashkim",
+      "title": "Merge Sort — Renditja me Bashkim",
+      "kind": "normal"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "theory",
+      "label": "Teori",
+      "id": "1-teoria",
+      "heading": "1. Teoria",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "cfare-eshte-kompleksiteti-kohor",
+      "heading": "Çfarë është Kompleksiteti Kohor?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:ea2f741eeb297b3d",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "notacioni-big-o-o-n",
+      "heading": "Notacioni Big O — O(n)",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:0c613d7cba48c153",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "rregulla-e-arte-n",
+      "heading": "Rregulla e artë: n₀",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:cf6121012036639c",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "merge-sort-renditja-me-bashkim",
+      "heading": "Merge Sort — Renditja me Bashkim",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:86b1c81a3630e696",
+      "srcIndex": 0
+    },
+    {
+      "type": "code",
+      "srcIndex": 1,
+      "interactive": false,
+      "html": "sha256:98877a73a4cd4bd7",
+      "raw": "sha256:c56ed35d7329d079",
+      "lines": 65,
+      "collapsed": true,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": true,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "plotly",
+          "file": "plotly-f94195f59cbf.json",
+          "bytes": 177234
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "srcIndex": 2,
+      "interactive": true,
+      "html": "sha256:e4925c29996db3fe",
+      "raw": "sha256:158a4917106faa21",
+      "lines": 146,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "build_steps"
+        },
+        {
+          "t": "def",
+          "n": "rec"
+        },
+        {
+          "t": "def",
+          "n": "draw"
+        },
+        {
+          "t": "def",
+          "n": "step"
+        },
+        {
+          "t": "def",
+          "n": "reset"
+        }
+      ],
+      "flags": {
+        "pygame": true,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 3,
+      "interactive": false,
+      "html": "sha256:54fa77046e70165c",
+      "raw": "sha256:9acce41c4c8f638f",
+      "lines": 93,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "insertion_sort"
+        },
+        {
+          "t": "def",
+          "n": "selection_sort"
+        },
+        {
+          "t": "def",
+          "n": "merge_sort"
+        },
+        {
+          "t": "def",
+          "n": "mat_kohen"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": true,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "plotly",
+          "file": "plotly-f7383a43d978.json",
+          "bytes": 14409
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "srcIndex": 4,
+      "interactive": false,
+      "html": "sha256:45fe856b75b6ad23",
+      "raw": "sha256:9cb4addde5835697",
+      "lines": 95,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "insertion_sort"
+        },
+        {
+          "t": "def",
+          "n": "merge_sort"
+        },
+        {
+          "t": "def",
+          "n": "mat_kohen"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": true,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "plotly",
+          "file": "plotly-fd2f74136268.json",
+          "bytes": 14591
+        },
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "n₀ ≈ 160\nPër n < 160:  Insertion dhe Merge janë gati njësoj\nPër n > 160:  Merge Sort bëhet dukshëm më i shpejtë\nPër n = 300:  Insertion është 3.5× më i ngadaltë se Merge Sort",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "srcIndex": 5,
+      "interactive": false,
+      "html": "sha256:6b5f83bdf4e25439",
+      "raw": "sha256:f65d468e7e28f86e",
+      "lines": 87,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "insertion_sort"
+        },
+        {
+          "t": "def",
+          "n": "selection_sort"
+        },
+        {
+          "t": "def",
+          "n": "merge_sort"
+        },
+        {
+          "t": "def",
+          "n": "mat_kohen"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": true,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "plotly",
+          "file": "plotly-30c964fc0801.json",
+          "bytes": 13542
+        }
+      ]
+    }
+  ],
+  "imports": ["numpy", "os", "plotly", "pygame", "random", "time"],
+  "dependencies": ["numpy", "plotly", "pygame"],
+  "flags": {
+    "pygame": true,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": true,
+    "matplotlib": false,
+    "networkx": false,
+    "numpy": true
+  },
+  "missingScripts": [],
+  "stats": {
+    "cells": 6,
+    "markdown": 1,
+    "code": 5,
+    "codeLines": 486
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": false,
+  "assets": [
+    {
+      "file": "plotly-30c964fc0801.json",
+      "bytes": 13545
+    },
+    {
+      "file": "plotly-f7383a43d978.json",
+      "bytes": 14432
+    },
+    {
+      "file": "plotly-f94195f59cbf.json",
+      "bytes": 177987
+    },
+    {
+      "file": "plotly-fd2f74136268.json",
+      "bytes": 14764
+    }
+  ]
+}

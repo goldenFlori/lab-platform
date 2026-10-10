@@ -1,0 +1,1430 @@
+{
+  "title": "Laboratori 9 — Max-Flow / Min-Cut & Ford-Fulkerson vs Edmonds-Karp",
+  "toc": [
+    {
+      "id": "ushtrimi-1-vizualizim-interaktiv-max-flow-min-cut",
+      "title": "Ushtrimi 1 — Vizualizim Interaktiv: Max-Flow/Min-Cut",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-ford-fulkerson-vs-edmonds-karp-vizualizim-hap-pas-hapi",
+      "title": "Ushtrimi 2 — Ford-Fulkerson vs Edmonds-Karp: Vizualizim Hap-pas-Hapi",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-network-capacity-planning-ford-fulkerson-vs-edmonds-karp",
+      "title": "Ushtrimi 3 — Network Capacity Planning: Ford-Fulkerson vs Edmonds-Karp",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-aeroporti-nderkombetar-rrjedha-e-pasagjereve",
+      "title": "Ushtrimi 4 — Aeroporti Ndërkombëtar: Rrjedha e Pasagjerëve",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "loja-finale-pipeline-defender",
+      "title": "Loja Finale — \"Pipeline Defender\"",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "detyra-shtepie",
+      "title": "Detyra Shtëpie",
+      "level": 2,
+      "kind": "homework"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "cfare-eshte-max-flow",
+      "title": "Çfarë është Max-Flow?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "termat-kyc",
+      "title": "Termat kyç",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "kushtet-e-rrjedhes",
+      "title": "Kushtet e Rrjedhës",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "algoritmet-kryesore",
+      "title": "Algoritmet kryesore",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "teorema-themelore-max-flow-min-cut",
+      "title": "Teorema Themelore: Max-Flow = Min-Cut",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-vizualizim-interaktiv-max-flow-min-cut",
+      "title": "Ushtrimi 1 — Vizualizim Interaktiv: Max-Flow/Min-Cut",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "konceptet-para-ushtrimit",
+      "title": "Konceptet para ushtrimit",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-do-te-besh",
+      "title": "Çfarë do të bësh:",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "si-funksionon-vizualizimi",
+      "title": "Si funksionon vizualizimi:",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-duhet-te-veresh",
+      "title": "Çfarë duhet të vëresh:",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-2-ford-fulkerson-vs-edmonds-karp-vizualizim-hap-pas-hapi",
+      "title": "Ushtrimi 2 — Ford-Fulkerson vs Edmonds-Karp: Vizualizim Hap-pas-Hapi",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ford-fulkerson-dfs",
+      "title": "Ford-Fulkerson (DFS)",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "edmonds-karp-bfs",
+      "title": "Edmonds-Karp (BFS)",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "krahasimi-vizual",
+      "title": "Krahasimi vizual:",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "skenari-real-rrjeti-i-ujesjellesit-te-qytetit",
+      "title": "Skenari Real: Rrjeti i Ujësjellësit të Qytetit",
+      "level": 3,
+      "kind": "scenario"
+    },
+    {
+      "id": "modelimi-si-graf",
+      "title": "Modelimi si Graf:",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "zgjidhja-me-algoritem",
+      "title": "Zgjidhja me algoritëm:",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-3-network-capacity-planning-ford-fulkerson-vs-edmonds-karp",
+      "title": "Ushtrimi 3 — Network Capacity Planning: Ford-Fulkerson vs Edmonds-Karp",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pse-max-flow-ne-rrjetet-kompjuterike",
+      "title": "Pse Max-Flow në rrjetet kompjuterike?",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "bottleneck-analysis",
+      "title": "Bottleneck Analysis:",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "graf-i-rezidual-vizualizim",
+      "title": "Graf-i Rezidual — Vizualizim:",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "pse-bfs-edmonds-karp-eshte-me-i-mire",
+      "title": "Pse BFS (Edmonds-Karp) është më i mirë?",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "skenari-real-data-center-network",
+      "title": "Skenari Real: Data Center Network",
+      "level": 3,
+      "kind": "scenario"
+    },
+    {
+      "id": "modelimi-si-graf-2",
+      "title": "Modelimi si Graf:",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-do-te-analizojme",
+      "title": "Cfarë do të analizojmë:",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-4-aeroporti-nderkombetar-rrjedha-e-pasagjereve",
+      "title": "Ushtrimi 4 — Aeroporti Ndërkombëtar: Rrjedha e Pasagjerëve",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "skenari-real-aeroporti-nderkombetar-tia",
+      "title": "Skenari Real: Aeroporti Ndërkombëtar TIA",
+      "level": 3,
+      "kind": "scenario"
+    },
+    {
+      "id": "cfare-ndodh-ne-secilen-pike",
+      "title": "Çfarë ndodh në secilën pikë",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "t-main-terminali-kryesor-burimi",
+      "title": "T-MAIN — Terminali Kryesor (Burimi)",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "gate-a-dhe-gate-b-portat-e-nisjes",
+      "title": "Gate-A dhe Gate-B — Portat e Nisjes",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "korridoret-rruget-ndermjetese",
+      "title": "Korridoret — Rrugët Ndërmjetëse",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "siguria-kontrolli-i-sigurise",
+      "title": "Siguria — Kontrolli i Sigurisë",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "baggage-zona-e-dorezimit-te-bagazheve-derdhja",
+      "title": "BAGGAGE — Zona e Dorëzimit të Bagazheve (Derdhja)",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "pyetja-operative",
+      "title": "Pyetja operative",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "kontrollet",
+      "title": "Kontrollet",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "loja-finale-pipeline-defender",
+      "title": "Loja Finale — \"Pipeline Defender\"",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "si-luhet",
+      "title": "Si luhet",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-meson-kjo-loje",
+      "title": "Çfarë mëson kjo lojë",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "detyra-shtepie",
+      "title": "Detyra Shtëpie",
+      "level": 2,
+      "kind": "homework"
+    },
+    {
+      "id": "detyre-1-max-flow-min-cut-rrjeti-i-internetit",
+      "title": "Detyrë 1 — Max-Flow & Min-Cut: Rrjeti i Internetit",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "detyre-2-ford-fulkerson-dfs-rrjeti-hekurudhor",
+      "title": "Detyrë 2 — Ford-Fulkerson (DFS): Rrjeti Hekurudhor",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "detyre-3-edmonds-karp-bfs-krahasimi-me-ford-fulkerson",
+      "title": "Detyrë 3 — Edmonds-Karp (BFS): Krahasimi me Ford-Fulkerson",
+      "level": 3,
+      "kind": "normal"
+    }
+  ],
+  "sections": [
+    {
+      "id": "cfare-eshte-max-flow",
+      "title": "Çfarë është Max-Flow?",
+      "kind": "normal"
+    },
+    {
+      "id": "termat-kyc",
+      "title": "Termat kyç",
+      "kind": "normal"
+    },
+    {
+      "id": "kushtet-e-rrjedhes",
+      "title": "Kushtet e Rrjedhës",
+      "kind": "normal"
+    },
+    {
+      "id": "algoritmet-kryesore",
+      "title": "Algoritmet kryesore",
+      "kind": "normal"
+    },
+    {
+      "id": "teorema-themelore-max-flow-min-cut",
+      "title": "Teorema Themelore: Max-Flow = Min-Cut",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-vizualizim-interaktiv-max-flow-min-cut",
+      "title": "Ushtrimi 1 — Vizualizim Interaktiv: Max-Flow/Min-Cut",
+      "kind": "exercise"
+    },
+    {
+      "id": "konceptet-para-ushtrimit",
+      "title": "Konceptet para ushtrimit",
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-do-te-besh",
+      "title": "Çfarë do të bësh:",
+      "kind": "normal"
+    },
+    {
+      "id": "si-funksionon-vizualizimi",
+      "title": "Si funksionon vizualizimi:",
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-duhet-te-veresh",
+      "title": "Çfarë duhet të vëresh:",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-2-ford-fulkerson-vs-edmonds-karp-vizualizim-hap-pas-hapi",
+      "title": "Ushtrimi 2 — Ford-Fulkerson vs Edmonds-Karp: Vizualizim Hap-pas-Hapi",
+      "kind": "exercise"
+    },
+    {
+      "id": "ford-fulkerson-dfs",
+      "title": "Ford-Fulkerson (DFS)",
+      "kind": "normal"
+    },
+    {
+      "id": "edmonds-karp-bfs",
+      "title": "Edmonds-Karp (BFS)",
+      "kind": "normal"
+    },
+    {
+      "id": "krahasimi-vizual",
+      "title": "Krahasimi vizual:",
+      "kind": "normal"
+    },
+    {
+      "id": "skenari-real-rrjeti-i-ujesjellesit-te-qytetit",
+      "title": "Skenari Real: Rrjeti i Ujësjellësit të Qytetit",
+      "kind": "scenario"
+    },
+    {
+      "id": "modelimi-si-graf",
+      "title": "Modelimi si Graf:",
+      "kind": "normal"
+    },
+    {
+      "id": "zgjidhja-me-algoritem",
+      "title": "Zgjidhja me algoritëm:",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-3-network-capacity-planning-ford-fulkerson-vs-edmonds-karp",
+      "title": "Ushtrimi 3 — Network Capacity Planning: Ford-Fulkerson vs Edmonds-Karp",
+      "kind": "exercise"
+    },
+    {
+      "id": "pse-max-flow-ne-rrjetet-kompjuterike",
+      "title": "Pse Max-Flow në rrjetet kompjuterike?",
+      "kind": "normal"
+    },
+    {
+      "id": "bottleneck-analysis",
+      "title": "Bottleneck Analysis:",
+      "kind": "normal"
+    },
+    {
+      "id": "graf-i-rezidual-vizualizim",
+      "title": "Graf-i Rezidual — Vizualizim:",
+      "kind": "normal"
+    },
+    {
+      "id": "pse-bfs-edmonds-karp-eshte-me-i-mire",
+      "title": "Pse BFS (Edmonds-Karp) është më i mirë?",
+      "kind": "normal"
+    },
+    {
+      "id": "skenari-real-data-center-network",
+      "title": "Skenari Real: Data Center Network",
+      "kind": "scenario"
+    },
+    {
+      "id": "modelimi-si-graf-2",
+      "title": "Modelimi si Graf:",
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-do-te-analizojme",
+      "title": "Cfarë do të analizojmë:",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-4-aeroporti-nderkombetar-rrjedha-e-pasagjereve",
+      "title": "Ushtrimi 4 — Aeroporti Ndërkombëtar: Rrjedha e Pasagjerëve",
+      "kind": "exercise"
+    },
+    {
+      "id": "skenari-real-aeroporti-nderkombetar-tia",
+      "title": "Skenari Real: Aeroporti Ndërkombëtar TIA",
+      "kind": "scenario"
+    },
+    {
+      "id": "cfare-ndodh-ne-secilen-pike",
+      "title": "Çfarë ndodh në secilën pikë",
+      "kind": "normal"
+    },
+    {
+      "id": "t-main-terminali-kryesor-burimi",
+      "title": "T-MAIN — Terminali Kryesor (Burimi)",
+      "kind": "normal"
+    },
+    {
+      "id": "gate-a-dhe-gate-b-portat-e-nisjes",
+      "title": "Gate-A dhe Gate-B — Portat e Nisjes",
+      "kind": "normal"
+    },
+    {
+      "id": "korridoret-rruget-ndermjetese",
+      "title": "Korridoret — Rrugët Ndërmjetëse",
+      "kind": "normal"
+    },
+    {
+      "id": "siguria-kontrolli-i-sigurise",
+      "title": "Siguria — Kontrolli i Sigurisë",
+      "kind": "normal"
+    },
+    {
+      "id": "baggage-zona-e-dorezimit-te-bagazheve-derdhja",
+      "title": "BAGGAGE — Zona e Dorëzimit të Bagazheve (Derdhja)",
+      "kind": "normal"
+    },
+    {
+      "id": "pyetja-operative",
+      "title": "Pyetja operative",
+      "kind": "normal"
+    },
+    {
+      "id": "kontrollet",
+      "title": "Kontrollet",
+      "kind": "normal"
+    },
+    {
+      "id": "loja-finale-pipeline-defender",
+      "title": "Loja Finale — \"Pipeline Defender\"",
+      "kind": "exercise"
+    },
+    {
+      "id": "si-luhet",
+      "title": "Si luhet",
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-meson-kjo-loje",
+      "title": "Çfarë mëson kjo lojë",
+      "kind": "normal"
+    },
+    {
+      "id": "detyra-shtepie",
+      "title": "Detyra Shtëpie",
+      "kind": "homework"
+    },
+    {
+      "id": "detyre-1-max-flow-min-cut-rrjeti-i-internetit",
+      "title": "Detyrë 1 — Max-Flow & Min-Cut: Rrjeti i Internetit",
+      "kind": "normal"
+    },
+    {
+      "id": "detyre-2-ford-fulkerson-dfs-rrjeti-hekurudhor",
+      "title": "Detyrë 2 — Ford-Fulkerson (DFS): Rrjeti Hekurudhor",
+      "kind": "normal"
+    },
+    {
+      "id": "detyre-3-edmonds-karp-bfs-krahasimi-me-ford-fulkerson",
+      "title": "Detyrë 3 — Edmonds-Karp (BFS): Krahasimi me Ford-Fulkerson",
+      "kind": "normal"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 0,
+      "intro": true
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "cfare-eshte-max-flow",
+      "heading": "Çfarë është Max-Flow?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:e37a695f981bbb5b",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "termat-kyc",
+      "heading": "Termat kyç",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:d74a495cadadf817",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "kushtet-e-rrjedhes",
+      "heading": "Kushtet e Rrjedhës",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:64420879a11b9556",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "algoritmet-kryesore",
+      "heading": "Algoritmet kryesore",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:1084306d4b3094cf",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "teorema-themelore-max-flow-min-cut",
+      "heading": "Teorema Themelore: Max-Flow = Min-Cut",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:3c18b60bf33913f5",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-1-vizualizim-interaktiv-max-flow-min-cut",
+      "heading": "Ushtrimi 1 — Vizualizim Interaktiv: Max-Flow/Min-Cut",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "konceptet-para-ushtrimit",
+      "heading": "Konceptet para ushtrimit",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:54996577eaf8668e",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "cfare-do-te-besh",
+      "heading": "Çfarë do të bësh:",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:5d804c3566e2f709",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "si-funksionon-vizualizimi",
+      "heading": "Si funksionon vizualizimi:",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:b69b7c1ea262d9bb",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "cfare-duhet-te-veresh",
+      "heading": "Çfarë duhet të vëresh:",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:9c9b303167fca817",
+      "srcIndex": 1
+    },
+    {
+      "type": "code",
+      "srcIndex": 2,
+      "interactive": true,
+      "html": "sha256:c7ac87ee2d1e11b9",
+      "raw": "sha256:abf99bff7e3b1a32",
+      "lines": 371,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "f"
+        },
+        {
+          "t": "def",
+          "n": "text"
+        },
+        {
+          "t": "def",
+          "n": "glow"
+        },
+        {
+          "t": "def",
+          "n": "graph_data"
+        },
+        {
+          "t": "def",
+          "n": "max_flow"
+        },
+        {
+          "t": "def",
+          "n": "partition"
+        },
+        {
+          "t": "def",
+          "n": "min_cut"
+        },
+        {
+          "t": "def",
+          "n": "dist_point_line"
+        },
+        {
+          "t": "def",
+          "n": "node_positions"
+        },
+        {
+          "t": "def",
+          "n": "draw_hydrant"
+        },
+        {
+          "t": "def",
+          "n": "draw_junction"
+        },
+        {
+          "t": "def",
+          "n": "draw_deposit"
+        },
+        {
+          "t": "def",
+          "n": "draw_node"
+        },
+        {
+          "t": "def",
+          "n": "draw_pipe"
+        }
+      ],
+      "flags": {
+        "pygame": true,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 3
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-2-ford-fulkerson-vs-edmonds-karp-vizualizim-hap-pas-hapi",
+      "heading": "Ushtrimi 2 — Ford-Fulkerson vs Edmonds-Karp: Vizualizim Hap-pas-Hapi",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 3
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "ford-fulkerson-dfs",
+      "heading": "Ford-Fulkerson (DFS)",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:a7104c3ced1d84b3",
+      "srcIndex": 3
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "edmonds-karp-bfs",
+      "heading": "Edmonds-Karp (BFS)",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:6864bac86ea63c37",
+      "srcIndex": 3
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "krahasimi-vizual",
+      "heading": "Krahasimi vizual:",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:264b5a4c99066a5b",
+      "srcIndex": 3
+    },
+    {
+      "type": "markdown",
+      "kind": "scenario",
+      "label": "Skenar Real",
+      "id": "skenari-real-rrjeti-i-ujesjellesit-te-qytetit",
+      "heading": "Skenari Real: Rrjeti i Ujësjellësit të Qytetit",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:622389cbec17334b",
+      "srcIndex": 3
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "modelimi-si-graf",
+      "heading": "Modelimi si Graf:",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:4de1d22b3108d295",
+      "srcIndex": 3
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "zgjidhja-me-algoritem",
+      "heading": "Zgjidhja me algoritëm:",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:7a8ee2398e338d7f",
+      "srcIndex": 3
+    },
+    {
+      "type": "code",
+      "srcIndex": 4,
+      "interactive": true,
+      "html": "sha256:29c313b92372a694",
+      "raw": "sha256:6e65255b7b292040",
+      "lines": 424,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "class",
+          "n": "RrjedhaMaksimale"
+        },
+        {
+          "t": "def",
+          "n": "__init__"
+        },
+        {
+          "t": "def",
+          "n": "emri_algoritmit"
+        },
+        {
+          "t": "def",
+          "n": "emri_kerkimit"
+        },
+        {
+          "t": "def",
+          "n": "_kopjo_rrjedhen"
+        },
+        {
+          "t": "def",
+          "n": "_rezidual"
+        },
+        {
+          "t": "def",
+          "n": "_kerkim_dfs"
+        },
+        {
+          "t": "def",
+          "n": "_kerkim_bfs"
+        },
+        {
+          "t": "def",
+          "n": "_kerko_rruge"
+        },
+        {
+          "t": "def",
+          "n": "_nderto_rrugen"
+        },
+        {
+          "t": "def",
+          "n": "_shto_hap"
+        },
+        {
+          "t": "def",
+          "n": "_ekzekuto"
+        },
+        {
+          "t": "def",
+          "n": "stili_i_brinjes"
+        },
+        {
+          "t": "def",
+          "n": "vizato_brinjet"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": true,
+        "plotly": true,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-3-network-capacity-planning-ford-fulkerson-vs-edmonds-karp",
+      "heading": "Ushtrimi 3 — Network Capacity Planning: Ford-Fulkerson vs Edmonds-Karp",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "pse-max-flow-ne-rrjetet-kompjuterike",
+      "heading": "Pse Max-Flow në rrjetet kompjuterike?",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:a83f8bc4388e4c0f",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "bottleneck-analysis",
+      "heading": "Bottleneck Analysis:",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:7c440e89200a616c",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "graf-i-rezidual-vizualizim",
+      "heading": "Graf-i Rezidual — Vizualizim:",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:2fbcda38808770cb",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "pse-bfs-edmonds-karp-eshte-me-i-mire",
+      "heading": "Pse BFS (Edmonds-Karp) është më i mirë?",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:aee30f32a0434626",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "scenario",
+      "label": "Skenar Real",
+      "id": "skenari-real-data-center-network",
+      "heading": "Skenari Real: Data Center Network",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:f823a951a5f6e3b9",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "modelimi-si-graf-2",
+      "heading": "Modelimi si Graf:",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:81377b635e36645e",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "cfare-do-te-analizojme",
+      "heading": "Cfarë do të analizojmë:",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:1ed627a0d225b2d6",
+      "srcIndex": 5
+    },
+    {
+      "type": "code",
+      "srcIndex": 6,
+      "interactive": true,
+      "html": "sha256:3d3d84c97b5fe9ed",
+      "raw": "sha256:b82afde707802e30",
+      "lines": 617,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "font"
+        },
+        {
+          "t": "def",
+          "n": "text"
+        },
+        {
+          "t": "def",
+          "n": "glow"
+        },
+        {
+          "t": "class",
+          "n": "MaxFlow"
+        },
+        {
+          "t": "def",
+          "n": "__init__"
+        },
+        {
+          "t": "def",
+          "n": "snap"
+        },
+        {
+          "t": "def",
+          "n": "search"
+        },
+        {
+          "t": "def",
+          "n": "dfs"
+        },
+        {
+          "t": "def",
+          "n": "bfs"
+        },
+        {
+          "t": "def",
+          "n": "total"
+        },
+        {
+          "t": "def",
+          "n": "add_step"
+        },
+        {
+          "t": "def",
+          "n": "run"
+        },
+        {
+          "t": "def",
+          "n": "node_positions"
+        },
+        {
+          "t": "def",
+          "n": "draw_data_center"
+        }
+      ],
+      "flags": {
+        "pygame": true,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-4-aeroporti-nderkombetar-rrjedha-e-pasagjereve",
+      "heading": "Ushtrimi 4 — Aeroporti Ndërkombëtar: Rrjedha e Pasagjerëve",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "scenario",
+      "label": "Skenar Real",
+      "id": "skenari-real-aeroporti-nderkombetar-tia",
+      "heading": "Skenari Real: Aeroporti Ndërkombëtar TIA",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:9872974b84b7bed0",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "cfare-ndodh-ne-secilen-pike",
+      "heading": "Çfarë ndodh në secilën pikë",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "t-main-terminali-kryesor-burimi",
+      "heading": "T-MAIN — Terminali Kryesor (Burimi)",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:079c1fc8b52f1c16",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "gate-a-dhe-gate-b-portat-e-nisjes",
+      "heading": "Gate-A dhe Gate-B — Portat e Nisjes",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:df7d16bd50ffa7fa",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "korridoret-rruget-ndermjetese",
+      "heading": "Korridoret — Rrugët Ndërmjetëse",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:4acd15147111896e",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "siguria-kontrolli-i-sigurise",
+      "heading": "Siguria — Kontrolli i Sigurisë",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:5874044bb44d009c",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "baggage-zona-e-dorezimit-te-bagazheve-derdhja",
+      "heading": "BAGGAGE — Zona e Dorëzimit të Bagazheve (Derdhja)",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:219438d78d9b89fd",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "pyetja-operative",
+      "heading": "Pyetja operative",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:2600c24430774d05",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "kontrollet",
+      "heading": "Kontrollet",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:398aa915f13cb155",
+      "srcIndex": 7
+    },
+    {
+      "type": "code",
+      "srcIndex": 8,
+      "interactive": true,
+      "html": "sha256:1222d824b24b682c",
+      "raw": "sha256:f230329a640eb0b2",
+      "lines": 449,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "fnt"
+        },
+        {
+          "t": "def",
+          "n": "txt"
+        },
+        {
+          "t": "def",
+          "n": "glow"
+        },
+        {
+          "t": "class",
+          "n": "MaxFlow"
+        },
+        {
+          "t": "def",
+          "n": "__init__"
+        },
+        {
+          "t": "def",
+          "n": "_snap"
+        },
+        {
+          "t": "def",
+          "n": "_res"
+        },
+        {
+          "t": "def",
+          "n": "_bfs"
+        },
+        {
+          "t": "def",
+          "n": "_dfs"
+        },
+        {
+          "t": "def",
+          "n": "_step"
+        },
+        {
+          "t": "def",
+          "n": "_run"
+        },
+        {
+          "t": "def",
+          "n": "draw_terminal"
+        },
+        {
+          "t": "def",
+          "n": "draw_gate"
+        },
+        {
+          "t": "def",
+          "n": "draw_corridor"
+        }
+      ],
+      "flags": {
+        "pygame": true,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 9
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "loja-finale-pipeline-defender",
+      "heading": "Loja Finale — \"Pipeline Defender\"",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:397a159c009a2927",
+      "srcIndex": 9
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "si-luhet",
+      "heading": "Si luhet",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:f2266e9389fcfe9e",
+      "srcIndex": 9
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "cfare-meson-kjo-loje",
+      "heading": "Çfarë mëson kjo lojë",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:0483bd93d49022cb",
+      "srcIndex": 9
+    },
+    {
+      "type": "code",
+      "srcIndex": 10,
+      "interactive": true,
+      "html": "sha256:7eec98b44b668597",
+      "raw": "sha256:6a60c7e135454aa1",
+      "lines": 455,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "fnt"
+        },
+        {
+          "t": "def",
+          "n": "txt"
+        },
+        {
+          "t": "def",
+          "n": "glow"
+        },
+        {
+          "t": "def",
+          "n": "compute_max_flow"
+        },
+        {
+          "t": "def",
+          "n": "compute_min_cut"
+        },
+        {
+          "t": "def",
+          "n": "reachable_after_cut"
+        },
+        {
+          "t": "def",
+          "n": "node_pos"
+        },
+        {
+          "t": "def",
+          "n": "dist_seg"
+        },
+        {
+          "t": "def",
+          "n": "draw_central"
+        },
+        {
+          "t": "def",
+          "n": "draw_substation"
+        },
+        {
+          "t": "def",
+          "n": "draw_transformer"
+        },
+        {
+          "t": "def",
+          "n": "draw_city"
+        },
+        {
+          "t": "def",
+          "n": "draw_node"
+        },
+        {
+          "t": "def",
+          "n": "draw_line"
+        }
+      ],
+      "flags": {
+        "pygame": true,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 11
+    },
+    {
+      "type": "markdown",
+      "kind": "homework",
+      "label": "Detyrë Shtëpie",
+      "id": "detyra-shtepie",
+      "heading": "Detyra Shtëpie",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:6ec31e444f5a5b06",
+      "srcIndex": 11
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "detyre-1-max-flow-min-cut-rrjeti-i-internetit",
+      "heading": "Detyrë 1 — Max-Flow & Min-Cut: Rrjeti i Internetit",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:c9a2d8ee25699f2d",
+      "srcIndex": 11
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "detyre-2-ford-fulkerson-dfs-rrjeti-hekurudhor",
+      "heading": "Detyrë 2 — Ford-Fulkerson (DFS): Rrjeti Hekurudhor",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:b21439bd26e6eba6",
+      "srcIndex": 11
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "detyre-3-edmonds-karp-bfs-krahasimi-me-ford-fulkerson",
+      "heading": "Detyrë 3 — Edmonds-Karp (BFS): Krahasimi me Ford-Fulkerson",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:c102d5c79d6f8c34",
+      "srcIndex": 11
+    }
+  ],
+  "imports": ["IPython", "collections", "ipywidgets", "plotly", "pygame", "random"],
+  "dependencies": ["ipywidgets", "plotly", "pygame"],
+  "flags": {
+    "pygame": true,
+    "tkinter": false,
+    "widgets": true,
+    "plotly": true,
+    "matplotlib": false,
+    "networkx": false,
+    "numpy": false
+  },
+  "missingScripts": [],
+  "stats": {
+    "cells": 12,
+    "markdown": 7,
+    "code": 5,
+    "codeLines": 2316
+  },
+  "hasEmbeddedHomework": true,
+  "hasClasswork": false,
+  "assets": []
+}

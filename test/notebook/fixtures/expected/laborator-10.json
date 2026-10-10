@@ -1,0 +1,633 @@
+{
+  "title": "Laboratori 10 — Aplikime të Rrjedhës Maksimale: Çiftëzimi Dyanësor dhe Problemet e Caktimit",
+  "toc": [
+    {
+      "id": "kujtues-teorik-ciftezimi-dhe-problemet-e-caktimit",
+      "title": "Kujtues teorik — Çiftëzimi dhe problemet e caktimit",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "reduktimi-ne-rrjedhe-max-slides-83-85",
+      "title": "Reduktimi në rrjedhë max (slides 83–85)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "problemet-e-caktimit-slide-86",
+      "title": "Problemet e caktimit (slide 86)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-vajzat-dhe-kotelet-slides-81-85",
+      "title": "Ushtrimi 1 — Vajzat dhe kotelet (slides 81–85)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-pse-funksionon-verifikim-me-force-brutale",
+      "title": "Ushtrimi 2 — Pse funksionon? Verifikim me forcë brutale",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-lulet-dhe-buqetat-slides-86-89",
+      "title": "Ushtrimi 3 — Lulet dhe buqetat (slides 86–89)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "kur-nuk-mjafton-nje-lloj-luleje-prerja-min-tregon-ku",
+      "title": "Kur nuk mjafton një lloj luleje: prerja min tregon ku",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-4-modelojeni-vete-grupet-e-laboratorit",
+      "title": "Ushtrimi 4 — Modelojeni vetë: grupet e laboratorit",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "kujtues-teorik-ciftezimi-dhe-problemet-e-caktimit",
+      "title": "Kujtues teorik — Çiftëzimi dhe problemet e caktimit",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "reduktimi-ne-rrjedhe-max-slides-83-85",
+      "title": "Reduktimi në rrjedhë max (slides 83–85)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "problemet-e-caktimit-slide-86",
+      "title": "Problemet e caktimit (slide 86)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-vajzat-dhe-kotelet-slides-81-85",
+      "title": "Ushtrimi 1 — Vajzat dhe kotelet (slides 81–85)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-pse-funksionon-verifikim-me-force-brutale",
+      "title": "Ushtrimi 2 — Pse funksionon? Verifikim me forcë brutale",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-lulet-dhe-buqetat-slides-86-89",
+      "title": "Ushtrimi 3 — Lulet dhe buqetat (slides 86–89)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "kur-nuk-mjafton-nje-lloj-luleje-prerja-min-tregon-ku",
+      "title": "Kur nuk mjafton një lloj luleje: prerja min tregon ku",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-4-modelojeni-vete-grupet-e-laboratorit",
+      "title": "Ushtrimi 4 — Modelojeni vetë: grupet e laboratorit",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "sections": [
+    {
+      "id": "kujtues-teorik-ciftezimi-dhe-problemet-e-caktimit",
+      "title": "Kujtues teorik — Çiftëzimi dhe problemet e caktimit",
+      "kind": "theory"
+    },
+    {
+      "id": "reduktimi-ne-rrjedhe-max-slides-83-85",
+      "title": "Reduktimi në rrjedhë max (slides 83–85)",
+      "kind": "normal"
+    },
+    {
+      "id": "problemet-e-caktimit-slide-86",
+      "title": "Problemet e caktimit (slide 86)",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-vajzat-dhe-kotelet-slides-81-85",
+      "title": "Ushtrimi 1 — Vajzat dhe kotelet (slides 81–85)",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-pse-funksionon-verifikim-me-force-brutale",
+      "title": "Ushtrimi 2 — Pse funksionon? Verifikim me forcë brutale",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-lulet-dhe-buqetat-slides-86-89",
+      "title": "Ushtrimi 3 — Lulet dhe buqetat (slides 86–89)",
+      "kind": "exercise"
+    },
+    {
+      "id": "kur-nuk-mjafton-nje-lloj-luleje-prerja-min-tregon-ku",
+      "title": "Kur nuk mjafton një lloj luleje: prerja min tregon ku",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-4-modelojeni-vete-grupet-e-laboratorit",
+      "title": "Ushtrimi 4 — Modelojeni vetë: grupet e laboratorit",
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "kind": "reflect"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:a8856ce86921d23e",
+      "srcIndex": 0,
+      "intro": true
+    },
+    {
+      "type": "markdown",
+      "kind": "theory",
+      "label": "Teori",
+      "id": "kujtues-teorik-ciftezimi-dhe-problemet-e-caktimit",
+      "heading": "Kujtues teorik — Çiftëzimi dhe problemet e caktimit",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:c784280764fba122",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "reduktimi-ne-rrjedhe-max-slides-83-85",
+      "heading": "Reduktimi në rrjedhë max (slides 83–85)",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:a44c80647be6f5a6",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "problemet-e-caktimit-slide-86",
+      "heading": "Problemet e caktimit (slide 86)",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:35fab03ae141132b",
+      "srcIndex": 1
+    },
+    {
+      "type": "code",
+      "srcIndex": 2,
+      "interactive": false,
+      "html": "sha256:1543d3f88fee32de",
+      "raw": "sha256:c5b3e41e8cf609f7",
+      "lines": 64,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "kontrollo"
+        },
+        {
+          "t": "def",
+          "n": "rrjedha_max"
+        },
+        {
+          "t": "def",
+          "n": "mbetes"
+        },
+        {
+          "t": "def",
+          "n": "prerja_min"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-1-vajzat-dhe-kotelet-slides-81-85",
+      "heading": "Ushtrimi 1 — Vajzat dhe kotelet (slides 81–85)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:684b452feb169859",
+      "srcIndex": 3
+    },
+    {
+      "type": "code",
+      "srcIndex": 4,
+      "interactive": false,
+      "html": "sha256:368f904822977379",
+      "raw": "sha256:b0246f173420dd5f",
+      "lines": 20,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "Çiftëzimi naiv: {'Helena': 'Mace', 'Ema': 'Bubi', 'Sara': 'Lulu'} → 3 vajza të lumtura",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:be4928b0a4af4aef",
+      "srcIndex": 5
+    },
+    {
+      "type": "code",
+      "srcIndex": 6,
+      "interactive": false,
+      "html": "sha256:6a7122dc1c2bd83f",
+      "raw": "sha256:f2e47017dab4aaad",
+      "lines": 8,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 7,
+      "interactive": false,
+      "html": "sha256:b7e011bf5cf85adc",
+      "raw": "sha256:3e16d42124ac6896",
+      "lines": 16,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 8,
+      "interactive": false,
+      "html": "sha256:a1c3bb522d78be45",
+      "raw": "sha256:1587e8d71ace1e67",
+      "lines": 26,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": true,
+        "matplotlib": true
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "image",
+          "file": "img-7f75f0b96070.png",
+          "bytes": 32957
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:699573c62b7573b4",
+      "srcIndex": 9
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-2-pse-funksionon-verifikim-me-force-brutale",
+      "heading": "Ushtrimi 2 — Pse funksionon? Verifikim me forcë brutale",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:7ccc4d5e85950426",
+      "srcIndex": 10
+    },
+    {
+      "type": "code",
+      "srcIndex": 11,
+      "interactive": false,
+      "html": "sha256:7aecebeca9c6b03c",
+      "raw": "sha256:1f3a4df0e07e3a55",
+      "lines": 27,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "300 grafe dyanësorë: rrjedha max = çiftëzimi maksimum në çdo rast.",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-3-lulet-dhe-buqetat-slides-86-89",
+      "heading": "Ushtrimi 3 — Lulet dhe buqetat (slides 86–89)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:8fc9048d5db9b98d",
+      "srcIndex": 12
+    },
+    {
+      "type": "code",
+      "srcIndex": 13,
+      "interactive": false,
+      "html": "sha256:005247c5a80a4b65",
+      "raw": "sha256:1bc754ecbef1d6d1",
+      "lines": 22,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 14,
+      "interactive": false,
+      "html": "sha256:53ee8aff16b6b1fa",
+      "raw": "sha256:2168aea207d35e68",
+      "lines": 18,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:ca088216fd62f686",
+      "srcIndex": 15
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "kur-nuk-mjafton-nje-lloj-luleje-prerja-min-tregon-ku",
+      "heading": "Kur nuk mjafton një lloj luleje: prerja min tregon ku",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:66ea391d128bee06",
+      "srcIndex": 15
+    },
+    {
+      "type": "code",
+      "srcIndex": 16,
+      "interactive": false,
+      "html": "sha256:26b3f2d78621b8f8",
+      "raw": "sha256:8390f97ac6a0d39c",
+      "lines": 19,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:bcf54b482861d289",
+      "srcIndex": 17
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-4-modelojeni-vete-grupet-e-laboratorit",
+      "heading": "Ushtrimi 4 — Modelojeni vetë: grupet e laboratorit",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:20ce185bd1ec57fe",
+      "srcIndex": 18
+    },
+    {
+      "type": "code",
+      "srcIndex": 19,
+      "interactive": false,
+      "html": "sha256:759f136ba604b1e1",
+      "raw": "sha256:fce20cdc3443c6ab",
+      "lines": 17,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 20,
+      "interactive": false,
+      "html": "sha256:fe69c047de6f6316",
+      "raw": "sha256:b93d86f0b42259d4",
+      "lines": 15,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:1aae4510c3ec4496",
+      "srcIndex": 21
+    },
+    {
+      "type": "markdown",
+      "kind": "classwork",
+      "label": "Punë në Klasë",
+      "id": "pune-ne-klase",
+      "heading": "Punë në Klasë",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:33baa555dcc7b718",
+      "srcIndex": 22
+    },
+    {
+      "type": "markdown",
+      "kind": "reflect",
+      "label": "Pyetje Reflektuese",
+      "id": "pyetje-reflektuese",
+      "heading": "Pyetje Reflektuese",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:382441a5bdd2bf8c",
+      "srcIndex": 23
+    }
+  ],
+  "imports": ["collections", "itertools", "matplotlib", "networkx", "random"],
+  "dependencies": ["matplotlib", "networkx"],
+  "flags": {
+    "pygame": false,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": false,
+    "matplotlib": true,
+    "networkx": true,
+    "numpy": false
+  },
+  "missingScripts": [],
+  "stats": {
+    "cells": 24,
+    "markdown": 13,
+    "code": 11,
+    "codeLines": 252
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": true,
+  "assets": [
+    {
+      "file": "img-7f75f0b96070.png",
+      "bytes": 32957
+    }
+  ]
+}

@@ -1,0 +1,754 @@
+{
+  "title": "Dijkstra's Algorithm — Interactive Step-by-Step Notebook",
+  "toc": [
+    {
+      "id": "1-setup",
+      "title": "1. Setup",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "2-the-graph",
+      "title": "2. The Graph",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "3-node-positions-what-are-they",
+      "title": "3. Node Positions — What Are They?",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "4-dijkstra-record-every-step",
+      "title": "4. Dijkstra — Record Every Step",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "5-frame-drawing-function",
+      "title": "5. Frame Drawing Function",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "6-step-by-step-interactive-walkthrough",
+      "title": "6. Step-by-Step Interactive Walkthrough",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "7-all-steps-at-a-glance",
+      "title": "7. All Steps at a Glance",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "8-final-distance-table-path-reconstruction",
+      "title": "8. Final Distance Table & Path Reconstruction",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "9-complexity",
+      "title": "9. Complexity",
+      "level": 2,
+      "kind": "complexity"
+    },
+    {
+      "id": "10-practice-exercises",
+      "title": "10. Practice Exercises",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "a-different-source",
+      "title": "A — Different source",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "b-add-an-edge",
+      "title": "B — Add an edge",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "c-count-relaxations",
+      "title": "C — Count relaxations",
+      "level": 3,
+      "kind": "normal"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "1-setup",
+      "title": "1. Setup",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "2-the-graph",
+      "title": "2. The Graph",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "3-node-positions-what-are-they",
+      "title": "3. Node Positions — What Are They?",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "4-dijkstra-record-every-step",
+      "title": "4. Dijkstra — Record Every Step",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "5-frame-drawing-function",
+      "title": "5. Frame Drawing Function",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "6-step-by-step-interactive-walkthrough",
+      "title": "6. Step-by-Step Interactive Walkthrough",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "7-all-steps-at-a-glance",
+      "title": "7. All Steps at a Glance",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "8-final-distance-table-path-reconstruction",
+      "title": "8. Final Distance Table & Path Reconstruction",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "9-complexity",
+      "title": "9. Complexity",
+      "level": 2,
+      "kind": "complexity"
+    },
+    {
+      "id": "10-practice-exercises",
+      "title": "10. Practice Exercises",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "a-different-source",
+      "title": "A — Different source",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "b-add-an-edge",
+      "title": "B — Add an edge",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "c-count-relaxations",
+      "title": "C — Count relaxations",
+      "level": 3,
+      "kind": "normal"
+    }
+  ],
+  "sections": [
+    {
+      "id": "1-setup",
+      "title": "1. Setup",
+      "kind": "normal"
+    },
+    {
+      "id": "2-the-graph",
+      "title": "2. The Graph",
+      "kind": "normal"
+    },
+    {
+      "id": "3-node-positions-what-are-they",
+      "title": "3. Node Positions — What Are They?",
+      "kind": "normal"
+    },
+    {
+      "id": "4-dijkstra-record-every-step",
+      "title": "4. Dijkstra — Record Every Step",
+      "kind": "normal"
+    },
+    {
+      "id": "5-frame-drawing-function",
+      "title": "5. Frame Drawing Function",
+      "kind": "normal"
+    },
+    {
+      "id": "6-step-by-step-interactive-walkthrough",
+      "title": "6. Step-by-Step Interactive Walkthrough",
+      "kind": "normal"
+    },
+    {
+      "id": "7-all-steps-at-a-glance",
+      "title": "7. All Steps at a Glance",
+      "kind": "normal"
+    },
+    {
+      "id": "8-final-distance-table-path-reconstruction",
+      "title": "8. Final Distance Table & Path Reconstruction",
+      "kind": "normal"
+    },
+    {
+      "id": "9-complexity",
+      "title": "9. Complexity",
+      "kind": "complexity"
+    },
+    {
+      "id": "10-practice-exercises",
+      "title": "10. Practice Exercises",
+      "kind": "normal"
+    },
+    {
+      "id": "a-different-source",
+      "title": "A — Different source",
+      "kind": "normal"
+    },
+    {
+      "id": "b-add-an-edge",
+      "title": "B — Add an edge",
+      "kind": "normal"
+    },
+    {
+      "id": "c-count-relaxations",
+      "title": "C — Count relaxations",
+      "kind": "normal"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:63a22799063d7f51",
+      "srcIndex": 0,
+      "intro": true
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "1-setup",
+      "heading": "1. Setup",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 1
+    },
+    {
+      "type": "code",
+      "srcIndex": 2,
+      "interactive": false,
+      "html": "sha256:0fab2963f1acb8a1",
+      "raw": "sha256:acee98c6981ae631",
+      "lines": 5,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": true
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "Libraries loaded.",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "2-the-graph",
+      "heading": "2. The Graph",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:8fc94df3fbe363c2",
+      "srcIndex": 3
+    },
+    {
+      "type": "code",
+      "srcIndex": 4,
+      "interactive": false,
+      "html": "sha256:060954db6d0a5e62",
+      "raw": "sha256:3e1423d2f13c6a1f",
+      "lines": 12,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "Nodes: ['A', 'B', 'C', 'D', 'E', 'F']\nNeighbors of B: [('A', 4), ('C', 1), ('D', 5), ('E', 1)]",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "3-node-positions-what-are-they",
+      "heading": "3. Node Positions — What Are They?",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:244a88fd4f03ea81",
+      "srcIndex": 5
+    },
+    {
+      "type": "code",
+      "srcIndex": 6,
+      "interactive": false,
+      "html": "sha256:187fa9c455d24fe4",
+      "raw": "sha256:96c7db0281341330",
+      "lines": 22,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": true
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "image",
+          "file": "img-a24ce73dda92.png",
+          "bytes": 22557
+        },
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "↑ Positions only — no algorithm involved here.",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "4-dijkstra-record-every-step",
+      "heading": "4. Dijkstra — Record Every Step",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:788a20e62a77b414",
+      "srcIndex": 7
+    },
+    {
+      "type": "code",
+      "srcIndex": 8,
+      "interactive": false,
+      "html": "sha256:dbf10f6ceba2925b",
+      "raw": "sha256:1be01b0e37b35e20",
+      "lines": 60,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "dijkstra_steps"
+        },
+        {
+          "t": "def",
+          "n": "snap"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "Recorded 17 steps.\n  Step 00: Start: set dist[A]=0, all others=inf. Push A onto the queue.\n  Step 01: Dequeue 'A' (dist=0). Mark as VISITED.\n  Step 02: Relax edges from 'A': improved B->4, C->2\n  Step 03: Dequeue 'C' (dist=2). Mark as VISITED.\n  Step 04: Relax edges from 'C': improved B->3, E->7\n  Step 05: Dequeue 'B' (dist=3). Mark as VISITED.\n  Step 06: Relax edges from 'B': improved D->8, E->4\n  Step 07: 'B' already visited — skip it.\n  Step 08: Dequeue 'E' (dist=4). Mark as VISITED.\n  Step 09: Relax edges from 'E': improved D->5, F->8\n  Step 10: Dequeue 'D' (dist=5). Mark as VISITED.\n  Step 11: No improvements from 'D'.\n  Step 12: 'E' already visited — skip it.\n  Step 13: 'D' already visited — skip it.\n  Step 14: Dequeue 'F' (dist=8). Mark as VISITED.\n  Step 15: No improvements from 'F'.\n  Step 16: Done! Shortest path A->F: A -> C -> B -> E -> F  (cost=8)",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "5-frame-drawing-function",
+      "heading": "5. Frame Drawing Function",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:2389d6bc7a60cc63",
+      "srcIndex": 9
+    },
+    {
+      "type": "code",
+      "srcIndex": 10,
+      "interactive": false,
+      "html": "sha256:9048966c867b18b3",
+      "raw": "sha256:821c96c4c423505a",
+      "lines": 75,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "draw_frame"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "image",
+          "file": "img-e8bd80b3e23c.png",
+          "bytes": 56810
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "6-step-by-step-interactive-walkthrough",
+      "heading": "6. Step-by-Step Interactive Walkthrough",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:7a5ed5055190cd4c",
+      "srcIndex": 11
+    },
+    {
+      "type": "code",
+      "srcIndex": 12,
+      "interactive": true,
+      "html": "sha256:b8bd8b3338790e98",
+      "raw": "sha256:3af19cd35a7ce6d6",
+      "lines": 7,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": true,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": ["dijkstra_pygame.py"],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "7-all-steps-at-a-glance",
+      "heading": "7. All Steps at a Glance",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:128401af063c9049",
+      "srcIndex": 13
+    },
+    {
+      "type": "code",
+      "srcIndex": 14,
+      "interactive": false,
+      "html": "sha256:2970180de34164b8",
+      "raw": "sha256:3d06d01aca147c40",
+      "lines": 19,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "image",
+          "file": "img-0fd8151fefb9.png",
+          "bytes": 388787
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "8-final-distance-table-path-reconstruction",
+      "heading": "8. Final Distance Table & Path Reconstruction",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 15
+    },
+    {
+      "type": "code",
+      "srcIndex": 16,
+      "interactive": false,
+      "html": "sha256:42009ee4419eacc9",
+      "raw": "sha256:ab097418fae5af9b",
+      "lines": 15,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "  Node |  Shortest Dist |  Via | Path from A\n-------------------------------------------------------\n     A |              0 |    — | A\n     B |              3 |    C | A → C → B\n     C |              2 |    A | A → C\n     D |              5 |    E | A → C → B → E → D\n     E |              4 |    B | A → C → B → E\n     F |              8 |    E | A → C → B → E → F",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "complexity",
+      "label": "Kompleksiteti",
+      "id": "9-complexity",
+      "heading": "9. Complexity",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:44387b27bb6f9fbd",
+      "srcIndex": 17
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "10-practice-exercises",
+      "heading": "10. Practice Exercises",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 18
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "a-different-source",
+      "heading": "A — Different source",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:a4e1f8c4f46814ce",
+      "srcIndex": 18
+    },
+    {
+      "type": "code",
+      "srcIndex": 19,
+      "interactive": false,
+      "html": "sha256:0e80a55600b60cd3",
+      "raw": "sha256:561006630ece0d4d",
+      "lines": 22,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "D -> A: cost=5, path=D -> E -> B -> C -> A",
+          "truncated": false
+        },
+        {
+          "kind": "image",
+          "file": "img-a195cccb802b.png",
+          "bytes": 377793
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "b-add-an-edge",
+      "heading": "B — Add an edge",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:6ad2a5c87e535f10",
+      "srcIndex": 20
+    },
+    {
+      "type": "code",
+      "srcIndex": 21,
+      "interactive": false,
+      "html": "sha256:8ab6d7f7b7a715a9",
+      "raw": "sha256:5d4cefcfe0b7990c",
+      "lines": 11,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "Original path: A → C → B → E → F  cost=8\nNew path:      A → C → B → E → F  cost=8\nPath changed? False",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "c-count-relaxations",
+      "heading": "C — Count relaxations",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:909ebc5aefbc2db4",
+      "srcIndex": 22
+    },
+    {
+      "type": "code",
+      "srcIndex": 23,
+      "interactive": false,
+      "html": "sha256:0823956bbf314ebb",
+      "raw": "sha256:f6d5f3a35b6fcaaf",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "Total relaxations from A: 8",
+          "truncated": false
+        }
+      ]
+    }
+  ],
+  "imports": ["copy", "heapq", "matplotlib", "subprocess"],
+  "dependencies": ["matplotlib"],
+  "flags": {
+    "pygame": false,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": false,
+    "matplotlib": true,
+    "networkx": false,
+    "numpy": false
+  },
+  "missingScripts": ["dijkstra_pygame.py"],
+  "stats": {
+    "cells": 24,
+    "markdown": 13,
+    "code": 11,
+    "codeLines": 251
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": false,
+  "assets": [
+    {
+      "file": "img-0fd8151fefb9.png",
+      "bytes": 388787
+    },
+    {
+      "file": "img-a195cccb802b.png",
+      "bytes": 377793
+    },
+    {
+      "file": "img-a24ce73dda92.png",
+      "bytes": 22557
+    },
+    {
+      "file": "img-e8bd80b3e23c.png",
+      "bytes": 56810
+    }
+  ]
+}

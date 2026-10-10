@@ -1,0 +1,673 @@
+{
+  "title": "Laboratori 2 · Ushtrime Shtesë — Analiza Asimptotike: Numërimi i Veprimeve dhe Përkufizimi i O(·)",
+  "toc": [
+    {
+      "id": "kujtues-teorik-nga-sekondat-te-o",
+      "title": "Kujtues teorik — Nga sekondat te O(·)",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "perkufizimi-matematik-slide-15",
+      "title": "Përkufizimi matematik (slide 15)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pro-dhe-kunder-slide-10",
+      "title": "Pro dhe kundër (slide 10)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-tabela-e-numerimit-te-rreshtave-slide-5",
+      "title": "Ushtrimi 1 — Tabela e numërimit të rreshtave (slide 5)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-gjeni-c-dhe-n",
+      "title": "Ushtrimi 2 — Gjeni c dhe n₀",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "grafiku-i-slides-18-19",
+      "title": "Grafiku i slides 18–19",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-3-rendi-i-rritjes-se-funksioneve",
+      "title": "Ushtrimi 3 — Rendi i rritjes së funksioneve",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-sa-kohe-do-te-duhej-leksioni-3-slide-2",
+      "title": "Ushtrimi 4 — Sa kohë do të duhej? (Leksioni 3, slide 2)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-5-merge-l-r-sakte",
+      "title": "Ushtrimi 5 — `Merge(L, R)` saktë",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "kujtues-teorik-nga-sekondat-te-o",
+      "title": "Kujtues teorik — Nga sekondat te O(·)",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "perkufizimi-matematik-slide-15",
+      "title": "Përkufizimi matematik (slide 15)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pro-dhe-kunder-slide-10",
+      "title": "Pro dhe kundër (slide 10)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-tabela-e-numerimit-te-rreshtave-slide-5",
+      "title": "Ushtrimi 1 — Tabela e numërimit të rreshtave (slide 5)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-gjeni-c-dhe-n",
+      "title": "Ushtrimi 2 — Gjeni c dhe n₀",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "grafiku-i-slides-18-19",
+      "title": "Grafiku i slides 18–19",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-3-rendi-i-rritjes-se-funksioneve",
+      "title": "Ushtrimi 3 — Rendi i rritjes së funksioneve",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-sa-kohe-do-te-duhej-leksioni-3-slide-2",
+      "title": "Ushtrimi 4 — Sa kohë do të duhej? (Leksioni 3, slide 2)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-5-merge-l-r-sakte",
+      "title": "Ushtrimi 5 — `Merge(L, R)` saktë",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "sections": [
+    {
+      "id": "kujtues-teorik-nga-sekondat-te-o",
+      "title": "Kujtues teorik — Nga sekondat te O(·)",
+      "kind": "theory"
+    },
+    {
+      "id": "perkufizimi-matematik-slide-15",
+      "title": "Përkufizimi matematik (slide 15)",
+      "kind": "normal"
+    },
+    {
+      "id": "pro-dhe-kunder-slide-10",
+      "title": "Pro dhe kundër (slide 10)",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-tabela-e-numerimit-te-rreshtave-slide-5",
+      "title": "Ushtrimi 1 — Tabela e numërimit të rreshtave (slide 5)",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-gjeni-c-dhe-n",
+      "title": "Ushtrimi 2 — Gjeni c dhe n₀",
+      "kind": "exercise"
+    },
+    {
+      "id": "grafiku-i-slides-18-19",
+      "title": "Grafiku i slides 18–19",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-3-rendi-i-rritjes-se-funksioneve",
+      "title": "Ushtrimi 3 — Rendi i rritjes së funksioneve",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-sa-kohe-do-te-duhej-leksioni-3-slide-2",
+      "title": "Ushtrimi 4 — Sa kohë do të duhej? (Leksioni 3, slide 2)",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-5-merge-l-r-sakte",
+      "title": "Ushtrimi 5 — `Merge(L, R)` saktë",
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "kind": "reflect"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:bad5187c1a6a1695",
+      "srcIndex": 0,
+      "intro": true
+    },
+    {
+      "type": "markdown",
+      "kind": "theory",
+      "label": "Teori",
+      "id": "kujtues-teorik-nga-sekondat-te-o",
+      "heading": "Kujtues teorik — Nga sekondat te O(·)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:f76b3faa5b193cc0",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "perkufizimi-matematik-slide-15",
+      "heading": "Përkufizimi matematik (slide 15)",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:f4daf23a02e2527b",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "pro-dhe-kunder-slide-10",
+      "heading": "Pro dhe kundër (slide 10)",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:4404543d1f531b17",
+      "srcIndex": 1
+    },
+    {
+      "type": "code",
+      "srcIndex": 2,
+      "interactive": false,
+      "html": "sha256:5c3d824ae63f2a36",
+      "raw": "sha256:7ce72378fd40089f",
+      "lines": 15,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-1-tabela-e-numerimit-te-rreshtave-slide-5",
+      "heading": "Ushtrimi 1 — Tabela e numërimit të rreshtave (slide 5)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:be6aae2803cec1f5",
+      "srcIndex": 3
+    },
+    {
+      "type": "code",
+      "srcIndex": 4,
+      "interactive": false,
+      "html": "sha256:671da481258ba451",
+      "raw": "sha256:864b94e77e55228b",
+      "lines": 28,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": " Rreshti |  e renditur |    e rastit |    zbritëse\n       1 |          10 |          10 |          10\n       2 |           9 |           9 |           9\n       3 |           9 |           9 |           9\n       4 |           9 |          31 |          54\n       5 |           0 |          22 |          45\n       6 |           0 |          22 |          45\n       7 |           9 |           9 |           9\n   Total |          46 |         112 |         181",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:f094dfa10cf0dafb",
+      "srcIndex": 5
+    },
+    {
+      "type": "code",
+      "srcIndex": 6,
+      "interactive": false,
+      "html": "sha256:c2d4c12b5bbc168a",
+      "raw": "sha256:6386d124632368f9",
+      "lines": 18,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:51a6bad018fca0be",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-2-gjeni-c-dhe-n",
+      "heading": "Ushtrimi 2 — Gjeni c dhe n₀",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:28d870ae00077177",
+      "srcIndex": 8
+    },
+    {
+      "type": "code",
+      "srcIndex": 9,
+      "interactive": false,
+      "html": "sha256:9e3229d27ff306ba",
+      "raw": "sha256:12b4de3b27f36341",
+      "lines": 8,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 10,
+      "interactive": false,
+      "html": "sha256:1fb135f8778d7af7",
+      "raw": "sha256:7c32384b9b75da36",
+      "lines": 15,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "grafiku-i-slides-18-19",
+      "heading": "Grafiku i slides 18–19",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 11
+    },
+    {
+      "type": "code",
+      "srcIndex": 12,
+      "interactive": false,
+      "html": "sha256:8e76c7504bc4f606",
+      "raw": "sha256:b1deac3146bf4264",
+      "lines": 13,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": true,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "plotly",
+          "file": "plotly-d166e8a37bcf.json",
+          "bytes": 10588
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-3-rendi-i-rritjes-se-funksioneve",
+      "heading": "Ushtrimi 3 — Rendi i rritjes së funksioneve",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:eade5d083bdd7e77",
+      "srcIndex": 13
+    },
+    {
+      "type": "code",
+      "srcIndex": 14,
+      "interactive": false,
+      "html": "sha256:2408619de3e86d9c",
+      "raw": "sha256:f7d3bb33bc9333e2",
+      "lines": 13,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 15,
+      "interactive": false,
+      "html": "sha256:446ef50abff05eed",
+      "raw": "sha256:61d9e625c27af6cd",
+      "lines": 17,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:ca39c55327f5bdd2",
+      "srcIndex": 16
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-4-sa-kohe-do-te-duhej-leksioni-3-slide-2",
+      "heading": "Ushtrimi 4 — Sa kohë do të duhej? (Leksioni 3, slide 2)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:57b93fe971c3ce59",
+      "srcIndex": 17
+    },
+    {
+      "type": "code",
+      "srcIndex": 18,
+      "interactive": false,
+      "html": "sha256:a45ad779bbd208c8",
+      "raw": "sha256:7bc1ca9a87c6306c",
+      "lines": 12,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "               n |         n² veprime |    n·log₂n veprime\n----------------------------------------------------------\n             100 |      1e-05 sekonda |      7e-07 sekonda  \n           1,000 |      1e-03 sekonda |      1e-05 sekonda  \n       1,000,000 |      1,000 sekonda |      2e-02 sekonda  \n   3,000,000,000 |           285 vite |         94 sekonda  (Facebook MAU)",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:c384a9d011a9b6ca",
+      "srcIndex": 19
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-5-merge-l-r-sakte",
+      "heading": "Ushtrimi 5 — `Merge(L, R)` saktë",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:af41e3b421654218",
+      "srcIndex": 20
+    },
+    {
+      "type": "code",
+      "srcIndex": 21,
+      "interactive": false,
+      "html": "sha256:ccd4931a26bd989d",
+      "raw": "sha256:00c92edf881ef369",
+      "lines": 15,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "IndexError: list index out of range — çfarë ndodh kur i == len(L)?",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:976d1f1335dc4d3c",
+      "srcIndex": 22
+    },
+    {
+      "type": "code",
+      "srcIndex": 23,
+      "interactive": false,
+      "html": "sha256:72252d4752dd063f",
+      "raw": "sha256:c828ef25bafd6c9e",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 24,
+      "interactive": false,
+      "html": "sha256:af68b32e37f25731",
+      "raw": "sha256:2c088708ccfba61c",
+      "lines": 32,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "classwork",
+      "label": "Punë në Klasë",
+      "id": "pune-ne-klase",
+      "heading": "Punë në Klasë",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:ce22bc7703ae58d8",
+      "srcIndex": 25
+    },
+    {
+      "type": "markdown",
+      "kind": "reflect",
+      "label": "Pyetje Reflektuese",
+      "id": "pyetje-reflektuese",
+      "heading": "Pyetje Reflektuese",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:d333a8ed635b80e0",
+      "srcIndex": 26
+    }
+  ],
+  "imports": ["hashlib", "math", "plotly", "random"],
+  "dependencies": ["hashlib", "plotly"],
+  "flags": {
+    "pygame": false,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": true,
+    "matplotlib": false,
+    "networkx": false,
+    "numpy": false
+  },
+  "missingScripts": [],
+  "stats": {
+    "cells": 27,
+    "markdown": 15,
+    "code": 12,
+    "codeLines": 189
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": true,
+  "assets": [
+    {
+      "file": "plotly-d166e8a37bcf.json",
+      "bytes": 10604
+    }
+  ]
+}

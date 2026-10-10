@@ -1,0 +1,1271 @@
+{
+  "title": "Laboratori 8 — Floyd-Warshall & Rrjedhat Maksimale: Edmonds-Karp",
+  "toc": [
+    {
+      "id": "1-floyd-warshall-rruget-me-te-shkurtra-ndermjet-te-gjitha-cifteve",
+      "title": "1 — Floyd-Warshall: Rrugët më të Shkurtra Ndërmjet Të Gjitha Çifteve",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-sistemi-logjistik-i-shperndarjes-urbane-urbanpost",
+      "title": "Ushtrimi 1 — Sistemi Logjistik i Shpërndarjes Urbane (UrbanPost)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-rrjeti-i-klinikave-dhe-transportit-te-urgjences-mjekesore",
+      "title": "Ushtrimi 2 — Rrjeti i Klinikave dhe Transportit të Urgjencës Mjekësore",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "3-edmonds-karp-rrjedhat-maksimale",
+      "title": "3 - Edmonds-Karp: Rrjedhat Maksimale",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-3-menaxhimi-i-rrjetit-urban-te-ujesjellesit-gjate-emergjences",
+      "title": "Ushtrimi 3 — Menaxhimi i Rrjetit Urban të Ujësjellësit gjatë Emergjencës",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "lidhja-midis-floyd-warshall-dhe-edmonds-karp",
+      "title": "Lidhja Midis Floyd-Warshall dhe Edmonds-Karp",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "1-floyd-warshall-rruget-me-te-shkurtra-ndermjet-te-gjitha-cifteve",
+      "title": "1 — Floyd-Warshall: Rrugët më të Shkurtra Ndërmjet Të Gjitha Çifteve",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-problemi-zgjidhim",
+      "title": "Çfarë problemi zgjidhim?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pse-kjo-eshte-ndryshe-nga-dijkstra",
+      "title": "Pse kjo është ndryshe nga Dijkstra?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ideja-e-programimit-dinamik",
+      "title": "Ideja e Programimit Dinamik",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pseudokodi-i-algoritmit",
+      "title": "Pseudokodi i Algoritmit",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "dy-matricat-e-daljes",
+      "title": "Dy Matricat e Daljes",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "rindertimi-i-rruges-nga-p-i-j",
+      "title": "Rindërtimi i Rrugës nga P[i][j]",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "trajtimi-i-cikleve-negative",
+      "title": "Trajtimi i Cikleve Negative",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-sistemi-logjistik-i-shperndarjes-urbane-urbanpost",
+      "title": "Ushtrimi 1 — Sistemi Logjistik i Shpërndarjes Urbane (UrbanPost)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "skenari-real",
+      "title": "Skenari Real",
+      "level": 3,
+      "kind": "scenario"
+    },
+    {
+      "id": "pse-floyd-warshall-dhe-jo-dijkstra",
+      "title": "Pse Floyd-Warshall dhe jo Dijkstra?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ne-rrjete-logjistike-reale",
+      "title": "Në rrjete logjistike reale:",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "algoritmi-floyd-warshall",
+      "title": "Algoritmi Floyd-Warshall:",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "struktura-e-rrjetit",
+      "title": "Struktura e Rrjetit",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-simulojme",
+      "title": "Çfarë Simulojmë?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "si-ta-arrijme",
+      "title": "Si ta Arrijmë?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "implementimi-i-ushtrimit-1-urbanpost",
+      "title": "Implementimi i Ushtrimit 1 — UrbanPost",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-2-rrjeti-i-klinikave-dhe-transportit-te-urgjences-mjekesore",
+      "title": "Ushtrimi 2 — Rrjeti i Klinikave dhe Transportit të Urgjencës Mjekësore",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "skenari-real-2",
+      "title": "Skenari Real",
+      "level": 3,
+      "kind": "scenario"
+    },
+    {
+      "id": "pse-floyd-warshall-per-rrjete-mjekesore",
+      "title": "Pse Floyd-Warshall për Rrjete Mjekësore?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ne-situata-urgjence",
+      "title": "Në situata urgjence:",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "struktura-e-rrjetit-2",
+      "title": "Struktura e Rrjetit",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-simulojme-2",
+      "title": "Çfarë Simulojmë?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "si-ta-arrijme-2",
+      "title": "Si ta Arrijmë?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "implementimi-i-ushtrimit-2-rrjeti-mjekesor",
+      "title": "Implementimi i Ushtrimit 2 — Rrjeti Mjekësor",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "3-edmonds-karp-rrjedhat-maksimale",
+      "title": "3 - Edmonds-Karp: Rrjedhat Maksimale",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-problemi-zgjidhim-2",
+      "title": "Çfarë problemi zgjidhim?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "konceptet-themelore",
+      "title": "Konceptet Themelore",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "kushtezimi-i-rrjedhes",
+      "title": "Kushtëzimi i Rrjedhës",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "algoritmi-edmonds-karp",
+      "title": "Algoritmi Edmonds-Karp",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-3-menaxhimi-i-rrjetit-urban-te-ujesjellesit-gjate-emergjences",
+      "title": "Ushtrimi 3 — Menaxhimi i Rrjetit Urban të Ujësjellësit gjatë Emergjencës",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "skenari-real-3",
+      "title": "Skenari Real",
+      "level": 3,
+      "kind": "scenario"
+    },
+    {
+      "id": "objektivi-i-problemit",
+      "title": "Objektivi i Problemit",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pse-perdoret-edmonds-karp",
+      "title": "Pse përdoret Edmonds-Karp?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ne-rrjete-reale",
+      "title": "Në rrjete reale:",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "algoritmi-edmonds-karp-2",
+      "title": "Algoritmi Edmonds-Karp:",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "struktura-e-rrjetit-3",
+      "title": "Struktura e Rrjetit",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "implementimi-i-edmonds-karp",
+      "title": "Implementimi i Edmonds-Karp",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "lidhja-midis-floyd-warshall-dhe-edmonds-karp",
+      "title": "Lidhja Midis Floyd-Warshall dhe Edmonds-Karp",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "kur-te-zgjedhim-cdonjerin",
+      "title": "Kur të zgjedhim çdonjërin?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "a-mund-te-kombinohen",
+      "title": "A mund të kombinohen?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "sections": [
+    {
+      "id": "1-floyd-warshall-rruget-me-te-shkurtra-ndermjet-te-gjitha-cifteve",
+      "title": "1 — Floyd-Warshall: Rrugët më të Shkurtra Ndërmjet Të Gjitha Çifteve",
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-problemi-zgjidhim",
+      "title": "Çfarë problemi zgjidhim?",
+      "kind": "normal"
+    },
+    {
+      "id": "pse-kjo-eshte-ndryshe-nga-dijkstra",
+      "title": "Pse kjo është ndryshe nga Dijkstra?",
+      "kind": "normal"
+    },
+    {
+      "id": "ideja-e-programimit-dinamik",
+      "title": "Ideja e Programimit Dinamik",
+      "kind": "normal"
+    },
+    {
+      "id": "pseudokodi-i-algoritmit",
+      "title": "Pseudokodi i Algoritmit",
+      "kind": "normal"
+    },
+    {
+      "id": "dy-matricat-e-daljes",
+      "title": "Dy Matricat e Daljes",
+      "kind": "normal"
+    },
+    {
+      "id": "rindertimi-i-rruges-nga-p-i-j",
+      "title": "Rindërtimi i Rrugës nga P[i][j]",
+      "kind": "normal"
+    },
+    {
+      "id": "trajtimi-i-cikleve-negative",
+      "title": "Trajtimi i Cikleve Negative",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-sistemi-logjistik-i-shperndarjes-urbane-urbanpost",
+      "title": "Ushtrimi 1 — Sistemi Logjistik i Shpërndarjes Urbane (UrbanPost)",
+      "kind": "exercise"
+    },
+    {
+      "id": "skenari-real",
+      "title": "Skenari Real",
+      "kind": "scenario"
+    },
+    {
+      "id": "pse-floyd-warshall-dhe-jo-dijkstra",
+      "title": "Pse Floyd-Warshall dhe jo Dijkstra?",
+      "kind": "normal"
+    },
+    {
+      "id": "ne-rrjete-logjistike-reale",
+      "title": "Në rrjete logjistike reale:",
+      "kind": "normal"
+    },
+    {
+      "id": "algoritmi-floyd-warshall",
+      "title": "Algoritmi Floyd-Warshall:",
+      "kind": "normal"
+    },
+    {
+      "id": "struktura-e-rrjetit",
+      "title": "Struktura e Rrjetit",
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-simulojme",
+      "title": "Çfarë Simulojmë?",
+      "kind": "normal"
+    },
+    {
+      "id": "si-ta-arrijme",
+      "title": "Si ta Arrijmë?",
+      "kind": "normal"
+    },
+    {
+      "id": "implementimi-i-ushtrimit-1-urbanpost",
+      "title": "Implementimi i Ushtrimit 1 — UrbanPost",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-2-rrjeti-i-klinikave-dhe-transportit-te-urgjences-mjekesore",
+      "title": "Ushtrimi 2 — Rrjeti i Klinikave dhe Transportit të Urgjencës Mjekësore",
+      "kind": "exercise"
+    },
+    {
+      "id": "skenari-real-2",
+      "title": "Skenari Real",
+      "kind": "scenario"
+    },
+    {
+      "id": "pse-floyd-warshall-per-rrjete-mjekesore",
+      "title": "Pse Floyd-Warshall për Rrjete Mjekësore?",
+      "kind": "normal"
+    },
+    {
+      "id": "ne-situata-urgjence",
+      "title": "Në situata urgjence:",
+      "kind": "normal"
+    },
+    {
+      "id": "struktura-e-rrjetit-2",
+      "title": "Struktura e Rrjetit",
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-simulojme-2",
+      "title": "Çfarë Simulojmë?",
+      "kind": "normal"
+    },
+    {
+      "id": "si-ta-arrijme-2",
+      "title": "Si ta Arrijmë?",
+      "kind": "normal"
+    },
+    {
+      "id": "implementimi-i-ushtrimit-2-rrjeti-mjekesor",
+      "title": "Implementimi i Ushtrimit 2 — Rrjeti Mjekësor",
+      "kind": "normal"
+    },
+    {
+      "id": "3-edmonds-karp-rrjedhat-maksimale",
+      "title": "3 - Edmonds-Karp: Rrjedhat Maksimale",
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-problemi-zgjidhim-2",
+      "title": "Çfarë problemi zgjidhim?",
+      "kind": "normal"
+    },
+    {
+      "id": "konceptet-themelore",
+      "title": "Konceptet Themelore",
+      "kind": "normal"
+    },
+    {
+      "id": "kushtezimi-i-rrjedhes",
+      "title": "Kushtëzimi i Rrjedhës",
+      "kind": "normal"
+    },
+    {
+      "id": "algoritmi-edmonds-karp",
+      "title": "Algoritmi Edmonds-Karp",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-3-menaxhimi-i-rrjetit-urban-te-ujesjellesit-gjate-emergjences",
+      "title": "Ushtrimi 3 — Menaxhimi i Rrjetit Urban të Ujësjellësit gjatë Emergjencës",
+      "kind": "exercise"
+    },
+    {
+      "id": "skenari-real-3",
+      "title": "Skenari Real",
+      "kind": "scenario"
+    },
+    {
+      "id": "objektivi-i-problemit",
+      "title": "Objektivi i Problemit",
+      "kind": "normal"
+    },
+    {
+      "id": "pse-perdoret-edmonds-karp",
+      "title": "Pse përdoret Edmonds-Karp?",
+      "kind": "normal"
+    },
+    {
+      "id": "ne-rrjete-reale",
+      "title": "Në rrjete reale:",
+      "kind": "normal"
+    },
+    {
+      "id": "algoritmi-edmonds-karp-2",
+      "title": "Algoritmi Edmonds-Karp:",
+      "kind": "normal"
+    },
+    {
+      "id": "struktura-e-rrjetit-3",
+      "title": "Struktura e Rrjetit",
+      "kind": "normal"
+    },
+    {
+      "id": "implementimi-i-edmonds-karp",
+      "title": "Implementimi i Edmonds-Karp",
+      "kind": "normal"
+    },
+    {
+      "id": "lidhja-midis-floyd-warshall-dhe-edmonds-karp",
+      "title": "Lidhja Midis Floyd-Warshall dhe Edmonds-Karp",
+      "kind": "normal"
+    },
+    {
+      "id": "kur-te-zgjedhim-cdonjerin",
+      "title": "Kur të zgjedhim çdonjërin?",
+      "kind": "normal"
+    },
+    {
+      "id": "a-mund-te-kombinohen",
+      "title": "A mund të kombinohen?",
+      "kind": "normal"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "kind": "reflect"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "1-floyd-warshall-rruget-me-te-shkurtra-ndermjet-te-gjitha-cifteve",
+      "heading": "1 — Floyd-Warshall: Rrugët më të Shkurtra Ndërmjet Të Gjitha Çifteve",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "cfare-problemi-zgjidhim",
+      "heading": "Çfarë problemi zgjidhim?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:fcb5d6d0ebc8f8d4",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "pse-kjo-eshte-ndryshe-nga-dijkstra",
+      "heading": "Pse kjo është ndryshe nga Dijkstra?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:4dd447c37c951562",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "ideja-e-programimit-dinamik",
+      "heading": "Ideja e Programimit Dinamik",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:50045e891c0a2d1b",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "pseudokodi-i-algoritmit",
+      "heading": "Pseudokodi i Algoritmit",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:2f5d3f882f97138a",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "dy-matricat-e-daljes",
+      "heading": "Dy Matricat e Daljes",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:529fc1337b079f8b",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "rindertimi-i-rruges-nga-p-i-j",
+      "heading": "Rindërtimi i Rrugës nga P[i][j]",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:0db22f0828b81377",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "trajtimi-i-cikleve-negative",
+      "heading": "Trajtimi i Cikleve Negative",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:c6cd5f0f13320493",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 2
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-1-sistemi-logjistik-i-shperndarjes-urbane-urbanpost",
+      "heading": "Ushtrimi 1 — Sistemi Logjistik i Shpërndarjes Urbane (UrbanPost)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 2
+    },
+    {
+      "type": "markdown",
+      "kind": "scenario",
+      "label": "Skenar Real",
+      "id": "skenari-real",
+      "heading": "Skenari Real",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:909362dd0e457270",
+      "srcIndex": 2
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "pse-floyd-warshall-dhe-jo-dijkstra",
+      "heading": "Pse Floyd-Warshall dhe jo Dijkstra?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 2
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "ne-rrjete-logjistike-reale",
+      "heading": "Në rrjete logjistike reale:",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:50ed186aec12a4aa",
+      "srcIndex": 2
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "algoritmi-floyd-warshall",
+      "heading": "Algoritmi Floyd-Warshall:",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:0a86078db09900d3",
+      "srcIndex": 2
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "struktura-e-rrjetit",
+      "heading": "Struktura e Rrjetit",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:615394d1f3c96268",
+      "srcIndex": 2
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "cfare-simulojme",
+      "heading": "Çfarë Simulojmë?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:59d999ab32b09843",
+      "srcIndex": 2
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "si-ta-arrijme",
+      "heading": "Si ta Arrijmë?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:e848bf1a74885780",
+      "srcIndex": 2
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "implementimi-i-ushtrimit-1-urbanpost",
+      "heading": "Implementimi i Ushtrimit 1 — UrbanPost",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 3
+    },
+    {
+      "type": "code",
+      "srcIndex": 4,
+      "interactive": true,
+      "html": "sha256:6941e4ae82726eda",
+      "raw": "sha256:2288e7d419a443c6",
+      "lines": 1051,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "fnt"
+        },
+        {
+          "t": "def",
+          "n": "txt"
+        },
+        {
+          "t": "def",
+          "n": "glow"
+        },
+        {
+          "t": "def",
+          "n": "build_matrix"
+        },
+        {
+          "t": "def",
+          "n": "floyd_warshall_steps"
+        },
+        {
+          "t": "def",
+          "n": "reconstruct"
+        },
+        {
+          "t": "def",
+          "n": "draw_depo"
+        },
+        {
+          "t": "def",
+          "n": "draw_qr"
+        },
+        {
+          "t": "def",
+          "n": "draw_pd"
+        },
+        {
+          "t": "def",
+          "n": "draw_arrow"
+        },
+        {
+          "t": "def",
+          "n": "bezier_points"
+        },
+        {
+          "t": "def",
+          "n": "get_ctrl_point"
+        },
+        {
+          "t": "def",
+          "n": "draw_road"
+        },
+        {
+          "t": "def",
+          "n": "edge_style"
+        }
+      ],
+      "flags": {
+        "pygame": true,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": true,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-2-rrjeti-i-klinikave-dhe-transportit-te-urgjences-mjekesore",
+      "heading": "Ushtrimi 2 — Rrjeti i Klinikave dhe Transportit të Urgjencës Mjekësore",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "scenario",
+      "label": "Skenar Real",
+      "id": "skenari-real-2",
+      "heading": "Skenari Real",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:9c39b9d7fcc2beff",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "pse-floyd-warshall-per-rrjete-mjekesore",
+      "heading": "Pse Floyd-Warshall për Rrjete Mjekësore?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "ne-situata-urgjence",
+      "heading": "Në situata urgjence:",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:1e8372716f912bb9",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "struktura-e-rrjetit-2",
+      "heading": "Struktura e Rrjetit",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:87498bed97706868",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "cfare-simulojme-2",
+      "heading": "Çfarë Simulojmë?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:9dd8d152df81db6c",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "si-ta-arrijme-2",
+      "heading": "Si ta Arrijmë?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:e0ba4b778a519b7f",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "implementimi-i-ushtrimit-2-rrjeti-mjekesor",
+      "heading": "Implementimi i Ushtrimit 2 — Rrjeti Mjekësor",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 6
+    },
+    {
+      "type": "code",
+      "srcIndex": 7,
+      "interactive": true,
+      "html": "sha256:1457361b60fa9eb5",
+      "raw": "sha256:41e693470cfad2a0",
+      "lines": 1040,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "fnt"
+        },
+        {
+          "t": "def",
+          "n": "txt"
+        },
+        {
+          "t": "def",
+          "n": "glow"
+        },
+        {
+          "t": "def",
+          "n": "build_matrix"
+        },
+        {
+          "t": "def",
+          "n": "floyd_warshall_steps"
+        },
+        {
+          "t": "def",
+          "n": "reconstruct"
+        },
+        {
+          "t": "def",
+          "n": "most_accessible"
+        },
+        {
+          "t": "def",
+          "n": "draw_hospital"
+        },
+        {
+          "t": "def",
+          "n": "draw_ambulance_node"
+        },
+        {
+          "t": "def",
+          "n": "draw_clinic"
+        },
+        {
+          "t": "def",
+          "n": "draw_urgency"
+        },
+        {
+          "t": "def",
+          "n": "bezier_points"
+        },
+        {
+          "t": "def",
+          "n": "get_ctrl_point"
+        },
+        {
+          "t": "def",
+          "n": "draw_arrow_at"
+        }
+      ],
+      "flags": {
+        "pygame": true,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": true,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 8
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "3-edmonds-karp-rrjedhat-maksimale",
+      "heading": "3 - Edmonds-Karp: Rrjedhat Maksimale",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 8
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "cfare-problemi-zgjidhim-2",
+      "heading": "Çfarë problemi zgjidhim?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:140237aa49a5261d",
+      "srcIndex": 8
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "konceptet-themelore",
+      "heading": "Konceptet Themelore",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:8561e4d76e3cac07",
+      "srcIndex": 8
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "kushtezimi-i-rrjedhes",
+      "heading": "Kushtëzimi i Rrjedhës",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:99b46b2c38cbbd76",
+      "srcIndex": 8
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "algoritmi-edmonds-karp",
+      "heading": "Algoritmi Edmonds-Karp",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:e6c0367325220778",
+      "srcIndex": 8
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 9
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-3-menaxhimi-i-rrjetit-urban-te-ujesjellesit-gjate-emergjences",
+      "heading": "Ushtrimi 3 — Menaxhimi i Rrjetit Urban të Ujësjellësit gjatë Emergjencës",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 9
+    },
+    {
+      "type": "markdown",
+      "kind": "scenario",
+      "label": "Skenar Real",
+      "id": "skenari-real-3",
+      "heading": "Skenari Real",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:523fc11abf50f1ca",
+      "srcIndex": 9
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "objektivi-i-problemit",
+      "heading": "Objektivi i Problemit",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:e7c9815dc2a4df63",
+      "srcIndex": 9
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "pse-perdoret-edmonds-karp",
+      "heading": "Pse përdoret Edmonds-Karp?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 9
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "ne-rrjete-reale",
+      "heading": "Në rrjete reale:",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:07938f2df47db8a9",
+      "srcIndex": 9
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "algoritmi-edmonds-karp-2",
+      "heading": "Algoritmi Edmonds-Karp:",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:cccaf6c6bd000d40",
+      "srcIndex": 9
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "struktura-e-rrjetit-3",
+      "heading": "Struktura e Rrjetit",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:cb2b9351b0ba37ba",
+      "srcIndex": 9
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "implementimi-i-edmonds-karp",
+      "heading": "Implementimi i Edmonds-Karp",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 10
+    },
+    {
+      "type": "code",
+      "srcIndex": 11,
+      "interactive": true,
+      "html": "sha256:1da023811ae14ed5",
+      "raw": "sha256:3752e4de325ca0fd",
+      "lines": 778,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "fnt"
+        },
+        {
+          "t": "def",
+          "n": "txt"
+        },
+        {
+          "t": "def",
+          "n": "glow"
+        },
+        {
+          "t": "class",
+          "n": "EK"
+        },
+        {
+          "t": "def",
+          "n": "__init__"
+        },
+        {
+          "t": "def",
+          "n": "_snap"
+        },
+        {
+          "t": "def",
+          "n": "_bfs"
+        },
+        {
+          "t": "def",
+          "n": "_run"
+        },
+        {
+          "t": "def",
+          "n": "draw_reservoir"
+        },
+        {
+          "t": "def",
+          "n": "draw_pump"
+        },
+        {
+          "t": "def",
+          "n": "draw_lagje"
+        },
+        {
+          "t": "def",
+          "n": "draw_relief"
+        },
+        {
+          "t": "def",
+          "n": "pipe_color"
+        },
+        {
+          "t": "def",
+          "n": "draw_pipe"
+        }
+      ],
+      "flags": {
+        "pygame": true,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": true,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 12
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "lidhja-midis-floyd-warshall-dhe-edmonds-karp",
+      "heading": "Lidhja Midis Floyd-Warshall dhe Edmonds-Karp",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:62264b78ada8c075",
+      "srcIndex": 12
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "kur-te-zgjedhim-cdonjerin",
+      "heading": "Kur të zgjedhim çdonjërin?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:5c12899c891bb435",
+      "srcIndex": 12
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "a-mund-te-kombinohen",
+      "heading": "A mund të kombinohen?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:ff48d525313be57f",
+      "srcIndex": 12
+    },
+    {
+      "type": "markdown",
+      "kind": "reflect",
+      "label": "Pyetje Reflektuese",
+      "id": "pyetje-reflektuese",
+      "heading": "Pyetje Reflektuese",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:34bb4cb08425de72",
+      "srcIndex": 12
+    }
+  ],
+  "imports": ["collections", "copy", "pygame"],
+  "dependencies": ["pygame"],
+  "flags": {
+    "pygame": true,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": false,
+    "matplotlib": false,
+    "networkx": false,
+    "numpy": false
+  },
+  "missingScripts": [],
+  "stats": {
+    "cells": 14,
+    "markdown": 11,
+    "code": 3,
+    "codeLines": 2869
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": false,
+  "assets": []
+}

@@ -1,0 +1,673 @@
+{
+  "title": "Laboratori 1 · Ushtrime Shtesë — Insertion Sort: A funksionon? Si e vërtetojmë?",
+  "toc": [
+    {
+      "id": "si-punohet-me-kete-fletore",
+      "title": "Si punohet me këtë fletore",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "kujtues-teorik-pseudokodi-i-leksionit-dhe-induksioni",
+      "title": "Kujtues teorik — Pseudokodi i leksionit dhe induksioni",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "kater-perberesit-e-induksionit-slides-40-41",
+      "title": "Katër përbërësit e induksionit (slides 40–41)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-nga-pseudokodi-ne-python-rresht-per-rresht",
+      "title": "Ushtrimi 1 — Nga pseudokodi në Python, rresht për rresht",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-hipoteza-e-induksionit-si-assert",
+      "title": "Ushtrimi 2 — Hipoteza e induksionit si `assert`",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "po-nese-algoritmi-ka-nje-gabim-te-vogel",
+      "title": "Po nëse algoritmi ka një gabim të vogël?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-3-e-provova-me-shume-shembuj-pra-funksionon",
+      "title": "Ushtrimi 3 — \"E provova me shumë shembuj, pra funksionon\"?",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-loja-me-kundershtarin-inputi-me-i-keq",
+      "title": "Ushtrimi 4 — Loja me kundërshtarin: inputi më i keq",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "grafiku-rasti-me-i-mire-rasti-i-rastit-rasti-me-i-keq",
+      "title": "Grafiku: rasti më i mirë, rasti i rastit, rasti më i keq",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-5-selection-sort-nen-te-njejten-lupe",
+      "title": "Ushtrimi 5 — Selection Sort nën të njëjtën lupë",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "si-punohet-me-kete-fletore",
+      "title": "Si punohet me këtë fletore",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "kujtues-teorik-pseudokodi-i-leksionit-dhe-induksioni",
+      "title": "Kujtues teorik — Pseudokodi i leksionit dhe induksioni",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "kater-perberesit-e-induksionit-slides-40-41",
+      "title": "Katër përbërësit e induksionit (slides 40–41)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-nga-pseudokodi-ne-python-rresht-per-rresht",
+      "title": "Ushtrimi 1 — Nga pseudokodi në Python, rresht për rresht",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-hipoteza-e-induksionit-si-assert",
+      "title": "Ushtrimi 2 — Hipoteza e induksionit si `assert`",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "po-nese-algoritmi-ka-nje-gabim-te-vogel",
+      "title": "Po nëse algoritmi ka një gabim të vogël?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-3-e-provova-me-shume-shembuj-pra-funksionon",
+      "title": "Ushtrimi 3 — \"E provova me shumë shembuj, pra funksionon\"?",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-loja-me-kundershtarin-inputi-me-i-keq",
+      "title": "Ushtrimi 4 — Loja me kundërshtarin: inputi më i keq",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "grafiku-rasti-me-i-mire-rasti-i-rastit-rasti-me-i-keq",
+      "title": "Grafiku: rasti më i mirë, rasti i rastit, rasti më i keq",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-5-selection-sort-nen-te-njejten-lupe",
+      "title": "Ushtrimi 5 — Selection Sort nën të njëjtën lupë",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "sections": [
+    {
+      "id": "si-punohet-me-kete-fletore",
+      "title": "Si punohet me këtë fletore",
+      "kind": "normal"
+    },
+    {
+      "id": "kujtues-teorik-pseudokodi-i-leksionit-dhe-induksioni",
+      "title": "Kujtues teorik — Pseudokodi i leksionit dhe induksioni",
+      "kind": "theory"
+    },
+    {
+      "id": "kater-perberesit-e-induksionit-slides-40-41",
+      "title": "Katër përbërësit e induksionit (slides 40–41)",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-nga-pseudokodi-ne-python-rresht-per-rresht",
+      "title": "Ushtrimi 1 — Nga pseudokodi në Python, rresht për rresht",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-hipoteza-e-induksionit-si-assert",
+      "title": "Ushtrimi 2 — Hipoteza e induksionit si `assert`",
+      "kind": "exercise"
+    },
+    {
+      "id": "po-nese-algoritmi-ka-nje-gabim-te-vogel",
+      "title": "Po nëse algoritmi ka një gabim të vogël?",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-3-e-provova-me-shume-shembuj-pra-funksionon",
+      "title": "Ushtrimi 3 — \"E provova me shumë shembuj, pra funksionon\"?",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-loja-me-kundershtarin-inputi-me-i-keq",
+      "title": "Ushtrimi 4 — Loja me kundërshtarin: inputi më i keq",
+      "kind": "exercise"
+    },
+    {
+      "id": "grafiku-rasti-me-i-mire-rasti-i-rastit-rasti-me-i-keq",
+      "title": "Grafiku: rasti më i mirë, rasti i rastit, rasti më i keq",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-5-selection-sort-nen-te-njejten-lupe",
+      "title": "Ushtrimi 5 — Selection Sort nën të njëjtën lupë",
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "kind": "reflect"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:f4c876913d5f38ca",
+      "srcIndex": 0,
+      "intro": true
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "si-punohet-me-kete-fletore",
+      "heading": "Si punohet me këtë fletore",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:4fa1f8a79f3ce17f",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "theory",
+      "label": "Teori",
+      "id": "kujtues-teorik-pseudokodi-i-leksionit-dhe-induksioni",
+      "heading": "Kujtues teorik — Pseudokodi i leksionit dhe induksioni",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:d503227afd11b5dc",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "kater-perberesit-e-induksionit-slides-40-41",
+      "heading": "Katër përbërësit e induksionit (slides 40–41)",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:d8651a63dc798e56",
+      "srcIndex": 1
+    },
+    {
+      "type": "code",
+      "srcIndex": 2,
+      "interactive": false,
+      "html": "sha256:5c3d824ae63f2a36",
+      "raw": "sha256:7ce72378fd40089f",
+      "lines": 15,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-1-nga-pseudokodi-ne-python-rresht-per-rresht",
+      "heading": "Ushtrimi 1 — Nga pseudokodi në Python, rresht për rresht",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:c5dea17d7276bc0d",
+      "srcIndex": 3
+    },
+    {
+      "type": "code",
+      "srcIndex": 4,
+      "interactive": false,
+      "html": "sha256:ba8f2df196fe3de7",
+      "raw": "sha256:2c0d68082f462244",
+      "lines": 27,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "Input:             [6, 4, 3, 8, 5]\npas i=1 (aktual=4):  [4, 6, 3, 8, 5]    ← A[:2] = [4, 6] e renditur\npas i=2 (aktual=3):  [3, 4, 6, 8, 5]    ← A[:3] = [3, 4, 6] e renditur\npas i=3 (aktual=8):  [3, 4, 6, 8, 5]    ← A[:4] = [3, 4, 6, 8] e renditur\npas i=4 (aktual=5):  [3, 4, 5, 6, 8]    ← A[:5] = [3, 4, 5, 6, 8] e renditur",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:a9e7ed830ab7260d",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-2-hipoteza-e-induksionit-si-assert",
+      "heading": "Ushtrimi 2 — Hipoteza e induksionit si `assert`",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:0091946b52f7e5be",
+      "srcIndex": 6
+    },
+    {
+      "type": "code",
+      "srcIndex": 7,
+      "interactive": false,
+      "html": "sha256:02966ec65a2612e7",
+      "raw": "sha256:a935ee52c19c8fd9",
+      "lines": 16,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 8,
+      "interactive": false,
+      "html": "sha256:01ab050a9e275ec6",
+      "raw": "sha256:4605963ef725d0b1",
+      "lines": 15,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "po-nese-algoritmi-ka-nje-gabim-te-vogel",
+      "heading": "Po nëse algoritmi ka një gabim të vogël?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:1a52d476ca8daeef",
+      "srcIndex": 9
+    },
+    {
+      "type": "code",
+      "srcIndex": 10,
+      "interactive": false,
+      "html": "sha256:65c0d4c9e3569123",
+      "raw": "sha256:ed72908e98426097",
+      "lines": 13,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "HI dështon pas iteracionit i=1: A[:2] = [6, 4]",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0678affa104d407e",
+      "srcIndex": 11
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-3-e-provova-me-shume-shembuj-pra-funksionon",
+      "heading": "Ushtrimi 3 — \"E provova me shumë shembuj, pra funksionon\"?",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:b338dd64a63dde99",
+      "srcIndex": 12
+    },
+    {
+      "type": "code",
+      "srcIndex": 13,
+      "interactive": false,
+      "html": "sha256:8832b12dda571f21",
+      "raw": "sha256:bb36af333520ebb4",
+      "lines": 21,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "10 000 teste të rastit me n ≤ 5 kaluan: True",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "srcIndex": 14,
+      "interactive": false,
+      "html": "sha256:190001515429845f",
+      "raw": "sha256:458ca03c95409ec1",
+      "lines": 10,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:5c031466a635cda7",
+      "srcIndex": 15
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-4-loja-me-kundershtarin-inputi-me-i-keq",
+      "heading": "Ushtrimi 4 — Loja me kundërshtarin: inputi më i keq",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:8c07b56445e3062a",
+      "srcIndex": 16
+    },
+    {
+      "type": "code",
+      "srcIndex": 17,
+      "interactive": false,
+      "html": "sha256:2aa2c993fc1a0e04",
+      "raw": "sha256:34a1bab6c2a1b569",
+      "lines": 13,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 18,
+      "interactive": false,
+      "html": "sha256:744c24e8caa89d8d",
+      "raw": "sha256:e9faedf0a163a4f2",
+      "lines": 14,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "grafiku-rasti-me-i-mire-rasti-i-rastit-rasti-me-i-keq",
+      "heading": "Grafiku: rasti më i mirë, rasti i rastit, rasti më i keq",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:9d3bd5ccedc5b298",
+      "srcIndex": 19
+    },
+    {
+      "type": "code",
+      "srcIndex": 20,
+      "interactive": false,
+      "html": "sha256:afc20ad4e071bbfb",
+      "raw": "sha256:f42f4fd9ee526e19",
+      "lines": 26,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": true,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "plotly",
+          "file": "plotly-f0f3519c1800.json",
+          "bytes": 8503
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:4f89cfef9c406106",
+      "srcIndex": 21
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-5-selection-sort-nen-te-njejten-lupe",
+      "heading": "Ushtrimi 5 — Selection Sort nën të njëjtën lupë",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:b57d67543c739863",
+      "srcIndex": 22
+    },
+    {
+      "type": "code",
+      "srcIndex": 23,
+      "interactive": false,
+      "html": "sha256:6337c9c589e1d81f",
+      "raw": "sha256:f91251e9a6a26bbc",
+      "lines": 22,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "classwork",
+      "label": "Punë në Klasë",
+      "id": "pune-ne-klase",
+      "heading": "Punë në Klasë",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:3f0d576b584d7cbe",
+      "srcIndex": 24
+    },
+    {
+      "type": "markdown",
+      "kind": "reflect",
+      "label": "Pyetje Reflektuese",
+      "id": "pyetje-reflektuese",
+      "heading": "Pyetje Reflektuese",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:edf402f01d5a7933",
+      "srcIndex": 25
+    }
+  ],
+  "imports": ["inspect", "itertools", "plotly", "random"],
+  "dependencies": ["inspect", "plotly"],
+  "flags": {
+    "pygame": false,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": true,
+    "matplotlib": false,
+    "networkx": false,
+    "numpy": false
+  },
+  "missingScripts": [],
+  "stats": {
+    "cells": 26,
+    "markdown": 15,
+    "code": 11,
+    "codeLines": 192
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": true,
+  "assets": [
+    {
+      "file": "plotly-f0f3519c1800.json",
+      "bytes": 8518
+    }
+  ]
+}
