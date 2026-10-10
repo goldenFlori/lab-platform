@@ -1,8 +1,7 @@
 import { zValidator } from '@hono/zod-validator';
-import { type Context, Hono } from 'hono';
+import { Hono } from 'hono';
 import {
   type CourseDetail,
-  type CourseSummary,
   createCourseInput,
   groupInput,
   joinCodeSwitchInput,
@@ -10,56 +9,11 @@ import {
 } from '../../shared/courses';
 import { generateJoinCode } from '../../shared/join-code';
 import { type GroupStudent, importStudentsInput, resetPasswordInput } from '../../shared/students';
-import type { Access, TenantEnv } from '../auth/access';
+import type { TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
+import { forbidden, groupOf, invalidRequest, seesCourse, summary, visibleCourse } from './course-context';
 
 // Courses and their groups, under /api/orgs/:org/courses (#10).
-// A course you cannot see answers 404; one you can see but may not change answers 403.
-
-type Course = { id: string; title: string; academicYear: string; archivedAt: Date | null };
-
-const summary = (course: Course): CourseSummary => ({
-  id: course.id,
-  title: course.title,
-  academicYear: course.academicYear,
-  archivedAt: course.archivedAt?.toISOString() ?? null,
-});
-
-/** Staff of the course, or a student of one of its groups. */
-function seesCourse(access: Access, courseId: string, groupIds: readonly string[]) {
-  return access.canInCourse('lab.view', courseId, groupIds) || access.canInCourse('course.manage', courseId, groupIds);
-}
-
-const invalidRequest = (result: { success: boolean }, c: Context) => {
-  if (!result.success) return c.json({ error: 'invalid_request' }, 400);
-};
-
-const forbidden = (c: Context) => c.json({ error: 'forbidden' }, 403);
-
-/** The course in the URL and its groups, or NotFoundError when it is missing or hidden from the user. */
-async function visibleCourse(c: Context<TenantEnv>) {
-  const { tenant, access } = c.var;
-  const courseId = c.req.param('courseId') ?? '';
-  const course = await tenant.courses.get(courseId);
-  const groups = course ? await tenant.groups.ofCourse(course.id) : [];
-  if (
-    !course ||
-    !seesCourse(
-      access,
-      course.id,
-      groups.map((g) => g.id),
-    )
-  )
-    throw new NotFoundError();
-  return { course, groups };
-}
-
-/** A group of the course in the URL. */
-function groupOf(c: Context<TenantEnv>, groups: { id: string; name: string; joinCode: string | null }[]) {
-  const group = groups.find((g) => g.id === c.req.param('groupId'));
-  if (!group) throw new NotFoundError();
-  return group;
-}
 
 export const courseRoutes = new Hono<TenantEnv>()
   .get('/', async (c) => {
