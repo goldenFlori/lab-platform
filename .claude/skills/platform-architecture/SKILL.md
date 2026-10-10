@@ -162,6 +162,24 @@ Built in #10, under `/api/orgs/:org/courses` (`src/api/routes/courses.ts`).
     the projector (lean-qr, always dark on white), new code / close registration, and delete;
   - `/join?code=…`: what the QR code opens. Signed-out students log in first and come back.
 
+## Labs and visibility
+
+Built in #12, under `/api/orgs/:org/courses/:courseId/labs` (`src/api/routes/labs.ts`). The rules
+are in `src/shared/lab-visibility.ts`.
+
+- **A rule** (`lab_access`) belongs to a lab and one group, or the whole course (`group_id`
+  null). A group's own rule wins over the course-wide one.
+- **No rule, or `visible_from` null, means hidden.** Otherwise the lab is scheduled before
+  `visible_from`, open until `visible_until`, and closed after it.
+- **Solutions** are open to students only while the lab is open and from `solutions_from` on.
+  Staff always see them.
+- **Staff** are those with `solution.view` in the course: pedagog, coordinator, and assistants
+  of its groups. They see every lab, with its state per group.
+- **Students** see only labs open to one of their groups right now. Any other lab answers 404,
+  also by direct link. Rules are read on every request, so a switch applies at once.
+- **Changing:** labs (add, rename, renumber, remove) need `course.manage`. Rules need
+  `lab.publish` in their scope: the course, or the group.
+
 ## Importing students
 
 Built in #11. Pages: the group's students (`…/groups/:id`) and the import (`…/groups/:id/import`).
