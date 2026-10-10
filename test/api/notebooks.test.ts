@@ -9,6 +9,11 @@ const json = async <T>(res: Response) => (await res.json()) as T;
 const ago = (seconds: number) => new Date(Date.now() - seconds * 1000).toISOString();
 const later = (seconds: number) => new Date(Date.now() + seconds * 1000).toISOString();
 
+const sha256 = async (data: ArrayBuffer | Uint8Array) =>
+  Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', data)), (b) => b.toString(16).padStart(2, '0')).join(
+    '',
+  );
+
 async function gzip(text: string) {
   const stream = new Blob([text]).stream().pipeThrough(new CompressionStream('gzip'));
   return new Uint8Array(await new Response(stream).arrayBuffer());
@@ -84,7 +89,8 @@ describe('uploading and reading notebooks', () => {
     expect(await plain.text()).toBe(RENDERED);
 
     const asset = await student.call(`${notebooks}/${nb.id}/files/img-0123456789ab.png`);
-    expect(new Uint8Array(await asset.arrayBuffer())).toEqual(big);
+    // Compare digests: a deep equality over 1.2 million bytes is slow enough to time out in CI.
+    expect(await sha256(await asset.arrayBuffer())).toBe(await sha256(big));
     const { results } = await env.DB.prepare(
       "select f.chunk_count from files f where f.notebook_id = ? and f.name = 'img-0123456789ab.png'",
     )
