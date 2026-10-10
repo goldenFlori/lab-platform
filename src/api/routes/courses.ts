@@ -11,6 +11,7 @@ import { generateJoinCode } from '../../shared/join-code';
 import { type GroupStudent, importStudentsInput, resetPasswordInput } from '../../shared/students';
 import type { TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
+import { courseActivityRoutes } from './activity';
 import { forbidden, groupOf, invalidRequest, seesCourse, summary, visibleCourse } from './course-context';
 import { labRoutes } from './labs';
 import { searchRoutes } from './search';
@@ -76,7 +77,14 @@ export const courseRoutes = new Hono<TenantEnv>()
             permissions: { manageStudents },
           };
         }),
-      permissions: { manage: access.can('course.manage', { courseId: course.id }) },
+      permissions: {
+        manage: access.can('course.manage', { courseId: course.id }),
+        analytics: access.canInCourse(
+          'analytics.view',
+          course.id,
+          groups.map((g) => g.id),
+        ),
+      },
     } satisfies CourseDetail);
   })
 
@@ -171,4 +179,5 @@ export const courseRoutes = new Hono<TenantEnv>()
   })
 
   .route('/:courseId/labs', labRoutes)
-  .route('/:courseId/search', searchRoutes);
+  .route('/:courseId/search', searchRoutes)
+  .route('/:courseId/activity', courseActivityRoutes);

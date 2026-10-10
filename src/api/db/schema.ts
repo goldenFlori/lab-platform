@@ -409,3 +409,31 @@ export const searchSections = sqliteTable(
     uniqueIndex('search_sections_notebook_position_unique').on(t.orgId, t.notebookId, t.position),
   ],
 );
+
+/**
+ * Learning activity (#18): that a student opened a lab, downloaded its notebook or used one of its
+ * visualizations on a day. At most one row per student, lab, kind and day, so a busy class stays
+ * small; reports show only counts. Gone with the student or the lab.
+ */
+export const labActivity = sqliteTable(
+  'lab_activity',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    labId: text('lab_id').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    kind: text('kind', { enum: ['view', 'download', 'visualization'] }).notNull(),
+    /** YYYY-MM-DD in the institution's time zone. */
+    day: text('day').notNull(),
+  },
+  (t) => [
+    foreignKey({
+      name: 'lab_activity_lab_fk',
+      columns: [t.labId, t.orgId],
+      foreignColumns: [labs.id, labs.orgId],
+    }).onDelete('cascade'),
+    uniqueIndex('lab_activity_unique').on(t.orgId, t.labId, t.userId, t.kind, t.day),
+  ],
+);

@@ -4,6 +4,7 @@ import { ruleForGroup, solutionsOpen, stateOf } from '../../shared/lab-visibilit
 import { type LabList, type LabRule, type LabView, labAccessInput, labInput, updateLabInput } from '../../shared/labs';
 import type { TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
+import { labActivityRoutes } from './activity';
 import { forbidden, invalidRequest } from './course-context';
 import { type Lab, type LabContext, labContext, openToViewer, visibleLab } from './lab-context';
 import { notebookRoutes } from './notebooks';
@@ -126,4 +127,5 @@ export const labRoutes = new Hono<TenantEnv>()
     return c.json(view(await labContext(c), lab));
   })
 
-  .route('/:labId/notebooks', notebookRoutes);
+  .route('/:labId/notebooks', notebookRoutes)
+  .route('/:labId/activity', labActivityRoutes);

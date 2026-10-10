@@ -1,7 +1,9 @@
 import {
   and,
   asc,
+  countDistinct,
   eq,
+  gte,
   type InferInsertModel,
   type InferSelectModel,
   inArray,
@@ -9,6 +11,7 @@ import {
   like,
   or,
   type SQL,
+  sql,
 } from 'drizzle-orm';
 import { roleExists } from './access';
 import { uuidv7 } from './ids';
@@ -21,6 +24,7 @@ import {
   files,
   groups,
   labAccess,
+  labActivity,
   labs,
   memberships,
   notebooks,
@@ -529,6 +533,78 @@ function tenantStudents(db: Db, orgId: string) {
   };
 }
 
+/** Learning activity (#18): recorded once per student, lab, kind and day; read only as counts. */
+function tenantActivity(db: Db, orgId: string) {
+  return {
+    /** Records that the student did this today; doing it again the same day changes nothing. */
+    async record(row: { labId: string; userId: string; kind: 'view' | 'download' | 'visualization'; day: string }) {
+      await rethrowMissingParent(
+        db
+          .insert(labActivity)
+          .values({ ...row, id: uuidv7(), orgId })
+          .onConflictDoNothing(),
+      );
+    },
+
+    /**
+     * Counts for a course: distinct students per week and kind since `since`, and per lab and kind
+     * overall. Only students of `groupIds` count (all the course's groups when null), so staff
+     * activity never shows and a pedagog of one group sees only that group.
+     */
+    async report({ courseId, groupIds, since }: { courseId: string; groupIds: string[] | null; since: string }) {
+      const courseLabs = db
+        .select({ id: labs.id })
+        .from(labs)
+        .where(and(eq(labs.orgId, orgId), eq(labs.courseId, courseId)));
+      const inGroups =
+        groupIds === null
+          ? inArray(
+              memberships.groupId,
+              db
+                .select({ id: groups.id })
+                .from(groups)
+                .where(and(eq(groups.orgId, orgId), eq(groups.courseId, courseId))),
+            )
+          : inArray(memberships.groupId, groupIds.length ? groupIds : ['']);
+      const students = db
+        .selectDistinct({ id: memberships.userId })
+        .from(memberships)
+        .where(and(eq(memberships.orgId, orgId), eq(memberships.role, 'student'), inGroups));
+      const counted = and(
+        eq(labActivity.orgId, orgId),
+        inArray(labActivity.labId, courseLabs),
+        inArray(labActivity.userId, students),
+      );
+      // The Monday of the row's week.
+      const week = sql<string>`date(${labActivity.day}, '-' || ((cast(strftime('%w', ${labActivity.day}) as integer) + 6) % 7) || ' days')`;
+      const recent = gte(labActivity.day, since);
+
+      const [enrolled, perWeekKind, perWeek, perLab] = await Promise.all([
+        db
+          .select({ n: countDistinct(memberships.userId) })
+          .from(memberships)
+          .where(and(eq(memberships.orgId, orgId), eq(memberships.role, 'student'), inGroups)),
+        db
+          .select({ week, kind: labActivity.kind, students: countDistinct(labActivity.userId) })
+          .from(labActivity)
+          .where(and(counted, recent))
+          .groupBy(week, labActivity.kind),
+        db
+          .select({ week, students: countDistinct(labActivity.userId) })
+          .from(labActivity)
+          .where(and(counted, recent))
+          .groupBy(week),
+        db
+          .select({ labId: labActivity.labId, kind: labActivity.kind, students: countDistinct(labActivity.userId) })
+          .from(labActivity)
+          .where(counted)
+          .groupBy(labActivity.labId, labActivity.kind),
+      ]);
+      return { students: enrolled[0]?.n ?? 0, perWeekKind, perWeek, perLab };
+    },
+  };
+}
+
 export function forTenant(db: Db, orgId: string) {
   const members = tenantUsers(db, orgId);
   return {
@@ -542,6 +618,7 @@ export function forTenant(db: Db, orgId: string) {
     labAccess: tenantLabAccess(db, orgId),
     students: tenantStudents(db, orgId),
     notebooks: tenantNotebooks(db, orgId),
+    activity: tenantActivity(db, orgId),
   };
 }
 

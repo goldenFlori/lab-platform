@@ -46,7 +46,8 @@ export type GroupView = {
 export type CourseDetail = {
   course: CourseSummary;
   groups: GroupView[];
-  permissions: { manage: boolean };
+  /** analytics: may see the course's activity, for the whole course or some of its groups (#18). */
+  permissions: { manage: boolean; analytics: boolean };
 };
 
 export type JoinResult = {

@@ -5,6 +5,7 @@ import {
   Archive,
   ArchiveRestore,
   ArrowLeft,
+  BarChart3,
   Lock,
   MonitorUp,
   Plus,
@@ -58,16 +59,27 @@ function CoursePage() {
           </div>
           <p className="mt-1 text-muted">Viti akademik {course.academicYear}</p>
         </div>
-        {permissions.manage && (
-          <Button
-            variant="tertiary"
-            isPending={changes.archive.isPending}
-            onPress={() => changes.archive.mutate(!archived)}
-          >
-            {archived ? <ArchiveRestore className="size-4" /> : <Archive className="size-4" />}
-            {archived ? 'Rikthe kursin' : 'Arkivo kursin'}
-          </Button>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          {permissions.analytics && (
+            <Link
+              to="/o/$org/courses/$courseId/activity"
+              params={{ org, courseId }}
+              className="button button--tertiary gap-2"
+            >
+              <BarChart3 className="size-4" /> Aktiviteti
+            </Link>
+          )}
+          {permissions.manage && (
+            <Button
+              variant="tertiary"
+              isPending={changes.archive.isPending}
+              onPress={() => changes.archive.mutate(!archived)}
+            >
+              {archived ? <ArchiveRestore className="size-4" /> : <Archive className="size-4" />}
+              {archived ? 'Rikthe kursin' : 'Arkivo kursin'}
+            </Button>
+          )}
+        </div>
       </div>
 
       {isStaff && (
