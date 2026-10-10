@@ -158,7 +158,10 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   lab's notebooks with their outputs, figures and visualizations (sanitized), and uploading and
   editing them from the browser. Every course notebook renders with its visualizations
   (PRs #37, #39 and #40).
-- **Next:** #15, presentation mode.
+- **2026-10-10:** #15 done. Presentation mode: a lab's notebook fullscreen in class, one step at a
+  time with the keyboard, visualizations in place of desktop-window code, and the solved code
+  and outputs on a switch (PR #41).
+- **Next:** #16, importing the "Struktura Diskrete & Algoritme" course.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 

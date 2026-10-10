@@ -513,3 +513,18 @@
     min-height: 300px;
   }
 }
+
+/* Presentation mode: larger text for a projector at the back of the room */
+.presentation .nb-prose {
+  font-size: clamp(1.15rem, 0.8rem + 0.9vw, 1.6rem);
+}
+.presentation .nb-shiki pre,
+.presentation .nb-stream {
+  font-size: clamp(0.95rem, 0.7rem + 0.6vw, 1.25rem);
+}
+.presentation .notebook-step h2 {
+  font-size: clamp(1.75rem, 1rem + 2vw, 2.75rem);
+}
+.presentation .notebook-step h3 {
+  font-size: clamp(1.5rem, 0.9rem + 1.5vw, 2.25rem);
+}

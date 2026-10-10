@@ -12,7 +12,7 @@ export function Output({ out, fileUrl }: { out: OutputItem; fileUrl: (name: stri
           <div className="flex items-center gap-2 border-b border-separator px-4 py-1.5 text-[0.7rem] font-semibold tracking-wider text-muted uppercase">
             <Terminal className="size-3.5" aria-hidden="true" /> Rezultati
           </div>
-          <pre className="overflow-x-auto px-4 py-3 font-mono text-[0.8rem] leading-relaxed text-foreground/90">
+          <pre className="nb-stream overflow-x-auto px-4 py-3 font-mono text-[0.8rem] leading-relaxed text-foreground/90">
             {out.text}
           </pre>
         </div>

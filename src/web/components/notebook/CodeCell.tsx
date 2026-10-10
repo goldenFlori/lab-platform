@@ -9,7 +9,16 @@ import { Output } from './Output';
  * (Pygame, Tkinter) or needs a live Jupyter kernel folds completely; its interactive version, if the
  * notebook has one, is shown just above it.
  */
-export function CodeCell({ cell, fileUrl }: { cell: Cell; fileUrl: (name: string) => string }) {
+export function CodeCell({
+  cell,
+  fileUrl,
+  presenting = false,
+}: {
+  cell: Cell;
+  fileUrl: (name: string) => string;
+  /** Presentation mode: long code is shown in full, and the outputs are left to the presenter. */
+  presenting?: boolean;
+}) {
   const code = (
     <div
       className="nb-shiki"
@@ -66,7 +75,7 @@ export function CodeCell({ cell, fileUrl }: { cell: Cell; fileUrl: (name: string
           </span>
           <CopyButton text={cell.raw} />
         </div>
-        {cell.collapsed ? (
+        {cell.collapsed && !presenting ? (
           <details className="group">
             <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-2.5 text-sm text-muted select-none hover:text-foreground [&::-webkit-details-marker]:hidden">
               <ChevronDown className="size-4 transition-transform group-open:rotate-180" aria-hidden="true" />
@@ -79,10 +88,11 @@ export function CodeCell({ cell, fileUrl }: { cell: Cell; fileUrl: (name: string
           code
         )}
       </div>
-      {cell.outputs.map((out, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: a cell's outputs are fixed; i is their order
-        <Output key={i} out={out} fileUrl={fileUrl} />
-      ))}
+      {!presenting &&
+        cell.outputs.map((out, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: a cell's outputs are fixed; i is their order
+          <Output key={i} out={out} fileUrl={fileUrl} />
+        ))}
     </div>
   );
 }

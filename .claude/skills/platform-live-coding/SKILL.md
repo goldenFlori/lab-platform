@@ -40,13 +40,32 @@ This is the platform's core innovation and the main difference from Google Class
 - Students can always reset, or compare with the original.
 - Staff never see private scratch work unless it is submitted.
 
-## Presentation mode (phase 1; works without Pyodide)
+## Presentation mode (built in #15; works without Pyodide)
 
-- Fullscreen with a large font for projectors.
-- Step by step: explanation → code → ▶ run (live, phase 2) or reveal the stored output (phase 1).
-- Keyboard: ←/→ to move, Space to run or reveal, Esc to exit.
-- GUI cells open their visualization fullscreen.
-- For staff, a solution toggle shows the solved code and its real outputs.
+- **Where:** **Prezanto** on the lab page opens `/o/:org/courses/:courseId/labs/:labId/present`
+  for the notebook shown. The step is in the URL (`?step=`), so a reload keeps the place.
+- **Fullscreen** starts with that click, because browsers allow it only on a user gesture. On an
+  iPhone, which has no fullscreen for pages, the presentation still fills the screen. Text, code
+  and headings are larger, for a projector.
+- **Steps** (`src/notebook/slides.ts`, unit-tested):
+  - one per cell: explanation, code, or visualization;
+  - a cell that only opens a section becomes a large title slide;
+  - code that opens a desktop window gives way to its visualization;
+  - any other visualization follows its cell.
+  - Phase 2 adds ▶ run beside reveal.
+- **Keyboard:**
+  - → and PageDown (what clickers send) move on, but first show a step's hidden output, like a
+    slide that builds;
+  - ← and PageUp go back;
+  - Space shows or hides the output;
+  - Home and End jump;
+  - Esc leaves, back to the same notebook.
+  - Inside a visualization its own keys apply, and Esc hands the keyboard back to the slides.
+- **Solution switch** (S, or the **Zgjidhja** button): it appears when the lab has a solution
+  notebook with the same cells and text (`isSolutionOf`). All 6 course solution notebooks match
+  their student versions. Each code step then shows the solved code and its real outputs. It
+  follows the API's permissions: students get it only once the solutions are open.
+- **Tested:** a whole lab is presented with the keyboard alone, on desktop and phone.
 
 ## Exercises and grading
 

@@ -1,7 +1,17 @@
 import { Alert, Chip } from '@heroui/react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
-import { ArrowLeft, ArrowRight, BookMarked, ChevronRight, Download, FileText, KeyRound, Sparkles } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  BookMarked,
+  ChevronRight,
+  Download,
+  FileText,
+  KeyRound,
+  Presentation,
+  Sparkles,
+} from 'lucide-react';
 import type { LabView } from '../../../../../../../../shared/labs';
 import { ORIGINAL_FILE } from '../../../../../../../../shared/notebook-files';
 import type { Embed, NotebookKind, NotebookSummary } from '../../../../../../../../shared/notebooks';
@@ -118,6 +128,16 @@ function LabPage() {
               <a href={notebookFileUrl(ref, ORIGINAL_FILE)} download className="button button--primary gap-2">
                 <Download className="size-4" aria-hidden="true" /> Shkarko fletoren
               </a>
+              <Link
+                to="/o/$org/courses/$courseId/labs/$labId/present"
+                params={{ org, courseId, labId }}
+                search={{ notebook: ref.notebookId }}
+                // Fullscreen needs the click itself, so it starts here rather than on the next page.
+                onClick={() => void document.documentElement.requestFullscreen?.().catch(() => undefined)}
+                className="button button--secondary gap-2"
+              >
+                <Presentation className="size-4" aria-hidden="true" /> Prezanto
+              </Link>
               {firstEmbed && (
                 <a href={`#${embedAnchor(ref.notebookId, firstEmbed.cell)}`} className="button button--tertiary gap-2">
                   <Sparkles className="size-4" aria-hidden="true" /> Te vizualizimi i parë

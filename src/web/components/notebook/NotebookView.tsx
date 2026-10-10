@@ -13,7 +13,8 @@ import { CodeCell } from './CodeCell';
 // tidily with long implementations folded, and an exercise that opens a desktop window replaced
 // by its interactive version. Nothing here runs notebook code.
 
-const KIND: Partial<Record<SectionKind, { label: string; icon: LucideIcon; color: string }>> = {
+/** How each kind of section is marked: exercise, theory, classwork and so on. */
+export const SECTION_KINDS: Partial<Record<SectionKind, { label: string; icon: LucideIcon; color: string }>> = {
   exercise: { label: 'Ushtrim', icon: FlaskConical, color: 'var(--accent)' },
   theory: { label: 'Teori', icon: BookOpen, color: 'var(--brand-2)' },
   classwork: { label: 'Punë në klasë', icon: Users, color: 'var(--warning)' },
@@ -71,7 +72,8 @@ export function NotebookView({
   );
 }
 
-function Markdown({ cell }: { cell: MarkdownCell }) {
+/** One markdown cell: reading text, or a section card when it starts an exercise, theory and so on. */
+export function Markdown({ cell }: { cell: MarkdownCell }) {
   const body = cell.html.trim() ? (
     <div
       className="nb-prose"
@@ -79,7 +81,7 @@ function Markdown({ cell }: { cell: MarkdownCell }) {
       dangerouslySetInnerHTML={{ __html: sanitize(cell.html) }}
     />
   ) : null;
-  const meta = KIND[cell.kind];
+  const meta = SECTION_KINDS[cell.kind];
   const level = cell.level ?? 2;
 
   if (meta && cell.heading) {
