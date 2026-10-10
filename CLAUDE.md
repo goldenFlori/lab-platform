@@ -112,5 +112,7 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   the free plan. Write many rows as multi-row inserts of `ROWS_PER_INSERT` rows, split big jobs
   into several requests, and test parameter counts with `toSQL()`. The local database does not
   enforce these limits.
+- **Uploaded files are served safely:** only allowlisted types, with `nosniff` and a sandboxing
+  CSP (`src/api/routes/notebooks.ts`). Staff upload, but students open them.
 - **Student data stays in the EU or encrypted.** The production database has the EU jurisdiction;
   backups are encrypted with the owner's key. Never commit, log or upload a plaintext export.

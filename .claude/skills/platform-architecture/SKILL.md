@@ -233,9 +233,10 @@ Planned:
 organizations + branding, settings
 org_domains(org_id, domain, kind: staff|student, verified_at)
 join codes on groups (#10)
-notebooks(id, lab_id, kind: student|solution|extra, source_ipynb_ref, rendered_ref, sha256)
-notebook_cells(notebook_id, idx, type, html, outputs_json, interactive, embed)  -- FTS5 index on text
-files(id, org_id, name, mime, size, chunk_count) + file_chunks(file_id, n, data)
+notebooks(id, org_id, lab_id, kind: main|extra|solution, title, position, original_name, sha256, ready_at)  -- built (#14)
+files(id, org_id, notebook_id?, name, mime, encoding, size, chunk_count) + file_chunks(org_id, file_id, n, data)  -- built (#14)
+embeds(id, org_id, notebook_id, cell, viz, title?, props?)  -- built (#14)
+notebook_cells(notebook_id, idx, text)  -- FTS5 index for search (#17)
 submissions, exercise_results, live_sessions, ai_logs, analytics_events (later phases)
 login_attempts(key, window_start, count)
 ```
@@ -299,11 +300,26 @@ Built in #8: `src/api/auth/`, data access in `src/api/db/auth.ts`, routes in
     site converter's output for each (HTML as fingerprints). Every one must match.
     `scripts/snapshot-course-notebooks.ts` rewrites the snapshots from the course repo. Do it
     only on purpose.
-  - Rendered cells and the original are stored.
+  - **Storage** (#14), `src/api/routes/notebooks.ts`:
+    - a lab has notebooks (`main`, `extra` or `solution`);
+    - each notebook has files: `notebook.ipynb` (the original), `rendered.json` (the converted
+      cells) and its images and figures under the converter's names;
+    - files are kept in `file_chunks` of at most 512 KB, since D1 allows 2 MB per value.
+  - **Gzip end to end:** the browser gzips the converted cells (up to 1.5 MB raw for the course
+    notebooks, about ten times smaller gzipped) and Plotly figures before upload. The Worker
+    serves them as stored, with `Content-Encoding: gzip` and `encodeBody: "manual"`, so it
+    never parses or re-encodes them. It unpacks only for clients that do not accept gzip.
+  - **Upload in steps** within D1's limits: `POST` the notebook, `PUT` each file (at most
+    10 MB), then `POST …/ready`. Until it is ready, only staff see it.
+  - **Uploaded files never run code on our origin:** only an allowlist of types is accepted
+    (JSON, ipynb, PNG, JPEG, GIF, SVG). Every file is served with `nosniff` and a sandboxing
+    `Content-Security-Policy`, and the original downloads as an attachment.
 - **Display:**
   - Cell HTML is sanitized with DOMPurify before it is shown.
   - Solution notebooks are served only with `solution.view`, or after `solutions_from`.
-- **Embeds** (cell → visualization + props) are stored as data. The admin UI edits them.
+- **Embeds** (cell → visualization + props) are stored as data: `embeds`, one per cell, from
+  the 13 ids in `src/shared/visualizers.ts`, replaced as a whole with
+  `PUT …/notebooks/:id/embeds`. Staff edit them in the app.
 - **Re-render all:** an admin action that re-converts the originals when the converter improves.
 
 ## Search
