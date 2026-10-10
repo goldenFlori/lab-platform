@@ -8,6 +8,7 @@
 
 import type { GEdge, GNode } from '../kit/GraphCanvas';
 import { natural } from './graphs';
+import { SCC_TEXT, type SccText } from './scc.text';
 
 export function reach(nodes: GNode[], edges: GEdge[], from: string, backwards = false): string[] {
   const adj = new Map<string, string[]>(nodes.map((n) => [n.id, []]));
@@ -37,13 +38,13 @@ export interface SccStep {
   line?: number;
 }
 
-export function sccSteps(nodes: GNode[], edges: GEdge[]): SccStep[] {
+export function sccSteps(nodes: GNode[], edges: GEdge[], T: SccText = SCC_TEXT.sq): SccStep[] {
   const steps: SccStep[] = [];
   const comps: string[][] = [];
   const assigned = new Set<string>();
   const ids = nodes.map((n) => n.id).sort(natural);
   steps.push({
-    note: 'Për çdo kulm të pacaktuar v: SCC(v) = **reach⁺(v) ∩ reach⁻(v)** — kulmet që v i arrin **dhe** që e arrijnë v.',
+    note: T.start,
     pivot: null,
     forward: [],
     backward: [],
@@ -54,7 +55,7 @@ export function sccSteps(nodes: GNode[], edges: GEdge[]): SccStep[] {
     if (assigned.has(v)) continue;
     const fwd = reach(nodes, edges, v);
     steps.push({
-      note: `Zgjedhim **${v}**. BFS përpara: reach⁺(${v}) = {${fwd.join(', ')}} — kulmet që arrihen nga ${v}.`,
+      note: T.forward(v, fwd.join(', ')),
       pivot: v,
       forward: fwd,
       backward: [],
@@ -63,7 +64,7 @@ export function sccSteps(nodes: GNode[], edges: GEdge[]): SccStep[] {
     });
     const bwd = reach(nodes, edges, v, true);
     steps.push({
-      note: `BFS mbrapa (harqet e kthyera): reach⁻(${v}) = {${bwd.join(', ')}} — kulmet që arrijnë ${v}.`,
+      note: T.backward(v, bwd.join(', ')),
       pivot: v,
       forward: fwd,
       backward: bwd,
@@ -74,7 +75,7 @@ export function sccSteps(nodes: GNode[], edges: GEdge[]): SccStep[] {
     for (const x of comp) assigned.add(x);
     comps.push(comp);
     steps.push({
-      note: `Prerja jep **SCC ${comps.length} = {${comp.join(', ')}}**${comp.length === 1 ? ' — një kulm i vetëm, pa cikël që e kthen.' : '.'}`,
+      note: T.component(comps.length, comp.join(', '), comp.length === 1),
       pivot: v,
       forward: fwd,
       backward: bwd,
@@ -83,10 +84,7 @@ export function sccSteps(nodes: GNode[], edges: GEdge[]): SccStep[] {
     });
   }
   steps.push({
-    note:
-      comps.length === 1
-        ? `Një komponente e vetme: digrafi **është i lidhur fort** — çdo kulm arrin çdo kulm.`
-        : `Gjithsej **${comps.length} komponente të lidhura fort**. Digrafi nuk është i lidhur fort.`,
+    note: comps.length === 1 ? T.strong : T.done(comps.length),
     pivot: null,
     forward: [],
     backward: [],

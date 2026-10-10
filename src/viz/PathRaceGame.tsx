@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { floydSteps, fwPath, weightMatrix } from './algorithms/shortest';
 import { fitLayout, type GEdge, type GNode, GraphCanvas } from './kit/GraphCanvas';
 import { StepNote, VizShell } from './kit/shell';
+import { bilingual, useText } from './kit/text';
 
 /* =====================================================================
  *  Gara e Rrugëve — Laboratori 7, Ushtrimi 6
@@ -75,7 +76,53 @@ const FIRST_ROUNDS: [number, number][] = [
 
 const weight = (a: string, b: string) => EDGES.find((e) => (e.u === a && e.v === b) || (e.u === b && e.v === a))?.w;
 
+const TEXT = bilingual(
+  {
+    notNeighbours: (last: string, id: string) =>
+      `${last} dhe ${id} nuk janë fqinjë — zgjidhni një qytet të lidhur me **${last}**.`,
+    repeated: (id: string) => `${id} është tashmë në rrugë — një rrugë e shkurtër nuk e përsërit një qytet.`,
+    title: 'Gara e rrugëve — Floyd-Warshall',
+    subtitle:
+      'Ndërtoni rrugën më të shkurtër duke klikuar qytetet me radhë. Pas konfirmimit, matrica P zbulon rrugën optimale.',
+    over: (score: number, max: number) => `Gara mbaroi: **${score} / ${max} pikë**.`,
+    newRounds: 'Raunde të reja',
+    missed: (dst: string, best: string, cost: number) =>
+      `Rruga nuk mbërriti te **${dst}**. Optimalja: ${best} = **${cost}**. 0 pikë.`,
+    optimal: (route: string, cost: number) => `**Optimale!** ${route} = ${cost}. +15 pikë.`,
+    valid: (cost: number, best: string, bestCost: number, points: number) =>
+      `Rrugë e vlefshme (${cost}), por optimalja është **${best} = ${bestCost}**. +${points} pikë.`,
+    result: 'Rezultati',
+    next: 'Raundi tjetër',
+    round: (n: number, src: string, dst: string, route: string, cost: number) =>
+      `Raundi ${n}: nga **${src}** te **${dst}**. Rruga juaj: ${route} (kosto ${cost}).`,
+    undo: 'Zhbëj',
+    confirm: 'Konfirmo',
+    map: 'Harta e garës me 8 qytete',
+  },
+  {
+    notNeighbours: (last, id) => `${last} and ${id} are not neighbours — choose a city connected to **${last}**.`,
+    repeated: (id) => `${id} is already on the path — a shortest path never visits a city twice.`,
+    title: 'The path race — Floyd-Warshall',
+    subtitle:
+      'Build the shortest path by clicking the cities in order. Once you confirm, the matrix P reveals the optimal path.',
+    over: (score, max) => `The race is over: **${score} / ${max} points**.`,
+    newRounds: 'New rounds',
+    missed: (dst, best, cost) => `The path did not reach **${dst}**. The optimal one: ${best} = **${cost}**. 0 points.`,
+    optimal: (route, cost) => `**Optimal!** ${route} = ${cost}. +15 points.`,
+    valid: (cost, best, bestCost, points) =>
+      `A valid path (${cost}), but the optimal one is **${best} = ${bestCost}**. +${points} points.`,
+    result: 'Result',
+    next: 'Next round',
+    round: (n, src, dst, route, cost) =>
+      `Round ${n}: from **${src}** to **${dst}**. Your path: ${route} (cost ${cost}).`,
+    undo: 'Undo',
+    confirm: 'Confirm',
+    map: 'The race map with 8 cities',
+  },
+);
+
 export default function PathRaceGame() {
+  const T = useText(TEXT);
   const [rounds, setRounds] = useState<[number, number][]>(FIRST_ROUNDS);
   const [r, setR] = useState(0);
   const [route, setRoute] = useState<string[]>([CITIES[FIRST_ROUNDS[0][0]]]);
@@ -102,10 +149,8 @@ export default function PathRaceGame() {
     if (result || over) return;
     const last = route[route.length - 1];
     if (id === last) return;
-    if (weight(last, id) === undefined)
-      return setMsg(`${last} dhe ${id} nuk janë fqinjë — zgjidhni një qytet të lidhur me **${last}**.`);
-    if (route.includes(id))
-      return setMsg(`${id} është tashmë në rrugë — një rrugë e shkurtër nuk e përsërit një qytet.`);
+    if (weight(last, id) === undefined) return setMsg(T.notNeighbours(last, id));
+    if (route.includes(id)) return setMsg(T.repeated(id));
     setMsg(null);
     setRoute([...route, id]);
   };
@@ -144,8 +189,8 @@ export default function PathRaceGame() {
 
   return (
     <VizShell
-      title="Gara e rrugëve — Floyd-Warshall"
-      subtitle="Ndërtoni rrugën më të shkurtër duke klikuar qytetet me radhë. Pas konfirmimit, matrica P zbulon rrugën optimale."
+      title={T.title}
+      subtitle={T.subtitle}
       icon={<Flag />}
       badges={
         <div className="flex items-center gap-2">
@@ -161,10 +206,10 @@ export default function PathRaceGame() {
         over ? (
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="flex-1">
-              <StepNote tone="success" text={`Gara mbaroi: **${score} / ${ROUNDS * 15} pikë**.`} />
+              <StepNote tone="success" text={T.over(score, ROUNDS * 15)} />
             </div>
             <Button onPress={restart}>
-              <RotateCcw /> Raunde të reja
+              <RotateCcw /> {T.newRounds}
             </Button>
           </div>
         ) : result ? (
@@ -174,15 +219,15 @@ export default function PathRaceGame() {
                 tone={result.points === 15 ? 'success' : result.points ? 'warning' : 'danger'}
                 text={
                   result.cost === null
-                    ? `Rruga nuk mbërriti te **${dst}**. Optimalja: ${result.bestRoute.join(' → ')} = **${result.best}**. 0 pikë.`
+                    ? T.missed(dst, result.bestRoute.join(' → '), result.best)
                     : result.points === 15
-                      ? `**Optimale!** ${route.join(' → ')} = ${result.cost}. +15 pikë.`
-                      : `Rrugë e vlefshme (${result.cost}), por optimalja është **${result.bestRoute.join(' → ')} = ${result.best}**. +${result.points} pikë.`
+                      ? T.optimal(route.join(' → '), result.cost)
+                      : T.valid(result.cost, result.bestRoute.join(' → '), result.best, result.points)
                 }
               />
             </div>
             <Button onPress={next}>
-              {r === ROUNDS - 1 ? 'Rezultati' : 'Raundi tjetër'} <ArrowRight />
+              {r === ROUNDS - 1 ? T.result : T.next} <ArrowRight />
             </Button>
           </div>
         ) : (
@@ -190,18 +235,15 @@ export default function PathRaceGame() {
             <div className="flex-1">
               <StepNote
                 tone={msg ? 'danger' : 'accent'}
-                text={
-                  msg ??
-                  `Raundi ${r + 1}: nga **${src}** te **${dst}**. Rruga juaj: ${route.join(' → ')} (kosto ${cost}).`
-                }
+                text={msg ?? T.round(r + 1, src, dst, route.join(' → '), cost)}
               />
             </div>
             <div className="flex gap-2">
               <Button variant="tertiary" isDisabled={route.length < 2} onPress={() => setRoute(route.slice(0, -1))}>
-                <Undo2 /> Zhbëj
+                <Undo2 /> {T.undo}
               </Button>
               <Button isDisabled={route.length < 2} onPress={confirm}>
-                <Check /> Konfirmo
+                <Check /> {T.confirm}
               </Button>
             </div>
           </div>
@@ -244,7 +286,7 @@ export default function PathRaceGame() {
                   ? { stroke: 'var(--viz-done)', width: 4.5, front: true }
                   : {}
             }
-            ariaLabel="Harta e garës me 8 qytete"
+            ariaLabel={T.map}
           />
         </div>
       </div>

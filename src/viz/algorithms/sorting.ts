@@ -1,3 +1,5 @@
+import type { SortingText } from './sorting.text';
+
 /* =====================================================================
  *  Sorting — Insertion, Selection, Merge.
  *  Counts COMPARISONS as the primary metric, exactly like Laboratori 3.
@@ -21,63 +23,38 @@ export interface SortStep {
   line?: number;
 }
 
-export const SORT_META: Record<
-  SortAlgo,
-  { name: string; best: string; avg: string; worst: string; idea: string; pseudo: string[] }
-> = {
+/** Names and complexities; what each algorithm does is in sorting.text.ts, in both languages. */
+export const SORT_META: Record<SortAlgo, { name: string; best: string; avg: string; worst: string }> = {
   insertion: {
     name: 'Insertion Sort',
     best: 'O(n)',
     avg: 'O(n²)',
     worst: 'O(n²)',
-    idea: 'Fut çdo element në pozicionin e duhur në pjesën e renditur — si të renditësh letrat në dorë.',
-    pseudo: [
-      'for i ⟵ 1, …, n−1:',
-      '    aktual = A[i];  j = i − 1',
-      '    while j ≥ 0 and A[j] > aktual:',
-      '        A[j+1] = A[j];  j = j − 1',
-      '    A[j+1] = aktual',
-    ],
   },
   selection: {
     name: 'Selection Sort',
     best: 'O(n²)',
     avg: 'O(n²)',
     worst: 'O(n²)',
-    idea: 'Në çdo hap gjen elementin më të vogël të pjesës së parenditur dhe e vendos në fund të pjesës së renditur.',
-    pseudo: [
-      'for i ⟵ 0, …, n−2:',
-      '    min = i',
-      '    for j ⟵ i+1, …, n−1:',
-      '        if A[j] < A[min]:  min = j',
-      '    këmbe A[i] me A[min]',
-    ],
   },
   merge: {
     name: 'Merge Sort',
     best: 'O(n log n)',
     avg: 'O(n log n)',
     worst: 'O(n log n)',
-    idea: 'Përça e sundo: ndaj listën përgjysmë, rendit secilën gjysmë rekursivisht, pastaj bashko (Merge) dy gjysmat e renditura.',
-    pseudo: [
-      'MergeSort(A):',
-      '    if len(A) ≤ 1: return A',
-      '    L = MergeSort(gjysma e majtë)',
-      '    R = MergeSort(gjysma e djathtë)',
-      '    return Merge(L, R)',
-    ],
   },
 };
 
 const range = (a: number, b: number) => Array.from({ length: Math.max(0, b - a + 1) }, (_, i) => a + i);
 
-export function insertionSteps(src: number[]): SortStep[] {
+export function insertionSteps(src: number[], text: SortingText): SortStep[] {
+  const T = text.insertion;
   const a = src.slice();
   const steps: SortStep[] = [];
   let c = 0,
     w = 0;
   steps.push({
-    note: 'Fillimi. Elementi i parë, A[0], formon vetë një listë të renditur.',
+    note: T.start,
     arr: a.slice(),
     sortedTo: 0,
     comparisons: c,
@@ -88,7 +65,7 @@ export function insertionSteps(src: number[]): SortStep[] {
     const v = a[i];
     let j = i - 1;
     steps.push({
-      note: `Marrim **aktual = A[${i}] = ${v}** dhe e fusim në pjesën e renditur A[0…${i - 1}].`,
+      note: T.take(i, v),
       arr: a.slice(),
       compare: [i],
       sortedTo: i - 1,
@@ -100,7 +77,7 @@ export function insertionSteps(src: number[]): SortStep[] {
       c++;
       const bigger = a[j] > v;
       steps.push({
-        note: `Krahasim: A[${j}] = ${a[j]} ${bigger ? '>' : '≤'} ${v}. ${bigger ? 'Spostojmë djathtas.' : 'Vendi u gjet — cikli `while` ndalon.'}`,
+        note: T.compare(j, a[j], bigger, v),
         arr: a.slice(),
         compare: [j],
         sortedTo: i - 1,
@@ -112,7 +89,7 @@ export function insertionSteps(src: number[]): SortStep[] {
       a[j + 1] = a[j];
       w++;
       steps.push({
-        note: `A[${j}] = ${a[j]} spostohet në pozicionin ${j + 1}.`,
+        note: T.shift(j, a[j]),
         arr: a.slice(),
         write: [j + 1],
         sortedTo: i - 1,
@@ -125,7 +102,7 @@ export function insertionSteps(src: number[]): SortStep[] {
     a[j + 1] = v;
     w++;
     steps.push({
-      note: `${v} vendoset në pozicionin ${j + 1}. Tani **A[0…${i}] është e renditur** — hipoteza e induksionit vlen pas iteracionit ${i}.`,
+      note: T.place(v, j + 1, i),
       arr: a.slice(),
       write: [j + 1],
       sortedTo: i,
@@ -135,7 +112,7 @@ export function insertionSteps(src: number[]): SortStep[] {
     });
   }
   steps.push({
-    note: `Përfundoi: **${c} krahasime**, ${w} shkrime.`,
+    note: T.done(c, w),
     arr: a.slice(),
     sortedTo: a.length - 1,
     comparisons: c,
@@ -144,13 +121,14 @@ export function insertionSteps(src: number[]): SortStep[] {
   return steps;
 }
 
-export function selectionSteps(src: number[]): SortStep[] {
+export function selectionSteps(src: number[], text: SortingText): SortStep[] {
+  const T = text.selection;
   const a = src.slice();
   const steps: SortStep[] = [];
   let c = 0,
     w = 0;
   steps.push({
-    note: 'Fillimi. Asnjë element nuk është ende në pozicionin final.',
+    note: T.start,
     arr: a.slice(),
     sortedTo: -1,
     comparisons: c,
@@ -160,7 +138,7 @@ export function selectionSteps(src: number[]): SortStep[] {
   for (let i = 0; i < a.length - 1; i++) {
     let min = i;
     steps.push({
-      note: `Kandidati fillestar për minimum: A[${i}] = ${a[i]}.`,
+      note: T.candidate(i, a[i]),
       arr: a.slice(),
       compare: [i],
       sortedTo: i - 1,
@@ -173,7 +151,7 @@ export function selectionSteps(src: number[]): SortStep[] {
       const smaller = a[j] < a[min];
       if (smaller) min = j;
       steps.push({
-        note: `Krahasim: A[${j}] = ${a[j]} ${smaller ? '<' : '≥'} minimumi aktual. ${smaller ? `Minimumi i ri: A[${min}] = ${a[min]}.` : 'Minimumi nuk ndryshon.'}`,
+        note: T.compare(j, a[j], smaller, min, a[min]),
         arr: a.slice(),
         compare: [j, min],
         sortedTo: i - 1,
@@ -187,10 +165,7 @@ export function selectionSteps(src: number[]): SortStep[] {
       w += 2;
     }
     steps.push({
-      note:
-        min !== i
-          ? `Këmbejmë A[${i}] me A[${min}]. **Pozicioni ${i} është final.**`
-          : `A[${i}] ishte tashmë minimumi. **Pozicioni ${i} është final.**`,
+      note: min !== i ? T.swap(i, min) : T.stay(i),
       arr: a.slice(),
       write: min !== i ? [i, min] : [i],
       sortedTo: i,
@@ -201,7 +176,7 @@ export function selectionSteps(src: number[]): SortStep[] {
   }
   const n = a.length;
   steps.push({
-    note: `Përfundoi: **${c} krahasime** — gjithmonë saktësisht n(n−1)/2 = ${(n * (n - 1)) / 2}, për çdo input.`,
+    note: T.done(c, (n * (n - 1)) / 2),
     arr: a.slice(),
     sortedTo: n - 1,
     comparisons: c,
@@ -210,13 +185,14 @@ export function selectionSteps(src: number[]): SortStep[] {
   return steps;
 }
 
-export function mergeSteps(src: number[]): SortStep[] {
+export function mergeSteps(src: number[], text: SortingText): SortStep[] {
+  const T = text.merge;
   const a = src.slice();
   const steps: SortStep[] = [];
   let c = 0,
     w = 0;
   steps.push({
-    note: 'Fillimi. Merge Sort e ndan listën përgjysmë në mënyrë rekursive, derisa çdo pjesë ka një element.',
+    note: T.start,
     arr: a.slice(),
     sortedSet: [],
     comparisons: c,
@@ -227,7 +203,7 @@ export function mergeSteps(src: number[]): SortStep[] {
     if (l >= r) return;
     const m = Math.floor((l + r) / 2);
     steps.push({
-      note: `PËRÇA: [${l}…${r}] → [${l}…${m}] dhe [${m + 1}…${r}].`,
+      note: T.split(l, m, r),
       arr: a.slice(),
       range: [l, r],
       sortedSet: [],
@@ -243,7 +219,7 @@ export function mergeSteps(src: number[]): SortStep[] {
       j = 0,
       k = l;
     steps.push({
-      note: `KOMBINO: Merge([${left.join(', ')}], [${right.join(', ')}]).`,
+      note: T.combine(left.join(', '), right.join(', ')),
       arr: a.slice(),
       range: [l, r],
       sortedSet: [],
@@ -255,7 +231,7 @@ export function mergeSteps(src: number[]): SortStep[] {
       c++;
       const takeLeft = left[i] <= right[j];
       steps.push({
-        note: `Krahasim: ${left[i]} ${takeLeft ? '≤' : '>'} ${right[j]} → marrim ${takeLeft ? left[i] : right[j]}.`,
+        note: T.compare(left[i], takeLeft, right[j]),
         arr: a.slice(),
         compare: [k],
         range: [l, r],
@@ -276,7 +252,7 @@ export function mergeSteps(src: number[]): SortStep[] {
       w++;
     }
     steps.push({
-      note: `Segmenti [${l}…${r}] është i renditur: [${a.slice(l, r + 1).join(', ')}].`,
+      note: T.sorted(l, r, a.slice(l, r + 1).join(', ')),
       arr: a.slice(),
       range: [l, r],
       sortedSet: range(l, r),
@@ -288,7 +264,7 @@ export function mergeSteps(src: number[]): SortStep[] {
   sort(0, a.length - 1);
   const n = a.length;
   steps.push({
-    note: `Përfundoi: **${c} krahasime** — afër n·log₂n = ${Math.round(n * Math.log2(Math.max(n, 2)))}.`,
+    note: T.done(c, Math.round(n * Math.log2(Math.max(n, 2)))),
     arr: a.slice(),
     sortedSet: range(0, n - 1),
     comparisons: c,
@@ -297,7 +273,7 @@ export function mergeSteps(src: number[]): SortStep[] {
   return steps;
 }
 
-export const SORT_RUN: Record<SortAlgo, (a: number[]) => SortStep[]> = {
+export const SORT_RUN: Record<SortAlgo, (a: number[], text: SortingText) => SortStep[]> = {
   insertion: insertionSteps,
   selection: selectionSteps,
   merge: mergeSteps,
@@ -386,13 +362,16 @@ export function makeInput(n: number, kind: Case, seed = 7): number[] {
   return a;
 }
 
-export function parseNumbers(text: string, max = 24): { values: number[]; error: string | null } {
+export function parseNumbers(
+  text: string,
+  T: SortingText['parse'],
+  max = 24,
+): { values: number[]; error: string | null } {
   const parts = text.split(/[^0-9.-]+/).filter(Boolean);
-  if (!parts.length) return { values: [], error: 'Shkruani të paktën dy numra.' };
+  if (!parts.length) return { values: [], error: T.empty };
   const values = parts.map(Number);
-  if (values.some((v) => !Number.isFinite(v)))
-    return { values: [], error: 'Përdorni vetëm numra, të ndarë me presje.' };
-  if (values.length < 2) return { values: [], error: 'Duhen të paktën dy numra.' };
-  if (values.length > max) return { values: values.slice(0, max), error: `U morën vetëm ${max} numrat e parë.` };
+  if (values.some((v) => !Number.isFinite(v))) return { values: [], error: T.notNumbers };
+  if (values.length < 2) return { values: [], error: T.tooFew };
+  if (values.length > max) return { values: values.slice(0, max), error: T.tooMany(max) };
   return { values, error: null };
 }

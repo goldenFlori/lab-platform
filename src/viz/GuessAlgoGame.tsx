@@ -3,6 +3,7 @@ import { ArrowRight, Gamepad2, RotateCcw, Trophy } from 'lucide-react';
 import { useState } from 'react';
 import { countComparisons, makeInput, SORT_META, type SortAlgo } from './algorithms/sorting';
 import { StepNote, VizShell } from './kit/shell';
+import { bilingual, useText } from './kit/text';
 
 /* =====================================================================
  *  Lojë: Gjej Algoritmin! — Laboratori 3, Ushtrimi 4
@@ -34,14 +35,59 @@ const FIRST: Puzzle = (() => {
   return { n: 24, algo: 'insertion', list, comparisons: countComparisons('insertion', list) };
 })();
 
-function explain(p: Puzzle) {
+const TEXT = bilingual(
+  {
+    selection: (sel: number) =>
+      `Selection Sort bën **gjithmonë saktësisht n(n−1)/2 = ${sel}** krahasime, pavarësisht nga rendi i listës.`,
+    merge: (nlog: number) => `Merge Sort bën afërsisht **n·log₂n ≈ ${nlog}** krahasime (pak më pak), për çdo listë.`,
+    insertion: (quarter: number, sel: number, nlog: number) =>
+      `Insertion Sort mbi një listë të rastit bën rreth **n²/4 ≈ ${quarter}** krahasime — shumë më pak se ${sel}, por shumë më tepër se ${nlog}.`,
+    title: 'Lojë: Gjej Algoritmin!',
+    subtitle: 'Programi renditi listën me një algoritëm të fshehur. Ju shihni vetëm numrin e krahasimeve.',
+    points: (n: number) => `${n} pikë`,
+    over: (score: number) =>
+      `Loja mbaroi! Morët **${score} pikë**. Strategjia: n(n−1)/2 → Selection · ≈ n·log₂n → Merge · midis tyre → Insertion.`,
+    again: 'Luaj sërish',
+    right: '**Saktë!**',
+    wrong: (name: string) => `**Jo** — ishte ${name}.`,
+    result: 'Shiko rezultatin',
+    nextRound: 'Raundi tjetër',
+    hint: 'Krahasoni numrin me dy vlerat referuese. Shtypni **I**, **S** ose **M**, ose klikoni një buton.',
+    list: (n: number) => `Lista me ${n} elemente`,
+    comparisons: 'Krahasime',
+    key: (k: string) => `tasti ${k}`,
+  },
+  {
+    selection: (sel) =>
+      `Selection Sort **always makes exactly n(n−1)/2 = ${sel}** comparisons, whatever the order of the list.`,
+    merge: (nlog) => `Merge Sort makes about **n·log₂n ≈ ${nlog}** comparisons (a little fewer), for any list.`,
+    insertion: (quarter, sel, nlog) =>
+      `Insertion Sort on a random list makes about **n²/4 ≈ ${quarter}** comparisons — far fewer than ${sel}, but far more than ${nlog}.`,
+    title: 'Game: Guess the algorithm!',
+    subtitle: 'The program sorted the list with a hidden algorithm. You only see the number of comparisons.',
+    points: (n) => `${n} points`,
+    over: (score) =>
+      `Game over! You scored **${score} points**. The strategy: n(n−1)/2 → Selection · ≈ n·log₂n → Merge · in between → Insertion.`,
+    again: 'Play again',
+    right: '**Right!**',
+    wrong: (name) => `**No** — it was ${name}.`,
+    result: 'See the result',
+    nextRound: 'Next round',
+    hint: 'Compare the number with the two reference values. Press **I**, **S** or **M**, or click a button.',
+    list: (n) => `A list of ${n} elements`,
+    comparisons: 'Comparisons',
+    key: (k) => `key ${k}`,
+  },
+);
+
+type GameText = (typeof TEXT)['sq'];
+
+function explain(L: GameText, p: Puzzle) {
   const sel = (p.n * (p.n - 1)) / 2;
   const nlog = Math.round(p.n * Math.log2(p.n));
-  if (p.algo === 'selection')
-    return `Selection Sort bën **gjithmonë saktësisht n(n−1)/2 = ${sel}** krahasime, pavarësisht nga rendi i listës.`;
-  if (p.algo === 'merge')
-    return `Merge Sort bën afërsisht **n·log₂n ≈ ${nlog}** krahasime (pak më pak), për çdo listë.`;
-  return `Insertion Sort mbi një listë të rastit bën rreth **n²/4 ≈ ${Math.round((p.n * p.n) / 4)}** krahasime — shumë më pak se ${sel}, por shumë më tepër se ${nlog}.`;
+  if (p.algo === 'selection') return L.selection(sel);
+  if (p.algo === 'merge') return L.merge(nlog);
+  return L.insertion(Math.round((p.n * p.n) / 4), sel, nlog);
 }
 
 export default function GuessAlgoGame() {
@@ -51,6 +97,7 @@ export default function GuessAlgoGame() {
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const over = round > ROUNDS;
+  const L = useText(TEXT);
 
   const choose = (a: SortAlgo) => {
     if (answer || over) return;
@@ -89,14 +136,14 @@ export default function GuessAlgoGame() {
 
   return (
     <VizShell
-      title="Lojë: Gjej Algoritmin!"
-      subtitle="Programi renditi listën me një algoritëm të fshehur. Ju shihni vetëm numrin e krahasimeve."
+      title={L.title}
+      subtitle={L.subtitle}
       icon={<Gamepad2 />}
       onKeyDown={onKey}
       badges={
         <div className="flex items-center gap-2">
           <Chip size="sm" variant="soft" color="accent">
-            <Trophy className="size-3" /> {score} pikë
+            <Trophy className="size-3" /> {L.points(score)}
           </Chip>
           <Chip size="sm" variant="soft">
             {Math.min(round, ROUNDS)} / {ROUNDS}
@@ -106,12 +153,9 @@ export default function GuessAlgoGame() {
       footer={
         over ? (
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <StepNote
-              text={`Loja mbaroi! Morët **${score} pikë**. Strategjia: n(n−1)/2 → Selection · ≈ n·log₂n → Merge · midis tyre → Insertion.`}
-              tone="success"
-            />
+            <StepNote text={L.over(score)} tone="success" />
             <Button onPress={restart}>
-              <RotateCcw /> Luaj sërish
+              <RotateCcw /> {L.again}
             </Button>
           </div>
         ) : answer ? (
@@ -119,18 +163,15 @@ export default function GuessAlgoGame() {
             <div className="flex-1">
               <StepNote
                 tone={answer === puzzle.algo ? 'success' : 'danger'}
-                text={`${answer === puzzle.algo ? '**Saktë!**' : `**Jo** — ishte ${SORT_META[puzzle.algo].name}.`} ${explain(puzzle)}`}
+                text={`${answer === puzzle.algo ? L.right : L.wrong(SORT_META[puzzle.algo].name)} ${explain(L, puzzle)}`}
               />
             </div>
             <Button onPress={next}>
-              {round === ROUNDS ? 'Shiko rezultatin' : 'Raundi tjetër'} <ArrowRight />
+              {round === ROUNDS ? L.result : L.nextRound} <ArrowRight />
             </Button>
           </div>
         ) : (
-          <StepNote
-            text="Krahasoni numrin me dy vlerat referuese. Shtypni **I**, **S** ose **M**, ose klikoni një buton."
-            tone="default"
-          />
+          <StepNote text={L.hint} tone="default" />
         )
       }
     >
@@ -139,7 +180,7 @@ export default function GuessAlgoGame() {
           <div
             className="flex items-end gap-[3px] rounded-2xl border border-border bg-[var(--viz-canvas)] p-3"
             style={{ height: 150 }}
-            aria-label={`Lista me ${puzzle.n} elemente`}
+            aria-label={L.list(puzzle.n)}
             role="img"
           >
             {puzzle.list.map((v, i) => (
@@ -168,7 +209,7 @@ export default function GuessAlgoGame() {
         </div>
         <div className="flex flex-col justify-between gap-4">
           <div className="rounded-3xl bg-gradient-to-br from-brand/12 via-brand-2/10 to-transparent p-5 text-center">
-            <div className="text-xs font-semibold tracking-wider text-muted uppercase">Krahasime</div>
+            <div className="text-xs font-semibold tracking-wider text-muted uppercase">{L.comparisons}</div>
             <div className="font-mono text-5xl font-bold tracking-tight tabular-nums">{puzzle.comparisons}</div>
           </div>
           <div className="grid grid-cols-3 gap-2">
@@ -185,7 +226,7 @@ export default function GuessAlgoGame() {
                   className="h-auto flex-col gap-0.5 rounded-2xl py-3"
                 >
                   <span className="text-[0.95rem] font-semibold">{SORT_META[a].name.split(' ')[0]}</span>
-                  <span className="font-mono text-[0.7rem] opacity-70">tasti {a[0].toUpperCase()}</span>
+                  <span className="font-mono text-[0.7rem] opacity-70">{L.key(a[0].toUpperCase())}</span>
                 </Button>
               );
             })}

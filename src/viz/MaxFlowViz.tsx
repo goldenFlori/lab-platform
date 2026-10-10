@@ -2,11 +2,13 @@ import { Button, Chip } from '@heroui/react';
 import { Droplets, Eye, Scissors, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { type FlowStep, maxflowSteps, residual, type Strategy, separated } from './algorithms/maxflow';
+import { MAXFLOW_TEXT } from './algorithms/maxflow.text';
 import { layeredLayout } from './algorithms/scc';
 import { Choice, Field, PlayerBar, Segmented } from './kit/controls';
 import { type EdgeLook, fitLayout, type GEdge, type GNode, GraphCanvas, type NodeLook } from './kit/GraphCanvas';
 import { must } from './kit/must';
 import { Legend, Panel, Pseudocode, Stat, StepNote, VizShell } from './kit/shell';
+import { bilingual, useText } from './kit/text';
 import { playerKeys, usePlayer } from './kit/usePlayer';
 
 /* =====================================================================
@@ -17,8 +19,6 @@ import { playerKeys, usePlayer } from './kit/usePlayer';
 
 interface FlowPreset {
   id: string;
-  name: string;
-  note: string;
   s: string;
   t: string;
   nodes: GNode[];
@@ -42,8 +42,6 @@ const auto = (ids: string[], edges: GEdge[]) => fitLayout(layeredLayout(ids, edg
 
 function preset(
   id: string,
-  name: string,
-  note: string,
   names: string[],
   list: number[][],
   opts: { pts?: [string, number, number][]; pill?: boolean } = {},
@@ -51,8 +49,6 @@ function preset(
   const edges = named(names, list);
   return {
     id,
-    name,
-    note,
     s: names[0],
     t: names[names.length - 1],
     edges,
@@ -66,8 +62,6 @@ const C = 40;
 export const FLOW_PRESETS: FlowPreset[] = [
   preset(
     'leksioni',
-    'Rrjeta e leksionit (slides 26–32)',
-    'Greedy ndalon te 16, maksimumi është 19.',
     ['s', '2', '3', '4', '5', 't'],
     [
       [0, 1, 10],
@@ -93,8 +87,6 @@ export const FLOW_PRESETS: FlowPreset[] = [
   ),
   preset(
     'romb',
-    'Rombi (slide 33)',
-    'E vetmja rrjedhë max ka f(u, v) = 0. Greedy gabon nëse zgjedh s → u → v → t.',
     ['s', 'u', 'v', 't'],
     [
       [0, 1, 2],
@@ -114,8 +106,6 @@ export const FLOW_PRESETS: FlowPreset[] = [
   ),
   preset(
     'C',
-    `Shembulli me C = ${C} (slides 66–74)`,
-    `Me rrugë të zgjedhura keq Ford-Fulkerson bën 2C = ${2 * C} iterime; Edmonds-Karp vetëm 2.`,
     ['s', 'a', 'b', 't'],
     [
       [0, 1, C],
@@ -135,8 +125,6 @@ export const FLOW_PRESETS: FlowPreset[] = [
   ),
   preset(
     'hidranti',
-    'Hidranti → depozita (Lab 9, Ush. 1)',
-    'Gjeni prerjen me kosto minimale që ndan hidrantin nga depozita.',
     ['Hidranti', 'B-1', 'B-2', 'B-3', 'B-4', 'Depozita'],
     [
       [0, 1, 10],
@@ -151,8 +139,6 @@ export const FLOW_PRESETS: FlowPreset[] = [
   ),
   preset(
     'qyteti',
-    'Ujësjellësi i qytetit (Lab 9, Ush. 2)',
-    'Ford-Fulkerson kundrejt Edmonds-Karp mbi të njëjtin rrjet.',
     ['S', '0', '1', '2', '3', 'T'],
     [
       [0, 1, 10],
@@ -166,8 +152,6 @@ export const FLOW_PRESETS: FlowPreset[] = [
   ),
   preset(
     'datacenter',
-    'Data center (Lab 9, Ush. 3)',
-    'Sa Gbps kalojnë nga DC te serveri? Cila lidhje është ngushtica?',
     ['DC', 'R-A', 'R-B', 'SW-1', 'SW-2', 'SW-3', 'SRV'],
     [
       [0, 1, 12],
@@ -187,8 +171,6 @@ export const FLOW_PRESETS: FlowPreset[] = [
   ),
   preset(
     'aeroporti',
-    'Aeroporti TIA (Lab 9, Ush. 4)',
-    'Pasagjerë në minutë nga terminali te bagazhet.',
     ['T-MAIN', 'Gate-A', 'Gate-B', 'Korr-N', 'Korr-S', 'Korr-W', 'Siguria', 'BAGGAGE'],
     [
       [0, 1, 18],
@@ -208,8 +190,6 @@ export const FLOW_PRESETS: FlowPreset[] = [
   ),
   preset(
     'centrali',
-    'Centrali → qyteti (Pipeline Defender)',
-    'Ndërpritni furnizimin me koston më të vogël.',
     ['Centrali', 'NS-A', 'NS-B', 'NS-C', 'TR-1', 'TR-2', 'TR-3', 'Qyteti'],
     [
       [0, 1, 15],
@@ -233,8 +213,6 @@ export const FLOW_PRESETS: FlowPreset[] = [
   ),
   preset(
     'ujesjellesi',
-    'Ujësjellësi në emergjencë (Lab 8, Ush. 3)',
-    'Edmonds-Karp: sa ujë arrin te qendra e emergjencës?',
     ['Rezervuari', 'SP-A', 'SP-B', 'SP-C', 'L-1', 'L-2', 'L-3', 'L-4', 'QE'],
     [
       [0, 1, 20],
@@ -264,10 +242,182 @@ const STRATS: { value: Strategy; label: string }[] = [
   { value: 'ek', label: 'Edmonds-Karp (BFS)' },
   { value: 'ff', label: 'Ford-Fulkerson (DFS)' },
   { value: 'greedy', label: 'Greedy' },
-  { value: 'adversary', label: 'Kundërshtari' },
+  { value: 'adversary', label: 'adversary' },
 ];
 
 const soft = (c: string, p = 24) => `color-mix(in oklab, ${c} ${p}%, var(--surface))`;
+
+const TEXT = bilingual(
+  {
+    presets: {
+      leksioni: { name: 'Rrjeta e leksionit (slides 26–32)', note: 'Greedy ndalon te 16, maksimumi është 19.' },
+      romb: {
+        name: 'Rombi (slide 33)',
+        note: 'E vetmja rrjedhë max ka f(u, v) = 0. Greedy gabon nëse zgjedh s → u → v → t.',
+      },
+      C: {
+        name: `Shembulli me C = ${C} (slides 66–74)`,
+        note: `Me rrugë të zgjedhura keq Ford-Fulkerson bën 2C = ${2 * C} iterime; Edmonds-Karp vetëm 2.`,
+      },
+      hidranti: {
+        name: 'Hidranti → depozita (Lab 9, Ush. 1)',
+        note: 'Gjeni prerjen me kosto minimale që ndan hidrantin nga depozita.',
+      },
+      qyteti: {
+        name: 'Ujësjellësi i qytetit (Lab 9, Ush. 2)',
+        note: 'Ford-Fulkerson kundrejt Edmonds-Karp mbi të njëjtin rrjet.',
+      },
+      datacenter: {
+        name: 'Data center (Lab 9, Ush. 3)',
+        note: 'Sa Gbps kalojnë nga DC te serveri? Cila lidhje është ngushtica?',
+      },
+      aeroporti: { name: 'Aeroporti TIA (Lab 9, Ush. 4)', note: 'Pasagjerë në minutë nga terminali te bagazhet.' },
+      centrali: { name: 'Centrali → qyteti (Pipeline Defender)', note: 'Ndërpritni furnizimin me koston më të vogël.' },
+      ujesjellesi: {
+        name: 'Ujësjellësi në emergjencë (Lab 8, Ush. 3)',
+        note: 'Edmonds-Karp: sa ujë arrin te qendra e emergjencës?',
+      },
+    } as Record<string, { name: string; note: string }>,
+    adversary: 'Kundërshtari',
+    title: 'Rrjedha maksimale dhe prerja minimale',
+    subtitle:
+      'Ford-Fulkerson: sa kohë ka rrugë rritëse në rrjetën mbetëse, rrit rrjedhën. Kur s’ka më, kulmet e arritshme japin prerjen minimale.',
+    mode: 'Mënyra',
+    algorithm: 'Algoritmi',
+    findCut: 'Gjej prerjen min',
+    network: 'Rrjeti',
+    pathStrategy: 'Strategjia e rrugës',
+    strategy: 'Strategjia',
+    show: 'Shfaq',
+    view: 'Pamja',
+    graphG: 'Rrjeta G (f/c)',
+    residualGf: 'Mbetëse G_f',
+    cutStart: (s: string, t: string) =>
+      `Klikoni tubat (brinjët) për t’i prerë. Qëllimi: të ndani **${s}** nga **${t}** me koston më të vogël.`,
+    stillFlows: (s: string, t: string, cost: number) =>
+      `Rrjedha ende kalon: ${t} arrihet nga ${s}. Kosto deri tani: ${cost}.`,
+    minCut: (cost: number) =>
+      `**Prerje minimale!** Kosto = ${cost} = rrjedha maksimale. Teorema rrjedhë-max = prerje-min në veprim.`,
+    validCut: (cost: number, max: number) =>
+      `Prerje e vlefshme me kosto **${cost}** — por ka një më të lirë. Çdo prerje ka kosto ≥ rrjedha max = ${max}.`,
+    residual: 'Rrjeta mbetëse',
+    flowNetwork: (name: string) => `Rrjeta rrjedhë: ${name}`,
+    augmenting: 'Rruga rritëse',
+    backOnPath: 'Brinjë kthyese në rrugë (−x)',
+    carries: 'Mbart rrjedhë',
+    saturated: 'E ngopur f = c',
+    forward: 'Brinjë e drejtë: c − f',
+    backward: 'Brinjë kthyese: f',
+    sideS: 'Ana S (arrihet nga burimi)',
+    cutEdge: 'Brinjë e prerë',
+    value: 'Vlera v(f)',
+    iterations: 'Iterime',
+    pseudo: [
+      'f ← 0;  G_f ← G',
+      'while t arrihet nga s në G_f:',
+      '  P = rrugë s→t në G_f',
+      '  f = rritRrjedhë(P, f)',
+      '  rinovo G_f',
+      'return f',
+    ],
+    paths: (n: number) => `Rrugët rritëse (${n})`,
+    none: 'Ende asnjë.',
+    cutCost: 'Kosto e prerjes',
+    maxFlow: 'Rrjedha max',
+    status: 'Statusi',
+    separated: (s: string, t: string) => `${s} dhe ${t} të ndarë`,
+    reachable: (t: string) => `${t} ende arrihet`,
+    minimal: 'prerje minimale ✓',
+    capacityStart: 'Kapaciteti i një prerjeje numëron vetëm brinjët',
+    fromStoT: 'nga S te T',
+    capacityEnd: 'Lema 1 (dualiteti i dobët): v(f) ≤ c(S, T) për çdo rrjedhë dhe çdo prerje.',
+  },
+  {
+    presets: {
+      leksioni: { name: 'The lecture’s network (slides 26–32)', note: 'Greedy stops at 16; the maximum is 19.' },
+      romb: {
+        name: 'The diamond (slide 33)',
+        note: 'The only max flow has f(u, v) = 0. Greedy goes wrong if it picks s → u → v → t.',
+      },
+      C: {
+        name: `The example with C = ${C} (slides 66–74)`,
+        note: `With badly chosen paths Ford-Fulkerson makes 2C = ${2 * C} iterations; Edmonds-Karp only 2.`,
+      },
+      hidranti: {
+        name: 'Hydrant → reservoir (Lab 9, Ex. 1)',
+        note: 'Find the cheapest cut that separates the hydrant from the reservoir.',
+      },
+      qyteti: {
+        name: 'The city water supply (Lab 9, Ex. 2)',
+        note: 'Ford-Fulkerson versus Edmonds-Karp on the same network.',
+      },
+      datacenter: {
+        name: 'Data center (Lab 9, Ex. 3)',
+        note: 'How many Gbps get from the DC to the server? Which link is the bottleneck?',
+      },
+      aeroporti: {
+        name: 'TIA airport (Lab 9, Ex. 4)',
+        note: 'Passengers per minute from the terminal to the baggage hall.',
+      },
+      centrali: { name: 'Power plant → city (Pipeline Defender)', note: 'Cut the supply at the lowest cost.' },
+      ujesjellesi: {
+        name: 'Water supply in an emergency (Lab 8, Ex. 3)',
+        note: 'Edmonds-Karp: how much water reaches the emergency centre?',
+      },
+    },
+    adversary: 'Adversary',
+    title: 'Maximum flow and minimum cut',
+    subtitle:
+      'Ford-Fulkerson: while the residual network has an augmenting path, push flow. When there are none, the reachable vertices give the minimum cut.',
+    mode: 'Mode',
+    algorithm: 'Algorithm',
+    findCut: 'Find the min cut',
+    network: 'Network',
+    pathStrategy: 'Path strategy',
+    strategy: 'Strategy',
+    show: 'Show',
+    view: 'View',
+    graphG: 'Network G (f/c)',
+    residualGf: 'Residual G_f',
+    cutStart: (s, t) =>
+      `Click the pipes (edges) to cut them. The goal: separate **${s}** from **${t}** at the lowest cost.`,
+    stillFlows: (s, t, cost) => `Flow still gets through: ${t} is reachable from ${s}. Cost so far: ${cost}.`,
+    minCut: (cost) => `**Minimum cut!** Cost = ${cost} = the maximum flow. The max-flow = min-cut theorem in action.`,
+    validCut: (cost, max) =>
+      `A valid cut costing **${cost}** — but there is a cheaper one. Every cut costs ≥ the max flow = ${max}.`,
+    residual: 'Residual network',
+    flowNetwork: (name) => `Flow network: ${name}`,
+    augmenting: 'Augmenting path',
+    backOnPath: 'Back edge on the path (−x)',
+    carries: 'Carries flow',
+    saturated: 'Saturated f = c',
+    forward: 'Forward edge: c − f',
+    backward: 'Back edge: f',
+    sideS: 'Side S (reachable from the source)',
+    cutEdge: 'Cut edge',
+    value: 'Value v(f)',
+    iterations: 'Iterations',
+    pseudo: [
+      'f ← 0;  G_f ← G',
+      'while t is reachable from s in G_f:',
+      '  P = path s→t in G_f',
+      '  f = augment(P, f)',
+      '  update G_f',
+      'return f',
+    ],
+    paths: (n) => `Augmenting paths (${n})`,
+    none: 'None yet.',
+    cutCost: 'Cut cost',
+    maxFlow: 'Max flow',
+    status: 'Status',
+    separated: (s, t) => `${s} and ${t} separated`,
+    reachable: (t) => `${t} still reachable`,
+    minimal: 'minimum cut ✓',
+    capacityStart: 'A cut’s capacity counts only the edges',
+    fromStoT: 'from S to T',
+    capacityEnd: 'Lemma 1 (weak duality): v(f) ≤ c(S, T) for every flow and every cut.',
+  },
+);
 
 export default function MaxFlowViz({
   preset: initial = 'leksioni',
@@ -278,6 +428,8 @@ export default function MaxFlowViz({
   strategy?: Strategy;
   mode?: 'algo' | 'cut';
 }) {
+  const X = useText(TEXT);
+  const M = useText(MAXFLOW_TEXT);
   const p0 = FLOW_PRESETS.find((p) => p.id === initial) ?? FLOW_PRESETS[0];
   const [presetId, setPresetId] = useState(p0.id);
   const net = must(
@@ -300,7 +452,10 @@ export default function MaxFlowViz({
     setRemoved(new Set());
   };
 
-  const steps = useMemo<FlowStep[]>(() => maxflowSteps(net.nodes, net.edges, net.s, net.t, strategy), [net, strategy]);
+  const steps = useMemo<FlowStep[]>(
+    () => maxflowSteps(net.nodes, net.edges, net.s, net.t, strategy, undefined, undefined, undefined, M),
+    [net, strategy, M],
+  );
   const best = useMemo(() => {
     const st = maxflowSteps(net.nodes, net.edges, net.s, net.t, 'ek');
     return st[st.length - 1];
@@ -412,45 +567,51 @@ export default function MaxFlowViz({
 
   return (
     <VizShell
-      title="Rrjedha maksimale dhe prerja minimale"
-      subtitle="Ford-Fulkerson: sa kohë ka rrugë rritëse në rrjetën mbetëse, rrit rrjedhën. Kur s’ka më, kulmet e arritshme japin prerjen minimale."
+      title={X.title}
+      subtitle={X.subtitle}
       icon={<Droplets />}
       onKeyDown={mode === 'algo' ? playerKeys(player) : undefined}
       toolbar={
         <>
-          <Field label="Mënyra">
+          <Field label={X.mode}>
             <Segmented
-              label="Mënyra"
+              label={X.mode}
               value={mode}
               onChange={setMode}
               options={[
-                { value: 'algo', label: 'Algoritmi', icon: <Droplets className="size-4" /> },
-                { value: 'cut', label: 'Gjej prerjen min', icon: <Scissors className="size-4" /> },
+                { value: 'algo', label: X.algorithm, icon: <Droplets className="size-4" /> },
+                { value: 'cut', label: X.findCut, icon: <Scissors className="size-4" /> },
               ]}
             />
           </Field>
-          <Field label="Rrjeti">
+          <Field label={X.network}>
             <Choice
-              label="Rrjeti"
+              label={X.network}
               value={presetId}
               onChange={load}
-              options={FLOW_PRESETS.map((p) => ({ value: p.id, label: p.name }))}
+              options={FLOW_PRESETS.map((p) => ({ value: p.id, label: X.presets[p.id]?.name ?? p.id }))}
               className="w-72"
             />
           </Field>
           {mode === 'algo' && (
             <>
-              <Field label="Strategjia e rrugës">
-                <Choice label="Strategjia" value={strategy} onChange={setStrategy} options={STRATS} className="w-56" />
+              <Field label={X.pathStrategy}>
+                <Choice
+                  label={X.strategy}
+                  value={strategy}
+                  onChange={setStrategy}
+                  options={STRATS.map((o) => (o.value === 'adversary' ? { ...o, label: X.adversary } : o))}
+                  className="w-56"
+                />
               </Field>
-              <Field label="Shfaq">
+              <Field label={X.show}>
                 <Segmented
-                  label="Pamja"
+                  label={X.view}
                   value={view}
                   onChange={setView}
                   options={[
-                    { value: 'G', label: 'Rrjeta G (f/c)' },
-                    { value: 'Gf', label: 'Mbetëse G_f' },
+                    { value: 'G', label: X.graphG },
+                    { value: 'Gf', label: X.residualGf },
                   ]}
                 />
               </Field>
@@ -469,12 +630,12 @@ export default function MaxFlowViz({
             tone={optimal ? 'success' : cut.separated ? 'warning' : 'accent'}
             text={
               removed.size === 0
-                ? `Klikoni tubat (brinjët) për t’i prerë. Qëllimi: të ndani **${net.s}** nga **${net.t}** me koston më të vogël.`
+                ? X.cutStart(net.s, net.t)
                 : !cut.separated
-                  ? `Rrjedha ende kalon: ${net.t} arrihet nga ${net.s}. Kosto deri tani: ${cost}.`
+                  ? X.stillFlows(net.s, net.t, cost)
                   : optimal
-                    ? `**Prerje minimale!** Kosto = ${cost} = rrjedha maksimale. Teorema rrjedhë-max = prerje-min në veprim.`
-                    : `Prerje e vlefshme me kosto **${cost}** — por ka një më të lirë. Çdo prerje ka kosto ≥ rrjedha max = ${best.value}.`
+                    ? X.minCut(cost)
+                    : X.validCut(cost, best.value)
             }
           />
         )
@@ -504,7 +665,7 @@ export default function MaxFlowViz({
                 nodeLook={nodeLook}
                 edgeLook={rEdgeLook}
                 onNodeMove={(id, x, y) => setNodes((ns) => ns.map((n) => (n.id === id ? { ...n, x, y } : n)))}
-                ariaLabel="Rrjeta mbetëse"
+                ariaLabel={X.residual}
               />
             ) : (
               <GraphCanvas
@@ -518,7 +679,7 @@ export default function MaxFlowViz({
                 edgeLook={mode === 'cut' ? cutEdgeLook : gEdgeLook}
                 onEdgeClick={mode === 'cut' ? toggleCut : undefined}
                 onNodeMove={(id, x, y) => setNodes((ns) => ns.map((n) => (n.id === id ? { ...n, x, y } : n)))}
-                ariaLabel={`Rrjeta rrjedhë: ${net.name}`}
+                ariaLabel={X.flowNetwork(X.presets[net.id]?.name ?? net.id)}
               />
             )}
           </div>
@@ -526,55 +687,48 @@ export default function MaxFlowViz({
             view === 'G' ? (
               <Legend
                 items={[
-                  { color: 'var(--viz-active)', label: 'Rruga rritëse', shape: 'line' },
-                  { color: 'var(--viz-compare)', label: 'Brinjë kthyese në rrugë (−x)', shape: 'dash' },
-                  { color: 'var(--viz-path)', label: 'Mbart rrjedhë', shape: 'line' },
-                  { color: 'var(--viz-reject)', label: 'E ngopur f = c', shape: 'line' },
+                  { color: 'var(--viz-active)', label: X.augmenting, shape: 'line' },
+                  { color: 'var(--viz-compare)', label: X.backOnPath, shape: 'dash' },
+                  { color: 'var(--viz-path)', label: X.carries, shape: 'line' },
+                  { color: 'var(--viz-reject)', label: X.saturated, shape: 'line' },
                 ]}
               />
             ) : (
               <Legend
                 items={[
-                  { color: 'var(--viz-line)', label: 'Brinjë e drejtë: c − f', shape: 'line' },
-                  { color: 'var(--viz-compare)', label: 'Brinjë kthyese: f', shape: 'dash' },
-                  { color: 'var(--viz-active)', label: 'Rruga rritëse', shape: 'line' },
+                  { color: 'var(--viz-line)', label: X.forward, shape: 'line' },
+                  { color: 'var(--viz-compare)', label: X.backward, shape: 'dash' },
+                  { color: 'var(--viz-active)', label: X.augmenting, shape: 'line' },
                 ]}
               />
             )
           ) : (
             <Legend
               items={[
-                { color: 'var(--brand)', label: 'Ana S (arrihet nga burimi)' },
-                { color: 'var(--viz-reject)', label: 'Brinjë e prerë', shape: 'dash' },
+                { color: 'var(--brand)', label: X.sideS },
+                { color: 'var(--viz-reject)', label: X.cutEdge, shape: 'dash' },
               ]}
             />
           )}
-          <p className="text-xs text-muted">{net.note}</p>
+          <p className="text-xs text-muted">{X.presets[net.id]?.note}</p>
         </div>
 
         <div className="grid min-w-0 content-start gap-3">
           {mode === 'algo' ? (
             <>
               <div className="grid grid-cols-2 gap-3">
-                <Stat label="Vlera v(f)" value={s.value} tone="success" />
-                <Stat label="Iterime" value={s.iteration} />
+                <Stat label={X.value} value={s.value} tone="success" />
+                <Stat label={X.iterations} value={s.iteration} />
               </div>
               <Panel title="Ford-Fulkerson (slide 47)">
                 <Pseudocode
-                  lines={[
-                    'f ← 0;  G_f ← G',
-                    'while t arrihet nga s në G_f:',
-                    '  P = rrugë s→t në G_f',
-                    '  f = rritRrjedhë(P, f)',
-                    '  rinovo G_f',
-                    'return f',
-                  ]}
+                  lines={X.pseudo}
                   active={s.phase === 'init' ? 0 : s.phase === 'path' ? 2 : s.phase === 'augment' ? 3 : 5}
                 />
               </Panel>
-              <Panel title={`Rrugët rritëse (${s.history.length})`}>
+              <Panel title={X.paths(s.history.length)}>
                 {s.history.length === 0 ? (
-                  <p className="text-sm text-muted">Ende asnjë.</p>
+                  <p className="text-sm text-muted">{X.none}</p>
                 ) : (
                   <ol className="max-h-56 space-y-1 overflow-y-auto font-mono text-[0.74rem]">
                     {s.history.map((h, k) => (
@@ -597,26 +751,25 @@ export default function MaxFlowViz({
             <>
               <div className="grid grid-cols-2 gap-3">
                 <Stat
-                  label="Kosto e prerjes"
+                  label={X.cutCost}
                   value={cost}
                   tone={optimal ? 'success' : cut.separated ? 'warning' : 'default'}
                 />
-                <Stat label="Rrjedha max" value={best.value} tone="accent" />
+                <Stat label={X.maxFlow} value={best.value} tone="accent" />
               </div>
-              <Panel title="Statusi">
+              <Panel title={X.status}>
                 <div className="flex flex-wrap gap-1.5">
                   <Chip size="sm" variant="soft" color={cut.separated ? 'success' : 'danger'}>
-                    {cut.separated ? `${net.s} dhe ${net.t} të ndarë` : `${net.t} ende arrihet`}
+                    {cut.separated ? X.separated(net.s, net.t) : X.reachable(net.t)}
                   </Chip>
                   {optimal && (
                     <Chip size="sm" variant="soft" color="success">
-                      prerje minimale ✓
+                      {X.minimal}
                     </Chip>
                   )}
                 </div>
                 <p className="mt-2.5 text-sm text-muted">
-                  Kapaciteti i një prerjeje numëron vetëm brinjët <b className="text-foreground">nga S te T</b>. Lema 1
-                  (dualiteti i dobët): v(f) ≤ c(S, T) për çdo rrjedhë dhe çdo prerje.
+                  {X.capacityStart} <b className="text-foreground">{X.fromStoT}</b>. {X.capacityEnd}
                 </p>
               </Panel>
             </>

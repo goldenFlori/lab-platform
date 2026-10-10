@@ -3,6 +3,7 @@
  * ===================================================================== */
 
 import type { GEdge, GNode } from '../kit/GraphCanvas';
+import { SHORTEST_TEXT, type ShortestText } from './shortest.text';
 
 export const INF = Infinity;
 export const inf = (v: number) => (v === INF ? '∞' : String(v));
@@ -39,7 +40,13 @@ export interface PathStep {
   done?: boolean;
 }
 
-export function dijkstraSteps(nodes: GNode[], arcs: Arc[], src: string): PathStep[] {
+export function dijkstraSteps(
+  nodes: GNode[],
+  arcs: Arc[],
+  src: string,
+  text: ShortestText = SHORTEST_TEXT.sq,
+): PathStep[] {
+  const T = text.dijkstra;
   const steps: PathStep[] = [];
   const dist: Record<string, number> = {};
   const prev: Record<string, string | null> = {};
@@ -52,9 +59,7 @@ export function dijkstraSteps(nodes: GNode[], arcs: Arc[], src: string): PathSte
   let relax = 0;
   const negative = arcs.some((a) => a.w < 0);
   steps.push({
-    note: negative
-      ? `Inicializim: dist[${src}] = 0, të tjerat ∞. **Kujdes:** ka peshë negative — kushti i Dijkstra-s (w ≥ 0) është shkelur.`
-      : `Inicializim: dist[${src}] = 0, të gjitha të tjerat ∞.`,
+    note: negative ? T.startNegative(src) : T.start(src),
     dist: { ...dist },
     prev: { ...prev },
     current: null,
@@ -71,7 +76,7 @@ export function dijkstraSteps(nodes: GNode[], arcs: Arc[], src: string): PathSte
     }
     if (u === null || dist[u] === INF) {
       steps.push({
-        note: 'Kulmet e mbetura janë të paarritshme nga burimi. Algoritmi ndalet.',
+        note: T.unreachable,
         dist: { ...dist },
         prev: { ...prev },
         current: null,
@@ -85,7 +90,7 @@ export function dijkstraSteps(nodes: GNode[], arcs: Arc[], src: string): PathSte
     }
     settled.push(u);
     steps.push({
-      note: `Zgjedhim kulmin e patabeluar me distancë minimale: **${u}** (dist = ${inf(dist[u])}). Ky vendim është përfundimtar.`,
+      note: T.pick(u, inf(dist[u])),
       dist: { ...dist },
       prev: { ...prev },
       current: u,
@@ -105,7 +110,7 @@ export function dijkstraSteps(nodes: GNode[], arcs: Arc[], src: string): PathSte
         prev[a.v] = u;
       }
       steps.push({
-        note: `Relaksim ${a.u}→${a.v} (w = ${a.w}): ${inf(dist[u])} + ${a.w} = ${inf(cand)} ${better ? '<' : '≥'} ${inf(old)}. ${better ? `**dist[${a.v}] = ${cand}**, paraardhësi ${a.u}.` : 'Pa përmirësim.'}`,
+        note: T.relax(a.u, a.v, a.w, inf(dist[u]), inf(cand), better, inf(old), cand),
         dist: { ...dist },
         prev: { ...prev },
         current: u,
@@ -117,9 +122,7 @@ export function dijkstraSteps(nodes: GNode[], arcs: Arc[], src: string): PathSte
     }
   }
   steps.push({
-    note: negative
-      ? 'Dijkstra mbaroi, por rezultati **mund të jetë i gabuar**: një kulm i tabeluar nuk rishikohet kurrë, ndërsa një brinjë negative më vonë mund ta shkurtonte rrugën. Përdorni Bellman-Ford.'
-      : `Dijkstra mbaroi pas ${relax} relaksimesh. Çdo kulm u tabelua saktësisht një herë.`,
+    note: negative ? T.doneNegative : T.done(relax),
     dist: { ...dist },
     prev: { ...prev },
     current: null,
@@ -132,7 +135,13 @@ export function dijkstraSteps(nodes: GNode[], arcs: Arc[], src: string): PathSte
   return steps;
 }
 
-export function bellmanFordSteps(nodes: GNode[], arcs: Arc[], src: string): PathStep[] {
+export function bellmanFordSteps(
+  nodes: GNode[],
+  arcs: Arc[],
+  src: string,
+  text: ShortestText = SHORTEST_TEXT.sq,
+): PathStep[] {
+  const T = text.bellman;
   const steps: PathStep[] = [];
   const dist: Record<string, number> = {};
   const prev: Record<string, string | null> = {};
@@ -143,7 +152,7 @@ export function bellmanFordSteps(nodes: GNode[], arcs: Arc[], src: string): Path
   dist[src] = 0;
   let relax = 0;
   steps.push({
-    note: `Inicializim: dist[${src}] = 0. Bellman-Ford kalon nëpër **të gjitha brinjët** në çdo iterim, deri në |V| − 1 = ${nodes.length - 1} herë.`,
+    note: T.start(src, nodes.length - 1),
     dist: { ...dist },
     prev: { ...prev },
     current: null,
@@ -167,7 +176,7 @@ export function bellmanFordSteps(nodes: GNode[], arcs: Arc[], src: string): Path
         changed = true;
       }
       steps.push({
-        note: `Iterimi ${it} · ${a.u}→${a.v} (w = ${a.w}): ${inf(dist[a.u])} + ${a.w} = ${inf(cand)} ${better ? '<' : '≥'} ${inf(old)}. ${better ? `**dist[${a.v}] = ${cand}**.` : 'Pa ndryshim.'}`,
+        note: T.relax(it, a.u, a.v, a.w, inf(dist[a.u]), inf(cand), better, inf(old), cand),
         dist: { ...dist },
         prev: { ...prev },
         current: a.u,
@@ -180,7 +189,7 @@ export function bellmanFordSteps(nodes: GNode[], arcs: Arc[], src: string): Path
     }
     if (!changed) {
       steps.push({
-        note: `Iterimi ${it} nuk ndryshoi asnjë distancë → **ndalim i hershëm**, pa bërë të gjitha ${nodes.length - 1} iterimet.`,
+        note: T.early(it, nodes.length - 1),
         dist: { ...dist },
         prev: { ...prev },
         current: null,
@@ -196,9 +205,7 @@ export function bellmanFordSteps(nodes: GNode[], arcs: Arc[], src: string): Path
   let negCycle = false;
   for (const a of arcs) if (dist[a.u] !== INF && dist[a.u] + a.w < dist[a.v]) negCycle = true;
   steps.push({
-    note: negCycle
-      ? `Kontrolli final: një brinjë ende relaksohet pas ${nodes.length - 1} iterimesh → **cikël negativ**. Rruga më e shkurtër nuk ekziston.`
-      : `Kontrolli final: asnjë brinjë nuk relaksohet më → **pa cikël negativ**. Distancat janë të sakta. Gjithsej ${relax} relaksime.`,
+    note: negCycle ? T.negativeCycle(nodes.length - 1) : T.done(relax),
     dist: { ...dist },
     prev: { ...prev },
     current: null,
@@ -250,7 +257,8 @@ export interface FwStep {
   negativeCycle?: boolean;
 }
 
-export function floydSteps(W: number[][], L: string[]): FwStep[] {
+export function floydSteps(W: number[][], L: string[], text: ShortestText = SHORTEST_TEXT.sq): FwStep[] {
+  const T = text.floyd;
   const n = W.length;
   const D = W.map((r) => r.slice());
   const P: (number | null)[][] = W.map((row, i) => row.map((v, j) => (i !== j && v !== INF ? i : null)));
@@ -258,7 +266,7 @@ export function floydSteps(W: number[][], L: string[]): FwStep[] {
   let updates = 0;
   const snap = () => ({ D: D.map((r) => r.slice()), P: P.map((r) => r.slice()) });
   steps.push({
-    note: 'Inicializim: **D⁰ = W** — pesha e harkut (i, j), ∞ kur s’ka hark, 0 në diagonale. P[i][j] = i kur ka hark.',
+    note: T.start,
     ...snap(),
     k: -1,
     i: -1,
@@ -269,7 +277,7 @@ export function floydSteps(W: number[][], L: string[]): FwStep[] {
   });
   for (let k = 0; k < n; k++) {
     steps.push({
-      note: `**k = ${L[k]}**: provojmë ${L[k]} si kulm ndërmjetës për çdo çift (i, j).`,
+      note: T.k(L[k]),
       ...snap(),
       k,
       i: -1,
@@ -290,7 +298,7 @@ export function floydSteps(W: number[][], L: string[]): FwStep[] {
           updates++;
         }
         steps.push({
-          note: `D[${L[i]}][${L[j]}] = min(${inf(old)}, D[${L[i]}][${L[k]}] + D[${L[k]}][${L[j]}] = ${inf(D[i][k])} + ${inf(D[k][j])} = ${inf(through)})${improved ? ` → **${through}**: ${L[i]} → ${L[k]} → ${L[j]} është më e shkurtër.` : ' → pa ndryshim.'}`,
+          note: T.compare(L[i], L[j], L[k], inf(old), inf(D[i][k]), inf(D[k][j]), inf(through), improved),
           ...snap(),
           k,
           i,
@@ -304,9 +312,7 @@ export function floydSteps(W: number[][], L: string[]): FwStep[] {
   }
   const neg = D.some((row, i) => row[i] < 0);
   steps.push({
-    note: neg
-      ? 'D[v][v] < 0 për ndonjë kulm → **cikël negativ**.'
-      : `Përfundoi: ${n}³ = ${n ** 3} kontrolle, **${updates} përmirësime**. D mban distancat minimale për çdo çift.`,
+    note: neg ? T.negativeCycle : T.done(n, n ** 3, updates),
     ...snap(),
     k: n - 1,
     i: -1,

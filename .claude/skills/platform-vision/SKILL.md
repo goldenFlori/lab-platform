@@ -175,8 +175,10 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-10:** #19, first half. Every screen of the app speaks Albanian and English. Each user
   chooses with the account menu (visitors with a toggle), and a course can set the language for
   those who have not chosen (PR #45).
-- **Next:** the text inside the 13 visualizations in both languages, which completes #19 and
-  phase 1.
+- **2026-10-10:** #19 done. The 13 visualizations speak both languages too, their step-by-step
+  explanations and pseudocode included. Phase 1 (foundation) is complete (PR #46).
+- **Next:** plan phase 2, live coding (Pyodide runs and edits, autosave, exercises with checks), as
+  GitHub issues in a new milestone.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 

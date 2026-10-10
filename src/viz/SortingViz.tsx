@@ -2,8 +2,10 @@ import { Button, Chip, Input } from '@heroui/react';
 import { ArrowDownWideNarrow, ArrowUpNarrowWide, BarChart3, Shuffle } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { makeInput, parseNumbers, SORT_META, SORT_RUN, type SortAlgo, type SortStep } from './algorithms/sorting';
+import { SORTING_TEXT } from './algorithms/sorting.text';
 import { Field, PlayerBar, Segmented } from './kit/controls';
 import { Legend, Panel, Pseudocode, Stat, StepNote, VizShell } from './kit/shell';
+import { bilingual, useText } from './kit/text';
 import { playerKeys, usePlayer } from './kit/usePlayer';
 
 const ALGOS: { value: SortAlgo; label: string }[] = [
@@ -11,6 +13,53 @@ const ALGOS: { value: SortAlgo; label: string }[] = [
   { value: 'selection', label: 'Selection' },
   { value: 'merge', label: 'Merge' },
 ];
+
+const TEXT = bilingual(
+  {
+    title: (name: string) => `Vizualizuesi i renditjes — ${name}`,
+    algorithm: 'Algoritmi',
+    yourList: 'Lista juaj',
+    numbers: 'Lista e numrave',
+    apply: 'Zbato',
+    generate: 'Gjenero',
+    random: 'E rastit',
+    sorted: 'E renditur',
+    worst: 'Rasti më i keq',
+    comparing: 'Po krahasohet',
+    written: 'Sapo u shkrua',
+    final: 'Në pozicionin final',
+    unsorted: 'E parenditur',
+    comparisons: 'Krahasime',
+    writes: 'Shkrime',
+    pseudocode: 'Pseudokodi',
+    complexity: 'Kompleksiteti',
+    best: 'më i miri',
+    average: 'mesatar',
+    worstCase: 'më i keqi',
+  },
+  {
+    title: (name) => `Sorting visualizer — ${name}`,
+    algorithm: 'Algorithm',
+    yourList: 'Your list',
+    numbers: 'List of numbers',
+    apply: 'Apply',
+    generate: 'Generate',
+    random: 'Random',
+    sorted: 'Sorted',
+    worst: 'Worst case',
+    comparing: 'Being compared',
+    written: 'Just written',
+    final: 'In its final position',
+    unsorted: 'Unsorted',
+    comparisons: 'Comparisons',
+    writes: 'Writes',
+    pseudocode: 'Pseudocode',
+    complexity: 'Complexity',
+    best: 'best',
+    average: 'average',
+    worstCase: 'worst',
+  },
+);
 
 export default function SortingViz({
   algo: initialAlgo = 'insertion',
@@ -26,7 +75,9 @@ export default function SortingViz({
   const [text, setText] = useState(initialValues.join(', '));
   const [error, setError] = useState<string | null>(null);
 
-  const steps = useMemo(() => SORT_RUN[algo](values), [algo, values]);
+  const L = useText(TEXT);
+  const S = useText(SORTING_TEXT);
+  const steps = useMemo(() => SORT_RUN[algo](values, S), [algo, values, S]);
   const player = usePlayer<SortStep>(steps, 700);
   const s = player.step;
   const meta = SORT_META[algo];
@@ -37,7 +88,7 @@ export default function SortingViz({
     setError(null);
   };
   const fromText = () => {
-    const r = parseNumbers(text);
+    const r = parseNumbers(text, S.parse);
     if (r.values.length) apply(r.values);
     setError(r.error);
   };
@@ -46,39 +97,39 @@ export default function SortingViz({
 
   return (
     <VizShell
-      title={title ?? `Vizualizuesi i renditjes — ${meta.name}`}
-      subtitle={meta.idea}
+      title={title ?? L.title(meta.name)}
+      subtitle={S.meta[algo].idea}
       icon={<BarChart3 />}
       onKeyDown={playerKeys(player)}
       toolbar={
         <>
-          <Field label="Algoritmi">
-            <Segmented label="Algoritmi" value={algo} onChange={setAlgo} options={ALGOS} />
+          <Field label={L.algorithm}>
+            <Segmented label={L.algorithm} value={algo} onChange={setAlgo} options={ALGOS} />
           </Field>
-          <Field label="Lista juaj" className="min-w-[14rem] flex-1">
+          <Field label={L.yourList} className="min-w-[14rem] flex-1">
             <div className="flex gap-2">
               <Input
-                aria-label="Lista e numrave"
+                aria-label={L.numbers}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && fromText()}
                 className="min-w-0 flex-1 font-mono text-sm"
               />
               <Button size="sm" variant="secondary" onPress={fromText}>
-                Zbato
+                {L.apply}
               </Button>
             </div>
           </Field>
-          <Field label="Gjenero">
+          <Field label={L.generate}>
             <div className="flex flex-wrap gap-1.5">
               <Button size="sm" variant="tertiary" onPress={() => gen('random')}>
-                <Shuffle /> E rastit
+                <Shuffle /> {L.random}
               </Button>
               <Button size="sm" variant="tertiary" onPress={() => gen('sorted')}>
-                <ArrowUpNarrowWide /> E renditur
+                <ArrowUpNarrowWide /> {L.sorted}
               </Button>
               <Button size="sm" variant="tertiary" onPress={() => gen('reversed')}>
-                <ArrowDownWideNarrow /> Rasti më i keq
+                <ArrowDownWideNarrow /> {L.worst}
               </Button>
             </div>
           </Field>
@@ -97,31 +148,31 @@ export default function SortingViz({
           <Bars step={s} />
           <Legend
             items={[
-              { color: 'var(--viz-compare)', label: 'Po krahasohet' },
-              { color: 'var(--viz-active)', label: 'Sapo u shkrua' },
-              { color: 'var(--viz-done)', label: 'Në pozicionin final' },
-              { color: 'var(--viz-idle)', label: 'E parenditur' },
+              { color: 'var(--viz-compare)', label: L.comparing },
+              { color: 'var(--viz-active)', label: L.written },
+              { color: 'var(--viz-done)', label: L.final },
+              { color: 'var(--viz-idle)', label: L.unsorted },
             ]}
           />
         </div>
         <div className="grid content-start gap-3">
           <div className="grid grid-cols-2 gap-3">
-            <Stat label="Krahasime" value={s.comparisons} tone="accent" />
-            <Stat label="Shkrime" value={s.writes} />
+            <Stat label={L.comparisons} value={s.comparisons} tone="accent" />
+            <Stat label={L.writes} value={s.writes} />
           </div>
-          <Panel title="Pseudokodi">
-            <Pseudocode lines={meta.pseudo} active={s.line} />
+          <Panel title={L.pseudocode}>
+            <Pseudocode lines={S.meta[algo].pseudo} active={s.line} />
           </Panel>
-          <Panel title="Kompleksiteti">
+          <Panel title={L.complexity}>
             <div className="flex flex-wrap gap-1.5">
               <Chip size="sm" color="success" variant="soft">
-                më i miri {meta.best}
+                {L.best} {meta.best}
               </Chip>
               <Chip size="sm" variant="soft">
-                mesatar {meta.avg}
+                {L.average} {meta.avg}
               </Chip>
               <Chip size="sm" color="danger" variant="soft">
-                më i keqi {meta.worst}
+                {L.worstCase} {meta.worst}
               </Chip>
             </div>
           </Panel>

@@ -4,6 +4,7 @@ import { toStored } from '../src/notebook/stored';
 import type { Me } from '../src/shared/auth';
 import { hashPassword } from '../src/shared/password';
 import type { GroupStudent } from '../src/shared/students';
+import { VISUALIZER_IDS } from '../src/shared/visualizers';
 import { E2E_STAFF } from './account';
 import { courseWithLab, uploadNotebook } from './notebooks';
 import { apiCall, signIn } from './sign-in';
@@ -151,4 +152,25 @@ test("a student's choice goes with the account; a course's language serves those
   await expectEnglish(besa);
   await besa.context().close();
   await staff.context().close();
+});
+
+test('every visualization reads in English, its steps included', async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.addInitScript(() => localStorage.setItem('locale', 'en'));
+  for (const id of VISUALIZER_IDS) {
+    await page.goto(`/visualizations/${id}`);
+    const region = page.locator('[data-viz-id]').getByRole('region');
+    await expect(region).toBeVisible();
+    // A step forward where there is one, so the algorithm's own explanation shows too.
+    const next = region.getByRole('button', { name: /^Next step/ });
+    if (await next.isVisible()) await next.click();
+    const text = await region.evaluate((el) => {
+      const labels = Array.from(el.querySelectorAll('[aria-label], [title]'), (x) =>
+        ['aria-label', 'title'].map((name) => x.getAttribute(name) ?? '').join(' '),
+      );
+      return `${(el as HTMLElement).innerText}\n${labels.join('\n')}`;
+    });
+    // Place names such as Tiranë stay as they are; Albanian's common words would mean a missed message.
+    expect(text, id).not.toMatch(/\b(dhe|një|për|nga|është|Hapi|Luaj|Rifillo|Klikoni|Kulmi|Brinja|krahasime)\b/);
+  }
 });

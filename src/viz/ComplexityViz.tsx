@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { Field, Segmented, Toggle } from './kit/controls';
 import { ChartLegend, LineChart } from './kit/LineChart';
 import { Panel, StepNote, VizShell } from './kit/shell';
+import { bilingual, useText } from './kit/text';
 
 /* =====================================================================
  *  Eksploruesi i Kompleksitetit — Laboratori 2 dhe 3, Leksioni 2
@@ -13,60 +14,46 @@ import { Panel, StepNote, VizShell } from './kit/shell';
 interface Klass {
   id: string;
   label: string;
-  name: string;
   f: (n: number) => number;
   color: string;
-  example: string;
 }
 
 const CLASSES: Klass[] = [
   {
     id: '1',
     label: 'O(1)',
-    name: 'Konstant',
     f: () => 1,
     color: 'var(--viz-done)',
-    example: 'Lexo elementin e parë të listës',
   },
   {
     id: 'logn',
     label: 'O(log n)',
-    name: 'Logaritmik',
     f: (n) => Math.log2(Math.max(n, 1)),
     color: 'oklch(0.7 0.15 190)',
-    example: 'Binary Search',
   },
   {
     id: 'n',
     label: 'O(n)',
-    name: 'Linear',
     f: (n) => n,
     color: 'var(--viz-compare)',
-    example: 'Kërko elementin në listë',
   },
   {
     id: 'nlogn',
     label: 'O(n log n)',
-    name: 'Linearitmik',
     f: (n) => n * Math.log2(Math.max(n, 2)),
     color: 'var(--viz-path)',
-    example: 'Merge Sort',
   },
   {
     id: 'n2',
     label: 'O(n²)',
-    name: 'Kuadratik',
     f: (n) => n * n,
     color: 'var(--viz-active)',
-    example: 'Insertion Sort, Selection Sort',
   },
   {
     id: '2n',
     label: 'O(2ⁿ)',
-    name: 'Eksponencial',
     f: (n) => 2 ** Math.min(n, 1000),
     color: 'var(--viz-reject)',
-    example: 'Problemet rekursive naive',
   },
 ];
 
@@ -90,15 +77,104 @@ const fmtNum = (v: number) => {
   return group(Math.round(v * 10) / 10);
 };
 
-const fmtTime = (ops: number) => {
+const TEXT = bilingual(
+  {
+    names: {
+      '1': 'Konstant',
+      logn: 'Logaritmik',
+      n: 'Linear',
+      nlogn: 'Linearitmik',
+      n2: 'Kuadratik',
+      '2n': 'Eksponencial',
+    } as Record<string, string>,
+    examples: {
+      '1': 'Lexo elementin e parë të listës',
+      logn: 'Binary Search',
+      n: 'Kërko elementin në listë',
+      nlogn: 'Merge Sort',
+      n2: 'Insertion Sort, Selection Sort',
+      '2n': 'Problemet rekursive naive',
+    } as Record<string, string>,
+    universe: 'më shumë se mosha e universit',
+    days: (d: string) => `${d} ditë`,
+    years: (y: string) => `${y} vite`,
+    title: 'Eksploruesi i kompleksitetit',
+    subtitle:
+      'Lëvizni n dhe shihni sa operacione kërkon secila klasë. Për n të mëdha, rendi i rritjes vendos gjithçka.',
+    classes: 'Klasat që krahasoni',
+    classesLabel: 'Klasat e kompleksitetit',
+    range: 'Diapazoni',
+    rangeLabel: 'Diapazoni i n',
+    logY: 'Bosht Y logaritmik',
+    compare: (n: number, worst: string, w: string, best: string, b: string, ratio: string) =>
+      `Për **n = ${n}**: ${worst} kërkon ${w} veprime, ${best} vetëm ${b} — **${ratio} herë** më pak.`,
+    one: (n: number, k: string, v: string) => `Për **n = ${n}**: ${k} kërkon ${v} veprime.`,
+    size: (n: number) => `Madhësia e inputit — n = ${n}`,
+    sizeLabel: 'Madhësia e inputit n',
+    xLabel: 'n (madhësia e inputit)',
+    yLabel: 'veprime',
+    chart: 'Rritja e funksioneve të kompleksitetit',
+    forN: (n: number) => `Për n = ${n}`,
+    klass: 'Klasa',
+    operations: 'Veprime',
+    time: 'Koha*',
+    timeNote: '* me 10⁹ veprime në sekondë, si në Leksionin 3.',
+    examplesTitle: 'Shembuj nga lënda',
+  },
+  {
+    names: {
+      '1': 'Constant',
+      logn: 'Logarithmic',
+      n: 'Linear',
+      nlogn: 'Linearithmic',
+      n2: 'Quadratic',
+      '2n': 'Exponential',
+    },
+    examples: {
+      '1': 'Read the first element of the list',
+      logn: 'Binary Search',
+      n: 'Search for an element in a list',
+      nlogn: 'Merge Sort',
+      n2: 'Insertion Sort, Selection Sort',
+      '2n': 'Naive recursive problems',
+    },
+    universe: 'longer than the age of the universe',
+    days: (d) => `${d} days`,
+    years: (y) => `${y} years`,
+    title: 'Complexity explorer',
+    subtitle:
+      'Move n and see how many operations each class needs. For large n, the order of growth decides everything.',
+    classes: 'Classes to compare',
+    classesLabel: 'Complexity classes',
+    range: 'Range',
+    rangeLabel: 'Range of n',
+    logY: 'Logarithmic Y axis',
+    compare: (n, worst, w, best, b, ratio) =>
+      `For **n = ${n}**: ${worst} needs ${w} operations, ${best} only ${b} — **${ratio} times** fewer.`,
+    one: (n, k, v) => `For **n = ${n}**: ${k} needs ${v} operations.`,
+    size: (n) => `Input size — n = ${n}`,
+    sizeLabel: 'Input size n',
+    xLabel: 'n (input size)',
+    yLabel: 'operations',
+    chart: 'Growth of the complexity functions',
+    forN: (n) => `For n = ${n}`,
+    klass: 'Class',
+    operations: 'Operations',
+    time: 'Time*',
+    timeNote: '* at 10⁹ operations per second, as in Lecture 3.',
+    examplesTitle: 'Examples from the course',
+  },
+);
+
+const fmtTime = (L: (typeof TEXT)['sq'], ops: number) => {
   const s = ops / 1e9;
-  if (!Number.isFinite(s) || s > 3.15e7 * 1e6) return 'më shumë se mosha e universit';
+  if (!Number.isFinite(s) || s > 3.15e7 * 1e6) return L.universe;
   if (s < 1e-6) return `${(s * 1e9).toFixed(0)} ns`;
   if (s < 1e-3) return `${(s * 1e6).toFixed(1)} µs`;
   if (s < 1) return `${(s * 1e3).toFixed(1)} ms`;
   if (s < 3600) return `${s.toFixed(1)} s`;
-  if (s < 86400 * 365) return `${(s / 86400).toFixed(1)} ditë`;
-  return `${(s / (86400 * 365)).toExponential(1).replace('e+', '×10^')} vite`;
+  if (s < 86400 * 365) return L.days((s / 86400).toFixed(1));
+  return L.years((s / (86400 * 365)).toExponential(1).replace('e+', '×10^'));
 };
 
 export default function ComplexityViz() {
@@ -106,6 +182,7 @@ export default function ComplexityViz() {
   const [range, setRange] = useState('100');
   const [n, setN] = useState(32);
   const [logY, setLogY] = useState(true);
+  const L = useText(TEXT);
 
   const nMax = Number(range);
   const nNow = Math.min(n, nMax);
@@ -129,14 +206,14 @@ export default function ComplexityViz() {
 
   return (
     <VizShell
-      title="Eksploruesi i kompleksitetit"
-      subtitle="Lëvizni n dhe shihni sa operacione kërkon secila klasë. Për n të mëdha, rendi i rritjes vendos gjithçka."
+      title={L.title}
+      subtitle={L.subtitle}
       icon={<TrendingUp />}
       toolbar={
         <>
-          <Field label="Klasat që krahasoni" className="min-w-0">
+          <Field label={L.classes} className="min-w-0">
             <ToggleButtonGroup
-              aria-label="Klasat e kompleksitetit"
+              aria-label={L.classesLabel}
               selectionMode="multiple"
               selectedKeys={selected}
               onSelectionChange={(keys) => keys.size > 0 && setSelected(new Set(keys))}
@@ -152,27 +229,27 @@ export default function ComplexityViz() {
               ))}
             </ToggleButtonGroup>
           </Field>
-          <Field label="Diapazoni">
-            <Segmented label="Diapazoni i n" value={range} onChange={setRange} options={RANGES} />
+          <Field label={L.range}>
+            <Segmented label={L.rangeLabel} value={range} onChange={setRange} options={RANGES} />
           </Field>
-          <Toggle label="Bosht Y logaritmik" value={logY} onChange={setLogY} />
+          <Toggle label={L.logY} value={logY} onChange={setLogY} />
         </>
       }
       footer={
         <StepNote
           text={
             active.length > 1
-              ? `Për **n = ${nNow}**: ${worst.label} kërkon ${fmtNum(worst.f(nNow))} veprime, ${best.label} vetëm ${fmtNum(best.f(nNow))} — **${fmtNum(ratio)} herë** më pak.`
-              : `Për **n = ${nNow}**: ${active[0].label} kërkon ${fmtNum(active[0].f(nNow))} veprime.`
+              ? L.compare(nNow, worst.label, fmtNum(worst.f(nNow)), best.label, fmtNum(best.f(nNow)), fmtNum(ratio))
+              : L.one(nNow, active[0].label, fmtNum(active[0].f(nNow)))
           }
         />
       }
     >
       <div className="grid grid-cols-1 gap-4 p-4 sm:p-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="flex min-w-0 flex-col gap-3">
-          <Field label={`Madhësia e inputit — n = ${nNow}`}>
+          <Field label={L.size(nNow)}>
             <Slider
-              aria-label="Madhësia e inputit n"
+              aria-label={L.sizeLabel}
               minValue={1}
               maxValue={nMax}
               value={nNow}
@@ -190,21 +267,21 @@ export default function ComplexityViz() {
               logY={logY}
               yMax={yMax}
               markerX={nNow}
-              xLabel="n (madhësia e inputit)"
-              yLabel="veprime"
-              ariaLabel="Rritja e funksioneve të kompleksitetit"
+              xLabel={L.xLabel}
+              yLabel={L.yLabel}
+              ariaLabel={L.chart}
             />
           </div>
           <ChartLegend series={series} />
         </div>
         <div className="grid content-start gap-3">
-          <Panel title={`Për n = ${nNow}`}>
+          <Panel title={L.forN(nNow)}>
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-xs text-muted">
-                  <th className="pb-1.5 font-medium">Klasa</th>
-                  <th className="pb-1.5 text-right font-medium">Veprime</th>
-                  <th className="pb-1.5 text-right font-medium">Koha*</th>
+                  <th className="pb-1.5 font-medium">{L.klass}</th>
+                  <th className="pb-1.5 text-right font-medium">{L.operations}</th>
+                  <th className="pb-1.5 text-right font-medium">{L.time}</th>
                 </tr>
               </thead>
               <tbody>
@@ -218,21 +295,22 @@ export default function ComplexityViz() {
                     </td>
                     <td className="py-1.5 text-right font-mono text-xs tabular-nums">{fmtNum(k.f(nNow))}</td>
                     <td className="py-1.5 text-right font-mono text-xs text-muted tabular-nums">
-                      {fmtTime(k.f(nNow))}
+                      {fmtTime(L, k.f(nNow))}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <p className="mt-2 text-xs text-muted">* me 10⁹ veprime në sekondë, si në Leksionin 3.</p>
+            <p className="mt-2 text-xs text-muted">{L.timeNote}</p>
           </Panel>
-          <Panel title="Shembuj nga lënda">
+          <Panel title={L.examplesTitle}>
             <ul className="space-y-1.5 text-sm">
               {active.map((k) => (
                 <li key={k.id} className="flex gap-2">
                   <span className="mt-1.5 size-2 shrink-0 rounded-full" style={{ background: k.color }} />
                   <span>
-                    <span className="font-semibold">{k.name}</span> <span className="text-muted">— {k.example}</span>
+                    <span className="font-semibold">{L.names[k.id]}</span>{' '}
+                    <span className="text-muted">— {L.examples[k.id]}</span>
                   </span>
                 </li>
               ))}

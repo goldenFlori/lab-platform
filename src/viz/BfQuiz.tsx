@@ -5,6 +5,7 @@ import { bellmanFordSteps, bfSnapshots, inf, pathTo, toArcs } from './algorithms
 import { GraphCanvas } from './kit/GraphCanvas';
 import { must } from './kit/must';
 import { StepNote, VizShell } from './kit/shell';
+import { bilingual, useText } from './kit/text';
 import { PATH_PRESETS } from './PathsViz';
 
 /* =====================================================================
@@ -22,7 +23,84 @@ interface Q {
 
 const SECONDS = 20;
 
-function buildQuestions(): Q[] {
+const TEXT = bilingual(
+  {
+    q1: 'Pas iterimit të parë të Bellman-Ford (burim A), sa është dist[D]?',
+    e1: (d: string) => `Në iterimin e parë relaksohen A→B (4) dhe pastaj B→D (5): 4 + 5 = **${d}**.`,
+    q2: 'Cila është distanca finale nga A te F?',
+    e2: (route: string, sum: string, d: string) =>
+      `Rruga optimale është **${route}** = ${sum} = **${d}** (falë brinjës negative B→E).`,
+    q3: 'Sa iterime bën Bellman-Ford, të shumtën, në një graf me V kulme?',
+    e3: 'Një rrugë e thjeshtë ka të shumtën **V − 1** brinjë, prandaj mjaftojnë V − 1 iterime.',
+    q4: 'A mund të zbulojë Bellman-Ford ciklet negative?',
+    a4: ['Po', 'Jo', 'Vetëm me peshë pozitive', 'Vetëm në grafe të padrejtuar'],
+    e4: 'Po: nëse pas V − 1 iterimeve një brinjë **ende relaksohet**, grafi ka cikël negativ.',
+    q5: 'Cili është kompleksiteti kohor i Bellman-Ford?',
+    e5: '**V − 1** iterime × **E** brinjë në çdo iterim = O(V·E).',
+    q6: 'Dijkstra apo Bellman-Ford: cili lejon peshë negative?',
+    a6: ['Vetëm Bellman-Ford', 'Vetëm Dijkstra', 'Të dy', 'Asnjëri'],
+    e6: 'Dijkstra **kërkon w ≥ 0**: një kulm i tabeluar nuk rishikohet më. Bellman-Ford nuk e ka këtë kufizim.',
+    q7: 'Pas iterimit të dytë (burim A), sa është dist[E]?',
+    e7: (d: string) => `A→B→E = 4 + (−3) = 1, ndërsa A→C→E = 2 + 3 = 5. Minimumi: **${d}**.`,
+    q8: 'Bellman-Ford gjen rrugët nga…',
+    a8: ['Një burim te të gjitha kulmet', 'Të gjitha çiftet', 'Një burim te një destinacion', 'Asnjë nga këto'],
+    e8: 'Bellman-Ford (si Dijkstra) është algoritëm **me një burim**. Për të gjitha çiftet: Floyd-Warshall.',
+    title: 'Kuiz: Bellman-Ford',
+    subtitle:
+      'Grafi i kuizit të laboratorit: 6 kulme, harqe me peshë pozitive dhe negative. Përgjigjuni shpejt për pikë bonus.',
+    finished: (correct: number, total: number, score: number) =>
+      `Përfunduat: **${correct} / ${total}** të sakta, **${score} pikë**.`,
+    restart: 'Rifillo',
+    right: '**Saktë!**',
+    timeUp: '**Koha mbaroi.**',
+    wrong: '**Jo.**',
+    result: 'Rezultati',
+    next: 'Pyetja tjetër',
+    pick: 'Zgjidhni një përgjigje.',
+    ready: 'Koha nis me përgjigjen e parë — lexoni grafin me qetësi.',
+    graph: 'Grafi i kuizit Bellman-Ford',
+    summary: (correct: number, total: number) => `pikë · ${correct} nga ${total} të sakta`,
+    question: (i: number, total: number) => `Pyetja ${i} nga ${total}`,
+  },
+  {
+    q1: 'After the first iteration of Bellman-Ford (source A), what is dist[D]?',
+    e1: (d) => `In the first iteration A→B (4) is relaxed, then B→D (5): 4 + 5 = **${d}**.`,
+    q2: 'What is the final distance from A to F?',
+    e2: (route, sum, d) => `The optimal path is **${route}** = ${sum} = **${d}** (thanks to the negative edge B→E).`,
+    q3: 'At most how many iterations does Bellman-Ford make on a graph with V vertices?',
+    e3: 'A simple path has at most **V − 1** edges, so V − 1 iterations are enough.',
+    q4: 'Can Bellman-Ford detect negative cycles?',
+    a4: ['Yes', 'No', 'Only with positive weights', 'Only in undirected graphs'],
+    e4: 'Yes: if an edge **still relaxes** after V − 1 iterations, the graph has a negative cycle.',
+    q5: 'What is the time complexity of Bellman-Ford?',
+    e5: '**V − 1** iterations × **E** edges in each iteration = O(V·E).',
+    q6: 'Dijkstra or Bellman-Ford: which allows negative weights?',
+    a6: ['Only Bellman-Ford', 'Only Dijkstra', 'Both', 'Neither'],
+    e6: 'Dijkstra **needs w ≥ 0**: a settled vertex is never revisited. Bellman-Ford has no such limit.',
+    q7: 'After the second iteration (source A), what is dist[E]?',
+    e7: (d) => `A→B→E = 4 + (−3) = 1, while A→C→E = 2 + 3 = 5. The minimum: **${d}**.`,
+    q8: 'Bellman-Ford finds the paths from…',
+    a8: ['One source to every vertex', 'All pairs', 'One source to one destination', 'None of these'],
+    e8: 'Bellman-Ford (like Dijkstra) is a **single-source** algorithm. For all pairs: Floyd-Warshall.',
+    title: 'Quiz: Bellman-Ford',
+    subtitle:
+      'The lab quiz’s graph: 6 vertices, edges with positive and negative weights. Answer fast for bonus points.',
+    finished: (correct, total, score) => `Finished: **${correct} / ${total}** right, **${score} points**.`,
+    restart: 'Restart',
+    right: '**Right!**',
+    timeUp: '**Time is up.**',
+    wrong: '**No.**',
+    result: 'Result',
+    next: 'Next question',
+    pick: 'Choose an answer.',
+    ready: 'The clock starts with your first answer — read the graph calmly.',
+    graph: 'The Bellman-Ford quiz graph',
+    summary: (correct, total) => `points · ${correct} of ${total} right`,
+    question: (i, total) => `Question ${i} of ${total}`,
+  },
+);
+
+function buildQuestions(L: (typeof TEXT)['sq']): Q[] {
   const g = must(
     PATH_PRESETS.find((p) => p.id === 'kuizi'),
     'preset kuizi',
@@ -43,50 +121,51 @@ function buildQuestions(): Q[] {
   };
   return [
     {
-      q: 'Pas iterimit të parë të Bellman-Ford (burim A), sa është dist[D]?',
+      q: L.q1,
       ...opts(inf(snaps[1].D), ['5', '∞', '4', '7']),
-      explain: `Në iterimin e parë relaksohen A→B (4) dhe pastaj B→D (5): 4 + 5 = **${inf(snaps[1].D)}**.`,
+      explain: L.e1(inf(snaps[1].D)),
     },
     {
-      q: 'Cila është distanca finale nga A te F?',
+      q: L.q2,
       ...opts(inf(final.dist.F), ['11', '13', '15', '9']),
-      explain: `Rruga optimale është **${route.join(' → ')}** = ${weights.join(' + ').replace(/\+ -/g, '− ')} = **${inf(final.dist.F)}** (falë brinjës negative B→E).`,
+      explain: L.e2(route.join(' → '), weights.join(' + ').replace(/\+ -/g, '− '), inf(final.dist.F)),
     },
     {
-      q: 'Sa iterime bën Bellman-Ford, të shumtën, në një graf me V kulme?',
+      q: L.q3,
       ...opts('V − 1', ['V', 'V + 1', 'V²']),
-      explain: 'Një rrugë e thjeshtë ka të shumtën **V − 1** brinjë, prandaj mjaftojnë V − 1 iterime.',
+      explain: L.e3,
     },
     {
-      q: 'A mund të zbulojë Bellman-Ford ciklet negative?',
-      ...opts('Po', ['Jo', 'Vetëm me peshë pozitive', 'Vetëm në grafe të padrejtuar']),
-      explain: 'Po: nëse pas V − 1 iterimeve një brinjë **ende relaksohet**, grafi ka cikël negativ.',
+      q: L.q4,
+      ...opts(L.a4[0] ?? '', L.a4.slice(1)),
+      explain: L.e4,
     },
     {
-      q: 'Cili është kompleksiteti kohor i Bellman-Ford?',
+      q: L.q5,
       ...opts('O(V·E)', ['O(V²)', 'O(E log V)', 'O(V + E)']),
-      explain: '**V − 1** iterime × **E** brinjë në çdo iterim = O(V·E).',
+      explain: L.e5,
     },
     {
-      q: 'Dijkstra apo Bellman-Ford: cili lejon peshë negative?',
-      ...opts('Vetëm Bellman-Ford', ['Vetëm Dijkstra', 'Të dy', 'Asnjëri']),
-      explain: 'Dijkstra **kërkon w ≥ 0**: një kulm i tabeluar nuk rishikohet më. Bellman-Ford nuk e ka këtë kufizim.',
+      q: L.q6,
+      ...opts(L.a6[0] ?? '', L.a6.slice(1)),
+      explain: L.e6,
     },
     {
-      q: 'Pas iterimit të dytë (burim A), sa është dist[E]?',
+      q: L.q7,
       ...opts(inf(snaps[2].E), ['7', '5', '3']),
-      explain: `A→B→E = 4 + (−3) = 1, ndërsa A→C→E = 2 + 3 = 5. Minimumi: **${inf(snaps[2].E)}**.`,
+      explain: L.e7(inf(snaps[2].E)),
     },
     {
-      q: 'Bellman-Ford gjen rrugët nga…',
-      ...opts('Një burim te të gjitha kulmet', ['Të gjitha çiftet', 'Një burim te një destinacion', 'Asnjë nga këto']),
-      explain: 'Bellman-Ford (si Dijkstra) është algoritëm **me një burim**. Për të gjitha çiftet: Floyd-Warshall.',
+      q: L.q8,
+      ...opts(L.a8[0] ?? '', L.a8.slice(1)),
+      explain: L.e8,
     },
   ];
 }
 
 export default function BfQuiz() {
-  const questions = useMemo(buildQuestions, []);
+  const L = useText(TEXT);
+  const questions = useMemo(() => buildQuestions(L), [L]);
   const graph = must(
     PATH_PRESETS.find((p) => p.id === 'kuizi'),
     'preset kuizi',
@@ -135,8 +214,8 @@ export default function BfQuiz() {
 
   return (
     <VizShell
-      title="Kuiz: Bellman-Ford"
-      subtitle="Grafi i kuizit të laboratorit: 6 kulme, harqe me peshë pozitive dhe negative. Përgjigjuni shpejt për pikë bonus."
+      title={L.title}
+      subtitle={L.subtitle}
       icon={<HelpCircle />}
       badges={
         <div className="flex items-center gap-2">
@@ -154,13 +233,10 @@ export default function BfQuiz() {
         over ? (
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="flex-1">
-              <StepNote
-                tone="success"
-                text={`Përfunduat: **${correct} / ${questions.length}** të sakta, **${score} pikë**.`}
-              />
+              <StepNote tone="success" text={L.finished(correct, questions.length, score)} />
             </div>
             <Button onPress={restart}>
-              <RotateCcw /> Rifillo
+              <RotateCcw /> {L.restart}
             </Button>
           </div>
         ) : picked !== null ? (
@@ -168,18 +244,15 @@ export default function BfQuiz() {
             <div className="flex-1">
               <StepNote
                 tone={picked === q.answer ? 'success' : 'danger'}
-                text={`${picked === q.answer ? '**Saktë!**' : picked === -1 ? '**Koha mbaroi.**' : '**Jo.**'} ${q.explain}`}
+                text={`${picked === q.answer ? L.right : picked === -1 ? L.timeUp : L.wrong} ${q.explain}`}
               />
             </div>
             <Button onPress={next}>
-              {i === questions.length - 1 ? 'Rezultati' : 'Pyetja tjetër'} <ArrowRight />
+              {i === questions.length - 1 ? L.result : L.next} <ArrowRight />
             </Button>
           </div>
         ) : (
-          <StepNote
-            tone="default"
-            text={started ? 'Zgjidhni një përgjigje.' : 'Koha nis me përgjigjen e parë — lexoni grafin me qetësi.'}
-          />
+          <StepNote tone="default" text={started ? L.pick : L.ready} />
         )
       }
     >
@@ -192,7 +265,7 @@ export default function BfQuiz() {
             width={graph.w}
             height={graph.h}
             edgeLook={(e) => ({ label: String(e.w), labelTone: (e.w ?? 0) < 0 ? 'danger' : 'muted' })}
-            ariaLabel="Grafi i kuizit Bellman-Ford"
+            ariaLabel={L.graph}
           />
         </div>
         {over ? (
@@ -200,15 +273,13 @@ export default function BfQuiz() {
             <div>
               <Trophy className="mx-auto size-10 text-accent" />
               <div className="mt-3 font-mono text-5xl font-bold">{score}</div>
-              <div className="mt-1 text-muted">
-                pikë · {correct} nga {questions.length} të sakta
-              </div>
+              <div className="mt-1 text-muted">{L.summary(correct, questions.length)}</div>
             </div>
           </div>
         ) : (
           <div className="flex flex-col gap-4">
             <div className="text-xs font-semibold tracking-wider text-muted uppercase">
-              Pyetja {i + 1} nga {questions.length}
+              {L.question(i + 1, questions.length)}
             </div>
             <p className="text-lg leading-snug font-semibold">{q.q}</p>
             <div className="grid gap-2">

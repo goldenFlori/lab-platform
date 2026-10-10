@@ -2,10 +2,12 @@ import { Button, Chip } from '@heroui/react';
 import { FastForward, Grid2x2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { type FwStep, floydSteps, fwPath, INF, inf, weightMatrix } from './algorithms/shortest';
+import { SHORTEST_TEXT } from './algorithms/shortest.text';
 import { Choice, Field, PlayerBar, Segmented } from './kit/controls';
 import { fitLayout, type GEdge, type GNode, GraphCanvas } from './kit/GraphCanvas';
 import { must } from './kit/must';
 import { Panel, Stat, StepNote, VizShell } from './kit/shell';
+import { bilingual, useText } from './kit/text';
 import { playerKeys, usePlayer } from './kit/usePlayer';
 
 /* =====================================================================
@@ -14,8 +16,6 @@ import { playerKeys, usePlayer } from './kit/usePlayer';
 
 interface FwPreset {
   id: string;
-  name: string;
-  note: string;
   directed: boolean;
   labels: string[];
   edges: GEdge[];
@@ -28,11 +28,83 @@ const URBAN_L = ['DQ', 'QR-A', 'QR-B', 'QR-C', 'PD-1', 'PD-2', 'PD-3', 'PD-4'];
 const MED_L = ['SQ', 'SA-1', 'SA-2', 'SA-3', 'KR-A', 'KR-B', 'QU-1', 'QU-2'];
 const CITY6 = ['Alfa', 'Beta', 'Gama', 'Delta', 'Eta', 'Zeta'];
 
+const TEXT = bilingual(
+  {
+    presets: {
+      klasa3: {
+        name: 'Punë në Klasë 3 — me dorë',
+        note: 'Matrica D⁰ e Problemit 3 të Laboratorit 7. Kontrolloni D¹ … D⁴ tuaja.',
+      },
+      ush5: { name: 'Matrica e distancave (Lab 7, Ush. 5)', note: 'Gjashtë qytete me rrugë të dyanshme.' },
+      urbanpost: {
+        name: 'UrbanPost — logjistika (Lab 8, Ush. 1)',
+        note: 'Depoja qendrore, 3 qendra rajonale dhe 4 pika dorëzimi; 21 harqe të drejtuara.',
+      },
+      mjekesor: {
+        name: 'Klinikat dhe urgjenca (Lab 8, Ush. 2)',
+        note: 'Spitali qendror, stacionet e ambulancave, klinikat rajonale dhe qendrat e urgjencës.',
+      },
+    } as Record<string, { name: string; note: string }>,
+    title: 'Floyd-Warshall — rrugët ndërmjet të gjitha çifteve',
+    subtitle:
+      'D[i][j] = min(D[i][j], D[i][k] + D[k][j]). Për çdo k, pyesim: a e shkurton kalimi nëpër k rrugën nga i te j?',
+    network: 'Rrjeti',
+    matrix: 'Matrica',
+    distances: 'D — distancat',
+    predecessors: 'P — paraardhësit',
+    nextK: 'k tjetër',
+    rebuild: 'Rindërtimi i rrugës nga matrica P',
+    from: 'Nga',
+    to: 'Te',
+    cost: 'kosto',
+    noPath: 'nuk ka rrugë (ende)',
+    improvements: 'Përmirësime',
+    step: 'Hapi',
+    matrixD: (zero: boolean) => `Matrica D${zero ? '⁰' : ''}`,
+    matrixP: 'Matrica P (paraardhësi i j në rrugën nga i)',
+    cycle: 'cikël negativ',
+    legendStart: 'Rreshti dhe kolona e',
+    legendEnd: 'nuk ndryshojnë gjatë fazës k. Qeliza e verdhë = (i, j) që po krahasohet; e gjelbër = u përmirësua.',
+  },
+  {
+    presets: {
+      klasa3: { name: 'Class work 3 — by hand', note: 'The D⁰ matrix of Problem 3 of Lab 7. Check your D¹ … D⁴.' },
+      ush5: { name: 'The distance matrix (Lab 7, Ex. 5)', note: 'Six cities with two-way roads.' },
+      urbanpost: {
+        name: 'UrbanPost — logistics (Lab 8, Ex. 1)',
+        note: 'The central depot, 3 regional centres and 4 delivery points; 21 directed edges.',
+      },
+      mjekesor: {
+        name: 'Clinics and emergencies (Lab 8, Ex. 2)',
+        note: 'The central hospital, ambulance stations, regional clinics and emergency centres.',
+      },
+    },
+    title: 'Floyd-Warshall — paths between all pairs',
+    subtitle:
+      'D[i][j] = min(D[i][j], D[i][k] + D[k][j]). For each k we ask: does going through k shorten the path from i to j?',
+    network: 'Network',
+    matrix: 'Matrix',
+    distances: 'D — distances',
+    predecessors: 'P — predecessors',
+    nextK: 'next k',
+    rebuild: 'Rebuilding the path from the matrix P',
+    from: 'From',
+    to: 'To',
+    cost: 'cost',
+    noPath: 'no path (yet)',
+    improvements: 'Improvements',
+    step: 'Step',
+    matrixD: (zero) => `Matrix D${zero ? '⁰' : ''}`,
+    matrixP: 'Matrix P (the predecessor of j on the path from i)',
+    cycle: 'negative cycle',
+    legendStart: 'The row and column of',
+    legendEnd: 'do not change during phase k. The yellow cell = the (i, j) being compared; green = it improved.',
+  },
+);
+
 export const FW_PRESETS: FwPreset[] = [
   {
     id: 'klasa3',
-    name: 'Punë në Klasë 3 — me dorë',
-    note: 'Matrica D⁰ e Problemit 3 të Laboratorit 7. Kontrolloni D¹ … D⁴ tuaja.',
     directed: true,
     labels: ['0', '1', '2', '3'],
     edges: E(
@@ -56,8 +128,6 @@ export const FW_PRESETS: FwPreset[] = [
   },
   {
     id: 'ush5',
-    name: 'Matrica e distancave (Lab 7, Ush. 5)',
-    note: 'Gjashtë qytete me rrugë të dyanshme.',
     directed: false,
     labels: CITY6,
     edges: E(
@@ -84,8 +154,6 @@ export const FW_PRESETS: FwPreset[] = [
   },
   {
     id: 'urbanpost',
-    name: 'UrbanPost — logjistika (Lab 8, Ush. 1)',
-    note: 'Depoja qendrore, 3 qendra rajonale dhe 4 pika dorëzimi; 21 harqe të drejtuara.',
     directed: true,
     labels: URBAN_L,
     edges: E(
@@ -127,8 +195,6 @@ export const FW_PRESETS: FwPreset[] = [
   },
   {
     id: 'mjekesor',
-    name: 'Klinikat dhe urgjenca (Lab 8, Ush. 2)',
-    note: 'Spitali qendror, stacionet e ambulancave, klinikat rajonale dhe qendrat e urgjencës.',
     directed: true,
     labels: MED_L,
     edges: E(
@@ -173,6 +239,8 @@ const H = 420;
 const soft = (c: string, p = 24) => `color-mix(in oklab, ${c} ${p}%, var(--surface))`;
 
 export default function FloydViz({ preset: initial = 'klasa3' }: { preset?: string }) {
+  const X = useText(TEXT);
+  const S = useText(SHORTEST_TEXT);
   const p0 = FW_PRESETS.find((p) => p.id === initial) ?? FW_PRESETS[0];
   const [presetId, setPresetId] = useState(p0.id);
   const preset = must(
@@ -198,7 +266,10 @@ export default function FloydViz({ preset: initial = 'klasa3' }: { preset?: stri
       ),
     [preset, L],
   );
-  const steps = useMemo<FwStep[]>(() => floydSteps(weightMatrix(L, preset.edges, preset.directed), L), [preset, L]);
+  const steps = useMemo<FwStep[]>(
+    () => floydSteps(weightMatrix(L, preset.edges, preset.directed), L, S),
+    [preset, L, S],
+  );
   const player = usePlayer(steps, 650);
   const s = player.step;
 
@@ -242,34 +313,34 @@ export default function FloydViz({ preset: initial = 'klasa3' }: { preset?: stri
   const M = show === 'D' ? s.D : s.P;
   return (
     <VizShell
-      title="Floyd-Warshall — rrugët ndërmjet të gjitha çifteve"
-      subtitle="D[i][j] = min(D[i][j], D[i][k] + D[k][j]). Për çdo k, pyesim: a e shkurton kalimi nëpër k rrugën nga i te j?"
+      title={X.title}
+      subtitle={X.subtitle}
       icon={<Grid2x2 />}
       onKeyDown={playerKeys(player)}
       toolbar={
         <>
-          <Field label="Rrjeti">
+          <Field label={X.network}>
             <Choice
-              label="Rrjeti"
+              label={X.network}
               value={presetId}
               onChange={load}
-              options={FW_PRESETS.map((p) => ({ value: p.id, label: p.name }))}
+              options={FW_PRESETS.map((p) => ({ value: p.id, label: X.presets[p.id]?.name ?? p.id }))}
               className="w-72"
             />
           </Field>
-          <Field label="Matrica">
+          <Field label={X.matrix}>
             <Segmented
-              label="Matrica"
+              label={X.matrix}
               value={show}
               onChange={setShow}
               options={[
-                { value: 'D', label: 'D — distancat' },
-                { value: 'P', label: 'P — paraardhësit' },
+                { value: 'D', label: X.distances },
+                { value: 'P', label: X.predecessors },
               ]}
             />
           </Field>
           <Button size="sm" variant="tertiary" onPress={nextK} isDisabled={player.atEnd}>
-            <FastForward /> k tjetër
+            <FastForward /> {X.nextK}
           </Button>
         </>
       }
@@ -292,13 +363,13 @@ export default function FloydViz({ preset: initial = 'klasa3' }: { preset?: stri
               shape={L.some((l) => l.length > 2) ? 'pill' : 'circle'}
               nodeLook={nodeLook}
               edgeLook={edgeLook}
-              ariaLabel={preset.name}
+              ariaLabel={X.presets[preset.id]?.name ?? preset.id}
             />
           </div>
-          <Panel title="Rindërtimi i rrugës nga matrica P">
+          <Panel title={X.rebuild}>
             <div className="flex flex-wrap items-center gap-2">
               <Choice
-                label="Nga"
+                label={X.from}
                 value={qs}
                 onChange={setQs}
                 options={L.map((l) => ({ value: l, label: l }))}
@@ -306,7 +377,7 @@ export default function FloydViz({ preset: initial = 'klasa3' }: { preset?: stri
               />
               <span className="text-muted">→</span>
               <Choice
-                label="Te"
+                label={X.to}
                 value={qt}
                 onChange={setQt}
                 options={L.map((l) => ({ value: l, label: l }))}
@@ -315,10 +386,11 @@ export default function FloydViz({ preset: initial = 'klasa3' }: { preset?: stri
               <span className="text-sm">
                 {route ? (
                   <>
-                    <b>{route.map((x) => L[x]).join(' → ')}</b> · kosto <b className="font-mono">{inf(s.D[si][ti])}</b>
+                    <b>{route.map((x) => L[x]).join(' → ')}</b> · {X.cost}{' '}
+                    <b className="font-mono">{inf(s.D[si][ti])}</b>
                   </>
                 ) : (
-                  <span className="text-muted">nuk ka rrugë (ende)</span>
+                  <span className="text-muted">{X.noPath}</span>
                 )}
               </span>
             </div>
@@ -327,17 +399,15 @@ export default function FloydViz({ preset: initial = 'klasa3' }: { preset?: stri
         <div className="flex min-w-0 flex-col gap-3">
           <div className="grid grid-cols-3 gap-3">
             <Stat label="k" value={s.k >= 0 && s.phase !== 'init' ? L[s.k] : '—'} tone="accent" />
-            <Stat label="Përmirësime" value={s.updates} tone="success" />
-            <Stat label="Hapi" value={`${player.index + 1} / ${steps.length}`} />
+            <Stat label={X.improvements} value={s.updates} tone="success" />
+            <Stat label={X.step} value={`${player.index + 1} / ${steps.length}`} />
           </div>
           <Panel
-            title={
-              show === 'D' ? `Matrica D${s.phase === 'init' ? '⁰' : ''}` : 'Matrica P (paraardhësi i j në rrugën nga i)'
-            }
+            title={show === 'D' ? X.matrixD(s.phase === 'init') : X.matrixP}
             aside={
               s.negativeCycle ? (
                 <Chip size="sm" color="danger" variant="soft">
-                  cikël negativ
+                  {X.cycle}
                 </Chip>
               ) : undefined
             }
@@ -396,8 +466,7 @@ export default function FloydViz({ preset: initial = 'klasa3' }: { preset?: stri
               </table>
             </div>
             <p className="mt-2 text-xs text-muted">
-              Rreshti dhe kolona e <b className="text-accent">k</b> nuk ndryshojnë gjatë fazës k. Qeliza e verdhë = (i,
-              j) që po krahasohet; e gjelbër = u përmirësua.
+              {X.legendStart} <b className="text-accent">k</b> {X.legendEnd}
             </p>
           </Panel>
         </div>

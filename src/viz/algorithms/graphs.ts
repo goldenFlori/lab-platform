@@ -6,6 +6,7 @@
 
 import type { GEdge, GNode } from '../kit/GraphCanvas';
 import { must } from '../kit/must';
+import { GRAPHS_TEXT, type GraphsText } from './graphs.text';
 
 export interface TraversalStep {
   note: string;
@@ -63,7 +64,14 @@ export function neighbours(nodes: GNode[], edges: GEdge[], directed: boolean) {
 
 /* ------------------------------------------------------------ BFS / DFS */
 
-export function bfsSteps(nodes: GNode[], edges: GEdge[], directed: boolean, start: string): TraversalStep[] {
+export function bfsSteps(
+  nodes: GNode[],
+  edges: GEdge[],
+  directed: boolean,
+  start: string,
+  text: GraphsText = GRAPHS_TEXT.sq,
+): TraversalStep[] {
+  const T = text.bfs;
   const adj = neighbours(nodes, edges, directed);
   const steps: TraversalStep[] = [];
   const visited = [start];
@@ -72,7 +80,7 @@ export function bfsSteps(nodes: GNode[], edges: GEdge[], directed: boolean, star
   const tree: number[] = [];
   const level: Record<string, number> = { [start]: 0 };
   steps.push({
-    note: `Nisim BFS nga **${start}**: e shënojmë si të vizituar dhe e fusim në radhë.`,
+    note: T.start(start),
     current: start,
     visited: [...visited],
     frontier: [...queue],
@@ -85,7 +93,7 @@ export function bfsSteps(nodes: GNode[], edges: GEdge[], directed: boolean, star
   for (let v = queue.shift(); v !== undefined; v = queue.shift()) {
     order.push(v);
     steps.push({
-      note: `Nxjerrim **${v}** nga fillimi i radhës (FIFO). Niveli i tij: ${level[v]}.`,
+      note: T.dequeue(v, level[v]),
       current: v,
       visited: [...visited],
       frontier: [...queue],
@@ -98,7 +106,7 @@ export function bfsSteps(nodes: GNode[], edges: GEdge[], directed: boolean, star
     for (const { to: w, edge } of adj.get(v) ?? []) {
       if (visited.includes(w)) {
         steps.push({
-          note: `${w} është tashmë i vizituar — e kapërcejmë.`,
+          note: T.seen(w),
           current: v,
           visited: [...visited],
           frontier: [...queue],
@@ -115,7 +123,7 @@ export function bfsSteps(nodes: GNode[], edges: GEdge[], directed: boolean, star
       tree.push(edge);
       level[w] = level[v] + 1;
       steps.push({
-        note: `${w} i pavizituar: e shënojmë, i japim nivelin ${level[w]} dhe e shtojmë **në fund** të radhës.`,
+        note: T.enqueue(w, level[w]),
         current: v,
         visited: [...visited],
         frontier: [...queue],
@@ -129,7 +137,7 @@ export function bfsSteps(nodes: GNode[], edges: GEdge[], directed: boolean, star
   }
   const missing = nodes.length - visited.length;
   steps.push({
-    note: `Radha u zbraz. Rendi i vizitës: ${order.join(' → ')}.${missing ? ` ${missing} kulme nuk arrihen nga ${start} — grafi nuk është i lidhur.` : ' BFS gjen rrugët me më pak brinjë: niveli = largesa.'}`,
+    note: T.done(order.join(' → '), missing, start),
     current: null,
     visited: [...visited],
     frontier: [],
@@ -141,7 +149,14 @@ export function bfsSteps(nodes: GNode[], edges: GEdge[], directed: boolean, star
   return steps;
 }
 
-export function dfsSteps(nodes: GNode[], edges: GEdge[], directed: boolean, start: string): TraversalStep[] {
+export function dfsSteps(
+  nodes: GNode[],
+  edges: GEdge[],
+  directed: boolean,
+  start: string,
+  text: GraphsText = GRAPHS_TEXT.sq,
+): TraversalStep[] {
+  const T = text.dfs;
   const adj = neighbours(nodes, edges, directed);
   const steps: TraversalStep[] = [];
   const visited: string[] = [];
@@ -149,7 +164,7 @@ export function dfsSteps(nodes: GNode[], edges: GEdge[], directed: boolean, star
   const order: string[] = [];
   const tree: number[] = [];
   steps.push({
-    note: `Nisim DFS nga **${start}**: e vendosim në stivë (LIFO).`,
+    note: T.start(start),
     current: start,
     visited: [],
     frontier: [start],
@@ -162,7 +177,7 @@ export function dfsSteps(nodes: GNode[], edges: GEdge[], directed: boolean, star
     const { v, via } = top;
     if (visited.includes(v)) {
       steps.push({
-        note: `${v} ishte vizituar ndërkohë — e hedhim.`,
+        note: T.stale(v),
         current: v,
         visited: [...visited],
         frontier: stack.map((s) => s.v),
@@ -177,7 +192,7 @@ export function dfsSteps(nodes: GNode[], edges: GEdge[], directed: boolean, star
     order.push(v);
     if (via !== null) tree.push(via);
     steps.push({
-      note: `Nxjerrim **${v}** nga maja e stivës dhe e vizitojmë.`,
+      note: T.pop(v),
       current: v,
       visited: [...visited],
       frontier: stack.map((s) => s.v),
@@ -190,10 +205,14 @@ export function dfsSteps(nodes: GNode[], edges: GEdge[], directed: boolean, star
     for (const x of next) stack.push({ v: x.to, via: x.edge });
     if (next.length)
       steps.push({
-        note: `Shtyjmë në stivë fqinjët e pavizituar të ${v}: ${next
-          .map((x) => x.to)
-          .reverse()
-          .join(', ')}. I pari që do të dalë: ${next[next.length - 1].to}.`,
+        note: T.push(
+          v,
+          next
+            .map((x) => x.to)
+            .reverse()
+            .join(', '),
+          next[next.length - 1].to,
+        ),
         current: v,
         visited: [...visited],
         frontier: stack.map((s) => s.v),
@@ -205,7 +224,7 @@ export function dfsSteps(nodes: GNode[], edges: GEdge[], directed: boolean, star
   }
   const missing = nodes.length - visited.length;
   steps.push({
-    note: `Stiva u zbraz. Rendi i vizitës: ${order.join(' → ')}.${missing ? ` ${missing} kulme nuk arrihen nga ${start}.` : ' DFS shkon sa më thellë, pastaj kthehet mbrapa.'}`,
+    note: T.done(order.join(' → '), missing, start),
     current: null,
     visited: [...visited],
     frontier: [],
@@ -218,7 +237,8 @@ export function dfsSteps(nodes: GNode[], edges: GEdge[], directed: boolean, star
 
 /* ----------------------------------------------------------- Kruskal/Prim */
 
-export function kruskalSteps(nodes: GNode[], edges: GEdge[]): MstStep[] {
+export function kruskalSteps(nodes: GNode[], edges: GEdge[], text: GraphsText = GRAPHS_TEXT.sq): MstStep[] {
+  const T = text.kruskal;
   const steps: MstStep[] = [];
   const idx = edges
     .map((_, i) => i)
@@ -238,7 +258,7 @@ export function kruskalSteps(nodes: GNode[], edges: GEdge[]): MstStep[] {
   let total = 0;
   const lbl = (i: number) => `${edges[i].u}–${edges[i].v}(${edges[i].w ?? 0})`;
   steps.push({
-    note: `Renditim brinjët sipas peshës: ${idx.map(lbl).join(', ')}.`,
+    note: T.start(idx.map(lbl).join(', ')),
     tree: [],
     rejected: [],
     considering: null,
@@ -251,7 +271,7 @@ export function kruskalSteps(nodes: GNode[], edges: GEdge[]): MstStep[] {
     const ru = find(e.u),
       rv = find(e.v);
     steps.push({
-      note: `Shqyrtojmë **${lbl(i)}**: find(${e.u}) = ${ru}, find(${e.v}) = ${rv}.`,
+      note: T.consider(lbl(i), e.u, ru, e.v, rv),
       tree: [...tree],
       rejected: [...rejected],
       considering: i,
@@ -264,7 +284,7 @@ export function kruskalSteps(nodes: GNode[], edges: GEdge[]): MstStep[] {
       tree.push(i);
       total += e.w ?? 0;
       steps.push({
-        note: `Bashkësi të ndryshme → **pranohet**. Pema ka ${tree.length} brinjë, pesha ${total}.`,
+        note: T.accept(tree.length, total),
         tree: [...tree],
         rejected: [...rejected],
         considering: i,
@@ -276,7 +296,7 @@ export function kruskalSteps(nodes: GNode[], edges: GEdge[]): MstStep[] {
     } else {
       rejected.push(i);
       steps.push({
-        note: `E njëjta bashkësi → **refuzohet**: do të formonte cikël.`,
+        note: T.reject,
         tree: [...tree],
         rejected: [...rejected],
         considering: i,
@@ -288,9 +308,7 @@ export function kruskalSteps(nodes: GNode[], edges: GEdge[]): MstStep[] {
   }
   const ok = tree.length === nodes.length - 1;
   steps.push({
-    note: ok
-      ? `Përfundoi: ${tree.length} brinjë (= |V| − 1), pesha totale **w(T) = ${total}**.`
-      : `Grafi nuk është i lidhur: u gjet një pyll me ${tree.length} brinjë, jo një pemë përfshirëse.`,
+    note: ok ? T.done(tree.length, total) : T.forest(tree.length),
     tree: [...tree],
     rejected: [...rejected],
     considering: null,
@@ -300,14 +318,15 @@ export function kruskalSteps(nodes: GNode[], edges: GEdge[]): MstStep[] {
   return steps;
 }
 
-export function primSteps(nodes: GNode[], edges: GEdge[], start: string): MstStep[] {
+export function primSteps(nodes: GNode[], edges: GEdge[], start: string, text: GraphsText = GRAPHS_TEXT.sq): MstStep[] {
+  const T = text.prim;
   const steps: MstStep[] = [];
   const inTree = new Set([start]);
   const tree: number[] = [];
   let total = 0;
   const lbl = (i: number) => `${edges[i].u}–${edges[i].v}(${edges[i].w ?? 0})`;
   steps.push({
-    note: `Nisim Prim-in nga **${start}**. Pema përmban vetëm këtë kulm.`,
+    note: T.start(start),
     tree: [],
     rejected: [],
     considering: null,
@@ -321,7 +340,7 @@ export function primSteps(nodes: GNode[], edges: GEdge[], start: string): MstSte
       .filter((i) => edges[i].u !== edges[i].v && inTree.has(edges[i].u) !== inTree.has(edges[i].v));
     if (!cand.length) {
       steps.push({
-        note: 'Asnjë brinjë nuk e zgjeron pemën — grafi nuk është i lidhur.',
+        note: T.stuck,
         tree: [...tree],
         rejected: [],
         considering: null,
@@ -332,7 +351,7 @@ export function primSteps(nodes: GNode[], edges: GEdge[], start: string): MstSte
     }
     const best = cand.reduce((a, b) => ((edges[b].w ?? 0) < (edges[a].w ?? 0) ? b : a));
     steps.push({
-      note: `Brinjët që dalin nga pema: ${cand.map(lbl).join(', ')}. Më e lehta: **${lbl(best)}**.`,
+      note: T.candidates(cand.map(lbl).join(', '), lbl(best)),
       tree: [...tree],
       rejected: [],
       considering: best,
@@ -346,7 +365,7 @@ export function primSteps(nodes: GNode[], edges: GEdge[], start: string): MstSte
     tree.push(best);
     total += e.w ?? 0;
     steps.push({
-      note: `Shtojmë kulmin **${added}** dhe brinjën ${lbl(best)}. Pesha: ${total}.`,
+      note: T.add(added, lbl(best), total),
       tree: [...tree],
       rejected: [],
       considering: best,
@@ -356,7 +375,7 @@ export function primSteps(nodes: GNode[], edges: GEdge[], start: string): MstSte
     });
   }
   steps.push({
-    note: `Përfundoi: pesha totale **w(T) = ${total}** — e njëjtë me Kruskal-in mbi të njëjtin graf.`,
+    note: T.done(total),
     tree: [...tree],
     rejected: [],
     considering: null,
