@@ -24,6 +24,7 @@ import {
   labs,
   memberships,
   notebooks,
+  searchSections,
   sessions,
   users,
 } from './schema';
@@ -373,6 +374,14 @@ function tenantNotebooks(db: Db, orgId: string) {
       return rows.map((row) => row.name);
     },
 
+    /** The ready and unfinished notebooks of these labs, in each lab's order. */
+    async ofLabs(labIds: string[]) {
+      const rows = (
+        await Promise.all(inChunks(labIds, IDS_PER_QUERY).map((ids) => base.list(inArray(notebooks.labId, ids))))
+      ).flat();
+      return rows.sort((a, b) => a.position - b.position || a.createdAt.getTime() - b.createdAt.getTime());
+    },
+
     embedsOf(notebookId: string) {
       return embedRows.list(eq(embeds.notebookId, notebookId));
     },
@@ -390,11 +399,49 @@ function tenantNotebooks(db: Db, orgId: string) {
         ]),
       );
     },
+
+    /** Replaces the notebook's search index (#17) at once: at most 400 sections, 41 statements. */
+    async setSearchSections(
+      notebookId: string,
+      list: { anchor: string | null; title: string; text: string; keywords: string }[],
+    ) {
+      const rows = list.map((section, position) => ({ ...section, position, id: uuidv7(), orgId, notebookId }));
+      await rethrowMissingParent(
+        db.batch([
+          db
+            .delete(searchSections)
+            .where(and(eq(searchSections.orgId, orgId), eq(searchSections.notebookId, notebookId))),
+          ...inChunks(rows).map((chunk) => db.insert(searchSections).values(chunk)),
+        ]),
+      );
+    },
+
+    /** The search index of these notebooks, each in its order. */
+    async searchSectionsOf(notebookIds: string[]) {
+      const rows = await Promise.all(
+        inChunks(notebookIds, IDS_PER_QUERY).map((ids) =>
+          db
+            .select({
+              notebookId: searchSections.notebookId,
+              anchor: searchSections.anchor,
+              title: searchSections.title,
+              text: searchSections.text,
+              keywords: searchSections.keywords,
+            })
+            .from(searchSections)
+            .where(and(eq(searchSections.orgId, orgId), inArray(searchSections.notebookId, ids)))
+            .orderBy(asc(searchSections.notebookId), asc(searchSections.position)),
+        ),
+      );
+      return rows.flat();
+    },
   };
 }
 
 /** Rows per multi-row insert, so each statement stays under D1's 100 bound parameters. */
 export const ROWS_PER_INSERT = 10;
+/** Ids per `IN (…)` list, leaving room under the 100 bound parameters for the organization. */
+const IDS_PER_QUERY = 90;
 
 function inChunks<T>(list: T[], size = ROWS_PER_INSERT) {
   return Array.from({ length: Math.ceil(list.length / size) }, (_, i) => list.slice(i * size, (i + 1) * size));

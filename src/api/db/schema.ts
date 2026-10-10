@@ -379,3 +379,33 @@ export const embeds = sqliteTable(
     uniqueIndex('embeds_notebook_cell_unique').on(t.orgId, t.notebookId, t.cell),
   ],
 );
+
+/**
+ * A notebook's search index (#17): one row per section (heading, text, the names its code defines),
+ * made where the notebook was converted. Search reads these rows for the labs the user may see.
+ * Plain rows rather than an FTS5 table: D1 cannot export a database with virtual tables, and the
+ * weekly backup is an export.
+ */
+export const searchSections = sqliteTable(
+  'search_sections',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    notebookId: text('notebook_id').notNull(),
+    position: integer('position').notNull(),
+    /** The heading's anchor on the lab page; null for the text above the first heading. */
+    anchor: text('anchor'),
+    title: text('title').notNull(),
+    text: text('text').notNull(),
+    keywords: text('keywords').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    foreignKey({
+      name: 'search_sections_notebook_fk',
+      columns: [t.notebookId, t.orgId],
+      foreignColumns: [notebooks.id, notebooks.orgId],
+    }).onDelete('cascade'),
+    uniqueIndex('search_sections_notebook_position_unique').on(t.orgId, t.notebookId, t.position),
+  ],
+);

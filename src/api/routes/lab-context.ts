@@ -42,6 +42,16 @@ export function openToViewer(ctx: LabContext, lab: Lab) {
   return ctx.viewerGroups.some((groupId) => stateOf(ruleForGroup(rules, groupId), ctx.now) === 'open');
 }
 
+/** A notebook of a lab the user sees: staff see all; students ready ones, and solutions once open. */
+export function mayReadNotebook(
+  ctx: LabContext,
+  lab: Lab,
+  nb: { kind: 'main' | 'extra' | 'solution'; readyAt: Date | null },
+) {
+  if (ctx.staff) return true;
+  return nb.readyAt !== null && (nb.kind !== 'solution' || solutionsOpenTo(ctx, lab));
+}
+
 /** The lab in the URL, or 404 when it is missing or not open to the user. */
 export function visibleLab(c: Context<TenantEnv>, ctx: LabContext) {
   const lab = ctx.labs.find((l) => l.id === c.req.param('labId'));
