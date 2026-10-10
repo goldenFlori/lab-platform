@@ -425,9 +425,22 @@ Built in #19: the interface in Albanian and English, Albanian first.
   - an end-to-end test goes through every staff screen in English, as well as the visitor's
     toggle, the account preference and a course's language;
   - it fails on Albanian letters or common Albanian interface words in visible text or
-    accessible labels (course content and visualizations excluded);
+    accessible labels (course content excluded);
+  - each of the 13 visualizations is opened in English and stepped once, and must contain no
+    common Albanian words (place names such as Tiranë are allowed);
   - API tests cover the settings.
-- **Not yet:** the text inside the 13 visualizations (the second half of #19).
+- **Visualizations** (`src/viz/kit/text.ts`):
+  - each visualization keeps its own `TEXT = bilingual(sq, en)` beside it, so its text loads with
+    its chunk rather than with every page; `useText(TEXT)` picks the interface language;
+  - `bilingual()` types English against Albanian, so a missing message fails the build;
+  - the algorithm modules (`algorithms/*.ts`) take their step text as a parameter, from
+    `algorithms/*.text.ts`, with Albanian as the default for callers that ignore the notes;
+  - pseudocode is translated word for word, keeping the lecture's structure;
+  - names stay as they are: Albanian cities, people and the lab notebooks' own vertex names
+    (Hidranti, Qyteti…), which students compare with their notebooks;
+  - descriptive vertex names (the flowers, the house and pasta steps) get English labels; the
+    flowers name the vertices outright, so the steps read in the interface language too;
+  - the embed's own title comes from the course and stays as the course wrote it.
 
 ## Search
 
