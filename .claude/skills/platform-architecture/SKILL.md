@@ -345,6 +345,32 @@ Built in #8: `src/api/auth/`, data access in `src/api/db/auth.ts`, routes in
   - The course site's own embeds are in `test/notebook/fixtures/embeds.json`, copied by the
     snapshot script.
 - **Re-render all:** an admin action that re-converts the originals when the converter improves.
+- **Course import** (#16), `scripts/import-course.ts` (`npm run course:import`):
+  - It reads a course site in the course repo's format: `site/content/course.mjs` (labs,
+    resources, homework, embeds), the notebooks, and the solutions in `zgjidhjet/`.
+  - `scripts/course-import/plan.ts` converts everything in Node; `apply.ts` uploads it through
+    the API, signed in as a pedagog. So it runs the same permission checks and upload steps as the
+    app, and works the same against `npm run dev` and production.
+  - The plan:
+    - resources become `main` or `extra` notebooks, titled without the "Laboratori N —" prefix;
+    - homework becomes an `extra` notebook of its lab;
+    - `X-ZGJIDHJE.ipynb` becomes the `solution` of `X.ipynb`, only if `isSolutionOf` holds, and
+      takes its embeds.
+  - **Sections:** a resource with `sections` (labs 5 and 6 share `laborator-05.ipynb` on the
+    site) gives each lab its own `.ipynb` of whole cells (`laborator-05-laboratori-6.ipynb`).
+    Each range starts at a heading that opens its cell. The embeds are renumbered for the part,
+    and a rule above the part's first heading is dropped, as on the site.
+  - **Re-running:**
+    - a lab is matched by its number and its imported notebooks by file name;
+    - if any of a lab's notebooks changed (file, title, kind or order), they are all uploaded
+      again in order;
+    - otherwise only differing embeds are written;
+    - notebooks added in the app are left alone;
+    - visibility is never touched.
+  - The Node scripts run TypeScript as is, so `src/notebook/index.ts` imports its modules with
+    `.ts` extensions.
+  - `test/notebook/fixtures/course.json` is the site's labs and homework, written by the snapshot
+    script.
 
 ## Visualizations
 
@@ -380,8 +406,10 @@ what the user may see. Pagefind is not used in the platform.
 
 - **Tests:**
   - Vitest in the Workers runtime: API, permissions, tenant isolation.
-  - Playwright end-to-end, porting the ideas from `site/scripts/qa.mjs`. Every one of the 19
-    course notebooks is uploaded with the site's embeds and must show each visualization,
+  - Playwright end-to-end, porting the ideas from `site/scripts/qa.mjs`. The course is imported
+    from the fixtures with the import's own code, which must give the site's labs, change nothing
+    when run again, and keep hidden labs and solutions from students. Every one of the 19 course
+    notebooks must then show each visualization,
     without errors or overflow at 375px, even with every letter 0.25px wider (text renders a
     little wider on CI's Linux than on a Mac); each visualization opens and steps; a pedagog's
     upload, embed editing and deletion run through the real UI.
