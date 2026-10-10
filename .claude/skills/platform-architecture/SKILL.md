@@ -236,8 +236,9 @@ join codes on groups (#10)
 notebooks(id, org_id, lab_id, kind: main|extra|solution, title, position, original_name, sha256, ready_at)  -- built (#14)
 files(id, org_id, notebook_id?, name, mime, encoding, size, chunk_count) + file_chunks(org_id, file_id, n, data)  -- built (#14)
 embeds(id, org_id, notebook_id, cell, viz, title?, props?)  -- built (#14)
-notebook_cells(notebook_id, idx, text)  -- FTS5 index for search (#17)
-submissions, exercise_results, live_sessions, ai_logs, analytics_events (later phases)
+search_sections(id, org_id, notebook_id, position, anchor?, title, text, keywords)  -- built (#17)
+lab_activity(id, org_id, lab_id, user_id, kind: view|download|visualization, day)  -- built (#18)
+submissions, exercise_results, live_sessions, ai_logs (later phases)
 login_attempts(key, window_start, count)
 ```
 
@@ -434,6 +435,36 @@ sections and the visualizations as you type.
 - **A section result** opens the lab at `?notebook=…#anchor`. The lab page scrolls to the hash
   once the notebook has rendered, so shared links to a section work too.
 
+## Analytics
+
+Built in #18: weekly activity per course for staff with `analytics.view` (pedagogs, coordinators),
+at `/o/:org/courses/:id/activity`, linked from the course page.
+
+- **What counts** (`lab_activity`): a student opened a lab's notebook, downloaded its `.ipynb`, or
+  used one of its visualizations.
+  - At most one row per student, lab, kind and day (`INSERT … ON CONFLICT DO NOTHING`), so a
+    class of 120 stays at tens of thousands of rows a year.
+  - Opening and downloading are recorded by the API as it serves the notebook's detail and its
+    original file. A visualization is reported by the lab page (`POST …/labs/:id/activity`) on the
+    first click or key inside one, once per notebook opened.
+  - The writes go through `waitUntil`, after the response, so reading a lab never waits for them
+    and never fails because of them.
+  - Staff are never recorded.
+  - Days are in `Europe/Tirane` for now (`ACTIVITY_TIME_ZONE`), and weeks run Monday to Sunday.
+    A time zone per institution comes with self-service institutions.
+- **The report** (`GET …/courses/:id/activity[?group=]`):
+  - students of the groups the user may see: the whole course with a course-wide grant, or only
+    their own groups;
+  - per week, from the week the course began (at most 26 weeks): students active at all, and per
+    kind;
+  - per lab, since the start;
+  - all as counts made in SQL (`COUNT(DISTINCT user_id)`): no student is named, and the Worker
+    does not loop over rows.
+- **Not yet:**
+  - analytics for the institution admin (who does not see courses);
+  - exercise completion and code runs (phase 2);
+  - deleting old activity (see open items in `platform-vision`).
+
 ## Quality, deploy, backups
 
 - **Tests:**
@@ -478,6 +509,8 @@ sections and the visualizations as you type.
 ## Privacy
 
 - **Minimal personal data:** full name, username, optional email.
+- **Learning activity** is kept per student and day only to count distinct students. Reports show
+  counts, never names, and no third-party tracker is used.
 - **Institutions own their data:** per-org export and delete.
 - **Data sent to AI:** only the question and the code or output context, never names.
 - **Before selling:** check the Albanian data-protection law (aligned with GDPR) and offer
