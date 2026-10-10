@@ -12,7 +12,7 @@ import {
   Presentation,
   Sparkles,
 } from 'lucide-react';
-import { useEffect } from 'react';
+import { type SyntheticEvent, useEffect, useRef } from 'react';
 import type { LabView } from '../../../../../../../../shared/labs';
 import { ORIGINAL_FILE } from '../../../../../../../../shared/notebook-files';
 import type { Embed, NotebookKind, NotebookSummary } from '../../../../../../../../shared/notebooks';
@@ -21,6 +21,7 @@ import { EmbedsEditor } from '../../../../../../../components/notebook/EmbedsEdi
 import { NotebookUpload } from '../../../../../../../components/notebook/NotebookUpload';
 import { embedAnchor, NotebookView } from '../../../../../../../components/notebook/NotebookView';
 import { Toc } from '../../../../../../../components/notebook/Toc';
+import { reportVisualizationUsed } from '../../../../../../../lib/activity';
 import { ApiError } from '../../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../../lib/brand';
 import { courseQuery } from '../../../../../../../lib/courses';
@@ -212,6 +213,9 @@ function LabPage() {
                   }
                 : null
             }
+            onVisualizationUsed={
+              labList.permissions.staff ? undefined : () => reportVisualizationUsed(org, courseId, labId)
+            }
           />
         )}
         <LabNeighbours org={org} courseId={courseId} labId={labId} labs={labList.labs} />
@@ -247,14 +251,24 @@ function NotebookSection({
   embeds,
   embedsFailed,
   editor,
+  onVisualizationUsed,
 }: {
   notebookRef: NotebookRef;
   embeds: Embed[] | undefined;
   embedsFailed: boolean;
   /** Staff who manage the course: where the visualizations go. */
   editor: { isPending: boolean; save: (embeds: Embed[]) => Promise<unknown> } | null;
+  /** Students: told the first time they use a visualization of this notebook (#18). */
+  onVisualizationUsed?: () => void;
 }) {
   const rendered = useQuery(renderedQuery(notebookRef));
+  const reported = useRef<string | null>(null);
+  const used = (event: SyntheticEvent) => {
+    if (!onVisualizationUsed || reported.current === notebookRef.notebookId) return;
+    if (!(event.target instanceof Element) || !event.target.closest('[data-viz-id]')) return;
+    reported.current = notebookRef.notebookId;
+    onVisualizationUsed();
+  };
   const ready = Boolean(rendered.data && embeds);
   const hash = useRouterState({ select: (state) => state.location.hash });
 
@@ -282,7 +296,8 @@ function NotebookSection({
   }
   return (
     <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_14rem]">
-      <article className="min-w-0">
+      {/* Capturing, so a visualization that handles its own keys or clicks is still noticed. */}
+      <article className="min-w-0" onPointerDownCapture={used} onKeyDownCapture={used}>
         {editor && (
           <div className="mb-8">
             <EmbedsEditor
