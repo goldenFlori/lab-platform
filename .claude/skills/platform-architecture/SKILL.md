@@ -179,6 +179,13 @@ are in `src/shared/lab-visibility.ts`.
   also by direct link. Rules are read on every request, so a switch applies at once.
 - **Changing:** labs (add, rename, renumber, remove) need `course.manage`. Rules need
   `lab.publish` in their scope: the course, or the group.
+- **On the course page** (`CourseLabs`):
+  - staff see each lab's state as chips (course, and any group with its own rule), a "Hapur"
+    switch for the whole course, and an "Orari" panel with per-group rules, closing time and
+    solutions date;
+  - students see only the open labs.
+  - Dates are written out in Albanian by `formatMoment`, not by Intl: not every browser
+    carries Albanian locale data.
 
 ## Importing students
 

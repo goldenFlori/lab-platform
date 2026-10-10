@@ -149,7 +149,10 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   codes and a QR view for the projector, and joining by code (PRs #30 and #31).
 - **2026-10-08:** #11 done. Student import from pasted lists, CSV or Excel, with passwords generated
   and hashed in the browser, printable A4 slips, and password reset by the pedagog (PR #32).
-- **Next:** #12, lab visibility (show, hide, schedule, solutions for staff).
+- **2026-10-10:** #12 done. Labs per course (add, rename, remove) and their visibility: hidden until
+  opened, per course or per group, scheduled, with a solutions date, enforced by the API (PRs #33
+  and #34).
+- **Next:** #13, the notebook converter in TypeScript.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 

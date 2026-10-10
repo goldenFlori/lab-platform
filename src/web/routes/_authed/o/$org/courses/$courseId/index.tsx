@@ -5,7 +5,6 @@ import {
   Archive,
   ArchiveRestore,
   ArrowLeft,
-  FlaskConical,
   Lock,
   MonitorUp,
   Plus,
@@ -17,6 +16,7 @@ import {
 import { type FormEvent, useState } from 'react';
 import type { CourseDetail, GroupView } from '../../../../../../../shared/courses';
 import { formatJoinCode } from '../../../../../../../shared/join-code';
+import { CourseLabs } from '../../../../../../components/CourseLabs';
 import { PresentJoinCode } from '../../../../../../components/PresentJoinCode';
 import { ApiError } from '../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../lib/brand';
@@ -74,13 +74,7 @@ function CoursePage() {
         <Groups data={data} org={org} courseId={courseId} archived={archived} canManage={permissions.manage} />
       )}
 
-      <div className="mt-10">
-        <h2 className="text-xl font-semibold tracking-tight">Laboratorët</h2>
-        <div className="mt-4 grid place-items-center rounded-2xl border border-dashed border-border px-6 py-12 text-center">
-          <FlaskConical className="size-8 text-muted" aria-hidden="true" />
-          <p className="mt-3 text-sm text-muted">Laboratorët shfaqen këtu sapo të hapen.</p>
-        </div>
-      </div>
+      <CourseLabs org={org} courseId={courseId} groups={groups} />
     </section>
   );
 }
