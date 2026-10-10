@@ -314,9 +314,26 @@ Built in #8: `src/api/auth/`, data access in `src/api/db/auth.ts`, routes in
   - **Uploaded files never run code on our origin:** only an allowlist of types is accepted
     (JSON, ipynb, PNG, JPEG, GIF, SVG). Every file is served with `nosniff` and a sandboxing
     `Content-Security-Policy`, and the original downloads as an attachment.
-- **Display:**
-  - Cell HTML is sanitized with DOMPurify before it is shown.
+- **Stored rendering:** `rendered.json` is a `StoredNotebook` (`src/notebook/stored.ts`): the
+  converter's result without its assets, plus `format` (1 today). Bump the format when the shape
+  changes, so that older renderings can be found and converted again.
+- **Display** (#14): the lab page `/o/:org/courses/:courseId/labs/:labId`, with `?notebook=` for a
+  lab's other notebooks. It looks like the course site's lab page: section cards, a table of
+  contents, long code folded, outputs below their code.
+  - **All notebook HTML goes through `sanitize()`** (`src/web/lib/sanitize.ts`, DOMPurify) before
+    it is shown. `rendered.json` is made in a browser and could be hand-crafted, so the converter's
+    own escaping is not enough. Scripts, event handlers, `javascript:` links, styles, forms and
+    frames are removed, and links to other sites open in a new tab. An end-to-end test uploads a
+    hostile rendering and checks that it stays harmless.
+  - **Embeds:** an interactive cell (Pygame, Tkinter, widgets) shows its visualization first, with
+    the code folded under it. Otherwise the visualization follows the last cell made from that
+    notebook cell.
+  - **Images** load from the notebook's files with the reader's session. **Plotly** (4.8 MB)
+    ships as its own file and loads with the first figure that comes near the screen; figures
+    follow the theme. KaTeX's styles and fonts load with the lab page.
   - Solution notebooks are served only with `solution.view`, or after `solutions_from`.
+  - Not yet: folding saved outputs as a spoiler. The course site did this for one homework
+    notebook, whose saved chart gives the answer away.
 - **Embeds** (cell → visualization + props) are stored as data: `embeds`, one per cell, from
   the 13 ids in `src/shared/visualizers.ts`, replaced as a whole with
   `PUT …/notebooks/:id/embeds`. Staff edit them in the app.
