@@ -14,6 +14,7 @@ import {
 import { searchSectionsInput } from '../../shared/search';
 import type { TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
+import { recordActivity } from './activity';
 import { forbidden, invalidRequest } from './course-context';
 import { type LabContext, labContext, mayReadNotebook, visibleLab } from './lab-context';
 
@@ -99,8 +100,10 @@ export const notebookRoutes = new Hono<TenantEnv>()
     return c.json(summary(nb), 201);
   })
 
+  // The lab page asks for this whenever a notebook opens: a student opened the lab (#18).
   .get('/:notebookId', async (c) => {
-    const { nb } = await notebookInUrl(c);
+    const { ctx, lab, nb } = await notebookInUrl(c);
+    recordActivity(c, ctx, lab.id, 'view');
     return c.json(await detail(c, nb));
   })
 
@@ -130,9 +133,11 @@ export const notebookRoutes = new Hono<TenantEnv>()
   })
 
   .get('/:notebookId/files/:name', async (c) => {
-    const { nb } = await notebookInUrl(c);
+    const { ctx, lab, nb } = await notebookInUrl(c);
     const file = await c.var.tenant.notebooks.getFile(nb.id, c.req.param('name'));
     if (!file) throw new NotFoundError();
+    // The original .ipynb, downloaded to work on it (#18).
+    if (c.req.param('name') === ORIGINAL_FILE) recordActivity(c, ctx, lab.id, 'download');
 
     // Uploaded by staff, read by students: never let a file run code on this origin.
     const headers: Record<string, string> = {
