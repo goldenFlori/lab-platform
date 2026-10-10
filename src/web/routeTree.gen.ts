@@ -20,6 +20,7 @@ import { Route as AuthedOOrgCoursesCourseIdIndexRouteImport } from './routes/_au
 import { Route as AuthedOOrgCoursesCourseIdLabsLabIdRouteImport } from './routes/_authed/o/$org/courses/$courseId/labs/$labId'
 import { Route as AuthedOOrgCoursesCourseIdGroupsGroupIdIndexRouteImport } from './routes/_authed/o/$org/courses/$courseId/groups/$groupId/index'
 import { Route as AuthedOOrgCoursesCourseIdGroupsGroupIdImportRouteImport } from './routes/_authed/o/$org/courses/$courseId/groups/$groupId/import'
+import { Route as AuthedOOrgCoursesCourseIdLabsLabIdPresentRouteImport } from './routes/_authed/o/$org/courses/$courseId/labs/$labId_.present'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -79,6 +80,12 @@ const AuthedOOrgCoursesCourseIdGroupsGroupIdImportRoute =
     path: '/o/$org/courses/$courseId/groups/$groupId/import',
     getParentRoute: () => AuthedRoute,
   } as any)
+const AuthedOOrgCoursesCourseIdLabsLabIdPresentRoute =
+  AuthedOOrgCoursesCourseIdLabsLabIdPresentRouteImport.update({
+    id: '/o/$org/courses/$courseId/labs/$labId_/present',
+    path: '/o/$org/courses/$courseId/labs/$labId/present',
+    getParentRoute: () => AuthedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/o/$org/courses/$courseId/': typeof AuthedOOrgCoursesCourseIdIndexRoute
   '/o/$org/courses/$courseId/labs/$labId': typeof AuthedOOrgCoursesCourseIdLabsLabIdRoute
   '/o/$org/courses/$courseId/groups/$groupId/import': typeof AuthedOOrgCoursesCourseIdGroupsGroupIdImportRoute
+  '/o/$org/courses/$courseId/labs/$labId/present': typeof AuthedOOrgCoursesCourseIdLabsLabIdPresentRoute
   '/o/$org/courses/$courseId/groups/$groupId/': typeof AuthedOOrgCoursesCourseIdGroupsGroupIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -102,6 +110,7 @@ export interface FileRoutesByTo {
   '/o/$org/courses/$courseId': typeof AuthedOOrgCoursesCourseIdIndexRoute
   '/o/$org/courses/$courseId/labs/$labId': typeof AuthedOOrgCoursesCourseIdLabsLabIdRoute
   '/o/$org/courses/$courseId/groups/$groupId/import': typeof AuthedOOrgCoursesCourseIdGroupsGroupIdImportRoute
+  '/o/$org/courses/$courseId/labs/$labId/present': typeof AuthedOOrgCoursesCourseIdLabsLabIdPresentRoute
   '/o/$org/courses/$courseId/groups/$groupId': typeof AuthedOOrgCoursesCourseIdGroupsGroupIdIndexRoute
 }
 export interface FileRoutesById {
@@ -116,6 +125,7 @@ export interface FileRoutesById {
   '/_authed/o/$org/courses/$courseId/': typeof AuthedOOrgCoursesCourseIdIndexRoute
   '/_authed/o/$org/courses/$courseId/labs/$labId': typeof AuthedOOrgCoursesCourseIdLabsLabIdRoute
   '/_authed/o/$org/courses/$courseId/groups/$groupId/import': typeof AuthedOOrgCoursesCourseIdGroupsGroupIdImportRoute
+  '/_authed/o/$org/courses/$courseId/labs/$labId_/present': typeof AuthedOOrgCoursesCourseIdLabsLabIdPresentRoute
   '/_authed/o/$org/courses/$courseId/groups/$groupId/': typeof AuthedOOrgCoursesCourseIdGroupsGroupIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/o/$org/courses/$courseId/'
     | '/o/$org/courses/$courseId/labs/$labId'
     | '/o/$org/courses/$courseId/groups/$groupId/import'
+    | '/o/$org/courses/$courseId/labs/$labId/present'
     | '/o/$org/courses/$courseId/groups/$groupId/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/o/$org/courses/$courseId'
     | '/o/$org/courses/$courseId/labs/$labId'
     | '/o/$org/courses/$courseId/groups/$groupId/import'
+    | '/o/$org/courses/$courseId/labs/$labId/present'
     | '/o/$org/courses/$courseId/groups/$groupId'
   id:
     | '__root__'
@@ -155,6 +167,7 @@ export interface FileRouteTypes {
     | '/_authed/o/$org/courses/$courseId/'
     | '/_authed/o/$org/courses/$courseId/labs/$labId'
     | '/_authed/o/$org/courses/$courseId/groups/$groupId/import'
+    | '/_authed/o/$org/courses/$courseId/labs/$labId_/present'
     | '/_authed/o/$org/courses/$courseId/groups/$groupId/'
   fileRoutesById: FileRoutesById
 }
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedOOrgCoursesCourseIdGroupsGroupIdImportRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/o/$org/courses/$courseId/labs/$labId_/present': {
+      id: '/_authed/o/$org/courses/$courseId/labs/$labId_/present'
+      path: '/o/$org/courses/$courseId/labs/$labId/present'
+      fullPath: '/o/$org/courses/$courseId/labs/$labId/present'
+      preLoaderRoute: typeof AuthedOOrgCoursesCourseIdLabsLabIdPresentRouteImport
+      parentRoute: typeof AuthedRoute
+    }
   }
 }
 
@@ -254,6 +274,7 @@ interface AuthedRouteChildren {
   AuthedOOrgCoursesCourseIdIndexRoute: typeof AuthedOOrgCoursesCourseIdIndexRoute
   AuthedOOrgCoursesCourseIdLabsLabIdRoute: typeof AuthedOOrgCoursesCourseIdLabsLabIdRoute
   AuthedOOrgCoursesCourseIdGroupsGroupIdImportRoute: typeof AuthedOOrgCoursesCourseIdGroupsGroupIdImportRoute
+  AuthedOOrgCoursesCourseIdLabsLabIdPresentRoute: typeof AuthedOOrgCoursesCourseIdLabsLabIdPresentRoute
   AuthedOOrgCoursesCourseIdGroupsGroupIdIndexRoute: typeof AuthedOOrgCoursesCourseIdGroupsGroupIdIndexRoute
 }
 
@@ -265,6 +286,8 @@ const AuthedRouteChildren: AuthedRouteChildren = {
     AuthedOOrgCoursesCourseIdLabsLabIdRoute,
   AuthedOOrgCoursesCourseIdGroupsGroupIdImportRoute:
     AuthedOOrgCoursesCourseIdGroupsGroupIdImportRoute,
+  AuthedOOrgCoursesCourseIdLabsLabIdPresentRoute:
+    AuthedOOrgCoursesCourseIdLabsLabIdPresentRoute,
   AuthedOOrgCoursesCourseIdGroupsGroupIdIndexRoute:
     AuthedOOrgCoursesCourseIdGroupsGroupIdIndexRoute,
 }

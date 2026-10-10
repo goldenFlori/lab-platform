@@ -71,7 +71,8 @@ export function NotebookView({
   );
 }
 
-function Markdown({ cell }: { cell: MarkdownCell }) {
+/** One markdown cell: reading text, or a section card when it starts an exercise, theory and so on. */
+export function Markdown({ cell }: { cell: MarkdownCell }) {
   const body = cell.html.trim() ? (
     <div
       className="nb-prose"
