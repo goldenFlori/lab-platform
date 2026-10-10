@@ -61,6 +61,8 @@ live in its git-ignored `zgjidhjet/`; never publish them.
 - `src/api/db`: the Drizzle schema and database access; `migrations/`: the generated SQL for D1.
 - `src/notebook`: the notebook converter. It runs in the browser, uses WebAssembly, and is never
   used in the Worker.
+- `src/viz`: the 13 visualizations from the course site and their kit. `src/viz/index.ts` loads
+  each one lazily; `VizEmbed` (`src/web/components`) shows one.
 - `src/shared`: request and response shapes for both sides. The app imports only types, which
   keeps Zod out of its bundle.
 - `test/`: Vitest in two projects. `api` runs inside workerd, each test on an empty migrated
