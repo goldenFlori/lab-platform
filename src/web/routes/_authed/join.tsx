@@ -1,6 +1,7 @@
 import { Alert, Button, FieldError, Form, Input, Label, TextField } from '@heroui/react';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import type { FormEvent } from 'react';
+import { t as messages, useT } from '../../i18n';
 import { ApiError } from '../../lib/api';
 import { APP_NAME } from '../../lib/brand';
 import { useJoin } from '../../lib/courses';
@@ -12,28 +13,25 @@ export const Route = createFileRoute('/_authed/join')({
   validateSearch: (search: Record<string, unknown>): JoinSearch => ({
     code: typeof search.code === 'string' ? search.code.slice(0, 32) : undefined,
   }),
-  head: () => ({ meta: [{ title: `Bashkohu me kod · ${APP_NAME}` }] }),
+  head: () => ({ meta: [{ title: `${messages().join.pageTitle} · ${APP_NAME}` }] }),
   component: JoinPage,
 });
 
 function errorMessage(error: Error) {
-  if (error instanceof ApiError && error.code === 'not_found') {
-    return 'Ky kod nuk funksionon. Kontrolloni shkronjat, ose kërkojini pedagogut një kod të ri.';
-  }
+  const t = messages();
+  if (error instanceof ApiError && error.code === 'not_found') return t.join.badCode;
   if (error instanceof ApiError && error.code === 'too_many_attempts') {
-    const minutes = Math.max(1, Math.ceil((error.retryAfterSeconds ?? 900) / 60));
-    return `Shumë kode të gabuara. Provoni përsëri pas ${minutes} ${minutes === 1 ? 'minute' : 'minutash'}.`;
+    return t.join.tooMany(Math.max(1, Math.ceil((error.retryAfterSeconds ?? 900) / 60)));
   }
-  if (error instanceof ApiError && error.code === 'network') {
-    return 'Nuk u lidhëm dot me serverin. Kontrolloni internetin dhe provoni përsëri.';
-  }
-  return 'Diçka shkoi keq. Provoni përsëri.';
+  if (error instanceof ApiError && error.code === 'network') return t.common.network;
+  return t.common.somethingWrong;
 }
 
 function JoinPage() {
   const { code } = Route.useSearch();
   const join = useJoin();
   const navigate = useNavigate();
+  const t = useT();
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -49,14 +47,14 @@ function JoinPage() {
   return (
     <section className="container-page grid min-h-[calc(100dvh-var(--nav-h))] place-items-center py-12">
       <div className="w-full max-w-sm">
-        <h1 className="text-3xl font-bold tracking-tight">Bashkohu me grupin</h1>
-        <p className="mt-2 text-muted">Shkruani kodin që shfaq pedagogu në ekran, ose skanoni kodin QR.</p>
+        <h1 className="text-3xl font-bold tracking-tight">{t.join.title}</h1>
+        <p className="mt-2 text-muted">{t.join.lead}</p>
 
         <Form className="mt-8 grid gap-5" onSubmit={onSubmit}>
           <TextField name="code" isRequired fullWidth defaultValue={code}>
-            <Label>Kodi i grupit</Label>
+            <Label>{t.join.code}</Label>
             <Input
-              placeholder="p.sh. K7QM-4XPA"
+              placeholder={t.join.placeholder}
               autoComplete="off"
               autoCapitalize="characters"
               autoCorrect="off"
@@ -64,7 +62,7 @@ function JoinPage() {
               className="font-mono text-lg tracking-widest uppercase placeholder:font-sans placeholder:text-base placeholder:tracking-normal placeholder:normal-case"
               autoFocus={!code}
             />
-            <FieldError>Shkruani kodin e grupit.</FieldError>
+            <FieldError>{t.join.codeMissing}</FieldError>
           </TextField>
 
           {join.error && (
@@ -77,7 +75,7 @@ function JoinPage() {
           )}
 
           <Button type="submit" variant="primary" fullWidth isPending={join.isPending}>
-            {join.isPending ? 'Duke u bashkuar…' : 'Bashkohu'}
+            {join.isPending ? t.join.submitting : t.join.submit}
           </Button>
         </Form>
       </div>
