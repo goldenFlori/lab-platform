@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Waypoints } from 'lucide-react';
 
 export const Route = createFileRoute('/')({
   component: HomePage,
@@ -23,6 +23,9 @@ function HomePage() {
         <div className="mt-8 flex flex-wrap gap-3">
           <Link to="/courses" className="button button--primary gap-2">
             Kurset e mia <ArrowRight className="size-4" />
+          </Link>
+          <Link to="/visualizations" className="button button--secondary gap-2">
+            <Waypoints className="size-4" /> Vizualizimet
           </Link>
         </div>
       </div>
