@@ -106,5 +106,8 @@ export async function uploadNotebook(
     await putFile(path, f.name, f.body, f.type, f.gzipped);
   }
   onProgress({ phase: 'finishing' });
+  // Its search index (#17), made here like the rest.
+  const { searchSections } = await import('../../notebook/search');
+  await api(`${path}/search`, { method: 'PUT', body: { sections: searchSections(stored) } });
   return api<NotebookDetail>(`${path}/ready`, { method: 'POST' });
 }
