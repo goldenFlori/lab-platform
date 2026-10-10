@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { LAB_MAZE, type Maze, type MazeStep, parseMaze, randomMaze, solve } from './algorithms/maze';
 import { PlayerBar } from './kit/controls';
 import { Legend, StepNote, VizShell } from './kit/shell';
+import { bilingual, useText } from './kit/text';
 import { playerKeys, usePlayer } from './kit/usePlayer';
 
 /* =====================================================================
@@ -13,10 +14,63 @@ import { playerKeys, usePlayer } from './kit/usePlayer';
 
 const CELL = 20;
 
+const TEXT = bilingual(
+  {
+    start:
+      'BFS (majtas) dhe DFS (djathtas) nisin nga **A** dhe kërkojnë **B**. Çdo hap = një qelizë e eksploruar. Klikoni një qelizë për të shtuar ose hequr mur.',
+    found: (bfsSteps: number, bfsCells: number, dfsSteps: number, dfsCells: number) =>
+      `BFS gjeti rrugën më të shkurtër: **${bfsSteps} hapa**, pasi eksploroi ${bfsCells} qeliza. DFS gjeti një rrugë me **${dfsSteps} hapa** pas ${dfsCells} qelizash — jo domosdoshmërisht më e shkurtra.`,
+    noPath: 'Nuk ka rrugë nga A në B: muret e mbyllin plotësisht.',
+    step: (t: number, bfs: number, dfs: number) =>
+      `Hapi ${t}: BFS ka eksploruar ${bfs} qeliza (zgjerohet në valë, shtresë pas shtrese), DFS ${dfs} (ndjek një korridor deri në fund).`,
+    title: 'Labirinti — BFS kundrejt DFS',
+    subtitle: 'I njëjti labirint, dy strategji: radha (BFS) zgjerohet në valë, stiva (DFS) shkon sa më thellë.',
+    random: 'Labirint i rastit',
+    lab: 'Labirinti i laboratorit',
+    bfs: 'BFS — radhë (FIFO)',
+    dfs: 'DFS — stivë (LIFO)',
+    startCell: 'Fillimi A',
+    goal: 'Qëllimi B',
+    explored: 'E eksploruar',
+    frontier: 'Në radhë / stivë',
+    path: 'Rruga e gjetur',
+    cells: (n: number) => `${n} qeliza`,
+    route: (n: number) => `rruga: ${n} hapa`,
+    none: "s'ka rrugë",
+    board: (title: string, n: number) => `${title}: ${n} qeliza të eksploruara`,
+  },
+  {
+    start:
+      'BFS (left) and DFS (right) start from **A** and look for **B**. Each step = one explored cell. Click a cell to add or remove a wall.',
+    found: (bfsSteps, bfsCells, dfsSteps, dfsCells) =>
+      `BFS found the shortest path: **${bfsSteps} steps**, after exploring ${bfsCells} cells. DFS found a path of **${dfsSteps} steps** after ${dfsCells} cells — not necessarily the shortest.`,
+    noPath: 'There is no path from A to B: the walls close it off completely.',
+    step: (t, bfs, dfs) =>
+      `Step ${t}: BFS has explored ${bfs} cells (it spreads in waves, layer by layer), DFS ${dfs} (it follows a corridor to its end).`,
+    title: 'The maze — BFS versus DFS',
+    subtitle:
+      'The same maze, two strategies: the queue (BFS) spreads in waves, the stack (DFS) goes as deep as it can.',
+    random: 'Random maze',
+    lab: 'The lab’s maze',
+    bfs: 'BFS — queue (FIFO)',
+    dfs: 'DFS — stack (LIFO)',
+    startCell: 'Start A',
+    goal: 'Goal B',
+    explored: 'Explored',
+    frontier: 'In the queue / stack',
+    path: 'The path found',
+    cells: (n) => `${n} cells`,
+    route: (n) => `path: ${n} steps`,
+    none: 'no path',
+    board: (title, n) => `${title}: ${n} cells explored`,
+  },
+);
+
 export default function MazeViz() {
   const [maze, setMaze] = useState<Maze>(() => parseMaze(LAB_MAZE));
   const [edited, setEdited] = useState(false);
 
+  const L = useText(TEXT);
   const runs = useMemo(() => ({ bfs: solve(maze, 'bfs'), dfs: solve(maze, 'dfs') }), [maze]);
   const ticks = useMemo(() => Array.from({ length: Math.max(runs.bfs.length, runs.dfs.length) }, (_, i) => i), [runs]);
   const player = usePlayer(ticks, 90);
@@ -36,17 +90,17 @@ export default function MazeViz() {
 
   const note =
     t === 0
-      ? 'BFS (majtas) dhe DFS (djathtas) nisin nga **A** dhe kërkojnë **B**. Çdo hap = një qelizë e eksploruar. Klikoni një qelizë për të shtuar ose hequr mur.'
+      ? L.start
       : b.done && d.done
         ? bEnd.found
-          ? `BFS gjeti rrugën më të shkurtër: **${bEnd.path.length - 1} hapa**, pasi eksploroi ${bEnd.explored.length} qeliza. DFS gjeti një rrugë me **${dEnd.path.length - 1} hapa** pas ${dEnd.explored.length} qelizash — jo domosdoshmërisht më e shkurtra.`
-          : 'Nuk ka rrugë nga A në B: muret e mbyllin plotësisht.'
-        : `Hapi ${t}: BFS ka eksploruar ${b.explored.length} qeliza (zgjerohet në valë, shtresë pas shtrese), DFS ${d.explored.length} (ndjek një korridor deri në fund).`;
+          ? L.found(bEnd.path.length - 1, bEnd.explored.length, dEnd.path.length - 1, dEnd.explored.length)
+          : L.noPath
+        : L.step(t, b.explored.length, d.explored.length);
 
   return (
     <VizShell
-      title="Labirinti — BFS kundrejt DFS"
-      subtitle="I njëjti labirint, dy strategji: radha (BFS) zgjerohet në valë, stiva (DFS) shkon sa më thellë."
+      title={L.title}
+      subtitle={L.subtitle}
       icon={<Grid3x3 />}
       onKeyDown={playerKeys(player)}
       toolbar={
@@ -59,7 +113,7 @@ export default function MazeViz() {
               setEdited(true);
             }}
           >
-            <Dices /> Labirint i rastit
+            <Dices /> {L.random}
           </Button>
           <Button
             size="sm"
@@ -70,7 +124,7 @@ export default function MazeViz() {
               setEdited(false);
             }}
           >
-            <RotateCcw /> Labirinti i laboratorit
+            <RotateCcw /> {L.lab}
           </Button>
         </div>
       }
@@ -82,16 +136,16 @@ export default function MazeViz() {
       }
     >
       <div className="grid grid-cols-1 gap-4 p-4 sm:p-5 lg:grid-cols-2">
-        <MazeBoard maze={maze} step={b} title="BFS — radhë (FIFO)" onToggle={toggleWall} final={bEnd} />
-        <MazeBoard maze={maze} step={d} title="DFS — stivë (LIFO)" onToggle={toggleWall} final={dEnd} />
+        <MazeBoard maze={maze} step={b} title={L.bfs} onToggle={toggleWall} final={bEnd} />
+        <MazeBoard maze={maze} step={d} title={L.dfs} onToggle={toggleWall} final={dEnd} />
         <div className="lg:col-span-2">
           <Legend
             items={[
-              { color: 'var(--viz-done)', label: 'Fillimi A' },
-              { color: 'var(--viz-reject)', label: 'Qëllimi B' },
-              { color: 'color-mix(in oklab, var(--viz-path) 35%, var(--viz-canvas))', label: 'E eksploruar' },
-              { color: 'var(--viz-compare)', label: 'Në radhë / stivë' },
-              { color: 'var(--viz-active)', label: 'Rruga e gjetur' },
+              { color: 'var(--viz-done)', label: L.startCell },
+              { color: 'var(--viz-reject)', label: L.goal },
+              { color: 'color-mix(in oklab, var(--viz-path) 35%, var(--viz-canvas))', label: L.explored },
+              { color: 'var(--viz-compare)', label: L.frontier },
+              { color: 'var(--viz-active)', label: L.path },
             ]}
           />
         </div>
@@ -113,6 +167,7 @@ function MazeBoard({
   onToggle: (i: number) => void;
   final: MazeStep;
 }) {
+  const L = useText(TEXT);
   const explored = new Set(step.explored);
   const frontier = new Set(step.frontier);
   const path = new Set(step.path);
@@ -124,16 +179,16 @@ function MazeBoard({
         <span className="text-sm font-semibold">{title}</span>
         <div className="flex gap-1.5">
           <Chip size="sm" variant="soft">
-            {step.explored.length} qeliza
+            {L.cells(step.explored.length)}
           </Chip>
           {step.done && step.found && (
             <Chip size="sm" variant="soft" color="success">
-              rruga: {step.path.length - 1} hapa
+              {L.route(step.path.length - 1)}
             </Chip>
           )}
           {step.done && !step.found && final.done && (
             <Chip size="sm" variant="soft" color="danger">
-              s'ka rrugë
+              {L.none}
             </Chip>
           )}
         </div>
@@ -142,7 +197,7 @@ function MazeBoard({
         viewBox={`0 0 ${W} ${H}`}
         className="block h-auto w-full rounded-lg"
         role="img"
-        aria-label={`${title}: ${step.explored.length} qeliza të eksploruara`}
+        aria-label={L.board(title, step.explored.length)}
       >
         {maze.wall.map((isWall, i) => {
           const r = Math.floor(i / maze.cols),
