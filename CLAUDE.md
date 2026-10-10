@@ -99,7 +99,9 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   `test/api/tenant-isolation.test.ts`.
 - **The converter must keep making the course site's cells.** The 19 fixture notebooks and their
   snapshots in `test/notebook/fixtures` are the specification. Change a snapshot only on
-  purpose, with `scripts/snapshot-course-notebooks.ts`.
+  purpose, with `scripts/snapshot-course-notebooks.ts`, which also copies the site's embeds
+  (`embeds.json`, used by the end-to-end tests). Run `npm run format` after it: the script writes
+  plain JSON, and only formatting tells a real change from none.
 - **Every organization route checks a capability.** It lives under `/api/orgs/:org` behind
   `tenantAccess` and uses `requireCapability` or `c.var.access.can(…)`, passing the resource's
   course and group. Add a test for who may and who may not.
