@@ -1,0 +1,276 @@
+{
+  "title": "Struktura Diskrete & Algoritme",
+  "labs": [
+    {
+      "n": 1,
+      "week": 1,
+      "lecture": "Leksioni 1",
+      "status": "updated",
+      "title": "Insertion Sort & Selection Sort",
+      "topics": ["renditje", "kompleksitet"],
+      "summary": "Hyrje në renditjen si problem themelor. Dy algoritmet e para: si funksionojnë, si i vizualizojmë dhe pse rendi fillestar i të dhënave ndikon te njëri por jo te tjetri.",
+      "resources": [
+        {
+          "type": "main",
+          "title": "Laboratori 1 — Materiali kryesor",
+          "notebook": "laborator-01.ipynb",
+          "note": "Teoria + 4 ushtrime (2 Pygame, 2 Plotly/matplotlib)."
+        },
+        {
+          "type": "supplementary",
+          "title": "Ushtrime Shtesë — A funksionon? Induksioni & rasti më i keq",
+          "notebook": "laborator-01-ushtrime-shtese.ipynb",
+          "note": "Leksioni 1 (slides 17–45): pseudokodi rresht për rresht, hipoteza e induksionit si assert, pse testet nuk vërtetojnë, inputi më i keq. 5 ushtrime me kontroll automatik + Punë në Klasë."
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "week": 2,
+      "lecture": "Leksioni 2",
+      "status": "updated",
+      "title": "Kompleksiteti Kohor dhe Merge Sort",
+      "topics": ["kompleksitet", "renditje"],
+      "summary": "Notacioni Big O dhe pse numërojmë operacione e jo sekonda. Merge Sort si përgjigjja ndaj pyetjes \"a mund të bëjmë më mirë se O(n²)?\" — Përça e Sundo në praktikë.",
+      "resources": [
+        {
+          "type": "main",
+          "title": "Laboratori 2 — Materiali kryesor",
+          "notebook": "laborator-02.ipynb",
+          "note": "Teoria e Big-O + 5 ushtrime. Grafikët Plotly janë interaktivë në këtë faqe."
+        },
+        {
+          "type": "supplementary",
+          "title": "Ushtrime Shtesë — Numërimi i veprimeve & përkufizimi i O(·)",
+          "notebook": "laborator-02-ushtrime-shtese.ipynb",
+          "note": "Leksioni 2 + Leksioni 3 (slides 2, 21): tabela e numërimit të rreshtave, gjetja e c dhe n₀, klasat O(·), Merge(L, R) i saktë. 5 ushtrime me kontroll automatik + Punë në Klasë."
+        }
+      ]
+    },
+    {
+      "n": 3,
+      "week": 3,
+      "lecture": "Leksioni 3",
+      "status": "updated",
+      "title": "Analiza e Kompleksitetit Mbi Algoritmet e Renditjes",
+      "topics": ["kompleksitet", "renditje"],
+      "summary": "Krahasimet si metrikë e pavarur nga hardware-i. Tre algoritmet × tre raste (rastësor, i renditur, reverse) dhe kurbat e rritjes O(n²) kundrejt O(n log n).",
+      "resources": [
+        {
+          "type": "main",
+          "title": "Laboratori 3 — Materiali kryesor",
+          "notebook": "laborator-03.ipynb",
+          "note": "Teoria + 4 ushtrime, përfshirë lojën \"Gjej Algoritmin!\"."
+        },
+        {
+          "type": "supplementary",
+          "title": "Ushtrime Shtesë — Induksioni i fortë & pema rekursive",
+          "notebook": "laborator-03-ushtrime-shtese.ipynb",
+          "note": "Leksioni 3: logaritmi si përgjysmime, pema rekursive e matur nga kodi, HI e Merge Sort në çdo thirrje rekursive, rasti bazë i gabuar. 4 ushtrime + Punë në Klasë."
+        }
+      ]
+    },
+    {
+      "n": 4,
+      "week": 4,
+      "lecture": "Leksioni 4",
+      "status": "updated",
+      "title": "Hyrje në Teorinë e Grafeve",
+      "topics": ["grafe"],
+      "summary": "G = (V, E): kulme, brinjë, fuqi, lake dhe brinjë paralele. Llojet e grafeve, lista kundrejt matricës së fqinjësisë, bashkësi e pavarur, klikë dhe grafe dyanësore.",
+      "resources": [
+        {
+          "type": "main",
+          "title": "Laboratori 4 — Materiali kryesor",
+          "notebook": "laborator-04.ipynb",
+          "note": "Terminologjia shqip↔anglisht + 4 ushtrime (2 Pygame, 2 NetworkX)."
+        },
+        {
+          "type": "supplementary",
+          "title": "Ushtrime Shtesë — Nga Königsbergu te komponentet e lidhura fort",
+          "notebook": "laborator-04-ushtrime-shtese.ipynb",
+          "note": "Leksioni 4 i plotë: Euler, lema e shtrëngimit të duarve, Kₙ dhe grafi plotësues, nëngrafet, paraqitjet, udhëtim/udha/cikël/shteg, diametri, lidhja te digrafet. 8 ushtrime + Punë në Klasë."
+        }
+      ]
+    },
+    {
+      "n": 5,
+      "week": 5,
+      "lecture": "",
+      "status": "published",
+      "title": "Algoritmet e Grafeve: BFS, DFS, Kruskal & Prim",
+      "topics": ["pershkim", "mst", "grafe"],
+      "summary": "Përshkimi i grafeve me radhë dhe stivë, zgjidhja e labirintit, dhe dy algoritmet greedy për Pemën Përfshirëse Minimum. Përfshin punë në klasë dhe detyra shtëpie.",
+      "resources": [
+        {
+          "type": "main",
+          "title": "Laboratori 5 — Materiali kryesor",
+          "notebook": "laborator-05.ipynb",
+          "sections": {
+            "ranges": [[null, "ushtrimi-4-komponentet-e-lidhura-fort"], ["pune-ne-klase", null]]
+          },
+          "note": "Ushtrimet 1–3, Punë në Klasë dhe Detyrat e Shtëpisë."
+        }
+      ],
+      "homework": [
+        {
+          "embedded": true,
+          "title": "3 probleme: lidhshmëria me BFS, nivelet e BFS, MST me Kruskal",
+          "anchor": "detyra-per-shtepi",
+          "note": "Brenda fletores së laboratorit — plotësohen boshllëqet `# PLOTESO`."
+        }
+      ]
+    },
+    {
+      "n": 6,
+      "week": 6,
+      "lecture": "Leksioni 4",
+      "status": "published",
+      "title": "Komponentet e Lidhura Fort & Renditjet Topologjike",
+      "topics": ["pershkim", "grafe"],
+      "summary": "SCC në grafe të drejtuara dhe renditja topologjike e një DAG-u. Ndërtohen mbi BFS/DFS të Laboratorit 5 dhe zbatohen te varësitë: lëndë universitare, hapa ndërtimi, receta.",
+      "resources": [
+        {
+          "type": "main",
+          "title": "Laboratori 6 — Materiali kryesor",
+          "notebook": "laborator-05.ipynb",
+          "sections": {
+            "ranges": [["ushtrimi-4-komponentet-e-lidhura-fort", "pune-ne-klase"]]
+          },
+          "note": "SCC, Renditjet Topologjike dhe loja interaktive e renditjes topologjike."
+        }
+      ]
+    },
+    {
+      "n": 7,
+      "week": 7,
+      "lecture": "",
+      "status": "published",
+      "title": "Rrugët më të Shkurtra: Dijkstra · Bellman-Ford · Floyd-Warshall",
+      "topics": ["rruget", "dp"],
+      "summary": "Tre algoritmet kryesore të rrugëve më të shkurtra, kushtet e tyre dhe kompleksiteti. Nga GPS-i mbi hartën e Shqipërisë te zbulimi i cikleve negative dhe matrica e distancave.",
+      "resources": [
+        {
+          "type": "main",
+          "title": "Laboratori 7 — Materiali kryesor",
+          "notebook": "laborator-07.ipynb",
+          "note": "6 ushtrime Pygame + Punë në Klasë me 4 probleme."
+        },
+        {
+          "type": "supplementary",
+          "title": "Dijkstra — Hap pas hapi",
+          "notebook": "dijkstra-animated.ipynb",
+          "lang": "en",
+          "note": "Fletore plotësuese që regjistron çdo hap të algoritmit dhe i vizaton me matplotlib."
+        },
+        {
+          "type": "supplementary",
+          "title": "Bellman-Ford — Hap pas hapi",
+          "notebook": "bellman-ford-animated.ipynb",
+          "lang": "en",
+          "note": "Struktura paralele me fletoren e Dijkstra-s — ideale për krahasim ballë-për-ballë."
+        }
+      ]
+    },
+    {
+      "n": 8,
+      "week": 8,
+      "lecture": "Leksionet 5–6",
+      "status": "published",
+      "title": "Floyd-Warshall & Rrjedhat Maksimale: Edmonds-Karp",
+      "topics": ["rruget", "dp", "rrjedha"],
+      "summary": "Programimi dinamik për të gjitha çiftet e kulmeve, dhe hyrja në rrjedhat maksimale. Tre skenarë realë: logjistika urbane, rrjeti i klinikave dhe ujësjellësi në emergjencë.",
+      "resources": [
+        {
+          "type": "main",
+          "title": "Laboratori 8 — Materiali kryesor",
+          "notebook": "laborator-08.ipynb",
+          "note": "Pseudokodi i plotë, matricat D dhe P, 3 skenarë realë + 7 pyetje reflektuese."
+        }
+      ]
+    },
+    {
+      "n": 9,
+      "week": 9,
+      "lecture": "Leksionet 5–6",
+      "status": "updated",
+      "title": "Max-Flow / Min-Cut & Ford-Fulkerson kundrejt Edmonds-Karp",
+      "topics": ["rrjedha", "grafe"],
+      "summary": "Teorema Max-Flow = Min-Cut dhe pse zgjedhja e rrugës rritëse (DFS apo BFS) ndryshon numrin e iterimeve por jo rezultatin final.",
+      "resources": [
+        {
+          "type": "main",
+          "title": "Laboratori 9 — Materiali kryesor",
+          "notebook": "laborator-09.ipynb",
+          "note": "4 ushtrime + loja finale \"Pipeline Defender\". Detyrat janë brenda fletores."
+        },
+        {
+          "type": "supplementary",
+          "title": "Ushtrime Shtesë — Ndërtoni Ford-Fulkerson-in hap pas hapi",
+          "notebook": "laborator-09-ushtrime-shtese.ipynb",
+          "note": "Leksionet 5–6: rrjedha e lejueshme, kapaciteti i prerjes, pse dështon greedy, rrjeta mbetëse, rritRrjedhë, FF/EK, shembulli me C, prerja min nga Gf. 8 ushtrime + Punë në Klasë."
+        }
+      ],
+      "homework": [
+        {
+          "embedded": true,
+          "title": "3 detyra: Min-Cut i rrjetit ISP, Ford-Fulkerson dhe Edmonds-Karp mbi rrjetin hekurudhor",
+          "anchor": "detyra-shtepie",
+          "note": "Brenda fletores — ndryshohen vetëm vlerat e shënuara me `# TODO`."
+        }
+      ]
+    },
+    {
+      "n": 10,
+      "week": 10,
+      "lecture": "Leksionet 5–6",
+      "status": "published",
+      "title": "Aplikime të Rrjedhës Maksimale: Çiftëzimi & Problemet e Caktimit",
+      "topics": ["rrjedha", "grafe"],
+      "summary": "Pjesa e fundit e Leksioneve 5–6: çiftëzimi maksimum në grafe dyanësore (vajzat dhe kotelet), problemet e caktimit (lulet dhe buqetat) dhe modelimi i një problemi të ri si rrjetë rrjedhë.",
+      "resources": [
+        {
+          "type": "main",
+          "title": "Laboratori 10 — Materiali kryesor",
+          "notebook": "laborator-10.ipynb",
+          "note": "4 ushtrime me kontroll automatik + Punë në Klasë. Pa Pygame — ekzekutohet edhe në Colab."
+        }
+      ]
+    }
+  ],
+  "homework": [
+    {
+      "id": "algoritmet-e-renditjes",
+      "lab": 2,
+      "alsoLabs": [1],
+      "title": "Algoritmet e Renditjes",
+      "status": "published",
+      "notebook": "detyra-lab02-algoritmet-e-renditjes.ipynb",
+      "topics": ["renditje", "kompleksitet"],
+      "summary": "Komentoni rresht për rresht Insertion, Selection dhe Merge Sort, pastaj plotësoni tabelat e karakteristikave (best/average/worst case, stable, in-place) dhe krahasimin final.",
+      "due": ""
+    },
+    {
+      "id": "analiza-e-kompleksitetit",
+      "lab": 3,
+      "alsoLabs": [2],
+      "title": "Analiza e Kompleksitetit Kohor",
+      "status": "published",
+      "notebook": "detyra-lab03-analiza-e-kompleksitetit.ipynb",
+      "topics": ["kompleksitet"],
+      "summary": "Zëvendësoni matjen e sekondave me numërimin e krahasimeve — saktësisht 3 rreshta `# NDRYSHO` — dhe përgjigjuni 5 pyetjeve analize mbi grafikun që prodhoni.",
+      "spoilerWarning": "Fletorja ruan grafikun përfundimtar nga një ekzekutim i mëparshëm. Në këtë faqe ai shfaqet i palosur — hapeni vetëm pasi të keni punuar vetë.",
+      "due": ""
+    },
+    {
+      "id": "scc-dhe-renditje-topologjike",
+      "lab": 6,
+      "title": "Komponentet e Lidhura Fort & Renditjet Topologjike",
+      "status": "published",
+      "notebook": "detyra-lab06-scc-dhe-renditje-topologjike.ipynb",
+      "topics": ["pershkim", "grafe"],
+      "summary": "Dy probleme, secili me punë me shkrim (tabela reach dhe SCC) dhe kod me boshllëqe `# PLOTESO` që ripërdorin funksionet e Ushtrimeve 4–6 të laboratorit.",
+      "due": ""
+    }
+  ]
+}
