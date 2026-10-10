@@ -6,7 +6,10 @@ export const ORIGIN = 'https://lab.test';
 const PASSWORD = 'Sakte-sakte-2026';
 let hash: Promise<string> | undefined;
 
-type Call = (path: string, init?: { method?: string; body?: unknown }) => Promise<Response>;
+type Call = (
+  path: string,
+  init?: { method?: string; body?: unknown; raw?: BodyInit; headers?: Record<string, string> },
+) => Promise<Response>;
 
 /** Calls the real API as a signed-in user (or anonymously without a cookie). */
 export function caller(cookie?: string): Call {
@@ -17,8 +20,9 @@ export function caller(cookie?: string): Call {
         Origin: ORIGIN,
         'Content-Type': 'application/json',
         ...(cookie ? { Cookie: cookie } : {}),
+        ...init.headers,
       },
-      body: init.body === undefined ? undefined : JSON.stringify(init.body),
+      body: init.raw ?? (init.body === undefined ? undefined : JSON.stringify(init.body)),
     });
 }
 

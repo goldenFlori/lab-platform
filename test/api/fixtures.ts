@@ -3,7 +3,10 @@ import { createDb } from '../../src/api/db';
 import { createOrganization } from '../../src/api/db/platform';
 import { forTenant } from '../../src/api/db/tenant';
 
-/** An organization with one of everything: a pedagog, a template, a course, a group, a lab and its access. */
+/**
+ * An organization with one of everything: a pedagog, a template, a course, a group, a lab with its
+ * access rule, and a ready notebook with one embed.
+ */
 export async function seedOrganization(slug: string) {
   const db = createDb(env.DB);
   const org = await createOrganization(db, { name: `Org ${slug}`, slug });
@@ -21,7 +24,18 @@ export async function seedOrganization(slug: string) {
   const labAccess = await tenant.labAccess.create({ labId: lab.id, groupId: group.id });
   const membership = await tenant.memberships.create({ userId: user.id, courseId: course.id, role: 'pedagog' });
 
-  return { db, org, tenant, user, template, course, group, lab, labAccess, membership };
+  const notebook = await tenant.notebooks.create({
+    labId: lab.id,
+    kind: 'main',
+    title: 'Grafet',
+    position: 1,
+    originalName: 'laborator-04.ipynb',
+    sha256: '0'.repeat(64),
+    readyAt: new Date(),
+  });
+  await tenant.notebooks.setEmbeds(notebook.id, [{ cell: 2, viz: 'grafet', title: 'Grafi', props: null }]);
+
+  return { db, org, tenant, user, template, course, group, lab, labAccess, membership, notebook };
 }
 
 export type Seeded = Awaited<ReturnType<typeof seedOrganization>>;
