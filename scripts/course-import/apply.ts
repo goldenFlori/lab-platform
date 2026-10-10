@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
+import { searchSections } from '../../src/notebook/search.ts';
 import type { StoredNotebook } from '../../src/notebook/stored.ts';
 import type { CourseSummary } from '../../src/shared/courses.ts';
 import type { LabList, LabView } from '../../src/shared/labs.ts';
@@ -74,6 +75,7 @@ export async function uploadNotebook(
     });
     if (!res.ok) throw new Error(`PUT ${file.name} of ${notebook.originalName}: ${res.status} ${await res.text()}`);
   }
+  await call(api, 'PUT', `${path}/search`, { sections: searchSections(notebook.stored) });
   await call(api, 'POST', `${path}/ready`);
   return created;
 }
@@ -116,13 +118,18 @@ export async function importCourse(
     const names = new Set(planned.notebooks.map((nb) => nb.originalName));
     const { notebooks: present } = await call<{ notebooks: NotebookSummary[] }>(api, 'GET', `${labPath}/notebooks`);
     let ours = present.filter((nb) => names.has(nb.originalName)).sort((a, b) => a.position - b.position);
-    if (!(await unchanged(api, labPath, ours, planned))) {
+    const kept = await unchanged(api, labPath, ours, planned);
+    if (!kept) {
       for (const nb of ours) await call(api, 'DELETE', `${labPath}/notebooks/${nb.id}`);
       ours = [];
       for (const nb of planned.notebooks) ours.push(await uploadNotebook(api, labPath, nb));
       if (change === 'unchanged') change = 'updated';
     }
     for (const [i, nb] of ours.entries()) {
+      // Kept notebooks get their search index again, so those imported before search have one too.
+      const stored = planned.notebooks[i]?.stored;
+      if (kept && stored)
+        await call(api, 'PUT', `${labPath}/notebooks/${nb.id}/search`, { sections: searchSections(stored) });
       const embeds: Embed[] = planned.notebooks[i]?.embeds ?? [];
       const current = await call<NotebookDetail>(api, 'GET', `${labPath}/notebooks/${nb.id}`);
       if (JSON.stringify(current.embeds) === JSON.stringify(embeds)) continue;

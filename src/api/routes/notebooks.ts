@@ -11,10 +11,11 @@ import {
   ORIGINAL_FILE,
   RENDERED_FILE,
 } from '../../shared/notebooks';
+import { searchSectionsInput } from '../../shared/search';
 import type { TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
 import { forbidden, invalidRequest } from './course-context';
-import { type LabContext, labContext, solutionsOpenTo, visibleLab } from './lab-context';
+import { type LabContext, labContext, mayReadNotebook, visibleLab } from './lab-context';
 
 // A lab's notebooks (#14), under /api/orgs/:org/courses/:courseId/labs/:labId/notebooks.
 //
@@ -31,8 +32,6 @@ type Notebook = {
   originalName: string;
   readyAt: Date | null;
 };
-type Lab = ReturnType<typeof visibleLab>;
-
 /** Types a file may be served as; anything else is refused at upload. */
 const SAFE_TYPES = new Set([
   'application/json',
@@ -52,17 +51,12 @@ const summary = (nb: Notebook): NotebookSummary => ({
   ready: nb.readyAt !== null,
 });
 
-function mayRead(ctx: LabContext, lab: Lab, nb: Notebook) {
-  if (ctx.staff) return true;
-  return nb.readyAt !== null && (nb.kind !== 'solution' || solutionsOpenTo(ctx, lab));
-}
-
 /** The lab and notebook in the URL as this user may see them, or 404. */
 async function notebookInUrl(c: Context<TenantEnv>) {
   const ctx = await labContext(c);
   const lab = visibleLab(c, ctx);
   const nb = await c.var.tenant.notebooks.get(c.req.param('notebookId') ?? '');
-  if (!nb || nb.labId !== lab.id || !mayRead(ctx, lab, nb)) throw new NotFoundError();
+  if (!nb || nb.labId !== lab.id || !mayReadNotebook(ctx, lab, nb)) throw new NotFoundError();
   return { ctx, lab, nb };
 }
 
@@ -88,7 +82,7 @@ export const notebookRoutes = new Hono<TenantEnv>()
     const ctx = await labContext(c);
     const lab = visibleLab(c, ctx);
     const notebooks = await c.var.tenant.notebooks.ofLab(lab.id);
-    return c.json({ notebooks: notebooks.filter((nb) => mayRead(ctx, lab, nb)).map(summary) });
+    return c.json({ notebooks: notebooks.filter((nb) => mayReadNotebook(ctx, lab, nb)).map(summary) });
   })
 
   .post('/', zValidator('json', createNotebookInput, invalidRequest), async (c) => {
@@ -168,6 +162,14 @@ export const notebookRoutes = new Hono<TenantEnv>()
         .embeds.map((e) => ({ cell: e.cell, viz: e.viz, title: e.title ?? null, props: e.props ?? null })),
     );
     return c.json(await detail(c, nb));
+  })
+
+  // Its search index (#17), made where it was converted; replaces the old one.
+  .put('/:notebookId/search', zValidator('json', searchSectionsInput, invalidRequest), async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    if (!canManage(c, ctx)) return forbidden(c);
+    await c.var.tenant.notebooks.setSearchSections(nb.id, c.req.valid('json').sections);
+    return c.body(null, 204);
   })
 
   .delete('/:notebookId', async (c) => {

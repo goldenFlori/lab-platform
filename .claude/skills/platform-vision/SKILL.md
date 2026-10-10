@@ -165,7 +165,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   visualizations and solutions (staff-only) in through the API. Re-running it updates only what
   changed. Labs 5 and 6 each get their own part of the notebook they share on the site. Next, the
   owner imports "Struktura Diskrete & Algoritme" 2026/27 into FSHN in production.
-- **Next:** #17, search.
+- **2026-10-10:** #17 done. A ⌘K search over labs, notebook sections and visualizations, instant
+  as you type and without accents mattering. A student never gets text from a hidden lab or a
+  closed solution: the server sends only what they may see, proven by tests. Re-running the
+  course import gives the notebooks already imported their search index (PR #43).
+- **Next:** #18, basic analytics.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
@@ -192,6 +196,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-10 | The 13 visualizations are platform content, open to everyone at `/visualizations`: they hold no tenant data, are already public on the course site, and show what the product does | Decided |
 | 2026-10-10 | Course content is imported through the API with a pedagog's sign-in, never written straight into the database: the same permission checks and storage as the app, for any environment. Re-running it is safe, and it never opens labs | Decided |
 | 2026-10-10 | When the site shows parts of one notebook in two labs, each lab gets its own notebook of those cells, so students download only their lab's part | Decided |
+| 2026-10-10 | Search without FTS5: D1 cannot export databases with virtual tables, and backups must keep working. The server sends each user the text of what they may see; the browser matches it as they type | Decided |
 
 Decisions were delegated to Claude ("you decide"). Record new ones here with the date.
 

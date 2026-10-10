@@ -114,6 +114,8 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   the new SQL. Never edit or delete a migration once it is merged. CI fails if the schema and the
   migrations disagree. Production applies them before the new code is live, so never rename or
   drop what the running code still uses in the same release.
+- **No virtual tables in D1** (FTS5 included): `wrangler d1 export`, which the weekly backup
+  uses, refuses a database that has one. Search uses plain rows (see `platform-architecture`).
 - **D1 limits bulk writes:** 100 bound parameters per statement and 50 statements per request on
   the free plan. Write many rows as multi-row inserts of `ROWS_PER_INSERT` rows, split big jobs
   into several requests, and test parameter counts with `toSQL()`. The local database does not

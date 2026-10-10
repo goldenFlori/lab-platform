@@ -99,6 +99,9 @@ describe('cross-tenant isolation: links to another organization', () => {
       a.tenant.memberships.create({ userId: a.user.id, groupId: b.group.id, role: 'student' }),
     ];
     for (const attempt of attempts) await expect(attempt).rejects.toBeInstanceOf(NotFoundError);
+    await expect(
+      a.tenant.notebooks.setSearchSections(b.notebook.id, [{ anchor: null, title: 'X', text: 'X', keywords: '' }]),
+    ).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it("does not give memberships to another organization's users", async () => {

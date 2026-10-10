@@ -13,6 +13,7 @@ import type { TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
 import { forbidden, groupOf, invalidRequest, seesCourse, summary, visibleCourse } from './course-context';
 import { labRoutes } from './labs';
+import { searchRoutes } from './search';
 
 // Courses and their groups, under /api/orgs/:org/courses (#10).
 
@@ -169,4 +170,5 @@ export const courseRoutes = new Hono<TenantEnv>()
     return c.json({ joinCode });
   })
 
-  .route('/:courseId/labs', labRoutes);
+  .route('/:courseId/labs', labRoutes)
+  .route('/:courseId/search', searchRoutes);
