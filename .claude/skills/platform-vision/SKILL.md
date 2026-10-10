@@ -154,7 +154,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   and #34).
 - **2026-10-10:** #13 done. The notebook converter in TypeScript (`src/notebook`) for the browser,
   matching the course site's output on all 19 course notebooks (PR #35).
-- **Next:** #14, the lab viewer with the 13 visualizations.
+- **2026-10-10:** #14 done. The 13 visualizations with a public gallery, the lab page that shows a
+  lab's notebooks with their outputs, figures and visualizations (sanitized), and uploading and
+  editing them from the browser. Every course notebook renders with its visualizations
+  (PRs #37, #39 and #40).
+- **Next:** #15, presentation mode.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 

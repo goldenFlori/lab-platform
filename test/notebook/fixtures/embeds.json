@@ -1,0 +1,359 @@
+{
+  "bellman-ford-animated.ipynb": [
+    {
+      "cell": 12,
+      "viz": "rruget",
+      "title": "Bellman-Ford hap pas hapi",
+      "props": {
+        "preset": "nb-bf",
+        "view": "bellman"
+      }
+    }
+  ],
+  "dijkstra-animated.ipynb": [
+    {
+      "cell": 12,
+      "viz": "rruget",
+      "title": "Dijkstra hap pas hapi",
+      "props": {
+        "preset": "nb-dijkstra",
+        "view": "dijkstra"
+      }
+    }
+  ],
+  "laborator-01-ushtrime-shtese.ipynb": [
+    {
+      "cell": 20,
+      "viz": "renditja",
+      "title": "Rasti më i keq i Insertion Sort",
+      "props": {
+        "algo": "insertion",
+        "values": [8, 7, 6, 5, 4, 3, 2, 1]
+      }
+    }
+  ],
+  "laborator-01.ipynb": [
+    {
+      "cell": 1,
+      "viz": "renditja",
+      "title": "Insertion Sort hap pas hapi",
+      "props": {
+        "algo": "insertion"
+      }
+    },
+    {
+      "cell": 3,
+      "viz": "renditja",
+      "title": "Selection Sort hap pas hapi",
+      "props": {
+        "algo": "selection"
+      }
+    }
+  ],
+  "laborator-02-ushtrime-shtese.ipynb": [
+    {
+      "cell": 12,
+      "viz": "kompleksiteti",
+      "title": "Eksploruesi i kompleksitetit"
+    }
+  ],
+  "laborator-02.ipynb": [
+    {
+      "cell": 1,
+      "viz": "kompleksiteti",
+      "title": "Eksploruesi i kompleksitetit"
+    },
+    {
+      "cell": 2,
+      "viz": "renditja",
+      "title": "Merge Sort hap pas hapi",
+      "props": {
+        "algo": "merge",
+        "values": [38, 27, 43, 3, 9, 82, 10, 15]
+      }
+    }
+  ],
+  "laborator-03-ushtrime-shtese.ipynb": [
+    {
+      "cell": 7,
+      "viz": "renditja",
+      "title": "Merge Sort hap pas hapi",
+      "props": {
+        "algo": "merge",
+        "values": [38, 27, 43, 3, 9, 82, 10, 15]
+      }
+    }
+  ],
+  "laborator-03.ipynb": [
+    {
+      "cell": 2,
+      "viz": "gara-e-krahasimeve",
+      "title": "Gara e krahasimeve"
+    },
+    {
+      "cell": 8,
+      "viz": "gjej-algoritmin",
+      "title": "Lojë: Gjej algoritmin!"
+    }
+  ],
+  "laborator-04-ushtrime-shtese.ipynb": [
+    {
+      "cell": 6,
+      "viz": "grafet",
+      "title": "Urat e Königsbergut",
+      "props": {
+        "mode": "build",
+        "preset": "konigsberg"
+      }
+    },
+    {
+      "cell": 35,
+      "viz": "scc-topologjike",
+      "title": "Komponentet e lidhura fort",
+      "props": {
+        "mode": "scc",
+        "preset": "lab"
+      }
+    }
+  ],
+  "laborator-04.ipynb": [
+    {
+      "cell": 2,
+      "viz": "grafet",
+      "title": "Ndërtoni grafin tuaj",
+      "props": {
+        "mode": "build",
+        "preset": "shembull"
+      }
+    },
+    {
+      "cell": 4,
+      "viz": "grafet",
+      "title": "E pavarur, klikë, dyanësi",
+      "props": {
+        "mode": "analyze",
+        "preset": "katror"
+      }
+    },
+    {
+      "cell": 8,
+      "viz": "grafet",
+      "title": "Lista dhe matrica e fqinjësisë",
+      "props": {
+        "mode": "repr",
+        "preset": "digraf"
+      }
+    }
+  ],
+  "laborator-05.ipynb": [
+    {
+      "cell": 3,
+      "viz": "labirinti",
+      "title": "Labirinti me BFS dhe DFS"
+    },
+    {
+      "cell": 6,
+      "viz": "grafet",
+      "title": "BFS dhe DFS në grafin tuaj",
+      "props": {
+        "mode": "traverse",
+        "preset": "klase1"
+      }
+    },
+    {
+      "cell": 9,
+      "viz": "grafet",
+      "title": "Kruskal dhe Prim",
+      "props": {
+        "mode": "mst",
+        "preset": "mst8"
+      }
+    },
+    {
+      "cell": 12,
+      "viz": "scc-topologjike",
+      "title": "Komponentet e lidhura fort",
+      "props": {
+        "mode": "scc",
+        "preset": "lab"
+      }
+    },
+    {
+      "cell": 15,
+      "viz": "scc-topologjike",
+      "title": "Renditja topologjike e lëndëve",
+      "props": {
+        "mode": "topo",
+        "preset": "lendet"
+      }
+    },
+    {
+      "cell": 18,
+      "viz": "scc-topologjike",
+      "title": "Lojë: renditja topologjike",
+      "props": {
+        "mode": "topo",
+        "preset": "shtepia"
+      }
+    }
+  ],
+  "laborator-07.ipynb": [
+    {
+      "cell": 2,
+      "viz": "rruget",
+      "title": "GPS: harta e Shqipërisë",
+      "props": {
+        "preset": "shqiperia",
+        "view": "dijkstra"
+      }
+    },
+    {
+      "cell": 4,
+      "viz": "rruget",
+      "title": "Dijkstra mbi grafin tuaj",
+      "props": {
+        "preset": "ndertoni",
+        "view": "dijkstra"
+      }
+    },
+    {
+      "cell": 6,
+      "viz": "rruget",
+      "title": "Bellman-Ford: rrjeti i dorëzimit",
+      "props": {
+        "preset": "dorezimi",
+        "view": "both"
+      }
+    },
+    {
+      "cell": 8,
+      "viz": "kuizi-bellman-ford",
+      "title": "Kuiz: Bellman-Ford"
+    },
+    {
+      "cell": 10,
+      "viz": "floyd-warshall",
+      "title": "Floyd-Warshall: matrica e distancave",
+      "props": {
+        "preset": "ush5"
+      }
+    },
+    {
+      "cell": 12,
+      "viz": "gara-e-rrugeve",
+      "title": "Lojë: gara e rrugëve"
+    }
+  ],
+  "laborator-08.ipynb": [
+    {
+      "cell": 4,
+      "viz": "floyd-warshall",
+      "title": "Floyd-Warshall: UrbanPost",
+      "props": {
+        "preset": "urbanpost"
+      }
+    },
+    {
+      "cell": 7,
+      "viz": "floyd-warshall",
+      "title": "Floyd-Warshall: rrjeti mjekësor",
+      "props": {
+        "preset": "mjekesor"
+      }
+    },
+    {
+      "cell": 11,
+      "viz": "rrjedha-max",
+      "title": "Edmonds-Karp: ujësjellësi",
+      "props": {
+        "preset": "ujesjellesi",
+        "strategy": "ek"
+      }
+    }
+  ],
+  "laborator-09-ushtrime-shtese.ipynb": [
+    {
+      "cell": 12,
+      "viz": "rrjedha-max",
+      "title": "Pse dështon greedy",
+      "props": {
+        "preset": "leksioni",
+        "strategy": "greedy"
+      }
+    },
+    {
+      "cell": 25,
+      "viz": "rrjedha-max",
+      "title": "Shembulli me C",
+      "props": {
+        "preset": "C",
+        "strategy": "adversary"
+      }
+    }
+  ],
+  "laborator-09.ipynb": [
+    {
+      "cell": 2,
+      "viz": "rrjedha-max",
+      "title": "Gjeni prerjen minimale",
+      "props": {
+        "preset": "hidranti",
+        "mode": "cut"
+      }
+    },
+    {
+      "cell": 4,
+      "viz": "rrjedha-max",
+      "title": "Ford-Fulkerson kundrejt Edmonds-Karp",
+      "props": {
+        "preset": "qyteti",
+        "strategy": "ff"
+      }
+    },
+    {
+      "cell": 6,
+      "viz": "rrjedha-max",
+      "title": "Data center: ngushtica",
+      "props": {
+        "preset": "datacenter",
+        "strategy": "ek"
+      }
+    },
+    {
+      "cell": 8,
+      "viz": "rrjedha-max",
+      "title": "Aeroporti TIA",
+      "props": {
+        "preset": "aeroporti",
+        "strategy": "ek"
+      }
+    },
+    {
+      "cell": 10,
+      "viz": "rrjedha-max",
+      "title": "Pipeline Defender",
+      "props": {
+        "preset": "centrali",
+        "mode": "cut"
+      }
+    }
+  ],
+  "laborator-10.ipynb": [
+    {
+      "cell": 4,
+      "viz": "ciftezimi",
+      "title": "Vajzat dhe kotelet",
+      "props": {
+        "mode": "matching"
+      }
+    },
+    {
+      "cell": 13,
+      "viz": "ciftezimi",
+      "title": "Lulet dhe buqetat",
+      "props": {
+        "mode": "assignment"
+      }
+    }
+  ]
+}

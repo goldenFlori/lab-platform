@@ -286,7 +286,8 @@ Built in #8: `src/api/auth/`, data access in `src/api/db/auth.ts`, routes in
 
 ## Content pipeline
 
-- **Upload:** a pedagog uploads a `.ipynb`.
+- **Upload:** a pedagog uploads a `.ipynb` on the lab page (**Ngarko fletore**), as the lab's
+  main notebook, supplementary material or a solution (`src/web/lib/upload-notebook.ts`).
   - Their browser converts it with `renderNotebook` (`src/notebook`, #13), a TypeScript port of
     the course site's `site/scripts/notebook.mjs`. GUI cells (pygame, tkinter, subprocess,
     widgets) keep no outputs; errors, stderr and `⏳` lines are dropped.
@@ -333,10 +334,16 @@ Built in #8: `src/api/auth/`, data access in `src/api/db/auth.ts`, routes in
     follow the theme. KaTeX's styles and fonts load with the lab page.
   - Solution notebooks are served only with `solution.view`, or after `solutions_from`.
   - Not yet: folding saved outputs as a spoiler. The course site did this for one homework
-    notebook, whose saved chart gives the answer away.
+    notebook, whose saved chart gives the answer away. Nor replacing a notebook with a new
+    version while keeping its visualizations: today it is deleted and uploaded again.
 - **Embeds** (cell → visualization + props) are stored as data: `embeds`, one per cell, from
   the 13 ids in `src/shared/visualizers.ts`, replaced as a whole with
-  `PUT …/notebooks/:id/embeds`. Staff edit them in the app.
+  `PUT …/notebooks/:id/embeds`.
+  - Staff edit them above the notebook. Each cell is listed by its heading, or for code by the
+    section it belongs to, since a first line such as an import rarely says which exercise it is.
+  - Props are typed as JSON for now; a form per visualization can come when pedagogs need it.
+  - The course site's own embeds are in `test/notebook/fixtures/embeds.json`, copied by the
+    snapshot script.
 - **Re-render all:** an admin action that re-converts the originals when the converter improves.
 
 ## Visualizations
@@ -373,8 +380,11 @@ what the user may see. Pagefind is not used in the platform.
 
 - **Tests:**
   - Vitest in the Workers runtime: API, permissions, tenant isolation.
-  - Playwright end-to-end, porting the ideas from `site/scripts/qa.mjs`: every lab renders,
-    visualizations respond, mobile at 375px has no overflow, hydration is clean.
+  - Playwright end-to-end, porting the ideas from `site/scripts/qa.mjs`. Every one of the 19
+    course notebooks is uploaded with the site's embeds and must show each visualization,
+    without errors or overflow at 375px, even with every letter 0.25px wider (text renders a
+    little wider on CI's Linux than on a Mac); each visualization opens and steps; a pedagog's
+    upload, embed editing and deletion run through the real UI.
   - Biome for lint and format.
 - **CI/CD:**
   - On every PR, GitHub Actions runs lint, typecheck, the migration and route-tree checks,
