@@ -44,6 +44,7 @@ For the end-to-end tests, install the browser once with `npx playwright install 
 | `npm run db:generate` | Write a migration after changing `src/api/db/schema.ts` |
 | `npm run db:migrate` | Apply the migrations to the local database |
 | `npm run account:create` | Create an organization's first account (see below) |
+| `npm run course:import` | Import a course site's labs, notebooks and solutions (see below) |
 | `npm run deploy` | Build and deploy from this machine (needs `npx wrangler login`); merges to `main` deploy on their own |
 
 ## Layout
@@ -68,6 +69,23 @@ npm run account:create -- --org-slug fshn --org-name "FSHN" \
 ```
 
 Leave out `--remote` to create it in the local database for `npm run dev`.
+
+## Course content
+
+A course site in the course repository's format (`site/content/course.mjs`, its notebooks and the
+git-ignored `zgjidhjet/` solutions) is imported with a pedagog's or admin's account:
+
+```bash
+npm run course:import -- --from ~/Desktop/discrete-structures-algorithms-course \
+  --org fshn --year 2026/27 --username florjan.mema \
+  --url https://lab-platform.florjanimema.workers.dev
+```
+
+- It asks for the password (or reads `LAB_PASSWORD`). Leave out `--url` to import into
+  `npm run dev`, and add `--dry-run` to see the plan without uploading.
+- Running it again updates only the labs that changed.
+- Labs stay hidden until you open them. Solutions are for staff, and for students from the date
+  set on each lab.
 
 ## Deploy
 

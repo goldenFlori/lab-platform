@@ -1,13 +1,10 @@
-import { createHash } from 'node:crypto';
-import { gzipSync } from 'node:zlib';
 import type { Page } from '@playwright/test';
+import { uploadNotebook as upload } from '../scripts/course-import/apply';
 import type { StoredNotebook } from '../src/notebook/stored';
 import type { CourseSummary, GroupView } from '../src/shared/courses';
 import type { LabView } from '../src/shared/labs';
-import type { NotebookKind, NotebookSummary } from '../src/shared/notebooks';
-import { apiCall } from './sign-in';
-
-const MIME: Record<string, string> = { png: 'image/png', svg: 'image/svg+xml', json: 'application/json' };
+import type { NotebookKind } from '../src/shared/notebooks';
+import { apiCall, pageApi } from './sign-in';
 
 /** A new course in the E2E organization, with one group and one lab, made by its admin. */
 export async function courseWithLab(staff: Page, name: string, { open = false } = {}) {
@@ -31,7 +28,7 @@ export async function courseWithLab(staff: Page, name: string, { open = false } 
 }
 
 /** Uploads a converted notebook through the API, in the same steps as the app. */
-export async function uploadNotebook(
+export function uploadNotebook(
   staff: Page,
   labPath: string,
   notebook: {
@@ -42,25 +39,5 @@ export async function uploadNotebook(
     assets?: Map<string, Uint8Array>;
   },
 ) {
-  const created = await apiCall<NotebookSummary>(staff, 'POST', `${labPath}/notebooks`, {
-    kind: notebook.kind,
-    title: notebook.title,
-    originalName: `${notebook.title}.ipynb`,
-    sha256: createHash('sha256').update(notebook.raw).digest('hex'),
-  });
-  const files = `${labPath}/notebooks/${created.id}/files`;
-  const put = (name: string, data: Buffer, type: string, gzipped = false) =>
-    apiCall(staff, 'PUT', `${files}/${name}`, data, {
-      'Content-Type': type,
-      ...(gzipped ? { 'X-Content-Encoding': 'gzip' } : {}),
-    });
-  await put('notebook.ipynb', Buffer.from(notebook.raw), 'application/x-ipynb+json');
-  await put('rendered.json', gzipSync(JSON.stringify(notebook.stored)), 'application/json', true);
-  for (const [name, data] of notebook.assets ?? []) {
-    const type = MIME[name.split('.').pop() ?? ''] ?? 'application/octet-stream';
-    const json = type === 'application/json';
-    await put(name, json ? gzipSync(data) : Buffer.from(data), type, json);
-  }
-  await apiCall(staff, 'POST', `${labPath}/notebooks/${created.id}/ready`);
-  return created;
+  return upload(pageApi(staff), labPath, { ...notebook, originalName: `${notebook.title}.ipynb` });
 }

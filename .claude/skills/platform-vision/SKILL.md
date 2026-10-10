@@ -161,7 +161,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-10:** #15 done. Presentation mode: a lab's notebook fullscreen in class, one step at a
   time with the keyboard, visualizations in place of desktop-window code, and the solved code
   and outputs on a switch (PR #41).
-- **Next:** #16, importing the "Struktura Diskrete & Algoritme" course.
+- **2026-10-10:** #16 done. `npm run course:import` brings a course site's labs, notebooks,
+  visualizations and solutions (staff-only) in through the API. Re-running it updates only what
+  changed. Labs 5 and 6 each get their own part of the notebook they share on the site. Next, the
+  owner imports "Struktura Diskrete & Algoritme" 2026/27 into FSHN in production.
+- **Next:** #17, search.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
@@ -186,6 +190,8 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-10 | Labs are hidden until opened, for the course or per group (a group's own setting wins), optionally scheduled; students see solutions only from a set date; staff see every lab to prepare | Decided |
 | 2026-10-08 | Imported students' passwords are made in the pedagog's browser: 12 lowercase letters and digits (easy on a phone), shown once and printed on slips, never stored or exported in plain text | Decided |
 | 2026-10-10 | The 13 visualizations are platform content, open to everyone at `/visualizations`: they hold no tenant data, are already public on the course site, and show what the product does | Decided |
+| 2026-10-10 | Course content is imported through the API with a pedagog's sign-in, never written straight into the database: the same permission checks and storage as the app, for any environment. Re-running it is safe, and it never opens labs | Decided |
+| 2026-10-10 | When the site shows parts of one notebook in two labs, each lab gets its own notebook of those cells, so students download only their lab's part | Decided |
 
 Decisions were delegated to Claude ("you decide"). Record new ones here with the date.
 

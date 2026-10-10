@@ -83,6 +83,8 @@ live in its git-ignored `zgjidhjet/`; never publish them.
     `npm run dev` the first time). Tests apply them on their own.
   - `npm run account:create -- …`: an organization's first account; prints its password once
     (see the README). The end-to-end tests use it on their own database in `.wrangler/e2e`.
+  - `npm run course:import -- …`: imports the course repo's labs, notebooks, embeds and
+    solutions through the API (see the README); `--dry-run` shows the plan.
 
 ## Rules that bite
 
