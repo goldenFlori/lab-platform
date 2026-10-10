@@ -2,29 +2,26 @@ import { Alert, Button, ProgressBar } from '@heroui/react';
 import { FileUp } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import type { NotebookDetail, NotebookKind } from '../../../shared/notebooks';
+import { type Messages, useT } from '../../i18n';
 import { ApiError } from '../../lib/api';
 import { UploadError, type UploadProgress, uploadNotebook } from '../../lib/upload-notebook';
 
-const KIND_LABEL: Record<NotebookKind, string> = {
-  main: 'Fletorja e laboratorit',
-  extra: 'Material plotësues',
-  solution: 'Zgjidhje',
-};
+const KINDS: NotebookKind[] = ['main', 'extra', 'solution'];
 
-function message(error: unknown) {
+function message(t: Messages, error: unknown) {
   if (error instanceof UploadError) return error.message;
   if (error instanceof ApiError) {
-    if (error.code === 'network') return 'Lidhja u ndërpre. Provoni sërish.';
-    if (error.status === 403) return 'Nuk keni të drejtë të ngarkoni fletore në këtë laborator.';
-    if (error.status === 413) return 'Një nga skedarët e fletores është shumë i madh.';
+    if (error.code === 'network') return t.upload.network;
+    if (error.status === 403) return t.upload.forbidden;
+    if (error.status === 413) return t.upload.tooLarge;
   }
-  return 'Ngarkimi dështoi. Provoni sërish; fletorja e papërfunduar mund të fshihet.';
+  return t.upload.failed;
 }
 
-function progressLabel(progress: UploadProgress) {
-  if (progress.phase === 'converting') return 'Duke përgatitur fletoren…';
-  if (progress.phase === 'uploading') return `Duke ngarkuar skedarët… ${progress.done} nga ${progress.total}`;
-  return 'Duke përfunduar…';
+function progressLabel(t: Messages, progress: UploadProgress) {
+  if (progress.phase === 'converting') return t.upload.converting;
+  if (progress.phase === 'uploading') return t.upload.uploading(progress.done, progress.total);
+  return t.upload.finishing;
 }
 
 /** Staff: pick an .ipynb, convert it in this browser and upload it into the lab. */
@@ -40,11 +37,12 @@ export function NotebookUpload({
   const [open, setOpen] = useState(false);
   const [progress, setProgress] = useState<UploadProgress | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const t = useT();
 
   if (!open) {
     return (
       <Button variant="secondary" onPress={() => setOpen(true)}>
-        <FileUp className="size-4" /> Ngarko fletore
+        <FileUp className="size-4" /> {t.upload.open}
       </Button>
     );
   }
@@ -65,7 +63,7 @@ export function NotebookUpload({
       setOpen(false);
       onUploaded(notebook);
     } catch (failure) {
-      setError(message(failure));
+      setError(message(t, failure));
     } finally {
       setProgress(null);
     }
@@ -76,11 +74,11 @@ export function NotebookUpload({
   return (
     <form
       onSubmit={submit}
-      aria-label="Ngarko fletore"
+      aria-label={t.upload.open}
       className="grid w-full gap-3 rounded-2xl border border-border bg-surface p-4 sm:grid-cols-2"
     >
       <label className="grid gap-1 text-sm sm:col-span-2">
-        <span className="font-medium">Fletorja (.ipynb)</span>
+        <span className="font-medium">{t.upload.file}</span>
         <input
           name="file"
           type="file"
@@ -91,32 +89,29 @@ export function NotebookUpload({
         />
       </label>
       <label className="grid gap-1 text-sm">
-        <span className="font-medium">Lloji</span>
+        <span className="font-medium">{t.upload.kind}</span>
         <select name="kind" defaultValue={hasMain ? 'extra' : 'main'} disabled={busy} className={field}>
-          {(Object.keys(KIND_LABEL) as NotebookKind[]).map((kind) => (
+          {KINDS.map((kind) => (
             <option key={kind} value={kind}>
-              {KIND_LABEL[kind]}
+              {t.upload.kinds[kind]}
             </option>
           ))}
         </select>
       </label>
       <label className="grid gap-1 text-sm">
-        <span className="font-medium">Titulli (s'është i detyrueshëm)</span>
-        <input name="title" maxLength={160} placeholder="Merret nga fletorja" disabled={busy} className={field} />
+        <span className="font-medium">{t.upload.title}</span>
+        <input name="title" maxLength={160} placeholder={t.upload.titlePlaceholder} disabled={busy} className={field} />
       </label>
-      <p className="text-xs text-muted sm:col-span-2">
-        Fletorja përgatitet në këtë shfletues dhe studentët e shohin vetëm kur laboratori është i hapur. Një zgjidhje
-        shfaqet vetëm pas datës së zgjidhjeve.
-      </p>
+      <p className="text-xs text-muted sm:col-span-2">{t.upload.help}</p>
       {progress && (
         <div className="sm:col-span-2">
           <ProgressBar
-            aria-label={progressLabel(progress)}
+            aria-label={progressLabel(t, progress)}
             value={progress.phase === 'uploading' ? progress.done : progress.phase === 'finishing' ? 1 : 0}
             maxValue={progress.phase === 'uploading' ? progress.total : 1}
           />
           <p className="mt-2 text-sm text-muted" aria-live="polite">
-            {progressLabel(progress)}
+            {progressLabel(t, progress)}
           </p>
         </div>
       )}
@@ -130,10 +125,10 @@ export function NotebookUpload({
       )}
       <div className="flex gap-2 sm:col-span-2">
         <Button type="submit" variant="primary" size="sm" isPending={busy}>
-          Ngarko
+          {t.upload.submit}
         </Button>
         <Button variant="ghost" size="sm" isDisabled={busy} onPress={() => setOpen(false)}>
-          Anulo
+          {t.common.cancel}
         </Button>
       </div>
     </form>

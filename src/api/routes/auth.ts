@@ -1,6 +1,6 @@
 import { zValidator } from '@hono/zod-validator';
 import { type Context, Hono } from 'hono';
-import { loginInput, type Me } from '../../shared/auth';
+import { loginInput, type Me, updateMeInput } from '../../shared/auth';
 import { hashPassword, needsRehash, verifyPassword } from '../../shared/password';
 import { LOGIN_WINDOW_SECONDS, MAX_FAILURES_PER_IP, MAX_FAILURES_PER_USERNAME, windowCutoff } from '../auth/limits';
 import { endSession, requireUser, startSession } from '../auth/session';
@@ -12,13 +12,14 @@ import {
   recentFailures,
   recordFailures,
   type SessionUser,
+  setLocale,
   setPasswordHash,
 } from '../db/auth';
 import type { AppEnv } from '../env';
 
 async function meOf(db: Db, user: SessionUser): Promise<Me> {
   return {
-    user: { id: user.id, username: user.username, fullName: user.fullName },
+    user: { id: user.id, username: user.username, fullName: user.fullName, locale: user.locale },
     organizations: await organizationsOf(db, user.id),
   };
 }
@@ -71,7 +72,16 @@ export const authRoutes = new Hono<AppEnv>()
     return c.body(null, 204);
   });
 
-export const meRoutes = new Hono<AppEnv>().get('/', requireUser, async (c) => {
-  const user = c.get('user') as SessionUser;
-  return c.json(await meOf(createDb(c.env.DB), user));
-});
+export const meRoutes = new Hono<AppEnv>()
+  .get('/', requireUser, async (c) => {
+    const user = c.get('user') as SessionUser;
+    return c.json(await meOf(createDb(c.env.DB), user));
+  })
+  // The user's own settings: today the interface language (#19).
+  .patch('/', requireUser, zValidator('json', updateMeInput, invalidRequest), async (c) => {
+    const user = c.get('user') as SessionUser;
+    const { locale } = c.req.valid('json');
+    const db = createDb(c.env.DB);
+    await setLocale(db, user.id, locale);
+    return c.json(await meOf(db, { ...user, locale }));
+  });

@@ -2,6 +2,7 @@ import { toStored } from '../../notebook/stored';
 import type { ApiErrorBody } from '../../shared/auth';
 import { MAX_FILE_BYTES, ORIGINAL_FILE, RENDERED_FILE } from '../../shared/notebook-files';
 import type { NotebookDetail, NotebookKind, NotebookSummary } from '../../shared/notebooks';
+import { t } from '../i18n';
 import { ApiError, api } from './api';
 
 // A notebook goes up the way the Worker can take it: converted here, in the pedagog's browser, then
@@ -65,7 +66,7 @@ export async function uploadNotebook(
   try {
     stored = toStored(await renderNotebook(raw, { assets }));
   } catch {
-    throw new UploadError('Ky skedar nuk është një fletore Jupyter (.ipynb) e vlefshme.');
+    throw new UploadError(t().upload.invalid);
   }
 
   const files: { name: string; body: Uint8Array; type: string; gzipped: boolean }[] = [
@@ -86,9 +87,7 @@ export async function uploadNotebook(
   }
   const tooBig = files.find((f) => f.body.byteLength > MAX_FILE_BYTES);
   if (tooBig) {
-    throw new UploadError(
-      `Fletorja përmban një skedar më të madh se ${MAX_FILE_BYTES / 1024 / 1024} MB (${tooBig.name}). Zvogëloni rezultatet e saj dhe provoni sërish.`,
-    );
+    throw new UploadError(t().upload.fileTooLarge(MAX_FILE_BYTES / 1024 / 1024, tooBig.name));
   }
 
   const created = await api<NotebookSummary>(base, {

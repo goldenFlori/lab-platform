@@ -1,6 +1,7 @@
 import { Check, ChevronDown, Code2, Copy, MonitorSmartphone } from 'lucide-react';
 import { useState } from 'react';
 import type { CodeCell as Cell } from '../../../notebook/types';
+import { useT } from '../../i18n';
 import { sanitize } from '../../lib/sanitize';
 import { Output } from './Output';
 
@@ -19,6 +20,7 @@ export function CodeCell({
   /** Presentation mode: long code is shown in full, and the outputs are left to the presenter. */
   presenting?: boolean;
 }) {
+  const t = useT();
   const code = (
     <div
       className="nb-shiki"
@@ -36,7 +38,7 @@ export function CodeCell({
         : f.widgets
           ? 'Jupyter widgets'
           : f.subprocess
-            ? 'program desktop'
+            ? t.notebook.desktopProgram
             : '';
     return (
       <details className="group rounded-2xl border border-dashed border-border bg-surface-secondary/50">
@@ -45,10 +47,10 @@ export function CodeCell({
             <MonitorSmartphone className="size-[18px]" aria-hidden="true" />
           </span>
           <span className="min-w-0 flex-1">
-            <span className="block text-sm font-semibold">Kodi Python i ushtrimit</span>
+            <span className="block text-sm font-semibold">{t.notebook.exerciseCode}</span>
             <span className="block text-xs text-muted">
               {library ? `${library} · ` : ''}
-              {cell.lines} rreshta · hap një dritare në kompjuterin tuaj
+              {t.notebook.windowLines(cell.lines)}
             </span>
           </span>
           <ChevronDown
@@ -79,8 +81,8 @@ export function CodeCell({
           <details className="group">
             <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-2.5 text-sm text-muted select-none hover:text-foreground [&::-webkit-details-marker]:hidden">
               <ChevronDown className="size-4 transition-transform group-open:rotate-180" aria-hidden="true" />
-              <span className="group-open:hidden">Shfaq kodin e plotë · {cell.lines} rreshta</span>
-              <span className="hidden group-open:inline">Fshih kodin</span>
+              <span className="group-open:hidden">{t.notebook.showFullCode(cell.lines)}</span>
+              <span className="hidden group-open:inline">{t.notebook.hideCode}</span>
             </summary>
             <div className="border-t border-[var(--code-border)]">{code}</div>
           </details>
@@ -99,6 +101,7 @@ export function CodeCell({
 
 function CopyButton({ text }: { text: string }) {
   const [state, setState] = useState<'idle' | 'copied' | 'failed'>('idle');
+  const t = useT();
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(text);
@@ -119,7 +122,9 @@ function CopyButton({ text }: { text: string }) {
       ) : (
         <Copy className="size-3.5" aria-hidden="true" />
       )}
-      <span aria-live="polite">{state === 'copied' ? 'U kopjua' : state === 'failed' ? 'Gabim' : 'Kopjo'}</span>
+      <span aria-live="polite">
+        {state === 'copied' ? t.notebook.copied : state === 'failed' ? t.notebook.copyFailed : t.notebook.copy}
+      </span>
     </button>
   );
 }

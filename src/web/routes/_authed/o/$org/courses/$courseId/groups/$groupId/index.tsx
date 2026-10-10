@@ -4,6 +4,7 @@ import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { ArrowLeft, KeyRound, Printer, Upload, Users } from 'lucide-react';
 import type { GroupStudent } from '../../../../../../../../../shared/students';
 import { CredentialSlips } from '../../../../../../../../components/CredentialSlips';
+import { t as messages, useT } from '../../../../../../../../i18n';
 import { ApiError } from '../../../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../../../lib/brand';
 import { courseQuery } from '../../../../../../../../lib/courses';
@@ -22,7 +23,9 @@ export const Route = createFileRoute('/_authed/o/$org/courses/$courseId/groups/$
       throw error;
     }
   },
-  head: ({ loaderData }) => ({ meta: [{ title: `${loaderData?.groupName ?? 'Grupi'} · ${APP_NAME}` }] }),
+  head: ({ loaderData }) => ({
+    meta: [{ title: `${loaderData?.groupName ?? messages().group.pageTitle} · ${APP_NAME}` }],
+  }),
   component: GroupStudentsPage,
 });
 
@@ -31,6 +34,7 @@ function GroupStudentsPage() {
   const { courseTitle, groupName } = Route.useLoaderData();
   const { data: students } = useSuspenseQuery(groupStudentsQuery(org, courseId, groupId));
   const reset = useResetPassword(org, courseId, groupId);
+  const t = useT();
 
   return (
     <section className="container-page py-10">
@@ -44,27 +48,23 @@ function GroupStudentsPage() {
       <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{groupName}</h1>
-          <p className="mt-1 text-muted">
-            {students.length} {students.length === 1 ? 'student' : 'studentë'}
-          </p>
+          <p className="mt-1 text-muted">{t.group.count(students.length)}</p>
         </div>
         <Link
           to="/o/$org/courses/$courseId/groups/$groupId/import"
           params={{ org, courseId, groupId }}
           className="button button--primary gap-2"
         >
-          <Upload className="size-4" /> Importo studentë
+          <Upload className="size-4" /> {t.group.import}
         </Link>
       </div>
 
       {reset.data && (
         <div className="mt-8 rounded-2xl border border-accent/40 bg-accent-soft/40 p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="font-medium">
-              Fjalëkalimi i ri për {reset.data.fullName}. Shfaqet vetëm tani: printojeni ose jepjani studentit.
-            </p>
+            <p className="font-medium">{t.group.newPasswordFor(reset.data.fullName)}</p>
             <Button variant="primary" size="sm" onPress={() => window.print()}>
-              <Printer className="size-4" /> Printo fletën
+              <Printer className="size-4" /> {t.group.print}
             </Button>
           </div>
           <div className="mt-4 max-w-md">
@@ -76,7 +76,7 @@ function GroupStudentsPage() {
         <Alert status="danger" className="mt-8">
           <Alert.Indicator />
           <Alert.Content>
-            <Alert.Description>Fjalëkalimi nuk u ndryshua. Provoni përsëri.</Alert.Description>
+            <Alert.Description>{t.group.resetFailed}</Alert.Description>
           </Alert.Content>
         </Alert>
       )}
@@ -84,10 +84,8 @@ function GroupStudentsPage() {
       {students.length === 0 ? (
         <div className="mt-8 grid place-items-center rounded-2xl border border-dashed border-border px-6 py-14 text-center">
           <Users className="size-8 text-muted" aria-hidden="true" />
-          <p className="mt-3 font-medium">Ky grup nuk ka ende studentë</p>
-          <p className="mt-1 max-w-sm text-sm text-muted">
-            Importoni listën e klasës, ose shfaqni kodin e regjistrimit që studentët të bashkohen vetë.
-          </p>
+          <p className="mt-3 font-medium">{t.group.emptyTitle}</p>
+          <p className="mt-1 max-w-sm text-sm text-muted">{t.group.emptyText}</p>
         </div>
       ) : (
         <ul className="mt-8 divide-y divide-separator rounded-2xl border border-border bg-surface">
@@ -119,28 +117,26 @@ function ResetPassword({
   isPending: boolean;
   onReset: () => void;
 }) {
+  const t = useT();
   return (
     <AlertDialog>
-      <Button size="sm" variant="tertiary" isPending={isPending} aria-label={`Fjalëkalim i ri për ${student.fullName}`}>
-        <KeyRound className="size-4" /> Fjalëkalim i ri
+      <Button size="sm" variant="tertiary" isPending={isPending} aria-label={t.group.resetLabel(student.fullName)}>
+        <KeyRound className="size-4" /> {t.group.reset}
       </Button>
       <AlertDialog.Backdrop>
         <AlertDialog.Container>
           <AlertDialog.Dialog>
             <AlertDialog.Header>
               <AlertDialog.Icon status="warning" />
-              <AlertDialog.Heading>Fjalëkalim i ri për {student.fullName}?</AlertDialog.Heading>
+              <AlertDialog.Heading>{t.group.resetTitle(student.fullName)}</AlertDialog.Heading>
             </AlertDialog.Header>
-            <AlertDialog.Body>
-              Fjalëkalimi i vjetër nuk do të funksionojë më, dhe studenti del nga llogaria në çdo pajisje. Fleta e re
-              shfaqet vetëm një herë.
-            </AlertDialog.Body>
+            <AlertDialog.Body>{t.group.resetText}</AlertDialog.Body>
             <AlertDialog.Footer>
               <Button slot="close" variant="tertiary">
-                Anulo
+                {t.common.cancel}
               </Button>
               <Button slot="close" variant="primary" onPress={onReset}>
-                Krijo fjalëkalimin
+                {t.group.resetConfirm}
               </Button>
             </AlertDialog.Footer>
           </AlertDialog.Dialog>

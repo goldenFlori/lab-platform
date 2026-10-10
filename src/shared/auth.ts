@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { LOCALES, type Locale } from './locale';
 
 // Shapes shared by the API and the app. The app imports only the types, so Zod stays out of its bundle.
 
@@ -9,9 +10,13 @@ export const loginInput = z.object({
 
 export type LoginInput = z.infer<typeof loginInput>;
 
+/** PATCH /api/me: the user's own settings. */
+export const updateMeInput = z.object({ locale: z.enum(LOCALES).nullable() });
+
 /** The signed-in user, from POST /api/auth/login and GET /api/me. */
 export type Me = {
-  user: { id: string; username: string; fullName: string };
+  /** locale: the interface language the user chose, or null (#19). */
+  user: { id: string; username: string; fullName: string; locale: Locale | null };
   organizations: { id: string; name: string; slug: string }[];
 };
 

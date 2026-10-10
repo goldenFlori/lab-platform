@@ -5,6 +5,7 @@ import { CalendarClock, FlaskConical, Pencil, Plus, Trash2 } from 'lucide-react'
 import { type FormEvent, useState } from 'react';
 import type { GroupView } from '../../shared/courses';
 import type { LabRule, LabState, LabView } from '../../shared/labs';
+import { type Messages, useT } from '../i18n';
 import { formatMoment, fromLocalInput, type LabFields, labsQuery, toLocalInput, useLabChanges } from '../lib/labs';
 
 type Props = { org: string; courseId: string; groups: GroupView[] };
@@ -16,13 +17,11 @@ const STATE_COLOR: Record<LabState, 'default' | 'accent' | 'success' | 'warning'
   closed: 'default',
 };
 
-function stateLabel(state: LabState, rule: LabRule | undefined) {
-  if (state === 'scheduled' && rule?.visibleFrom) return `Hapet ${formatMoment(rule.visibleFrom)}`;
-  if (state === 'open' && rule?.visibleUntil) return `E hapur deri ${formatMoment(rule.visibleUntil)}`;
-  return { hidden: 'E fshehur', scheduled: 'Me orar', open: 'E hapur', closed: 'E mbyllur' }[state];
+function stateLabel(t: Messages, state: LabState, rule: LabRule | undefined) {
+  if (state === 'scheduled' && rule?.visibleFrom) return t.labs.opensAt(formatMoment(rule.visibleFrom));
+  if (state === 'open' && rule?.visibleUntil) return t.labs.openUntil(formatMoment(rule.visibleUntil));
+  return t.labs.states[state];
 }
-
-const labHeading = (lab: LabView) => `Laboratori ${lab.n}${lab.week ? ` · Java ${lab.week}` : ''}`;
 
 function LabLink({
   org,
@@ -48,17 +47,18 @@ function LabLink({
 
 export function CourseLabs({ org, courseId, groups }: Props) {
   const labs = useQuery(labsQuery(org, courseId));
+  const t = useT();
 
   return (
     <div className="mt-10">
-      <h2 className="text-xl font-semibold tracking-tight">Laboratorët</h2>
+      <h2 className="text-xl font-semibold tracking-tight">{t.labs.title}</h2>
       {labs.isPending ? (
-        <p className="mt-3 text-sm text-muted">Duke ngarkuar…</p>
+        <p className="mt-3 text-sm text-muted">{t.common.loading}</p>
       ) : labs.isError ? (
         <Alert status="danger" className="mt-4">
           <Alert.Indicator />
           <Alert.Content>
-            <Alert.Description>Laboratorët nuk u ngarkuan. Provoni përsëri.</Alert.Description>
+            <Alert.Description>{t.labs.loadFailed}</Alert.Description>
           </Alert.Content>
         </Alert>
       ) : labs.data.permissions.staff ? (
@@ -71,11 +71,12 @@ export function CourseLabs({ org, courseId, groups }: Props) {
 }
 
 function StudentLabs({ org, courseId, labs }: { org: string; courseId: string; labs: LabView[] }) {
+  const t = useT();
   if (labs.length === 0) {
     return (
       <div className="mt-4 grid place-items-center rounded-2xl border border-dashed border-border px-6 py-12 text-center">
         <FlaskConical className="size-8 text-muted" aria-hidden="true" />
-        <p className="mt-3 text-sm text-muted">Laboratorët shfaqen këtu sapo pedagogu t'i hapë.</p>
+        <p className="mt-3 text-sm text-muted">{t.labs.studentsEmpty}</p>
       </div>
     );
   }
@@ -86,7 +87,7 @@ function StudentLabs({ org, courseId, labs }: { org: string; courseId: string; l
           key={lab.id}
           className="relative rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent/50"
         >
-          <p className="text-xs font-medium tracking-wide text-muted uppercase">{labHeading(lab)}</p>
+          <p className="text-xs font-medium tracking-wide text-muted uppercase">{t.labs.heading(lab.n, lab.week)}</p>
           <h3 className="mt-1 font-semibold">
             {/* The whole card opens the lab. */}
             <LabLink
@@ -99,7 +100,7 @@ function StudentLabs({ org, courseId, labs }: { org: string; courseId: string; l
           {lab.summary && <p className="mt-2 text-sm text-muted">{lab.summary}</p>}
           {lab.solutionsAvailable && (
             <Chip size="sm" color="success" variant="soft" className="mt-3">
-              Zgjidhjet janë të disponueshme
+              {t.labs.solutionsAvailable}
             </Chip>
           )}
         </li>
@@ -116,13 +117,15 @@ function StaffLabs({
 }: Props & { list: { labs: LabView[]; permissions: { manage: boolean; publish: boolean } } }) {
   const changes = useLabChanges(org, courseId);
   const [adding, setAdding] = useState(false);
+  const t = useT();
   const nextNumber = Math.max(0, ...list.labs.map((lab) => lab.n)) + 1;
 
   return (
     <>
       {list.labs.length === 0 ? (
         <p className="mt-3 text-sm text-muted">
-          Ky kurs nuk ka ende laboratorë.{list.permissions.manage ? ' Shtoni të parin.' : ''}
+          {t.labs.staffEmpty}
+          {list.permissions.manage ? ` ${t.labs.addFirst}` : ''}
         </p>
       ) : (
         <ul className="mt-4 grid gap-3">
@@ -144,14 +147,14 @@ function StaffLabs({
         (adding ? (
           <LabForm
             initial={{ n: nextNumber, title: '', week: null, summary: null }}
-            submitLabel="Shto laboratorin"
+            submitLabel={t.labs.addSubmit}
             isPending={changes.addLab.isPending}
             onCancel={() => setAdding(false)}
             onSubmit={(fields) => changes.addLab.mutate(fields, { onSuccess: () => setAdding(false) })}
           />
         ) : (
           <Button variant="secondary" className="mt-4" onPress={() => setAdding(true)}>
-            <Plus className="size-4" /> Shto laborator
+            <Plus className="size-4" /> {t.labs.add}
           </Button>
         ))}
     </>
@@ -175,11 +178,12 @@ function LabRow({
 }) {
   const changes = useLabChanges(org, courseId);
   const [panel, setPanel] = useState<'none' | 'schedule' | 'edit'>('none');
+  const t = useT();
   const visibility = lab.visibility;
   const courseRule = visibility?.rules.find((rule) => rule.groupId === null);
   const courseState = visibility?.course ?? 'hidden';
   const differing = visibility?.groups.filter((g) => g.ownRule) ?? [];
-  const groupName = (id: string) => groups.find((g) => g.id === id)?.name ?? 'Grup';
+  const groupName = (id: string) => groups.find((g) => g.id === id)?.name ?? t.labs.groupFallback;
   const now = () => new Date().toISOString();
 
   function toggle(open: boolean) {
@@ -200,19 +204,20 @@ function LabRow({
     <div className="rounded-2xl border border-border bg-surface p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-medium tracking-wide text-muted uppercase">{labHeading(lab)}</p>
+          <p className="text-xs font-medium tracking-wide text-muted uppercase">{t.labs.heading(lab.n, lab.week)}</p>
           <h3 className="mt-0.5 font-semibold">
             <LabLink org={org} courseId={courseId} lab={lab} className="hover:text-accent" />
           </h3>
           <div className="mt-2 flex flex-wrap gap-1.5">
             <Chip size="sm" variant="soft" color={STATE_COLOR[courseState]}>
-              {differing.length > 0 ? 'Kursi: ' : ''}
-              {stateLabel(courseState, courseRule)}
+              {differing.length > 0 ? t.labs.coursePrefix : ''}
+              {stateLabel(t, courseState, courseRule)}
             </Chip>
             {differing.map((group) => (
               <Chip key={group.groupId} size="sm" variant="soft" color={STATE_COLOR[group.state]}>
                 {groupName(group.groupId)}:{' '}
                 {stateLabel(
+                  t,
                   group.state,
                   visibility?.rules.find((rule) => rule.groupId === group.groupId),
                 )}
@@ -226,20 +231,20 @@ function LabRow({
               isSelected={courseState === 'open'}
               isDisabled={changes.setRule.isPending}
               onChange={toggle}
-              aria-label={`Hapur për studentët: ${lab.title}`}
+              aria-label={t.labs.openSwitch(lab.title)}
               className="flex-row items-center gap-2"
             >
               <Switch.Control>
                 <Switch.Thumb />
               </Switch.Control>
               <Switch.Content>
-                <Label className="text-sm">Hapur</Label>
+                <Label className="text-sm">{t.labs.open}</Label>
               </Switch.Content>
             </Switch>
           )}
           {canPublish && (
             <Button size="sm" variant="tertiary" onPress={() => setPanel(panel === 'schedule' ? 'none' : 'schedule')}>
-              <CalendarClock className="size-4" /> Orari
+              <CalendarClock className="size-4" /> {t.labs.schedule}
             </Button>
           )}
           {canManage && (
@@ -247,7 +252,7 @@ function LabRow({
               isIconOnly
               size="sm"
               variant="ghost"
-              aria-label={`Ndrysho ${lab.title}`}
+              aria-label={t.labs.edit(lab.title)}
               onPress={() => setPanel(panel === 'edit' ? 'none' : 'edit')}
             >
               <Pencil className="size-4" />
@@ -260,7 +265,7 @@ function LabRow({
       {panel === 'schedule' && visibility && (
         <div className="mt-4 grid gap-3 border-t border-separator pt-4">
           <RuleEditor
-            title="Të gjitha grupet"
+            title={t.labs.allGroups}
             rule={courseRule}
             onSave={(rule) => changes.setRule.mutate({ labId: lab.id, rule: { ...rule, groupId: null } })}
             isPending={changes.setRule.isPending}
@@ -287,7 +292,7 @@ function LabRow({
       {panel === 'edit' && (
         <LabForm
           initial={{ n: lab.n, title: lab.title, week: lab.week, summary: lab.summary }}
-          submitLabel="Ruaj"
+          submitLabel={t.common.save}
           isPending={changes.updateLab.isPending}
           onCancel={() => setPanel('none')}
           onSubmit={(fields) =>
@@ -323,6 +328,7 @@ function RuleEditor({
       ? 'scheduled'
       : 'open';
   const [editing, setEditing] = useState(!inheritsFromCourse);
+  const t = useT();
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -348,10 +354,10 @@ function RuleEditor({
     return (
       <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-surface-secondary px-4 py-3">
         <p className="text-sm">
-          <span className="font-medium">{title}</span> <span className="text-muted">ndjek kursin</span>
+          <span className="font-medium">{title}</span> <span className="text-muted">{t.labs.followsCourse}</span>
         </p>
         <Button size="sm" variant="ghost" onPress={() => setEditing(true)}>
-          Ndryshe për këtë grup
+          {t.labs.differForGroup}
         </Button>
       </div>
     );
@@ -360,20 +366,20 @@ function RuleEditor({
   return (
     <form
       onSubmit={onSubmit}
-      aria-label={`Orari: ${title}`}
+      aria-label={t.labs.scheduleFor(title)}
       className="grid gap-3 rounded-xl bg-surface-secondary p-4 sm:grid-cols-2 lg:grid-cols-4"
     >
       <p className="font-medium sm:col-span-2 lg:col-span-4">{title}</p>
       <label className="grid gap-1 text-sm">
-        <span className="font-medium">Gjendja</span>
+        <span className="font-medium">{t.labs.state}</span>
         <select name="mode" defaultValue={initialMode} className="h-10 rounded-xl border border-border bg-surface px-3">
-          <option value="hidden">E fshehur</option>
-          <option value="open">E hapur</option>
-          <option value="scheduled">Hapet më…</option>
+          <option value="hidden">{t.labs.modeHidden}</option>
+          <option value="open">{t.labs.modeOpen}</option>
+          <option value="scheduled">{t.labs.modeScheduled}</option>
         </select>
       </label>
       <label className="grid gap-1 text-sm">
-        <span className="font-medium">Hapet më</span>
+        <span className="font-medium">{t.labs.opensOn}</span>
         <input
           type="datetime-local"
           name="from"
@@ -382,7 +388,7 @@ function RuleEditor({
         />
       </label>
       <label className="grid gap-1 text-sm">
-        <span className="font-medium">Mbyllet më (s'është e detyrueshme)</span>
+        <span className="font-medium">{t.labs.closesOn}</span>
         <input
           type="datetime-local"
           name="until"
@@ -391,7 +397,7 @@ function RuleEditor({
         />
       </label>
       <label className="grid gap-1 text-sm">
-        <span className="font-medium">Zgjidhjet për studentët nga</span>
+        <span className="font-medium">{t.labs.solutionsFrom}</span>
         <input
           type="datetime-local"
           name="solutions"
@@ -401,16 +407,16 @@ function RuleEditor({
       </label>
       <div className="flex flex-wrap gap-2 sm:col-span-2 lg:col-span-4">
         <Button type="submit" size="sm" variant="primary" isPending={isPending}>
-          Ruaj orarin
+          {t.labs.saveSchedule}
         </Button>
         {onFollowCourse && (
           <Button size="sm" variant="ghost" onPress={onFollowCourse}>
-            Si gjithë kursi
+            {t.labs.likeCourse}
           </Button>
         )}
         {inheritsFromCourse && (
           <Button size="sm" variant="ghost" onPress={() => setEditing(false)}>
-            Anulo
+            {t.common.cancel}
           </Button>
         )}
       </div>
@@ -431,6 +437,7 @@ function LabForm({
   onCancel: () => void;
   onSubmit: (fields: LabFields) => void;
 }) {
+  const t = useT();
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -451,19 +458,19 @@ function LabForm({
       className="mt-4 grid gap-3 rounded-2xl border border-border bg-surface p-4 sm:grid-cols-[6rem_1fr_6rem]"
     >
       <label className="grid gap-1 text-sm">
-        <span className="font-medium">Nr.</span>
+        <span className="font-medium">{t.labs.number}</span>
         <input name="n" type="number" min={0} max={99} required defaultValue={initial.n} className={field} />
       </label>
       <label className="grid gap-1 text-sm">
-        <span className="font-medium">Titulli</span>
+        <span className="font-medium">{t.labs.titleLabel}</span>
         <input name="title" required maxLength={160} defaultValue={initial.title} className={field} />
       </label>
       <label className="grid gap-1 text-sm">
-        <span className="font-medium">Java</span>
+        <span className="font-medium">{t.labs.week}</span>
         <input name="week" type="number" min={1} max={60} defaultValue={initial.week ?? ''} className={field} />
       </label>
       <label className="grid gap-1 text-sm sm:col-span-3">
-        <span className="font-medium">Përmbledhje (s'është e detyrueshme)</span>
+        <span className="font-medium">{t.labs.summary}</span>
         <input name="summary" maxLength={600} defaultValue={initial.summary ?? ''} className={field} />
       </label>
       <div className="flex gap-2 sm:col-span-3">
@@ -471,7 +478,7 @@ function LabForm({
           {submitLabel}
         </Button>
         <Button variant="ghost" size="sm" onPress={onCancel}>
-          Anulo
+          {t.common.cancel}
         </Button>
       </div>
     </form>
@@ -479,9 +486,10 @@ function LabForm({
 }
 
 function DeleteLab({ lab, onDelete }: { lab: LabView; onDelete: () => void }) {
+  const t = useT();
   return (
     <AlertDialog>
-      <Button isIconOnly size="sm" variant="ghost" aria-label={`Fshi ${lab.title}`}>
+      <Button isIconOnly size="sm" variant="ghost" aria-label={t.labs.deleteLabel(lab.title)}>
         <Trash2 className="size-4" />
       </Button>
       <AlertDialog.Backdrop>
@@ -489,15 +497,15 @@ function DeleteLab({ lab, onDelete }: { lab: LabView; onDelete: () => void }) {
           <AlertDialog.Dialog>
             <AlertDialog.Header>
               <AlertDialog.Icon status="danger" />
-              <AlertDialog.Heading>Të fshihet {lab.title}?</AlertDialog.Heading>
+              <AlertDialog.Heading>{t.labs.deleteTitle(lab.title)}</AlertDialog.Heading>
             </AlertDialog.Header>
-            <AlertDialog.Body>Laboratori dhe orari i tij fshihen nga ky kurs.</AlertDialog.Body>
+            <AlertDialog.Body>{t.labs.deleteText}</AlertDialog.Body>
             <AlertDialog.Footer>
               <Button slot="close" variant="tertiary">
-                Anulo
+                {t.common.cancel}
               </Button>
               <Button slot="close" variant="danger" onPress={onDelete}>
-                Fshi laboratorin
+                {t.labs.deleteConfirm}
               </Button>
             </AlertDialog.Footer>
           </AlertDialog.Dialog>

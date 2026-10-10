@@ -3,6 +3,7 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { ArrowLeft, BarChart3, ShieldCheck } from 'lucide-react';
 import type { ActivityReport } from '../../../../../../../shared/activity';
+import { type Messages, t as messages, useT } from '../../../../../../i18n';
 import { activityQuery } from '../../../../../../lib/activity';
 import { ApiError } from '../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../lib/brand';
@@ -26,29 +27,33 @@ export const Route = createFileRoute('/_authed/o/$org/courses/$courseId/activity
     }
   },
   head: ({ loaderData }) => ({
-    meta: [{ title: `Aktiviteti · ${loaderData?.course.title ?? 'Kursi'} · ${APP_NAME}` }],
+    meta: [
+      {
+        title: `${messages().activity.title} · ${loaderData?.course.title ?? messages().course.pageTitle} · ${APP_NAME}`,
+      },
+    ],
   }),
   component: ActivityPage,
 });
 
-// Written out rather than left to Intl: not every browser carries Albanian month names.
-const MONTHS = ['jan', 'shk', 'mar', 'pri', 'maj', 'qer', 'korr', 'gush', 'sht', 'tet', 'nën', 'dhj'];
+// Month names come from the messages rather than Intl: not every browser carries Albanian ones.
 
 /** "5–11 tet", or "29 sht – 5 tet" across two months: the week from Monday to Sunday. */
-function label(week: string) {
+function label(t: Messages, week: string) {
+  const months = t.common.monthsShort;
   const monday = new Date(`${week}T00:00:00Z`);
   const sunday = new Date(monday);
   sunday.setUTCDate(monday.getUTCDate() + 6);
-  const [m1, m2] = [MONTHS[monday.getUTCMonth()], MONTHS[sunday.getUTCMonth()]];
+  const [m1, m2] = [months[monday.getUTCMonth()], months[sunday.getUTCMonth()]];
   return m1 === m2
     ? `${monday.getUTCDate()}–${sunday.getUTCDate()} ${m2}`
     : `${monday.getUTCDate()} ${m1} – ${sunday.getUTCDate()} ${m2}`;
 }
 
 /** The bar's short label: the Monday. */
-const short = (week: string) => {
+const short = (t: Messages, week: string) => {
   const monday = new Date(`${week}T00:00:00Z`);
-  return `${monday.getUTCDate()} ${MONTHS[monday.getUTCMonth()]}`;
+  return `${monday.getUTCDate()} ${t.common.monthsShort[monday.getUTCMonth()]}`;
 };
 const percent = (part: number, whole: number) => (whole ? Math.round((100 * part) / whole) : 0);
 
@@ -57,6 +62,7 @@ function ActivityPage() {
   const { group } = Route.useSearch();
   const { data: detail } = useSuspenseQuery(courseQuery(org, courseId));
   const report = useQuery(activityQuery(org, courseId, group));
+  const t = useT();
 
   return (
     <section className="container-page py-10">
@@ -67,22 +73,22 @@ function ActivityPage() {
       >
         <ArrowLeft className="size-4" /> {detail.course.title}
       </Link>
-      <h1 className="mt-4 text-3xl font-bold tracking-tight">Aktiviteti</h1>
-      <p className="mt-1 max-w-2xl text-muted">Sa studentë hapën, shkarkuan dhe provuan laboratorët, javë pas jave.</p>
+      <h1 className="mt-4 text-3xl font-bold tracking-tight">{t.activity.title}</h1>
+      <p className="mt-1 max-w-2xl text-muted">{t.activity.lead}</p>
       <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success">
-        <ShieldCheck className="size-4" aria-hidden="true" /> Vetëm numra: asnjë student nuk shfaqet me emër.
+        <ShieldCheck className="size-4" aria-hidden="true" /> {t.activity.privacy}
       </p>
 
       {report.isError ? (
         <Alert status="danger" className="mt-8">
           <Alert.Indicator />
           <Alert.Content>
-            <Alert.Description>Aktiviteti nuk u ngarkua. Rifreskoni faqen dhe provoni sërish.</Alert.Description>
+            <Alert.Description>{t.activity.loadFailed}</Alert.Description>
           </Alert.Content>
         </Alert>
       ) : !report.data ? (
         <p className="mt-8 text-sm text-muted" aria-busy="true">
-          Duke ngarkuar…
+          {t.common.loading}
         </p>
       ) : (
         <Report report={report.data} org={org} courseId={courseId} />
@@ -96,12 +102,13 @@ function Report({ report, org, courseId }: { report: ActivityReport; org: string
   const [last, previous] = [weeks.at(-1), weeks.at(-2)];
   const quiet = weeks.every((w) => w.active === 0) && labs.every((l) => l.view === 0);
   const peak = Math.max(students, ...weeks.map((w) => w.active), 1);
+  const t = useT();
 
   return (
     <>
       {groups.length > 1 && (
-        <nav aria-label="Grupet" className="mt-8 flex flex-wrap gap-2">
-          {[{ id: undefined, name: 'Të gjitha grupet' }, ...groups].map((g) => {
+        <nav aria-label={t.activity.groups} className="mt-8 flex flex-wrap gap-2">
+          {[{ id: undefined, name: t.activity.allGroups }, ...groups].map((g) => {
             const on = (report.group ?? undefined) === g.id;
             return (
               <Link
@@ -124,28 +131,24 @@ function Report({ report, org, courseId }: { report: ActivityReport; org: string
       )}
 
       <dl className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Stat label="Studentë" value={String(students)} />
+        <Stat label={t.activity.students} value={String(students)} />
         <Stat
-          label="Aktivë këtë javë"
+          label={t.activity.activeThisWeek}
           value={String(last?.active ?? 0)}
-          note={students ? `${percent(last?.active ?? 0, students)}% e studentëve` : undefined}
+          note={students ? t.activity.ofStudents(percent(last?.active ?? 0, students)) : undefined}
         />
         <Stat
-          label="Aktivë javën e kaluar"
+          label={t.activity.activeLastWeek}
           value={String(previous?.active ?? 0)}
-          note={students ? `${percent(previous?.active ?? 0, students)}% e studentëve` : undefined}
+          note={students ? t.activity.ofStudents(percent(previous?.active ?? 0, students)) : undefined}
         />
       </dl>
 
-      {students === 0 ? (
-        <Empty text="Ende nuk ka studentë në këtë kurs. Aktiviteti shfaqet sapo ata të hyjnë." />
-      ) : quiet ? (
-        <Empty text="Ende pa aktivitet. Numrat shfaqen sapo studentët të hapin laboratorët." />
-      ) : null}
+      {students === 0 ? <Empty text={t.activity.noStudents} /> : quiet ? <Empty text={t.activity.quiet} /> : null}
 
       <div className="mt-10 rounded-3xl border border-border bg-surface p-5 shadow-surface sm:p-7">
-        <h2 className="text-lg font-semibold tracking-tight">Studentë aktivë sipas javës</h2>
-        <p className="mt-1 text-sm text-muted">Ata që hapën, shkarkuan ose provuan të paktën një laborator.</p>
+        <h2 className="text-lg font-semibold tracking-tight">{t.activity.perWeek}</h2>
+        <p className="mt-1 text-sm text-muted">{t.activity.perWeekHelp}</p>
         {/* The bars repeat the table below for the eye; screen readers get the table. */}
         <div className="mt-6 flex h-40 items-end gap-1.5 overflow-x-auto pb-1" aria-hidden="true">
           {weeks.map((w) => (
@@ -157,33 +160,33 @@ function Report({ report, org, courseId }: { report: ActivityReport; org: string
                   height: `${Math.max(w.active ? 4 : 1, (100 * w.active) / peak)}%`,
                   opacity: w.active ? 1 : 0.25,
                 }}
-                title={`${label(w.week)}: ${w.active}`}
+                title={`${label(t, w.week)}: ${w.active}`}
               />
-              <span className="text-[0.65rem] whitespace-nowrap text-muted">{short(w.week)}</span>
+              <span className="text-[0.65rem] whitespace-nowrap text-muted">{short(t, w.week)}</span>
             </div>
           ))}
         </div>
         <details className="group mt-6">
-          <summary className="cursor-pointer text-sm font-medium text-accent">Shiko tabelën javë pas jave</summary>
+          <summary className="cursor-pointer text-sm font-medium text-accent">{t.activity.showTable}</summary>
           <div className="mt-3 overflow-x-auto">
             <table className="w-full min-w-md text-left text-sm">
-              <caption className="sr-only">Studentë aktivë sipas javës</caption>
+              <caption className="sr-only">{t.activity.perWeek}</caption>
               <thead className="text-xs text-muted">
                 <tr className="border-b border-separator">
                   <th scope="col" className="py-2 pr-4 font-medium">
-                    Java
+                    {t.activity.week}
                   </th>
                   <th scope="col" className="py-2 pr-4 font-medium">
-                    Aktivë
+                    {t.activity.active}
                   </th>
                   <th scope="col" className="py-2 pr-4 font-medium">
-                    Hapën
+                    {t.activity.opened}
                   </th>
                   <th scope="col" className="py-2 pr-4 font-medium">
-                    Shkarkuan
+                    {t.activity.downloaded}
                   </th>
                   <th scope="col" className="py-2 font-medium">
-                    Provuan vizualizime
+                    {t.activity.triedViz}
                   </th>
                 </tr>
               </thead>
@@ -191,7 +194,7 @@ function Report({ report, org, courseId }: { report: ActivityReport; org: string
                 {[...weeks].reverse().map((w) => (
                   <tr key={w.week} className="border-b border-separator/60 last:border-0">
                     <th scope="row" className="py-2 pr-4 font-medium">
-                      {label(w.week)}
+                      {label(t, w.week)}
                     </th>
                     <td className="py-2 pr-4 tabular-nums">{w.active}</td>
                     <td className="py-2 pr-4 tabular-nums">{w.view}</td>
@@ -206,27 +209,27 @@ function Report({ report, org, courseId }: { report: ActivityReport; org: string
       </div>
 
       <div className="mt-8 rounded-3xl border border-border bg-surface p-5 shadow-surface sm:p-7">
-        <h2 className="text-lg font-semibold tracking-tight">Sipas laboratorit</h2>
-        <p className="mt-1 text-sm text-muted">Sa nga {students} studentët e bënë, që nga fillimi i kursit.</p>
+        <h2 className="text-lg font-semibold tracking-tight">{t.activity.perLab}</h2>
+        <p className="mt-1 text-sm text-muted">{t.activity.perLabHelp(students)}</p>
         {labs.length === 0 ? (
-          <p className="mt-4 text-sm text-muted">Ky kurs nuk ka ende laboratorë.</p>
+          <p className="mt-4 text-sm text-muted">{t.activity.noLabs}</p>
         ) : (
           <div className="mt-4 overflow-x-auto">
             <table className="w-full min-w-md text-left text-sm">
-              <caption className="sr-only">Aktiviteti sipas laboratorit</caption>
+              <caption className="sr-only">{t.activity.perLabCaption}</caption>
               <thead className="text-xs text-muted">
                 <tr className="border-b border-separator">
                   <th scope="col" className="py-2 pr-4 font-medium">
-                    Laboratori
+                    {t.activity.lab}
                   </th>
                   <th scope="col" className="py-2 pr-4 font-medium">
-                    Hapën
+                    {t.activity.opened}
                   </th>
                   <th scope="col" className="py-2 pr-4 font-medium">
-                    Shkarkuan
+                    {t.activity.downloaded}
                   </th>
                   <th scope="col" className="py-2 font-medium">
-                    Provuan vizualizime
+                    {t.activity.triedViz}
                   </th>
                 </tr>
               </thead>

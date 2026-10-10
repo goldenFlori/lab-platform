@@ -31,7 +31,7 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   decision only when new facts appear. Record product decisions in the `platform-vision` decision
   log.
 - **Explain plainly:** say what something does for teaching or for the business, not just the
-  tech. Write to the owner in English; student-facing text is Albanian.
+  tech. Write to the owner in English. The interface is Albanian first, with English beside it.
 - **Work smart:** prefer the solution that lasts over the quick one, without overbuilding.
 - **Git:**
   - No AI attribution anywhere: no `Co-Authored-By` trailers, no "Generated with" lines, no
@@ -94,6 +94,9 @@ live in its git-ignored `zgjidhjet/`; never publish them.
 - **`compatibility_date`** in `wrangler.jsonc` must not be newer than the test runtime supports,
   or the tests fail to start.
 - **Vitest stays on 4.x** until `@cloudflare/vitest-pool-workers` supports 5.
+- **No interface text inline.** Every word the app shows goes through `src/web/i18n`: add it to
+  `sq.ts` (the source) and `en.ts`, which the build checks for every message. Components use
+  `useT()`, page titles and error texts `t()`. Course content (notebooks, titles) is not translated.
 - **Static assets are public.** Protected content must come from `/api` after a permission check.
 - **Every tenant-owned query goes through `forTenant()`** (`src/api/db/tenant.ts`); lint blocks
   Drizzle and schema imports elsewhere in `src/api`. A new tenant table needs `org_id`,

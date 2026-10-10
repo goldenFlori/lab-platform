@@ -1,6 +1,7 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AccessSummary } from '../../shared/capabilities';
 import type { CourseDetail, CourseSummary, GroupView, JoinResult } from '../../shared/courses';
+import type { Locale } from '../../shared/locale';
 import { api } from './api';
 
 const orgPath = (org: string) => `/orgs/${encodeURIComponent(org)}`;
@@ -26,7 +27,7 @@ function useRefresh(org: string) {
 export function useCreateCourse(org: string) {
   const refresh = useRefresh(org);
   return useMutation({
-    mutationFn: (input: { title: string; academicYear: string; copyFromCourseId?: string }) =>
+    mutationFn: (input: { title: string; academicYear: string; locale?: Locale | null; copyFromCourseId?: string }) =>
       api<CourseSummary>(`${orgPath(org)}/courses`, { method: 'POST', body: input }),
     onSuccess: refresh,
   });
@@ -39,6 +40,10 @@ export function useCourseChanges(org: string, courseId: string) {
     archive: useMutation({
       mutationFn: (archived: boolean) =>
         api<CourseSummary>(`${base}/${archived ? 'archive' : 'unarchive'}`, { method: 'POST' }),
+      onSuccess,
+    }),
+    setLocale: useMutation({
+      mutationFn: (locale: Locale | null) => api<CourseSummary>(base, { method: 'PATCH', body: { locale } }),
       onSuccess,
     }),
     addGroup: useMutation({

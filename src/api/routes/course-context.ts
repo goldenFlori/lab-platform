@@ -1,18 +1,20 @@
 import type { Context } from 'hono';
 import type { CourseSummary } from '../../shared/courses';
+import type { Locale } from '../../shared/locale';
 import type { Access, TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
 
 // Shared by the course, group and lab routes: find the course in the URL as the user may see it.
 // A course you cannot see answers 404; one you can see but may not change answers 403.
 
-type Course = { id: string; title: string; academicYear: string; archivedAt: Date | null };
+type Course = { id: string; title: string; academicYear: string; archivedAt: Date | null; locale: Locale | null };
 
 export const summary = (course: Course): CourseSummary => ({
   id: course.id,
   title: course.title,
   academicYear: course.academicYear,
   archivedAt: course.archivedAt?.toISOString() ?? null,
+  locale: course.locale,
 });
 
 /** Staff of the course, or a student of one of its groups. */

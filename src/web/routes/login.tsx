@@ -2,6 +2,7 @@ import { Alert, Button, FieldError, Form, Input, Label, TextField } from '@herou
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { Eye, EyeOff } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
+import { t as messages, useT } from '../i18n';
 import { ApiError } from '../lib/api';
 import { meQuery, useLogin } from '../lib/auth';
 import { APP_NAME } from '../lib/brand';
@@ -18,23 +19,22 @@ export const Route = createFileRoute('/login')({
   beforeLoad: async ({ context, search }) => {
     if (await context.queryClient.ensureQueryData(meQuery)) throw redirect({ href: search.redirect ?? '/courses' });
   },
-  head: () => ({ meta: [{ title: `Hyr · ${APP_NAME}` }] }),
+  head: () => ({ meta: [{ title: `${messages().login.pageTitle} · ${APP_NAME}` }] }),
   component: LoginPage,
 });
 
 function errorMessage(error: Error) {
-  if (!(error instanceof ApiError)) return 'Diçka shkoi keq. Provoni përsëri.';
+  const t = messages();
+  if (!(error instanceof ApiError)) return t.common.somethingWrong;
   switch (error.code) {
     case 'invalid_credentials':
-      return 'Emri i përdoruesit ose fjalëkalimi nuk është i saktë.';
-    case 'too_many_attempts': {
-      const minutes = Math.max(1, Math.ceil((error.retryAfterSeconds ?? 900) / 60));
-      return `Shumë përpjekje të gabuara. Provoni përsëri pas ${minutes} ${minutes === 1 ? 'minute' : 'minutash'}.`;
-    }
+      return t.login.wrong;
+    case 'too_many_attempts':
+      return t.login.tooMany(Math.max(1, Math.ceil((error.retryAfterSeconds ?? 900) / 60)));
     case 'network':
-      return 'Nuk u lidhëm dot me serverin. Kontrolloni internetin dhe provoni përsëri.';
+      return t.common.network;
     default:
-      return 'Diçka shkoi keq. Provoni përsëri.';
+      return t.common.somethingWrong;
   }
 }
 
@@ -43,6 +43,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const login = useLogin();
   const [showPassword, setShowPassword] = useState(false);
+  const t = useT();
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -56,18 +57,18 @@ function LoginPage() {
   return (
     <section className="container-page grid min-h-[calc(100dvh-var(--nav-h))] place-items-center py-12">
       <div className="w-full max-w-sm">
-        <h1 className="text-3xl font-bold tracking-tight">Hyr në llogari</h1>
-        <p className="mt-2 text-muted">Me emrin e përdoruesit dhe fjalëkalimin që ju dha pedagogu.</p>
+        <h1 className="text-3xl font-bold tracking-tight">{t.login.title}</h1>
+        <p className="mt-2 text-muted">{t.login.lead}</p>
 
         <Form className="mt-8 grid gap-5" onSubmit={onSubmit}>
           <TextField name="username" isRequired fullWidth>
-            <Label>Emri i përdoruesit</Label>
+            <Label>{t.login.username}</Label>
             <Input autoComplete="username" autoCapitalize="none" autoCorrect="off" spellCheck={false} autoFocus />
-            <FieldError>Shkruani emrin e përdoruesit.</FieldError>
+            <FieldError>{t.login.usernameMissing}</FieldError>
           </TextField>
 
           <TextField name="password" type={showPassword ? 'text' : 'password'} isRequired fullWidth>
-            <Label>Fjalëkalimi</Label>
+            <Label>{t.login.password}</Label>
             <div className="relative">
               <Input autoComplete="current-password" className="w-full pr-11" />
               <Button
@@ -75,13 +76,13 @@ function LoginPage() {
                 size="sm"
                 variant="ghost"
                 className="absolute top-1/2 right-1 -translate-y-1/2"
-                aria-label={showPassword ? 'Fshih fjalëkalimin' : 'Shfaq fjalëkalimin'}
+                aria-label={showPassword ? t.login.hidePassword : t.login.showPassword}
                 onPress={() => setShowPassword((shown) => !shown)}
               >
                 {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
               </Button>
             </div>
-            <FieldError>Shkruani fjalëkalimin.</FieldError>
+            <FieldError>{t.login.passwordMissing}</FieldError>
           </TextField>
 
           {login.error && (
@@ -94,11 +95,11 @@ function LoginPage() {
           )}
 
           <Button type="submit" variant="primary" fullWidth isPending={login.isPending}>
-            {login.isPending ? 'Duke hyrë…' : 'Hyr'}
+            {login.isPending ? t.login.submitting : t.login.submit}
           </Button>
         </Form>
 
-        <p className="mt-6 text-sm text-muted">Keni harruar fjalëkalimin? Kërkojini pedagogut një të ri.</p>
+        <p className="mt-6 text-sm text-muted">{t.login.forgot}</p>
       </div>
     </section>
   );

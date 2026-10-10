@@ -1,16 +1,18 @@
 import { BarChart3, Terminal } from 'lucide-react';
 import type { OutputItem } from '../../../notebook/types';
+import { useT } from '../../i18n';
 import { sanitize } from '../../lib/sanitize';
 import { PlotlyFigure } from './PlotlyFigure';
 
 /** One saved output of a code cell, as the converter cleaned it (no errors, no desktop-window noise). */
 export function Output({ out, fileUrl }: { out: OutputItem; fileUrl: (name: string) => string }) {
+  const t = useT();
   switch (out.kind) {
     case 'stream':
       return (
         <div className="overflow-hidden rounded-2xl border border-border bg-surface">
           <div className="flex items-center gap-2 border-b border-separator px-4 py-1.5 text-[0.7rem] font-semibold tracking-wider text-muted uppercase">
-            <Terminal className="size-3.5" aria-hidden="true" /> Rezultati
+            <Terminal className="size-3.5" aria-hidden="true" /> {t.notebook.output}
           </div>
           <pre className="nb-stream overflow-x-auto px-4 py-3 font-mono text-[0.8rem] leading-relaxed text-foreground/90">
             {out.text}
@@ -22,7 +24,7 @@ export function Output({ out, fileUrl }: { out: OutputItem; fileUrl: (name: stri
         <figure className="overflow-hidden rounded-2xl border border-border bg-white p-2 dark:bg-surface">
           <img
             src={fileUrl(out.file)}
-            alt="Figura e prodhuar nga kodi i mësipërm"
+            alt={t.notebook.figureAlt}
             loading="lazy"
             decoding="async"
             className="mx-auto block h-auto max-w-full rounded-xl"
@@ -33,7 +35,7 @@ export function Output({ out, fileUrl }: { out: OutputItem; fileUrl: (name: stri
       return (
         <div className="overflow-hidden rounded-2xl border border-border bg-surface">
           <div className="flex items-center gap-2 border-b border-separator px-4 py-1.5 text-[0.7rem] font-semibold tracking-wider text-muted uppercase">
-            <BarChart3 className="size-3.5" aria-hidden="true" /> Grafik interaktiv
+            <BarChart3 className="size-3.5" aria-hidden="true" /> {t.notebook.interactiveChart}
           </div>
           <PlotlyFigure src={fileUrl(out.file)} />
         </div>

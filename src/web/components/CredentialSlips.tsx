@@ -1,4 +1,5 @@
 import { createPortal } from 'react-dom';
+import { useT } from '../i18n';
 import type { Slip } from '../lib/students';
 
 type Props = { slips: Slip[]; courseTitle: string; groupName: string };
@@ -30,6 +31,7 @@ export function CredentialSlips(props: Props) {
 }
 
 function SlipCard({ slip, courseTitle, groupName, screen = false }: Props & { slip: Slip; screen?: boolean }) {
+  const t = useT();
   return (
     <div
       className={screen ? 'rounded-2xl border border-dashed border-border bg-surface p-5' : 'slip-print'}
@@ -41,16 +43,14 @@ function SlipCard({ slip, courseTitle, groupName, screen = false }: Props & { sl
       </p>
       <p className={screen ? 'mt-2 text-lg font-semibold' : 'slip-name'}>{slip.fullName}</p>
       <dl className={screen ? 'mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1' : 'slip-fields'}>
-        <dt className={screen ? 'text-sm text-muted' : ''}>Përdoruesi</dt>
+        <dt className={screen ? 'text-sm text-muted' : ''}>{t.slip.username}</dt>
         <dd className="font-mono font-semibold">{slip.username}</dd>
-        <dt className={screen ? 'text-sm text-muted' : ''}>Fjalëkalimi</dt>
+        <dt className={screen ? 'text-sm text-muted' : ''}>{t.slip.password}</dt>
         <dd className="font-mono font-semibold tracking-wider" data-testid={screen ? 'slip-password' : undefined}>
           {slip.password}
         </dd>
       </dl>
-      <p className={screen ? 'mt-3 text-xs text-muted' : 'slip-hint'}>
-        Hyni te {window.location.host}/login. Mbajeni fjalëkalimin për vete.
-      </p>
+      <p className={screen ? 'mt-3 text-xs text-muted' : 'slip-hint'}>{t.slip.hint(window.location.host)}</p>
     </div>
   );
 }

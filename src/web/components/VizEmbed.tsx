@@ -3,6 +3,7 @@ import { RotateCcw } from 'lucide-react';
 import { Component, type ReactNode, Suspense, useEffect, useRef, useState } from 'react';
 import type { VisualizerId } from '../../shared/visualizers';
 import { VIZ, type VizProps } from '../../viz';
+import { t as messages, useT } from '../i18n';
 
 /** One visualization. Its code loads only when it comes near the screen. */
 export function VizEmbed({ viz, props, label }: { viz: VisualizerId; props?: VizProps | null; label?: string | null }) {
@@ -45,9 +46,10 @@ export function VizEmbed({ viz, props, label }: { viz: VisualizerId; props?: Viz
 }
 
 function VizPlaceholder() {
+  const t = useT();
   return (
     <div className="grid min-h-96 place-items-center rounded-3xl border border-border bg-surface" aria-busy="true">
-      <span className="text-sm text-muted">Duke ngarkuar vizualizimin…</span>
+      <span className="text-sm text-muted">{t.notebook.vizLoading}</span>
     </div>
   );
 }
@@ -62,17 +64,18 @@ class VizErrorBoundary extends Component<{ children: ReactNode }, { failed: bool
 
   render() {
     if (!this.state.failed) return this.props.children;
+    const t = messages();
     return (
       <div
         role="alert"
         className="grid min-h-48 place-items-center gap-3 rounded-3xl border border-dashed border-border px-6 py-10 text-center"
       >
         <div>
-          <p className="font-medium">Ky vizualizim nuk u hap.</p>
-          <p className="mt-1 text-sm text-muted">Rifreskoni faqen dhe provoni sërish.</p>
+          <p className="font-medium">{t.notebook.vizFailed}</p>
+          <p className="mt-1 text-sm text-muted">{t.notebook.vizFailedHelp}</p>
         </div>
         <Button size="sm" variant="secondary" onPress={() => window.location.reload()}>
-          <RotateCcw className="size-4" /> Rifresko faqen
+          <RotateCcw className="size-4" /> {t.notebook.reload}
         </Button>
       </div>
     );

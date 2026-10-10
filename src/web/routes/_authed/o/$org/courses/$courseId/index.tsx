@@ -17,8 +17,10 @@ import {
 import { type FormEvent, useState } from 'react';
 import type { CourseDetail, GroupView } from '../../../../../../../shared/courses';
 import { formatJoinCode } from '../../../../../../../shared/join-code';
+import { isLocale, LOCALES } from '../../../../../../../shared/locale';
 import { CourseLabs } from '../../../../../../components/CourseLabs';
 import { PresentJoinCode } from '../../../../../../components/PresentJoinCode';
+import { LANGUAGE_NAMES, t as messages, useT } from '../../../../../../i18n';
 import { ApiError } from '../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../lib/brand';
 import { courseQuery, useCourseChanges } from '../../../../../../lib/courses';
@@ -33,7 +35,9 @@ export const Route = createFileRoute('/_authed/o/$org/courses/$courseId/')({
       throw error;
     }
   },
-  head: ({ loaderData }) => ({ meta: [{ title: `${loaderData?.course.title ?? 'Kursi'} · ${APP_NAME}` }] }),
+  head: ({ loaderData }) => ({
+    meta: [{ title: `${loaderData?.course.title ?? messages().course.pageTitle} · ${APP_NAME}` }],
+  }),
   component: CoursePage,
 });
 
@@ -44,20 +48,21 @@ function CoursePage() {
   const changes = useCourseChanges(org, courseId);
   const isStaff = permissions.manage || groups.some((g) => g.permissions.manageStudents);
   const archived = course.archivedAt !== null;
+  const t = useT();
 
   return (
     <section className="container-page py-10">
       <Link to="/courses" className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground">
-        <ArrowLeft className="size-4" /> Kurset e mia
+        <ArrowLeft className="size-4" /> {t.course.back}
       </Link>
 
       <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-3xl font-bold tracking-tight">{course.title}</h1>
-            {archived && <Chip variant="secondary">I arkivuar</Chip>}
+            {archived && <Chip variant="secondary">{t.course.archived}</Chip>}
           </div>
-          <p className="mt-1 text-muted">Viti akademik {course.academicYear}</p>
+          <p className="mt-1 text-muted">{t.course.academicYear(course.academicYear)}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {permissions.analytics && (
@@ -66,7 +71,7 @@ function CoursePage() {
               params={{ org, courseId }}
               className="button button--tertiary gap-2"
             >
-              <BarChart3 className="size-4" /> Aktiviteti
+              <BarChart3 className="size-4" /> {t.course.activity}
             </Link>
           )}
           {permissions.manage && (
@@ -76,11 +81,37 @@ function CoursePage() {
               onPress={() => changes.archive.mutate(!archived)}
             >
               {archived ? <ArchiveRestore className="size-4" /> : <Archive className="size-4" />}
-              {archived ? 'Rikthe kursin' : 'Arkivo kursin'}
+              {archived ? t.course.unarchive : t.course.archive}
             </Button>
           )}
         </div>
       </div>
+
+      {permissions.manage && (
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          <label htmlFor="course-locale" className="text-sm font-medium">
+            {t.course.language}
+          </label>
+          <select
+            id="course-locale"
+            value={course.locale ?? ''}
+            disabled={changes.setLocale.isPending}
+            onChange={(e) => changes.setLocale.mutate(isLocale(e.target.value) ? e.target.value : null)}
+            aria-describedby="course-locale-help"
+            className="h-9 rounded-xl border border-border bg-surface px-3 text-sm"
+          >
+            <option value="">{LANGUAGE_NAMES.sq}</option>
+            {LOCALES.filter((code) => code !== 'sq').map((code) => (
+              <option key={code} value={code} lang={code}>
+                {LANGUAGE_NAMES[code]}
+              </option>
+            ))}
+          </select>
+          <span id="course-locale-help" className="text-xs text-muted">
+            {t.course.languageHelp}
+          </span>
+        </div>
+      )}
 
       {isStaff && (
         <Groups data={data} org={org} courseId={courseId} archived={archived} canManage={permissions.manage} />
@@ -105,6 +136,7 @@ function Groups({
   canManage: boolean;
 }) {
   const changes = useCourseChanges(org, courseId);
+  const t = useT();
 
   function onAddGroup(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -114,12 +146,10 @@ function Groups({
 
   return (
     <div className="mt-10">
-      <h2 className="text-xl font-semibold tracking-tight">Grupet</h2>
-      {archived && (
-        <p className="mt-2 text-sm text-muted">Kursi është arkivuar: kodet e regjistrimit nuk pranohen më.</p>
-      )}
+      <h2 className="text-xl font-semibold tracking-tight">{t.course.groups}</h2>
+      {archived && <p className="mt-2 text-sm text-muted">{t.course.archivedNote}</p>}
       {data.groups.length === 0 ? (
-        <p className="mt-3 text-sm text-muted">Ky kurs nuk ka ende grupe.</p>
+        <p className="mt-3 text-sm text-muted">{t.course.noGroups}</p>
       ) : (
         <ul className="mt-4 grid gap-4 lg:grid-cols-2">
           {data.groups.map((group) => (
@@ -137,13 +167,13 @@ function Groups({
         </ul>
       )}
       {canManage && (
-        <Form onSubmit={onAddGroup} aria-label="Shto grup" className="mt-4 flex flex-wrap items-start gap-3">
-          <TextField name="name" isRequired aria-label="Emri i grupit" className="w-full max-w-xs">
-            <Input placeholder="Emri i grupit, p.sh. Grupi B" />
-            <FieldError>Shkruani emrin e grupit.</FieldError>
+        <Form onSubmit={onAddGroup} aria-label={t.course.addGroup} className="mt-4 flex flex-wrap items-start gap-3">
+          <TextField name="name" isRequired aria-label={t.course.groupName} className="w-full max-w-xs">
+            <Input placeholder={t.course.groupPlaceholder} />
+            <FieldError>{t.course.groupNameMissing}</FieldError>
           </TextField>
           <Button type="submit" variant="secondary" isPending={changes.addGroup.isPending}>
-            <Plus className="size-4" /> Shto grupin
+            <Plus className="size-4" /> {t.course.addGroupSubmit}
           </Button>
         </Form>
       )}
@@ -168,6 +198,7 @@ function GroupCard({
 }) {
   const changes = useCourseChanges(org, courseId);
   const [presenting, setPresenting] = useState(false);
+  const t = useT();
   const code = group.joinCode;
   const switching = changes.switchJoinCode.isPending && changes.switchJoinCode.variables?.groupId === group.id;
 
@@ -180,13 +211,13 @@ function GroupCard({
 
       {group.permissions.manageStudents && (
         <>
-          <p className="mt-4 text-xs font-medium tracking-wide text-muted uppercase">Kodi i regjistrimit</p>
+          <p className="mt-4 text-xs font-medium tracking-wide text-muted uppercase">{t.course.joinCode}</p>
           {code ? (
             <p className="mt-1 font-mono text-3xl font-bold tracking-widest" data-testid="join-code">
               {formatJoinCode(code)}
             </p>
           ) : (
-            <p className="mt-1 text-sm text-muted">Regjistrimi është i mbyllur.</p>
+            <p className="mt-1 text-sm text-muted">{t.course.joiningClosed}</p>
           )}
           <div className="mt-4 flex flex-wrap gap-2">
             <Link
@@ -194,11 +225,11 @@ function GroupCard({
               params={{ org, courseId, groupId: group.id }}
               className="button button--sm button--secondary gap-1.5"
             >
-              <Users className="size-4" /> Studentët
+              <Users className="size-4" /> {t.course.students}
             </Link>
             {code && !archived && (
               <Button size="sm" variant="primary" onPress={() => setPresenting(true)}>
-                <MonitorUp className="size-4" /> Shfaq në ekran
+                <MonitorUp className="size-4" /> {t.course.present}
               </Button>
             )}
             <Button
@@ -208,7 +239,7 @@ function GroupCard({
               onPress={() => changes.switchJoinCode.mutate({ groupId: group.id, enabled: true })}
             >
               {code ? <RefreshCw className="size-4" /> : <Unlock className="size-4" />}
-              {code ? 'Kod i ri' : 'Hap regjistrimin'}
+              {code ? t.course.newCode : t.course.openJoining}
             </Button>
             {code && (
               <Button
@@ -217,7 +248,7 @@ function GroupCard({
                 isPending={switching}
                 onPress={() => changes.switchJoinCode.mutate({ groupId: group.id, enabled: false })}
               >
-                <Lock className="size-4" /> Mbyll regjistrimin
+                <Lock className="size-4" /> {t.course.closeJoining}
               </Button>
             )}
           </div>
@@ -237,9 +268,10 @@ function GroupCard({
 }
 
 function DeleteGroup({ group, onDelete }: { group: GroupView; onDelete: () => void }) {
+  const t = useT();
   return (
     <AlertDialog>
-      <Button isIconOnly size="sm" variant="ghost" aria-label={`Fshi ${group.name}`}>
+      <Button isIconOnly size="sm" variant="ghost" aria-label={t.course.deleteGroupLabel(group.name)}>
         <Trash2 className="size-4" />
       </Button>
       <AlertDialog.Backdrop>
@@ -247,18 +279,15 @@ function DeleteGroup({ group, onDelete }: { group: GroupView; onDelete: () => vo
           <AlertDialog.Dialog>
             <AlertDialog.Header>
               <AlertDialog.Icon status="danger" />
-              <AlertDialog.Heading>Të fshihet {group.name}?</AlertDialog.Heading>
+              <AlertDialog.Heading>{t.course.deleteGroupTitle(group.name)}</AlertDialog.Heading>
             </AlertDialog.Header>
-            <AlertDialog.Body>
-              Studentët e këtij grupi largohen nga kursi. Llogaritë e tyre mbeten, por do t'u duhet një kod i ri për t'u
-              kthyer.
-            </AlertDialog.Body>
+            <AlertDialog.Body>{t.course.deleteGroupText}</AlertDialog.Body>
             <AlertDialog.Footer>
               <Button slot="close" variant="tertiary">
-                Anulo
+                {t.common.cancel}
               </Button>
               <Button slot="close" variant="danger" onPress={onDelete}>
-                Fshi grupin
+                {t.course.deleteGroup}
               </Button>
             </AlertDialog.Footer>
           </AlertDialog.Dialog>

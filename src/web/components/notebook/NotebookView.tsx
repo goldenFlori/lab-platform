@@ -5,6 +5,7 @@ import type { StoredNotebook } from '../../../notebook/stored';
 import type { MarkdownCell, SectionKind } from '../../../notebook/types';
 import type { Embed } from '../../../shared/notebooks';
 import { isVisualizerId } from '../../../shared/visualizers';
+import { type Messages, useT } from '../../i18n';
 import { sanitize } from '../../lib/sanitize';
 import { VizEmbed } from '../VizEmbed';
 import { CodeCell } from './CodeCell';
@@ -14,15 +15,19 @@ import { CodeCell } from './CodeCell';
 // by its interactive version. Nothing here runs notebook code.
 
 /** How each kind of section is marked: exercise, theory, classwork and so on. */
-export const SECTION_KINDS: Partial<Record<SectionKind, { label: string; icon: LucideIcon; color: string }>> = {
-  exercise: { label: 'Ushtrim', icon: FlaskConical, color: 'var(--accent)' },
-  theory: { label: 'Teori', icon: BookOpen, color: 'var(--brand-2)' },
-  classwork: { label: 'Punë në klasë', icon: Users, color: 'var(--warning)' },
-  homework: { label: 'Detyrë shtëpie', icon: House, color: 'var(--danger)' },
-  reflect: { label: 'Pyetje reflektuese', icon: Lightbulb, color: 'var(--brand-3)' },
-  scenario: { label: 'Skenar real', icon: Globe2, color: 'var(--success)' },
-  complexity: { label: 'Kompleksiteti', icon: Gauge, color: 'var(--brand-2)' },
+export const SECTION_KINDS: Partial<Record<SectionKind, { icon: LucideIcon; color: string }>> = {
+  exercise: { icon: FlaskConical, color: 'var(--accent)' },
+  theory: { icon: BookOpen, color: 'var(--brand-2)' },
+  classwork: { icon: Users, color: 'var(--warning)' },
+  homework: { icon: House, color: 'var(--danger)' },
+  reflect: { icon: Lightbulb, color: 'var(--brand-3)' },
+  scenario: { icon: Globe2, color: 'var(--success)' },
+  complexity: { icon: Gauge, color: 'var(--brand-2)' },
 };
+
+/** The marked section kinds' names, in the interface language. */
+export const sectionLabel = (t: Messages, kind: SectionKind) =>
+  (t.notebook.kinds as Partial<Record<SectionKind, string>>)[kind] ?? '';
 
 /** Where an embed for a cell is anchored, so a page can link to it. */
 export const embedAnchor = (notebookId: string, cell: number) => `viz-${notebookId}-${cell}`;
@@ -38,6 +43,7 @@ export function NotebookView({
   embeds: Embed[];
   fileUrl: (name: string) => string;
 }) {
+  const t = useT();
   const embedAt = new Map(embeds.map((embed) => [embed.cell, embed]));
   const lastOfSource = new Map<number, number>();
   notebook.cells.forEach((cell, i) => {
@@ -62,9 +68,9 @@ export function NotebookView({
         return (
           // biome-ignore lint/suspicious/noArrayIndexKey: the cells of a stored notebook never change order
           <Fragment key={i}>
-            {before && viz(embed, 'Versioni interaktiv')}
+            {before && viz(embed, t.notebook.interactiveFirst)}
             {cell.type === 'markdown' ? <Markdown cell={cell} /> : <CodeCell cell={cell} fileUrl={fileUrl} />}
-            {after && viz(embed, 'Provojeni në shfletues')}
+            {after && viz(embed, t.notebook.tryInBrowser)}
           </Fragment>
         );
       })}
@@ -74,6 +80,7 @@ export function NotebookView({
 
 /** One markdown cell: reading text, or a section card when it starts an exercise, theory and so on. */
 export function Markdown({ cell }: { cell: MarkdownCell }) {
+  const t = useT();
   const body = cell.html.trim() ? (
     <div
       className="nb-prose"
@@ -97,7 +104,7 @@ export function Markdown({ cell }: { cell: MarkdownCell }) {
         </span>
         <div className="min-w-0">
           <p className="text-[0.7rem] font-semibold tracking-wider uppercase" style={{ color: 'var(--kind)' }}>
-            {meta.label}
+            {sectionLabel(t, cell.kind)}
           </p>
           <HeadingLink id={cell.id}>
             {!body || level <= 2 ? (

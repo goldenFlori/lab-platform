@@ -3,8 +3,8 @@ import { useQueries } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { CornerDownLeft, FileText, FlaskConical, KeyRound, Search, Waypoints } from 'lucide-react';
 import { useDeferredValue, useId, useMemo, useState } from 'react';
-import { isVisualizerId, VISUALIZERS, type VisualizerId } from '../../shared/visualizers';
-import { VIZ } from '../../viz';
+import { VISUALIZER_IDS, type VisualizerId } from '../../shared/visualizers';
+import { useT } from '../i18n';
 import { useMe } from '../lib/auth';
 import { coursesQuery } from '../lib/courses';
 import { searchIndexQuery } from '../lib/search';
@@ -47,6 +47,7 @@ export default function SearchPalette({
 }) {
   const me = useMe();
   const navigate = useNavigate();
+  const t = useT();
   const listId = useId();
   const [query, setQuery] = useState('');
   const [active, setActive] = useState(0);
@@ -80,14 +81,14 @@ export default function SearchPalette({
       const inCourse = courses.length > 1 ? ` · ${course.title}` : '';
       const labs = new Map(index.labs.map((lab) => [lab.id, lab]));
       for (const lab of index.labs) {
-        const title = `Laboratori ${lab.n} · ${lab.title}`;
+        const title = `${t.labs.lab(lab.n)} · ${lab.title}`;
         const s = score(terms, [title, lab.summary ?? '']);
         if (s === 0) continue;
         found.push({
           key: `lab-${lab.id}`,
           icon: FlaskConical,
           title: mark(title, terms),
-          context: `Laboratori${inCourse}`,
+          context: `${t.search.lab}${inCourse}`,
           excerpt: lab.summary ? snippet(lab.summary, terms) : undefined,
           target: { kind: 'lab', org, courseId: course.id, labId: lab.id },
           // A lab whose name matches comes before its sections.
@@ -101,12 +102,12 @@ export default function SearchPalette({
         if (!nb || !lab) return;
         const s = score(terms, [section.title, section.keywords, section.text]);
         if (s === 0) return;
-        const notebookTitle = nb.kind === 'solution' ? `Zgjidhja · ${nb.title}` : nb.title;
+        const notebookTitle = nb.kind === 'solution' ? t.lab.solutionTab(nb.title) : nb.title;
         found.push({
           key: `section-${nb.id}-${j}`,
           icon: nb.kind === 'solution' ? KeyRound : FileText,
           title: mark(section.title || nb.title, terms),
-          context: `Laboratori ${lab.n} · ${notebookTitle}${inCourse}`,
+          context: `${t.labs.lab(lab.n)} · ${notebookTitle}${inCourse}`,
           excerpt: section.text ? snippet(section.text, terms) : undefined,
           target: {
             kind: 'lab',
@@ -120,22 +121,22 @@ export default function SearchPalette({
         });
       });
     });
-    for (const [id, title] of Object.entries(VISUALIZERS)) {
-      if (!isVisualizerId(id)) continue;
-      const s = score(terms, [title, VIZ[id].summary, id]);
+    for (const id of VISUALIZER_IDS) {
+      const title = t.viz.names[id];
+      const s = score(terms, [title, t.viz.summaries[id], id]);
       if (s === 0) continue;
       found.push({
         key: `viz-${id}`,
         icon: Waypoints,
         title: mark(title, terms),
-        context: 'Vizualizim',
-        excerpt: snippet(VIZ[id].summary, terms),
+        context: t.search.visualization,
+        excerpt: snippet(t.viz.summaries[id], terms),
         target: { kind: 'viz', vizId: id },
         score: s * 2,
       });
     }
     return found.sort((a, b) => b.score - a.score).slice(0, MAX_HITS);
-  }, [deferred, courses, indexes.data]);
+  }, [deferred, courses, indexes.data, t]);
 
   const go = (hit: Hit | undefined) => {
     if (!hit) return;
@@ -157,18 +158,18 @@ export default function SearchPalette({
   return (
     <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange} variant="blur">
       <Modal.Container placement="top" size="lg" className="mt-[10vh]">
-        <Modal.Dialog aria-label="Kërko në laboratorë" className="overflow-hidden p-0">
+        <Modal.Dialog aria-label={t.search.dialog} className="overflow-hidden p-0">
           <div className="flex items-center gap-3 border-b border-separator px-4 py-3">
             <Search className="size-5 shrink-0 text-muted" aria-hidden="true" />
             <Input
               autoFocus
               role="combobox"
-              aria-label="Kërko"
+              aria-label={t.search.input}
               aria-expanded={hits.length > 0}
               aria-controls={listId}
               aria-autocomplete="list"
               aria-activedescendant={hits[current] ? `${listId}-${current}` : undefined}
-              placeholder="Kërko: Dijkstra, Merge Sort, prerja min…"
+              placeholder={t.search.placeholder}
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
@@ -188,25 +189,17 @@ export default function SearchPalette({
               }}
               className="min-w-0 flex-1 border-0 bg-transparent text-base shadow-none focus:ring-0"
             />
-            {loading && <Spinner size="sm" aria-label="Duke ngarkuar" />}
+            {loading && <Spinner size="sm" aria-label={t.search.loading} />}
             <Kbd className="hidden sm:inline-flex">Esc</Kbd>
           </div>
           <div className="max-h-[60vh] overflow-y-auto p-2">
-            {failed && (
-              <p className="px-3 py-2 text-center text-sm text-danger">
-                Disa kurse nuk u ngarkuan. Rifreskoni faqen dhe provoni sërish.
-              </p>
-            )}
-            {!typed && (
-              <p className="px-3 py-6 text-center text-sm text-muted">
-                Shkruani një algoritëm, një koncept ose numrin e laboratorit.
-              </p>
-            )}
+            {failed && <p className="px-3 py-2 text-center text-sm text-danger">{t.search.someFailed}</p>}
+            {!typed && <p className="px-3 py-6 text-center text-sm text-muted">{t.search.hint}</p>}
             {typed && !loading && hits.length === 0 && (
-              <p className="px-3 py-6 text-center text-sm text-muted">Asnjë rezultat për “{query.trim()}”.</p>
+              <p className="px-3 py-6 text-center text-sm text-muted">{t.search.none(query.trim())}</p>
             )}
             {/* Options take clicks; the keyboard stays in the input (aria-activedescendant). */}
-            <div id={listId} role="listbox" aria-label="Rezultatet" className={hits.length ? '' : 'hidden'}>
+            <div id={listId} role="listbox" aria-label={t.search.results} className={hits.length ? '' : 'hidden'}>
               {hits.map((hit, i) => {
                 const on = i === current;
                 return (
