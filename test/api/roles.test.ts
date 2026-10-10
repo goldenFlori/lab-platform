@@ -2,12 +2,12 @@ import { env, exports } from 'cloudflare:workers';
 import { Hono } from 'hono';
 import { describe, expect, it } from 'vitest';
 import { Access, requireCapability, type TenantEnv, tenantAccess } from '../../src/api/auth/access';
-import { hashPassword } from '../../src/api/auth/password';
 import { createDb } from '../../src/api/db';
 import { listRoles } from '../../src/api/db/access';
 import { InvalidInputError } from '../../src/api/db/tenant';
 import { handleError, notFound } from '../../src/api/errors';
 import { CAPABILITIES, type Capability, isCapability } from '../../src/shared/capabilities';
+import { hashPassword } from '../../src/shared/password';
 import { type Seeded, seedOrganization } from './fixtures';
 
 /** The agreed permissions of each built-in role: the specification the database must match. */

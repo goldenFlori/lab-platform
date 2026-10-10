@@ -1,8 +1,8 @@
-import { and, asc, eq, type InferInsertModel, type InferSelectModel, inArray, type SQL } from 'drizzle-orm';
+import { and, asc, eq, type InferInsertModel, type InferSelectModel, inArray, like, or, type SQL } from 'drizzle-orm';
 import { roleExists } from './access';
 import { uuidv7 } from './ids';
 import type { Db } from './index';
-import { courses, courseTemplates, groups, labAccess, labs, memberships, users } from './schema';
+import { courses, courseTemplates, groups, labAccess, labs, memberships, sessions, users } from './schema';
 
 // The tenant-scoped data layer. Route handlers reach tenant-owned data only through forTenant(),
 // which adds the organization to every query. Another organization's rows look like rows that do
@@ -227,6 +227,95 @@ function tenantGroups(db: Db, orgId: string) {
   };
 }
 
+/** Rows per multi-row insert, so each statement stays under D1's 100 bound parameters. */
+export const ROWS_PER_INSERT = 10;
+
+function inChunks<T>(list: T[], size = ROWS_PER_INSERT) {
+  return Array.from({ length: Math.ceil(list.length / size) }, (_, i) => list.slice(i * size, (i + 1) * size));
+}
+
+type NewStudent = { fullName: string; username: string; passwordHash: string };
+
+/** Students of a group: imported accounts, their list, and password resets by staff (#11). */
+function tenantStudents(db: Db, orgId: string) {
+  /** The account rows to insert: each username numbered where it is already taken ("ana.kola2"). */
+  async function withFreeUsernames(rows: NewStudent[]) {
+    const bases = [...new Set(rows.map((row) => row.username))];
+    // Usernames are [a-z.] only, so the base contains no LIKE wildcards.
+    const existing = await db
+      .select({ username: users.username })
+      .from(users)
+      .where(or(...bases.map((base) => like(users.username, `${base}%`))));
+    const taken = new Set(existing.map((row) => row.username));
+    return rows.map((row) => {
+      let username = row.username;
+      for (let n = 2; taken.has(username); n++) username = `${row.username}${n}`;
+      taken.add(username);
+      return { id: uuidv7(), fullName: row.fullName, username, passwordHash: row.passwordHash };
+    });
+  }
+
+  return {
+    async ofGroup(groupId: string) {
+      return db
+        .select({ id: users.id, fullName: users.fullName, username: users.username })
+        .from(memberships)
+        .innerJoin(users, eq(users.id, memberships.userId))
+        .where(and(eq(memberships.orgId, orgId), eq(memberships.groupId, groupId), eq(memberships.role, 'student')))
+        .orderBy(asc(users.fullName));
+    },
+
+    /**
+     * New accounts, each only a student of the group: no organization-wide role, so they see this
+     * course and nothing else. One select and a few multi-row inserts, written together.
+     */
+    async importInto(groupId: string, rows: NewStudent[]) {
+      for (let attempt = 1; ; attempt++) {
+        const accounts = await withFreeUsernames(rows);
+        const statements = [
+          ...inChunks(accounts).map((chunk) => db.insert(users).values(chunk)),
+          ...inChunks(accounts).map((chunk) =>
+            db
+              .insert(memberships)
+              .values(chunk.map((account) => ({ id: uuidv7(), orgId, userId: account.id, groupId, role: 'student' }))),
+          ),
+        ];
+        const [first, ...rest] = statements;
+        if (!first) return [];
+        try {
+          await rethrowMissingParent(db.batch([first, ...rest]));
+          return accounts.map(({ id, fullName, username }) => ({ id, fullName, username }));
+        } catch (error) {
+          // Another import took one of these usernames meanwhile: pick again, once.
+          if (attempt === 1 && String((error as Error).cause ?? error).includes('UNIQUE')) continue;
+          throw error;
+        }
+      }
+    },
+
+    /** A new password for a student of the group; their other sessions end. */
+    async setPassword(groupId: string, userId: string, passwordHash: string) {
+      const [member] = await db
+        .select({ id: memberships.id })
+        .from(memberships)
+        .where(
+          and(
+            eq(memberships.orgId, orgId),
+            eq(memberships.groupId, groupId),
+            eq(memberships.userId, userId),
+            eq(memberships.role, 'student'),
+          ),
+        )
+        .limit(1);
+      if (!member) throw new NotFoundError('Student not found');
+      await db.batch([
+        db.update(users).set({ passwordHash }).where(eq(users.id, userId)),
+        db.delete(sessions).where(eq(sessions.userId, userId)),
+      ]);
+    },
+  };
+}
+
 export function forTenant(db: Db, orgId: string) {
   const members = tenantUsers(db, orgId);
   return {
@@ -238,6 +327,7 @@ export function forTenant(db: Db, orgId: string) {
     groups: tenantGroups(db, orgId),
     labs: tenantTable(db, orgId, labs),
     labAccess: tenantTable(db, orgId, labAccess),
+    students: tenantStudents(db, orgId),
   };
 }
 

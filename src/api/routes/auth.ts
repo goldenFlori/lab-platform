@@ -1,8 +1,8 @@
 import { zValidator } from '@hono/zod-validator';
 import { type Context, Hono } from 'hono';
 import { loginInput, type Me } from '../../shared/auth';
+import { hashPassword, needsRehash, verifyPassword } from '../../shared/password';
 import { LOGIN_WINDOW_SECONDS, MAX_FAILURES_PER_IP, MAX_FAILURES_PER_USERNAME, windowCutoff } from '../auth/limits';
-import { hashPassword, needsRehash, verifyPassword } from '../auth/password';
 import { endSession, requireUser, startSession } from '../auth/session';
 import { createDb, type Db } from '../db';
 import {

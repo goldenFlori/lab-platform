@@ -12,16 +12,17 @@ import {
   RefreshCw,
   Trash2,
   Unlock,
+  Users,
 } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
-import type { CourseDetail, GroupView } from '../../../../../../shared/courses';
-import { formatJoinCode } from '../../../../../../shared/join-code';
-import { PresentJoinCode } from '../../../../../components/PresentJoinCode';
-import { ApiError } from '../../../../../lib/api';
-import { APP_NAME } from '../../../../../lib/brand';
-import { courseQuery, useCourseChanges } from '../../../../../lib/courses';
+import type { CourseDetail, GroupView } from '../../../../../../../shared/courses';
+import { formatJoinCode } from '../../../../../../../shared/join-code';
+import { PresentJoinCode } from '../../../../../../components/PresentJoinCode';
+import { ApiError } from '../../../../../../lib/api';
+import { APP_NAME } from '../../../../../../lib/brand';
+import { courseQuery, useCourseChanges } from '../../../../../../lib/courses';
 
-export const Route = createFileRoute('/_authed/o/$org/courses/$courseId')({
+export const Route = createFileRoute('/_authed/o/$org/courses/$courseId/')({
   loader: async ({ context, params }) => {
     try {
       return await context.queryClient.ensureQueryData(courseQuery(params.org, params.courseId));
@@ -182,6 +183,13 @@ function GroupCard({
             <p className="mt-1 text-sm text-muted">Regjistrimi është i mbyllur.</p>
           )}
           <div className="mt-4 flex flex-wrap gap-2">
+            <Link
+              to="/o/$org/courses/$courseId/groups/$groupId"
+              params={{ org, courseId, groupId: group.id }}
+              className="button button--sm button--secondary gap-1.5"
+            >
+              <Users className="size-4" /> Studentët
+            </Link>
             {code && !archived && (
               <Button size="sm" variant="primary" onPress={() => setPresenting(true)}>
                 <MonitorUp className="size-4" /> Shfaq në ekran

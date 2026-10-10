@@ -3,7 +3,7 @@ import { env, exports } from 'cloudflare:workers';
 import { describe, expect, it } from 'vitest';
 import worker from '../../src/api';
 import { LOGIN_WINDOW_SECONDS, MAX_FAILURES_PER_IP, MAX_FAILURES_PER_USERNAME } from '../../src/api/auth/limits';
-import { hashPassword, PASSWORD_ITERATIONS } from '../../src/api/auth/password';
+import { hashPassword, PASSWORD_ITERATIONS } from '../../src/shared/password';
 import { seedOrganization } from './fixtures';
 
 const ORIGIN = 'https://lab.test';

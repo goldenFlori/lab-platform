@@ -162,6 +162,29 @@ Built in #10, under `/api/orgs/:org/courses` (`src/api/routes/courses.ts`).
     the projector (lean-qr, always dark on white), new code / close registration, and delete;
   - `/join?code=…`: what the QR code opens. Signed-out students log in first and come back.
 
+## Importing students
+
+Built in #11. Pages: the group's students (`…/groups/:id`) and the import (`…/groups/:id/import`).
+
+- **In the pedagog's browser:**
+  - the class list is read from pasted text (Excel or Sheets columns, CSV, one name per line),
+    a CSV or an `.xlsx` file (read-excel-file, loaded only for Excel);
+  - each name gets a username base (`usernameBase`: first and last name, no accents) and a
+    12-character password (lowercase and digits without look-alikes);
+  - each password is hashed here with the same PBKDF2 code (`src/shared/password.ts`).
+  - **Only hashes reach the server.** Plain passwords exist only on screen and on the printed
+    slips (`CredentialSlips`: a print-only copy, A4, 10 per page, cut lines). There is no
+    digital export, and the page warns before it is left unprinted.
+- **On the server** (`POST …/groups/:id/students`, `student.manage`):
+  - at most 25 students per request (`IMPORT_CHUNK`), and the browser sends a class in
+    several requests;
+  - the hash must have today's parameters (`isValidPasswordHash`);
+  - usernames are numbered where taken anywhere on the platform (`arben.hoxha2`);
+  - one select plus multi-row inserts of 10 rows (`ROWS_PER_INSERT`), all in one batch;
+  - imported students get a group membership only.
+- **Password reset** (`POST …/students/:id/password`): only for a student of that group. The
+  new hash also comes from the browser, and the student's sessions end.
+
 ## Data model sketch
 
 Built (#7; `src/api/db/schema.ts` is the source of truth):

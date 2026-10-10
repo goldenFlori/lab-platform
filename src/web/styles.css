@@ -179,3 +179,67 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* ---------------------------------------------------------------------
+ *  Printing credential slips (#11). The app is hidden; only the
+ *  print-only copy is printed, black on white whatever the theme.
+ * ------------------------------------------------------------------- */
+.print-only {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+  body > *:not(.print-only) {
+    display: none;
+  }
+  body {
+    background: #fff;
+  }
+  .print-only {
+    display: block;
+    color: #000;
+  }
+  .slips-print {
+    display: grid;
+    grid-template-columns: repeat(2, 95mm);
+    grid-auto-rows: 55mm;
+    border-top: 0.3mm dashed #777;
+    border-left: 0.3mm dashed #777;
+  }
+  .slip-print {
+    box-sizing: border-box;
+    padding: 5mm 6mm;
+    border-right: 0.3mm dashed #777;
+    border-bottom: 0.3mm dashed #777;
+    break-inside: avoid;
+    font-size: 10pt;
+  }
+  .slip-meta {
+    color: #555;
+    font-size: 8pt;
+  }
+  .slip-name {
+    margin-top: 2mm;
+    font-size: 13pt;
+    font-weight: 700;
+  }
+  .slip-fields {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1mm 5mm;
+    margin-top: 3mm;
+    font-size: 11pt;
+  }
+  .slip-fields dd {
+    font-size: 13pt;
+  }
+  .slip-hint {
+    margin-top: 3mm;
+    color: #555;
+    font-size: 8pt;
+  }
+}

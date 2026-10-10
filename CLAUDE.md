@@ -102,5 +102,9 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   the new SQL. Never edit or delete a migration once it is merged. CI fails if the schema and the
   migrations disagree. Production applies them before the new code is live, so never rename or
   drop what the running code still uses in the same release.
+- **D1 limits bulk writes:** 100 bound parameters per statement and 50 statements per request on
+  the free plan. Write many rows as multi-row inserts of `ROWS_PER_INSERT` rows, split big jobs
+  into several requests, and test parameter counts with `toSQL()`. The local database does not
+  enforce these limits.
 - **Student data stays in the EU or encrypted.** The production database has the EU jurisdiction;
   backups are encrypted with the owner's key. Never commit, log or upload a plaintext export.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { hashPassword, needsRehash, PASSWORD_ITERATIONS, verifyPassword } from '../../src/api/auth/password';
+import { hashPassword, needsRehash, PASSWORD_ITERATIONS, verifyPassword } from '../../src/shared/password';
 
 describe('passwords', () => {
   it('stores the algorithm and its parameters with the hash', async () => {
