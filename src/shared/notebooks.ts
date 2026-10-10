@@ -7,9 +7,7 @@ import { isVisualizerId } from './visualizers';
 export const NOTEBOOK_KINDS = ['main', 'extra', 'solution'] as const;
 export type NotebookKind = (typeof NOTEBOOK_KINDS)[number];
 
-/** The two files every notebook has; its images and figures keep the converter's names. */
-export const ORIGINAL_FILE = 'notebook.ipynb';
-export const RENDERED_FILE = 'rendered.json';
+export { ORIGINAL_FILE, RENDERED_FILE } from './notebook-files';
 
 /** Largest file accepted in one request (stored in chunks; Workers accept 100 MB bodies). */
 export const MAX_FILE_BYTES = 10 * 1024 * 1024;

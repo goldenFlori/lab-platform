@@ -11,6 +11,13 @@ export const labsQuery = (org: string, courseId: string) =>
     queryFn: () => api<LabList>(labsPath(org, courseId)),
   });
 
+export const labQuery = (org: string, courseId: string, labId: string) =>
+  queryOptions({
+    // Under the list's key, so whatever refreshes the list refreshes the lab too.
+    queryKey: [...labsQuery(org, courseId).queryKey, labId],
+    queryFn: () => api<LabView>(`${labsPath(org, courseId)}/${encodeURIComponent(labId)}`),
+  });
+
 export type LabFields = { n: number; title: string; week: number | null; summary: string | null };
 
 export function useLabChanges(org: string, courseId: string) {

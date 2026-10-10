@@ -1,5 +1,6 @@
 import { Alert, AlertDialog, Button, Chip, Label, Switch } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from '@tanstack/react-router';
 import { CalendarClock, FlaskConical, Pencil, Plus, Trash2 } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import type { GroupView } from '../../shared/courses';
@@ -23,6 +24,28 @@ function stateLabel(state: LabState, rule: LabRule | undefined) {
 
 const labHeading = (lab: LabView) => `Laboratori ${lab.n}${lab.week ? ` · Java ${lab.week}` : ''}`;
 
+function LabLink({
+  org,
+  courseId,
+  lab,
+  className,
+}: {
+  org: string;
+  courseId: string;
+  lab: LabView;
+  className?: string;
+}) {
+  return (
+    <Link
+      to="/o/$org/courses/$courseId/labs/$labId"
+      params={{ org, courseId, labId: lab.id }}
+      className={`rounded-sm ${className ?? ''}`}
+    >
+      {lab.title}
+    </Link>
+  );
+}
+
 export function CourseLabs({ org, courseId, groups }: Props) {
   const labs = useQuery(labsQuery(org, courseId));
 
@@ -41,13 +64,13 @@ export function CourseLabs({ org, courseId, groups }: Props) {
       ) : labs.data.permissions.staff ? (
         <StaffLabs org={org} courseId={courseId} groups={groups} list={labs.data} />
       ) : (
-        <StudentLabs labs={labs.data.labs} />
+        <StudentLabs org={org} courseId={courseId} labs={labs.data.labs} />
       )}
     </div>
   );
 }
 
-function StudentLabs({ labs }: { labs: LabView[] }) {
+function StudentLabs({ org, courseId, labs }: { org: string; courseId: string; labs: LabView[] }) {
   if (labs.length === 0) {
     return (
       <div className="mt-4 grid place-items-center rounded-2xl border border-dashed border-border px-6 py-12 text-center">
@@ -59,9 +82,20 @@ function StudentLabs({ labs }: { labs: LabView[] }) {
   return (
     <ul className="mt-4 grid gap-4 sm:grid-cols-2">
       {labs.map((lab) => (
-        <li key={lab.id} className="rounded-2xl border border-border bg-surface p-5">
+        <li
+          key={lab.id}
+          className="relative rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent/50"
+        >
           <p className="text-xs font-medium tracking-wide text-muted uppercase">{labHeading(lab)}</p>
-          <h3 className="mt-1 font-semibold">{lab.title}</h3>
+          <h3 className="mt-1 font-semibold">
+            {/* The whole card opens the lab. */}
+            <LabLink
+              org={org}
+              courseId={courseId}
+              lab={lab}
+              className="after:absolute after:inset-0 after:rounded-2xl"
+            />
+          </h3>
           {lab.summary && <p className="mt-2 text-sm text-muted">{lab.summary}</p>}
           {lab.solutionsAvailable && (
             <Chip size="sm" color="success" variant="soft" className="mt-3">
@@ -167,7 +201,9 @@ function LabRow({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-medium tracking-wide text-muted uppercase">{labHeading(lab)}</p>
-          <h3 className="mt-0.5 font-semibold">{lab.title}</h3>
+          <h3 className="mt-0.5 font-semibold">
+            <LabLink org={org} courseId={courseId} lab={lab} className="hover:text-accent" />
+          </h3>
           <div className="mt-2 flex flex-wrap gap-1.5">
             <Chip size="sm" variant="soft" color={STATE_COLOR[courseState]}>
               {differing.length > 0 ? 'Kursi: ' : ''}

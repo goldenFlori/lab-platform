@@ -116,5 +116,7 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   enforce these limits.
 - **Uploaded files are served safely:** only allowlisted types, with `nosniff` and a sandboxing
   CSP (`src/api/routes/notebooks.ts`). Staff upload, but students open them.
+- **Notebook HTML is shown only through `sanitize()`** (`src/web/lib/sanitize.ts`). A rendering is
+  made in a browser and can be hand-crafted, so never trust the converter's escaping alone.
 - **Student data stays in the EU or encrypted.** The production database has the EU jurisdiction;
   backups are encrypted with the owner's key. Never commit, log or upload a plaintext export.
