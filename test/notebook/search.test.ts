@@ -3,6 +3,7 @@ import { renderNotebook } from '../../src/notebook';
 import { plainText, searchSections } from '../../src/notebook/search';
 import { toStored } from '../../src/notebook/stored';
 import { MAX_SECTION_TEXT, MAX_SECTIONS } from '../../src/shared/search-limits';
+import { fold, mark, score, snippet, terms } from '../../src/web/lib/search-text';
 
 // A notebook's search index (#17): what a reader sees, split at the headings the lab page links to.
 
@@ -58,5 +59,32 @@ describe('search sections', () => {
         expect(s.text, path).not.toMatch(/katex|class=|aria-hidden|&(amp|lt|gt|quot|nbsp);/);
       }
     }
+  });
+});
+
+describe('matching in the search palette', () => {
+  it('ignores case and Albanian accents, keeping every character in place', () => {
+    expect(fold('Çiftëzimi i Dijkstrës')).toBe('ciftezimi i dijkstres');
+    expect(fold('Çiftëzimi').length).toBe('Çiftëzimi'.length);
+    expect(terms('  Prerja   MIN ')).toEqual(['prerja', 'min']);
+  });
+
+  it('needs every term at the start of a word, and weighs the title most', () => {
+    expect(score(['min'], ['Algoritmin e Dijkstrës'])).toBe(0);
+    expect(score(['min'], ['prerja minimale'])).toBeGreaterThan(0);
+    expect(score(['prerja', 'min'], ['Prerja', 'rrjedha'])).toBe(0);
+    expect(score(['dijks'], ['Dijkstra', 'tekst'])).toBeGreaterThan(score(['dijks'], ['Hyrje', 'Dijkstra']));
+  });
+
+  it('marks the matches in the original text, accents and all', () => {
+    expect(mark('Algoritmi i Dijkstrës', ['dijkstres'])).toEqual([
+      { text: 'Algoritmi i ', mark: false },
+      { text: 'Dijkstrës', mark: true },
+    ]);
+    const long = `${'fjalë '.repeat(60)}Bellman-Ford ${'tjetër '.repeat(60)}`;
+    const parts = snippet(long, ['bellman']);
+    expect(parts[0]?.text.startsWith('…')).toBe(true);
+    expect(parts.find((p) => p.mark)?.text).toBe('Bellman');
+    expect(parts.at(-1)?.text.endsWith('…')).toBe(true);
   });
 });

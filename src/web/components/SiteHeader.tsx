@@ -1,6 +1,7 @@
-import { Button, Dropdown, Label } from '@heroui/react';
+import { Button, Dropdown, Kbd, Label } from '@heroui/react';
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
-import { GraduationCap, LogOut, Menu, Waypoints } from 'lucide-react';
+import { GraduationCap, LogOut, Menu, Search, Waypoints } from 'lucide-react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import type { Me } from '../../shared/auth';
 import { useLogout, useMe } from '../lib/auth';
 import { APP_NAME } from '../lib/brand';
@@ -11,6 +12,68 @@ const links = [
   { to: '/courses', label: 'Kurset', icon: GraduationCap },
   { to: '/visualizations', label: 'Vizualizimet', icon: Waypoints },
 ] as const;
+
+const APPLE = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.userAgent);
+
+// Loaded the first time it opens.
+const SearchPalette = lazy(() => import('./SearchPalette'));
+
+const isTyping = (target: EventTarget | null) =>
+  target instanceof HTMLElement &&
+  (target.tagName === 'INPUT' ||
+    target.tagName === 'TEXTAREA' ||
+    target.tagName === 'SELECT' ||
+    target.isContentEditable);
+
+/** The search button and its shortcuts: ⌘K or Ctrl+K anywhere, and / when not typing. */
+function SearchButton() {
+  const [open, setOpen] = useState(false);
+  const [used, setUsed] = useState(false);
+  const show = (next: boolean) => {
+    setOpen(next);
+    if (next) setUsed(true);
+  };
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setOpen((was) => !was);
+        setUsed(true);
+      } else if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey && !isTyping(e.target)) {
+        e.preventDefault();
+        setOpen(true);
+        setUsed(true);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  return (
+    <>
+      <Button
+        size="sm"
+        variant="ghost"
+        onPress={() => show(true)}
+        className="hidden gap-2 border border-border px-3 text-muted sm:inline-flex"
+        aria-keyshortcuts="Meta+K Control+K"
+      >
+        <Search className="size-4" aria-hidden="true" />
+        Kërko
+        <Kbd className="ml-2">{APPLE ? '⌘K' : 'Ctrl K'}</Kbd>
+      </Button>
+      <Button isIconOnly size="sm" variant="ghost" onPress={() => show(true)} aria-label="Kërko" className="sm:hidden">
+        <Search className="size-[18px]" />
+      </Button>
+      {used && (
+        <Suspense fallback={null}>
+          <SearchPalette isOpen={open} onOpenChange={show} />
+        </Suspense>
+      )}
+    </>
+  );
+}
 
 function initials(fullName: string) {
   return fullName
@@ -80,6 +143,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-1.5 md:ml-2">
+          {!onLoginPage && <SearchButton />}
           <ThemeToggle />
           {me ? (
             <AccountMenu me={me} />

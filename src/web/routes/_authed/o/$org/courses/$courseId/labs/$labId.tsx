@@ -1,6 +1,6 @@
 import { Alert, Chip } from '@heroui/react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, Link, notFound } from '@tanstack/react-router';
+import { createFileRoute, Link, notFound, useRouterState } from '@tanstack/react-router';
 import {
   ArrowLeft,
   ArrowRight,
@@ -12,6 +12,7 @@ import {
   Presentation,
   Sparkles,
 } from 'lucide-react';
+import { useEffect } from 'react';
 import type { LabView } from '../../../../../../../../shared/labs';
 import { ORIGINAL_FILE } from '../../../../../../../../shared/notebook-files';
 import type { Embed, NotebookKind, NotebookSummary } from '../../../../../../../../shared/notebooks';
@@ -254,6 +255,13 @@ function NotebookSection({
   editor: { isPending: boolean; save: (embeds: Embed[]) => Promise<unknown> } | null;
 }) {
   const rendered = useQuery(renderedQuery(notebookRef));
+  const ready = Boolean(rendered.data && embeds);
+  const hash = useRouterState({ select: (state) => state.location.hash });
+
+  // A link to a section (from search, or shared) lands on it once the notebook has rendered.
+  useEffect(() => {
+    if (ready && hash) document.getElementById(decodeURIComponent(hash))?.scrollIntoView({ block: 'start' });
+  }, [ready, hash]);
 
   if (rendered.isError || embedsFailed) {
     return (
