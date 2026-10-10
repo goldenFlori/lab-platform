@@ -172,7 +172,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-10:** #18 done. Each course has an activity page for its pedagogs: how many students
   opened, downloaded and tried each lab, week by week, for the whole course or one group. Counts
   only, never a name, and staff are not counted (PR #44).
-- **Next:** #19, the Albanian and English interface, the last item of phase 1.
+- **2026-10-10:** #19, first half. Every screen of the app speaks Albanian and English. Each user
+  chooses with the account menu (visitors with a toggle), and a course can set the language for
+  those who have not chosen (PR #45).
+- **Next:** the text inside the 13 visualizations in both languages, which completes #19 and
+  phase 1.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
@@ -200,6 +204,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-10 | Course content is imported through the API with a pedagog's sign-in, never written straight into the database: the same permission checks and storage as the app, for any environment. Re-running it is safe, and it never opens labs | Decided |
 | 2026-10-10 | When the site shows parts of one notebook in two labs, each lab gets its own notebook of those cells, so students download only their lab's part | Decided |
 | 2026-10-10 | Activity counts students, not clicks: at most one record per student, lab, kind (opened, downloaded, tried a visualization) and day, shown only as weekly counts to staff with analytics rights, for the groups they may see. Staff are not counted | Decided |
+| 2026-10-10 | The interface's messages are typed objects in the code (Albanian the source, English checked against it by the build), not an i18n library: two languages, a tiny team, and no extraction step. Language: the user's choice, else the device's, else the course's, else Albanian | Decided |
 | 2026-10-10 | Search without FTS5: D1 cannot export databases with virtual tables, and backups must keep working. The server sends each user the text of what they may see; the browser matches it as they type | Decided |
 
 Decisions were delegated to Claude ("you decide"). Record new ones here with the date.

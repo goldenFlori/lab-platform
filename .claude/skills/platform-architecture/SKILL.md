@@ -377,8 +377,8 @@ Built in #8: `src/api/auth/`, data access in `src/api/db/auth.ts`, routes in
 
 - **Ported from the course site** (`site/src/viz`) with the same behaviour. The only changes are
   lint and accessibility fixes.
-- **Loading:** `src/viz/index.ts` maps each id in `src/shared/visualizers.ts` to a lazy component
-  and a one-line summary.
+- **Loading:** `src/viz/index.ts` maps each id in `src/shared/visualizers.ts` to a lazy component.
+  Their names and one-line summaries are messages (`viz.names`, `viz.summaries`) in both languages.
   - Each visualization is its own chunk (2–9 KB gzipped), plus the shared kit.
   - `VizEmbed` loads one when it comes within 300 px of the screen.
   - An error boundary keeps a failing one from taking the page down. The usual cause is a deploy:
@@ -397,6 +397,37 @@ Built in #8: `src/api/auth/`, data access in `src/api/db/auth.ts`, routes in
     second focusable "button", which doubles every tab stop.
 - **Tests:** the end-to-end tests open all 13 on desktop and at 375 px. Each must have no errors,
   must step forward, and must not overflow.
+
+## Languages
+
+Built in #19: the interface in Albanian and English, Albanian first.
+
+- **Messages** (`src/web/i18n`):
+  - `sq.ts` is the source, plain objects grouped by screen; a message with values is a function
+    (`count: (n) => …`), which also handles plurals.
+  - `en.ts` is typed as `Messages`, so a missing or extra English message fails the build. No
+    i18n library and no extraction step.
+  - `useT()` in components (re-renders on a switch); `t()` outside React, for page titles in
+    `head` and error texts. Both dictionaries ship in the main bundle (a few KB gzipped).
+  - Dates are spelled from the messages' month names rather than Intl, because not every browser
+    carries Albanian locale data.
+  - Course content is never translated: notebooks, course, lab and group names stay as written.
+- **Which language** (`useLocaleSync` in `src/web/lib/locale.ts`):
+  1. the user's own choice: `users.locale`, set with `PATCH /api/me` from the account menu;
+  2. else this device's choice (`localStorage.locale`), which visitors set with the header's
+     toggle;
+  3. else the language of the course on screen: `courses.locale`, set on the course page by
+     whoever manages it, or in the new-course form;
+  4. else Albanian.
+
+  A switch updates `<html lang>` and re-runs the routes so page titles follow.
+- **Tests:**
+  - an end-to-end test goes through every staff screen in English, as well as the visitor's
+    toggle, the account preference and a course's language;
+  - it fails on Albanian letters or common Albanian interface words in visible text or
+    accessible labels (course content and visualizations excluded);
+  - API tests cover the settings.
+- **Not yet:** the text inside the 13 visualizations (the second half of #19).
 
 ## Search
 
