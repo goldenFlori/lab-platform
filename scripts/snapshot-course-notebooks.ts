@@ -5,7 +5,8 @@
 //
 // It imports site/scripts/notebook.mjs from there (with that repository's own dependencies) and
 // writes test/notebook/fixtures/expected/<notebook>.json. Rerun only on purpose: the snapshots
-// define what "the same cells as the current site" means.
+// define what "the same cells as the current site" means. It also copies the site's embeds for
+// these notebooks (site/content/course.mjs) to test/notebook/fixtures/embeds.json.
 
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -36,3 +37,15 @@ for (const file of readdirSync(join(fixtures, 'notebooks'))
   );
   console.log(`✔ ${file}`);
 }
+
+// Where the site places its visualizations in these notebooks: notebook → [{ cell, viz, title, props }].
+const course = pathToFileURL(resolve(courseRepo, 'site/content/course.mjs')).href;
+const { embeds } = (await import(course)) as { embeds: Record<string, unknown[]> };
+const notebooks = new Set(readdirSync(join(fixtures, 'notebooks')));
+const fixtureEmbeds = Object.fromEntries(
+  Object.entries(embeds)
+    .filter(([file]) => notebooks.has(file))
+    .sort(([a], [b]) => a.localeCompare(b)),
+);
+writeFileSync(join(fixtures, 'embeds.json'), `${JSON.stringify(fixtureEmbeds, null, 2)}\n`);
+console.log(`✔ embeds.json (${Object.keys(fixtureEmbeds).length} notebooks)`);
