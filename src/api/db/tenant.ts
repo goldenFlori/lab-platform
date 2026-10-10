@@ -13,7 +13,20 @@ import {
 import { roleExists } from './access';
 import { uuidv7 } from './ids';
 import type { Db } from './index';
-import { courses, courseTemplates, groups, labAccess, labs, memberships, sessions, users } from './schema';
+import {
+  courses,
+  courseTemplates,
+  embeds,
+  fileChunks,
+  files,
+  groups,
+  labAccess,
+  labs,
+  memberships,
+  notebooks,
+  sessions,
+  users,
+} from './schema';
 
 // The tenant-scoped data layer. Route handlers reach tenant-owned data only through forTenant(),
 // which adds the organization to every query. Another organization's rows look like rows that do
@@ -45,7 +58,9 @@ type TenantTable =
   | typeof groups
   | typeof labs
   | typeof labAccess
-  | typeof memberships;
+  | typeof memberships
+  | typeof notebooks
+  | typeof embeds;
 
 // $inferSelect / $inferInsert rather than InferSelectModel<T>: over a union of tables, the latter
 // loses the optional columns.
@@ -287,6 +302,97 @@ function tenantLabAccess(db: Db, orgId: string) {
   };
 }
 
+/** Bytes per stored chunk: well under D1's 2 MB per value. */
+export const CHUNK_BYTES = 512 * 1024;
+
+type StoredFile = { mime: string; encoding: 'identity' | 'gzip'; size: number; data: Uint8Array };
+
+/** A lab's notebooks (#14), with their files in chunks and their embeds. */
+function tenantNotebooks(db: Db, orgId: string) {
+  const base = tenantTable(db, orgId, notebooks);
+  const embedRows = tenantTable(db, orgId, embeds);
+  const fileOf = (notebookId: string, name: string) =>
+    and(eq(files.orgId, orgId), eq(files.notebookId, notebookId), eq(files.name, name));
+
+  return {
+    ...base,
+    async ofLab(labId: string) {
+      const rows = await base.list(eq(notebooks.labId, labId));
+      return rows.sort((a, b) => a.position - b.position || a.createdAt.getTime() - b.createdAt.getTime());
+    },
+
+    /** Stores (or replaces) a file of the notebook: one file row and its chunks, written together. */
+    async putFile(notebookId: string, name: string, file: Omit<StoredFile, 'size'>) {
+      const id = uuidv7();
+      const chunks = Array.from({ length: Math.ceil(file.data.length / CHUNK_BYTES) }, (_, n) => ({
+        orgId,
+        fileId: id,
+        n,
+        data: file.data.subarray(n * CHUNK_BYTES, (n + 1) * CHUNK_BYTES),
+      }));
+      await rethrowMissingParent(
+        db.batch([
+          db.delete(files).where(fileOf(notebookId, name)),
+          db.insert(files).values({
+            id,
+            orgId,
+            notebookId,
+            name,
+            mime: file.mime,
+            encoding: file.encoding,
+            size: file.data.length,
+            chunkCount: chunks.length,
+          }),
+          ...chunks.map((chunk) => db.insert(fileChunks).values(chunk)),
+        ]),
+      );
+    },
+
+    async getFile(notebookId: string, name: string): Promise<StoredFile | undefined> {
+      const [file] = await db.select().from(files).where(fileOf(notebookId, name)).limit(1);
+      if (!file) return undefined;
+      const chunks = await db
+        .select({ data: fileChunks.data })
+        .from(fileChunks)
+        .where(and(eq(fileChunks.orgId, orgId), eq(fileChunks.fileId, file.id)))
+        .orderBy(asc(fileChunks.n));
+      const data = new Uint8Array(file.size);
+      let offset = 0;
+      for (const chunk of chunks) {
+        data.set(chunk.data, offset);
+        offset += chunk.data.length;
+      }
+      return { mime: file.mime, encoding: file.encoding, size: file.size, data };
+    },
+
+    async fileNames(notebookId: string) {
+      const rows = await db
+        .select({ name: files.name })
+        .from(files)
+        .where(and(eq(files.orgId, orgId), eq(files.notebookId, notebookId)));
+      return rows.map((row) => row.name);
+    },
+
+    embedsOf(notebookId: string) {
+      return embedRows.list(eq(embeds.notebookId, notebookId));
+    },
+
+    /** Replaces all embeds of the notebook at once. */
+    async setEmbeds(
+      notebookId: string,
+      list: { cell: number; viz: string; title: string | null; props: Record<string, unknown> | null }[],
+    ) {
+      const rows = list.map((embed) => ({ ...embed, id: uuidv7(), orgId, notebookId }));
+      await rethrowMissingParent(
+        db.batch([
+          db.delete(embeds).where(and(eq(embeds.orgId, orgId), eq(embeds.notebookId, notebookId))),
+          ...inChunks(rows).map((chunk) => db.insert(embeds).values(chunk)),
+        ]),
+      );
+    },
+  };
+}
+
 /** Rows per multi-row insert, so each statement stays under D1's 100 bound parameters. */
 export const ROWS_PER_INSERT = 10;
 
@@ -388,6 +494,7 @@ export function forTenant(db: Db, orgId: string) {
     labs: tenantLabs(db, orgId),
     labAccess: tenantLabAccess(db, orgId),
     students: tenantStudents(db, orgId),
+    notebooks: tenantNotebooks(db, orgId),
   };
 }
 
