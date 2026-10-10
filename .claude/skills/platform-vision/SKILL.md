@@ -152,7 +152,9 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-10:** #12 done. Labs per course (add, rename, remove) and their visibility: hidden until
   opened, per course or per group, scheduled, with a solutions date, enforced by the API (PRs #33
   and #34).
-- **Next:** #13, the notebook converter in TypeScript.
+- **2026-10-10:** #13 done. The notebook converter in TypeScript (`src/notebook`) for the browser,
+  matching the course site's output on all 19 course notebooks (PR #35).
+- **Next:** #14, the lab viewer with the 13 visualizations.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
