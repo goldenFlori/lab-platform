@@ -1,0 +1,836 @@
+{
+  "title": "Laboratori 9 · Ushtrime Shtesë — Rrjedha Max / Prerja Min: nga Përkufizimi te Ford-Fulkerson",
+  "toc": [
+    {
+      "id": "kujtues-teorik-perkufizimet-e-leksionit",
+      "title": "Kujtues teorik — Përkufizimet e leksionit",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "ushtrimi-1-a-eshte-rrjedhe-e-lejueshme",
+      "title": "Ushtrimi 1 — A është rrjedhë e lejueshme?",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-kapaciteti-i-nje-prerjeje-slides-7-10",
+      "title": "Ushtrimi 2 — Kapaciteti i një prerjeje (slides 7–10)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-pse-deshton-algoritmi-greedy-slides-26-36",
+      "title": "Ushtrimi 3 — Pse dështon algoritmi greedy (slides 26–36)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-rrjeta-mbetese-gf-slides-37-39",
+      "title": "Ushtrimi 4 — Rrjeta mbetëse Gf (slides 37–39)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-5-rritrrjedhe-slide-46",
+      "title": "Ushtrimi 5 — `rritRrjedhë` (slide 46)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-6-ford-fulkerson-dhe-edmonds-karp-slides-47-74",
+      "title": "Ushtrimi 6 — Ford-Fulkerson dhe Edmonds-Karp (slides 47, 74)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-7-shembulli-me-c-slides-66-74",
+      "title": "Ushtrimi 7 — Shembulli me C (slides 66–74)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-8-prerja-min-nga-rrjeta-mbetese-slides-59-64",
+      "title": "Ushtrimi 8 — Prerja min nga rrjeta mbetëse (slides 59–64)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "kujtues-teorik-perkufizimet-e-leksionit",
+      "title": "Kujtues teorik — Përkufizimet e leksionit",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "ushtrimi-1-a-eshte-rrjedhe-e-lejueshme",
+      "title": "Ushtrimi 1 — A është rrjedhë e lejueshme?",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-kapaciteti-i-nje-prerjeje-slides-7-10",
+      "title": "Ushtrimi 2 — Kapaciteti i një prerjeje (slides 7–10)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-pse-deshton-algoritmi-greedy-slides-26-36",
+      "title": "Ushtrimi 3 — Pse dështon algoritmi greedy (slides 26–36)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-rrjeta-mbetese-gf-slides-37-39",
+      "title": "Ushtrimi 4 — Rrjeta mbetëse Gf (slides 37–39)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-5-rritrrjedhe-slide-46",
+      "title": "Ushtrimi 5 — `rritRrjedhë` (slide 46)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-6-ford-fulkerson-dhe-edmonds-karp-slides-47-74",
+      "title": "Ushtrimi 6 — Ford-Fulkerson dhe Edmonds-Karp (slides 47, 74)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-7-shembulli-me-c-slides-66-74",
+      "title": "Ushtrimi 7 — Shembulli me C (slides 66–74)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-8-prerja-min-nga-rrjeta-mbetese-slides-59-64",
+      "title": "Ushtrimi 8 — Prerja min nga rrjeta mbetëse (slides 59–64)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "sections": [
+    {
+      "id": "kujtues-teorik-perkufizimet-e-leksionit",
+      "title": "Kujtues teorik — Përkufizimet e leksionit",
+      "kind": "theory"
+    },
+    {
+      "id": "ushtrimi-1-a-eshte-rrjedhe-e-lejueshme",
+      "title": "Ushtrimi 1 — A është rrjedhë e lejueshme?",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-kapaciteti-i-nje-prerjeje-slides-7-10",
+      "title": "Ushtrimi 2 — Kapaciteti i një prerjeje (slides 7–10)",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-pse-deshton-algoritmi-greedy-slides-26-36",
+      "title": "Ushtrimi 3 — Pse dështon algoritmi greedy (slides 26–36)",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-rrjeta-mbetese-gf-slides-37-39",
+      "title": "Ushtrimi 4 — Rrjeta mbetëse Gf (slides 37–39)",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-5-rritrrjedhe-slide-46",
+      "title": "Ushtrimi 5 — `rritRrjedhë` (slide 46)",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-6-ford-fulkerson-dhe-edmonds-karp-slides-47-74",
+      "title": "Ushtrimi 6 — Ford-Fulkerson dhe Edmonds-Karp (slides 47, 74)",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-7-shembulli-me-c-slides-66-74",
+      "title": "Ushtrimi 7 — Shembulli me C (slides 66–74)",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-8-prerja-min-nga-rrjeta-mbetese-slides-59-64",
+      "title": "Ushtrimi 8 — Prerja min nga rrjeta mbetëse (slides 59–64)",
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "kind": "reflect"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:5c7a5c0122854e96",
+      "srcIndex": 0,
+      "intro": true
+    },
+    {
+      "type": "markdown",
+      "kind": "theory",
+      "label": "Teori",
+      "id": "kujtues-teorik-perkufizimet-e-leksionit",
+      "heading": "Kujtues teorik — Përkufizimet e leksionit",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:d3dae4f00b2a0df3",
+      "srcIndex": 1
+    },
+    {
+      "type": "code",
+      "srcIndex": 2,
+      "interactive": false,
+      "html": "sha256:f8c2eefdbfd34efa",
+      "raw": "sha256:223df955ab7f4d9c",
+      "lines": 32,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 3,
+      "interactive": false,
+      "html": "sha256:57c59b8e50748d2b",
+      "raw": "sha256:29e1db04a9a5887f",
+      "lines": 51,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "vizato_rrjeten"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": true,
+        "matplotlib": true
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "image",
+          "file": "img-12e9af1a68c5.png",
+          "bytes": 63719
+        },
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "Brinjët e kuqe janë të ngopura: f(e) = c(e).",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-1-a-eshte-rrjedhe-e-lejueshme",
+      "heading": "Ushtrimi 1 — A është rrjedhë e lejueshme?",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:76e1b26f6d74258b",
+      "srcIndex": 4
+    },
+    {
+      "type": "code",
+      "srcIndex": 5,
+      "interactive": false,
+      "html": "sha256:dde12a41697affa4",
+      "raw": "sha256:8b10c2d071338447",
+      "lines": 8,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 6,
+      "interactive": false,
+      "html": "sha256:b75f8665ed0a3055",
+      "raw": "sha256:56f4d802d76e82bd",
+      "lines": 13,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-2-kapaciteti-i-nje-prerjeje-slides-7-10",
+      "heading": "Ushtrimi 2 — Kapaciteti i një prerjeje (slides 7–10)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:6ea38ffd5d79dfc8",
+      "srcIndex": 7
+    },
+    {
+      "type": "code",
+      "srcIndex": 8,
+      "interactive": false,
+      "html": "sha256:ca07513a6ce1e6b1",
+      "raw": "sha256:4522a33aef1bec3c",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 9,
+      "interactive": false,
+      "html": "sha256:64f67e72392d1dec",
+      "raw": "sha256:02376867edcbc6d2",
+      "lines": 30,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:c13508a32d1ed259",
+      "srcIndex": 10
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-3-pse-deshton-algoritmi-greedy-slides-26-36",
+      "heading": "Ushtrimi 3 — Pse dështon algoritmi greedy (slides 26–36)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:ab2d680c40941f5a",
+      "srcIndex": 11
+    },
+    {
+      "type": "code",
+      "srcIndex": 12,
+      "interactive": false,
+      "html": "sha256:3e6d89bb713a7447",
+      "raw": "sha256:cdd83769879fde24",
+      "lines": 30,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "rruga s → 2 → 5 → t        shton 8   vlera = 8\nrruga s → 2 → 3 → 5 → t    shton 2   vlera = 10\nrruga s → 3 → 5 → 4 → t    shton 6   vlera = 16\nGreedy ndalon me vlerë 16 — por maksimumi është 19.\n\nrruga s → u → v → t        shton 1   vlera = 1\nrruga s → u → t            shton 1   vlera = 2\nrruga s → v → t            shton 1   vlera = 3\nGreedy ndalon me vlerë 3 — por maksimumi është 4.",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:a2b2a8a14c44155a",
+      "srcIndex": 13
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-4-rrjeta-mbetese-gf-slides-37-39",
+      "heading": "Ushtrimi 4 — Rrjeta mbetëse Gf (slides 37–39)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:32d765b96a024cc3",
+      "srcIndex": 14
+    },
+    {
+      "type": "code",
+      "srcIndex": 15,
+      "interactive": false,
+      "html": "sha256:bc28902d8352bf4e",
+      "raw": "sha256:f01df1d0e8b1bc45",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 16,
+      "interactive": false,
+      "html": "sha256:4401162490028932",
+      "raw": "sha256:ba8ddc34fa47b97b",
+      "lines": 12,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 17,
+      "interactive": false,
+      "html": "sha256:69d2b16c77458996",
+      "raw": "sha256:7665010456101346",
+      "lines": 7,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-5-rritrrjedhe-slide-46",
+      "heading": "Ushtrimi 5 — `rritRrjedhë` (slide 46)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:258c7e0420539c3a",
+      "srcIndex": 18
+    },
+    {
+      "type": "code",
+      "srcIndex": 19,
+      "interactive": false,
+      "html": "sha256:bbb8c03f31528f02",
+      "raw": "sha256:e2742ce58b7586f8",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 20,
+      "interactive": false,
+      "html": "sha256:aa90c6f5f0b6d924",
+      "raw": "sha256:98bdd9376d8c7b7a",
+      "lines": 14,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-6-ford-fulkerson-dhe-edmonds-karp-slides-47-74",
+      "heading": "Ushtrimi 6 — Ford-Fulkerson dhe Edmonds-Karp (slides 47, 74)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:4e65d62734a906dc",
+      "srcIndex": 21
+    },
+    {
+      "type": "code",
+      "srcIndex": 22,
+      "interactive": false,
+      "html": "sha256:d4e50a88d3356dd5",
+      "raw": "sha256:61b9a6b2d7235670",
+      "lines": 46,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "fqinjet"
+        },
+        {
+          "t": "def",
+          "n": "rruge_dfs"
+        },
+        {
+          "t": "def",
+          "n": "rruge_bfs"
+        },
+        {
+          "t": "def",
+          "n": "ford_fulkerson"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 23,
+      "interactive": false,
+      "html": "sha256:d340f4a204c1e634",
+      "raw": "sha256:e2d51e36190874b7",
+      "lines": 17,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-7-shembulli-me-c-slides-66-74",
+      "heading": "Ushtrimi 7 — Shembulli me C (slides 66–74)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:b5da67e46256a299",
+      "srcIndex": 24
+    },
+    {
+      "type": "code",
+      "srcIndex": 25,
+      "interactive": false,
+      "html": "sha256:e2bce00799afe3ae",
+      "raw": "sha256:e69df107a62974c3",
+      "lines": 28,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 26,
+      "interactive": false,
+      "html": "sha256:cff57a109f65648b",
+      "raw": "sha256:9aae3902692cd135",
+      "lines": 9,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "        C |  kundërshtari | Edmonds-Karp",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:110302bd58081d74",
+      "srcIndex": 27
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-8-prerja-min-nga-rrjeta-mbetese-slides-59-64",
+      "heading": "Ushtrimi 8 — Prerja min nga rrjeta mbetëse (slides 59–64)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:3b99d839d24874b5",
+      "srcIndex": 28
+    },
+    {
+      "type": "code",
+      "srcIndex": 29,
+      "interactive": false,
+      "html": "sha256:b563d1186e758356",
+      "raw": "sha256:a1546f9c72e128f1",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 30,
+      "interactive": false,
+      "html": "sha256:a86a223abe8f4a3d",
+      "raw": "sha256:43535bd73f632c85",
+      "lines": 24,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 31,
+      "interactive": false,
+      "html": "sha256:f44d3ea733946cb0",
+      "raw": "sha256:6c6bb22566dd37aa",
+      "lines": 7,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "classwork",
+      "label": "Punë në Klasë",
+      "id": "pune-ne-klase",
+      "heading": "Punë në Klasë",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:a8c8b11b6ee8aea3",
+      "srcIndex": 32
+    },
+    {
+      "type": "markdown",
+      "kind": "reflect",
+      "label": "Pyetje Reflektuese",
+      "id": "pyetje-reflektuese",
+      "heading": "Pyetje Reflektuese",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:0e5e1aa47610e695",
+      "srcIndex": 33
+    }
+  ],
+  "imports": ["collections", "itertools", "matplotlib", "networkx"],
+  "dependencies": ["matplotlib", "networkx"],
+  "flags": {
+    "pygame": false,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": false,
+    "matplotlib": true,
+    "networkx": true,
+    "numpy": false
+  },
+  "missingScripts": [],
+  "stats": {
+    "cells": 34,
+    "markdown": 15,
+    "code": 19,
+    "codeLines": 340
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": true,
+  "assets": [
+    {
+      "file": "img-12e9af1a68c5.png",
+      "bytes": 63719
+    }
+  ]
+}

@@ -1,0 +1,690 @@
+{
+  "title": "Laboratori 3 — Analiza e Kompleksitetit Kohor Mbi Algoritmet e Renditjes",
+  "toc": [
+    {
+      "id": "ushtrimi-1-vizualizim-rendi-i-rritjes-se-krahasimeve",
+      "title": "Ushtrimi 1 — Vizualizim: Rendi i Rritjes së Krahasimeve",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "cfare-eshte-kompleksiteti-kohor",
+      "title": "Çfarë është Kompleksiteti Kohor?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-mat-vizualizimi",
+      "title": "Çfarë mat vizualizimi?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-2-krahasim-empirik-3-raste-3-algoritme",
+      "title": "Ushtrimi 2 — Krahasim Empirik: 3 Raste × 3 Algoritme",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "qellimi",
+      "title": "Qëllimi",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-tregon-grafiku",
+      "title": "Çfarë tregon grafiku?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "lidhja-me-teorine",
+      "title": "Lidhja me teorinë",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-3-kurba-e-rritjes-o-n-vs-o-n-log-n",
+      "title": "Ushtrimi 3 — Kurba e Rritjes: O(n²) vs O(n log n)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "qellimi-2",
+      "title": "Qëllimi",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-tregon-grafiku-2",
+      "title": "Çfarë tregon grafiku?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-4-loje-gjej-algoritmin",
+      "title": "Ushtrimi 4 — Lojë: Gjej Algoritmin!",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "qellimi-3",
+      "title": "Qëllimi",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "rregullat",
+      "title": "Rregullat",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "strategjia-bazuar-ne-teori",
+      "title": "Strategjia (bazuar në teori)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "celesat",
+      "title": "Çelësat",
+      "level": 3,
+      "kind": "normal"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "ushtrimi-1-vizualizim-rendi-i-rritjes-se-krahasimeve",
+      "title": "Ushtrimi 1 — Vizualizim: Rendi i Rritjes së Krahasimeve",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "cfare-eshte-kompleksiteti-kohor",
+      "title": "Çfarë është Kompleksiteti Kohor?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-mat-vizualizimi",
+      "title": "Çfarë mat vizualizimi?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-2-krahasim-empirik-3-raste-3-algoritme",
+      "title": "Ushtrimi 2 — Krahasim Empirik: 3 Raste × 3 Algoritme",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "qellimi",
+      "title": "Qëllimi",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-tregon-grafiku",
+      "title": "Çfarë tregon grafiku?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "lidhja-me-teorine",
+      "title": "Lidhja me teorinë",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-3-kurba-e-rritjes-o-n-vs-o-n-log-n",
+      "title": "Ushtrimi 3 — Kurba e Rritjes: O(n²) vs O(n log n)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "qellimi-2",
+      "title": "Qëllimi",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-tregon-grafiku-2",
+      "title": "Çfarë tregon grafiku?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-4-loje-gjej-algoritmin",
+      "title": "Ushtrimi 4 — Lojë: Gjej Algoritmin!",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "qellimi-3",
+      "title": "Qëllimi",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "rregullat",
+      "title": "Rregullat",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "strategjia-bazuar-ne-teori",
+      "title": "Strategjia (bazuar në teori)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "celesat",
+      "title": "Çelësat",
+      "level": 3,
+      "kind": "normal"
+    }
+  ],
+  "sections": [
+    {
+      "id": "ushtrimi-1-vizualizim-rendi-i-rritjes-se-krahasimeve",
+      "title": "Ushtrimi 1 — Vizualizim: Rendi i Rritjes së Krahasimeve",
+      "kind": "exercise"
+    },
+    {
+      "id": "cfare-eshte-kompleksiteti-kohor",
+      "title": "Çfarë është Kompleksiteti Kohor?",
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-mat-vizualizimi",
+      "title": "Çfarë mat vizualizimi?",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-2-krahasim-empirik-3-raste-3-algoritme",
+      "title": "Ushtrimi 2 — Krahasim Empirik: 3 Raste × 3 Algoritme",
+      "kind": "exercise"
+    },
+    {
+      "id": "qellimi",
+      "title": "Qëllimi",
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-tregon-grafiku",
+      "title": "Çfarë tregon grafiku?",
+      "kind": "normal"
+    },
+    {
+      "id": "lidhja-me-teorine",
+      "title": "Lidhja me teorinë",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-3-kurba-e-rritjes-o-n-vs-o-n-log-n",
+      "title": "Ushtrimi 3 — Kurba e Rritjes: O(n²) vs O(n log n)",
+      "kind": "exercise"
+    },
+    {
+      "id": "qellimi-2",
+      "title": "Qëllimi",
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-tregon-grafiku-2",
+      "title": "Çfarë tregon grafiku?",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-4-loje-gjej-algoritmin",
+      "title": "Ushtrimi 4 — Lojë: Gjej Algoritmin!",
+      "kind": "exercise"
+    },
+    {
+      "id": "qellimi-3",
+      "title": "Qëllimi",
+      "kind": "normal"
+    },
+    {
+      "id": "rregullat",
+      "title": "Rregullat",
+      "kind": "normal"
+    },
+    {
+      "id": "strategjia-bazuar-ne-teori",
+      "title": "Strategjia (bazuar në teori)",
+      "kind": "normal"
+    },
+    {
+      "id": "celesat",
+      "title": "Çelësat",
+      "kind": "normal"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:e30f110843291a1b",
+      "srcIndex": 0,
+      "intro": true
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-1-vizualizim-rendi-i-rritjes-se-krahasimeve",
+      "heading": "Ushtrimi 1 — Vizualizim: Rendi i Rritjes së Krahasimeve",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "cfare-eshte-kompleksiteti-kohor",
+      "heading": "Çfarë është Kompleksiteti Kohor?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:7f8d5bc524907bf7",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "cfare-mat-vizualizimi",
+      "heading": "Çfarë mat vizualizimi?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:7825a604ccf9d861",
+      "srcIndex": 1
+    },
+    {
+      "type": "code",
+      "srcIndex": 2,
+      "interactive": true,
+      "html": "sha256:43e959c169b95bb6",
+      "raw": "sha256:65751e39b4a972c1",
+      "lines": 354,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "hapat_insertion"
+        },
+        {
+          "t": "def",
+          "n": "hapat_selection"
+        },
+        {
+          "t": "def",
+          "n": "hapat_merge"
+        },
+        {
+          "t": "def",
+          "n": "bashko"
+        },
+        {
+          "t": "def",
+          "n": "vizato_grafiket"
+        },
+        {
+          "t": "def",
+          "n": "vizato_grafik_kompleksiteti"
+        },
+        {
+          "t": "def",
+          "n": "ne_pixel"
+        },
+        {
+          "t": "def",
+          "n": "vizato"
+        }
+      ],
+      "flags": {
+        "pygame": true,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 3
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-2-krahasim-empirik-3-raste-3-algoritme",
+      "heading": "Ushtrimi 2 — Krahasim Empirik: 3 Raste × 3 Algoritme",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 3
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "qellimi",
+      "heading": "Qëllimi",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:1e961668a0ce0a94",
+      "srcIndex": 3
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "cfare-tregon-grafiku",
+      "heading": "Çfarë tregon grafiku?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:e57f49f55f1b4f94",
+      "srcIndex": 3
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "lidhja-me-teorine",
+      "heading": "Lidhja me teorinë",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:8ae3f7c7b0b9683b",
+      "srcIndex": 3
+    },
+    {
+      "type": "code",
+      "srcIndex": 4,
+      "interactive": false,
+      "html": "sha256:57baee3849287176",
+      "raw": "sha256:8093b2e0dd3add04",
+      "lines": 85,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "ins_cmps"
+        },
+        {
+          "t": "def",
+          "n": "sel_cmps"
+        },
+        {
+          "t": "def",
+          "n": "merge_cmps"
+        },
+        {
+          "t": "def",
+          "n": "mg"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": true,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "plotly",
+          "file": "plotly-a801cfc073cb.json",
+          "bytes": 11369
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-3-kurba-e-rritjes-o-n-vs-o-n-log-n",
+      "heading": "Ushtrimi 3 — Kurba e Rritjes: O(n²) vs O(n log n)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "qellimi-2",
+      "heading": "Qëllimi",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:decc1ab4d7558564",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "cfare-tregon-grafiku-2",
+      "heading": "Çfarë tregon grafiku?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:c502946cefb35e1b",
+      "srcIndex": 5
+    },
+    {
+      "type": "code",
+      "srcIndex": 6,
+      "interactive": false,
+      "html": "sha256:e343858fcdcea79b",
+      "raw": "sha256:07f0961e7029b226",
+      "lines": 65,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "ins_cmps"
+        },
+        {
+          "t": "def",
+          "n": "sel_cmps"
+        },
+        {
+          "t": "def",
+          "n": "merge_cmps"
+        },
+        {
+          "t": "def",
+          "n": "mg"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": true,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "Duke llogaritur...",
+          "truncated": false
+        },
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": " gati!",
+          "truncated": false
+        },
+        {
+          "kind": "plotly",
+          "file": "plotly-62a8ba1d06b6.json",
+          "bytes": 9798
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-4-loje-gjej-algoritmin",
+      "heading": "Ushtrimi 4 — Lojë: Gjej Algoritmin!",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "qellimi-3",
+      "heading": "Qëllimi",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:589ded303be518e6",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "rregullat",
+      "heading": "Rregullat",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:53513d95a05a08b6",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "strategjia-bazuar-ne-teori",
+      "heading": "Strategjia (bazuar në teori)",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:1d4207757693d67f",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "celesat",
+      "heading": "Çelësat",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:53630cc9b25b1248",
+      "srcIndex": 7
+    },
+    {
+      "type": "code",
+      "srcIndex": 8,
+      "interactive": true,
+      "html": "sha256:c25e07b9e148c113",
+      "raw": "sha256:5e03981d2eb0adca",
+      "lines": 137,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "ins_cmps"
+        },
+        {
+          "t": "def",
+          "n": "sel_cmps"
+        },
+        {
+          "t": "def",
+          "n": "merge_cmps"
+        },
+        {
+          "t": "def",
+          "n": "mg"
+        },
+        {
+          "t": "def",
+          "n": "new_q"
+        },
+        {
+          "t": "def",
+          "n": "draw"
+        }
+      ],
+      "flags": {
+        "pygame": true,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    }
+  ],
+  "imports": ["math", "os", "plotly", "pygame", "random"],
+  "dependencies": ["plotly", "pygame"],
+  "flags": {
+    "pygame": true,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": true,
+    "matplotlib": false,
+    "networkx": false,
+    "numpy": false
+  },
+  "missingScripts": [],
+  "stats": {
+    "cells": 9,
+    "markdown": 5,
+    "code": 4,
+    "codeLines": 641
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": false,
+  "assets": [
+    {
+      "file": "plotly-62a8ba1d06b6.json",
+      "bytes": 9800
+    },
+    {
+      "file": "plotly-a801cfc073cb.json",
+      "bytes": 11374
+    }
+  ]
+}

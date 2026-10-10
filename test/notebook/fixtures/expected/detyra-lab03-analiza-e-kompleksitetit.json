@@ -1,0 +1,199 @@
+{
+  "title": "Detyre Shtepie — Analiza e Kompleksitetit Kohor",
+  "toc": [
+    {
+      "id": "konteksti",
+      "title": "Konteksti",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "detyra",
+      "title": "Detyra",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "pyetjet-e-analizes",
+      "title": "Pyetjet e Analizes",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "konteksti",
+      "title": "Konteksti",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "detyra",
+      "title": "Detyra",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "pyetjet-e-analizes",
+      "title": "Pyetjet e Analizes",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "sections": [
+    {
+      "id": "konteksti",
+      "title": "Konteksti",
+      "kind": "normal"
+    },
+    {
+      "id": "detyra",
+      "title": "Detyra",
+      "kind": "normal"
+    },
+    {
+      "id": "pyetjet-e-analizes",
+      "title": "Pyetjet e Analizes",
+      "kind": "reflect"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 0,
+      "intro": true
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "konteksti",
+      "heading": "Konteksti",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:33362120fd8505c4",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "detyra",
+      "heading": "Detyra",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:12d50e2eba22614c",
+      "srcIndex": 0
+    },
+    {
+      "type": "code",
+      "srcIndex": 1,
+      "interactive": false,
+      "html": "sha256:3d749f59515fbf3d",
+      "raw": "sha256:23145aceedd2a551",
+      "lines": 178,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "insertion_sort"
+        },
+        {
+          "t": "def",
+          "n": "selection_sort"
+        },
+        {
+          "t": "def",
+          "n": "merge_sort"
+        },
+        {
+          "t": "def",
+          "n": "insertion_sort_ops"
+        },
+        {
+          "t": "def",
+          "n": "selection_sort_ops"
+        },
+        {
+          "t": "def",
+          "n": "merge_sort_ops"
+        },
+        {
+          "t": "def",
+          "n": "_sort"
+        },
+        {
+          "t": "def",
+          "n": "mat_kohen"
+        },
+        {
+          "t": "def",
+          "n": "mat_operacionet"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": true,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "plotly",
+          "file": "plotly-95c8266b4848.json",
+          "bytes": 12771
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 2
+    },
+    {
+      "type": "markdown",
+      "kind": "reflect",
+      "label": "Pyetje Reflektuese",
+      "id": "pyetjet-e-analizes",
+      "heading": "Pyetjet e Analizes",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:ac88e25efc0254cd",
+      "srcIndex": 2
+    }
+  ],
+  "imports": ["plotly", "random", "time"],
+  "dependencies": ["plotly"],
+  "flags": {
+    "pygame": false,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": true,
+    "matplotlib": false,
+    "networkx": false,
+    "numpy": false
+  },
+  "missingScripts": [],
+  "stats": {
+    "cells": 3,
+    "markdown": 2,
+    "code": 1,
+    "codeLines": 178
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": false,
+  "assets": [
+    {
+      "file": "plotly-95c8266b4848.json",
+      "bytes": 12793
+    }
+  ]
+}

@@ -1,0 +1,552 @@
+{
+  "title": "Laboratori 3 · Ushtrime Shtesë — Merge Sort: Induksioni i Fortë dhe Pema Rekursive",
+  "toc": [
+    {
+      "id": "kujtues-teorik-perca-e-sundo",
+      "title": "Kujtues teorik — Përça e sundo",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "induksioni-per-algoritme-iterative-dhe-rekursive-slide-27",
+      "title": "Induksioni për algoritme iterative dhe rekursive (slide 27)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pema-rekursive-slides-33-39",
+      "title": "Pema rekursive (slides 33–39)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-logaritmi-si-numer-pergjysmimesh-slide-31",
+      "title": "Ushtrimi 1 — Logaritmi si numër përgjysmimesh (slide 31)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-pema-rekursive-e-matur-nga-kodi",
+      "title": "Ushtrimi 2 — Pema rekursive, e matur nga kodi",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-induksioni-i-forte-ne-veprim",
+      "title": "Ushtrimi 3 — Induksioni i fortë në veprim",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "kur-deshton-rasti-baze",
+      "title": "Kur dështon rasti bazë",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-4-teoria-kundrejt-matjes",
+      "title": "Ushtrimi 4 — Teoria kundrejt matjes",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "kujtues-teorik-perca-e-sundo",
+      "title": "Kujtues teorik — Përça e sundo",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "induksioni-per-algoritme-iterative-dhe-rekursive-slide-27",
+      "title": "Induksioni për algoritme iterative dhe rekursive (slide 27)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pema-rekursive-slides-33-39",
+      "title": "Pema rekursive (slides 33–39)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-logaritmi-si-numer-pergjysmimesh-slide-31",
+      "title": "Ushtrimi 1 — Logaritmi si numër përgjysmimesh (slide 31)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-pema-rekursive-e-matur-nga-kodi",
+      "title": "Ushtrimi 2 — Pema rekursive, e matur nga kodi",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-induksioni-i-forte-ne-veprim",
+      "title": "Ushtrimi 3 — Induksioni i fortë në veprim",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "kur-deshton-rasti-baze",
+      "title": "Kur dështon rasti bazë",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-4-teoria-kundrejt-matjes",
+      "title": "Ushtrimi 4 — Teoria kundrejt matjes",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "sections": [
+    {
+      "id": "kujtues-teorik-perca-e-sundo",
+      "title": "Kujtues teorik — Përça e sundo",
+      "kind": "theory"
+    },
+    {
+      "id": "induksioni-per-algoritme-iterative-dhe-rekursive-slide-27",
+      "title": "Induksioni për algoritme iterative dhe rekursive (slide 27)",
+      "kind": "normal"
+    },
+    {
+      "id": "pema-rekursive-slides-33-39",
+      "title": "Pema rekursive (slides 33–39)",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-logaritmi-si-numer-pergjysmimesh-slide-31",
+      "title": "Ushtrimi 1 — Logaritmi si numër përgjysmimesh (slide 31)",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-pema-rekursive-e-matur-nga-kodi",
+      "title": "Ushtrimi 2 — Pema rekursive, e matur nga kodi",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-induksioni-i-forte-ne-veprim",
+      "title": "Ushtrimi 3 — Induksioni i fortë në veprim",
+      "kind": "exercise"
+    },
+    {
+      "id": "kur-deshton-rasti-baze",
+      "title": "Kur dështon rasti bazë",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-4-teoria-kundrejt-matjes",
+      "title": "Ushtrimi 4 — Teoria kundrejt matjes",
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "kind": "reflect"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:25c292f674578811",
+      "srcIndex": 0,
+      "intro": true
+    },
+    {
+      "type": "markdown",
+      "kind": "theory",
+      "label": "Teori",
+      "id": "kujtues-teorik-perca-e-sundo",
+      "heading": "Kujtues teorik — Përça e sundo",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:3fa2424ab944f68f",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "induksioni-per-algoritme-iterative-dhe-rekursive-slide-27",
+      "heading": "Induksioni për algoritme iterative dhe rekursive (slide 27)",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:2c7ad48a41b01605",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "pema-rekursive-slides-33-39",
+      "heading": "Pema rekursive (slides 33–39)",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:929f59383bb2a23f",
+      "srcIndex": 1
+    },
+    {
+      "type": "code",
+      "srcIndex": 2,
+      "interactive": false,
+      "html": "sha256:5c3d824ae63f2a36",
+      "raw": "sha256:7ce72378fd40089f",
+      "lines": 15,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-1-logaritmi-si-numer-pergjysmimesh-slide-31",
+      "heading": "Ushtrimi 1 — Logaritmi si numër përgjysmimesh (slide 31)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:b0c443e9cecee372",
+      "srcIndex": 3
+    },
+    {
+      "type": "code",
+      "srcIndex": 4,
+      "interactive": false,
+      "html": "sha256:fa4292c9e1554ac0",
+      "raw": "sha256:6fbf35a8e1a2541e",
+      "lines": 14,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 5,
+      "interactive": false,
+      "html": "sha256:604b4a12bf37a1b3",
+      "raw": "sha256:30d775d908918a47",
+      "lines": 5,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "log₂(numri i grimcave të universit ≈ 10⁸⁰) ≈ 265.8 < 280   (slide 31)\n\n             n |  log₂ n |              n |         n·log₂ n |                       n²\n            16 |     4.0 |             16 |               64 |                      256\n         1,024 |    10.0 |          1,024 |           10,240 |                1,048,576\n     1,000,000 |    19.9 |      1,000,000 |       19,931,569 |        1,000,000,000,000\n 1,000,000,000 |    29.9 |  1,000,000,000 |   29,897,352,854 | 1,000,000,000,000,000,000",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-2-pema-rekursive-e-matur-nga-kodi",
+      "heading": "Ushtrimi 2 — Pema rekursive, e matur nga kodi",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:af91ce2ba9f189e5",
+      "srcIndex": 6
+    },
+    {
+      "type": "code",
+      "srcIndex": 7,
+      "interactive": false,
+      "html": "sha256:15e5f2e0bb56b3e6",
+      "raw": "sha256:c8132cbfd063d1aa",
+      "lines": 37,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": " Niveli t |  # nënprobleme |      gjatësitë |  puna e Merge\n        0 |              1 |             16 |            16\n        1 |              2 |              8 |            16\n        2 |              4 |              4 |            16\n        3 |              8 |              2 |            16\n        4 |             16 |              1 |             0",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:4f94e08629905690",
+      "srcIndex": 8
+    },
+    {
+      "type": "code",
+      "srcIndex": 9,
+      "interactive": false,
+      "html": "sha256:326c0c277f3a6886",
+      "raw": "sha256:d411f3acacb9b63e",
+      "lines": 25,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-3-induksioni-i-forte-ne-veprim",
+      "heading": "Ushtrimi 3 — Induksioni i fortë në veprim",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:d81ec84a74d2bda6",
+      "srcIndex": 10
+    },
+    {
+      "type": "code",
+      "srcIndex": 11,
+      "interactive": false,
+      "html": "sha256:157c84d951fa3d29",
+      "raw": "sha256:c1853bcc7e125490",
+      "lines": 35,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "kur-deshton-rasti-baze",
+      "heading": "Kur dështon rasti bazë",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:c5588815eb83d1e5",
+      "srcIndex": 12
+    },
+    {
+      "type": "code",
+      "srcIndex": 13,
+      "interactive": false,
+      "html": "sha256:64fe528c333be048",
+      "raw": "sha256:1f31e95df2bdd853",
+      "lines": 19,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "[1, 2, 5, 9]\n[] → RecursionError: rekursioni nuk ndalon kurrë!",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:2a37abf55ecb4680",
+      "srcIndex": 14
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-4-teoria-kundrejt-matjes",
+      "heading": "Ushtrimi 4 — Teoria kundrejt matjes",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:854cfd1490ee9053",
+      "srcIndex": 15
+    },
+    {
+      "type": "code",
+      "srcIndex": 16,
+      "interactive": false,
+      "html": "sha256:726919b63a430e42",
+      "raw": "sha256:4c8da43d3e4d7c1d",
+      "lines": 47,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "krahasime_merge"
+        },
+        {
+          "t": "def",
+          "n": "ms"
+        },
+        {
+          "t": "def",
+          "n": "krahasime_insertion"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": true,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "plotly",
+          "file": "plotly-fdbac67e7dd9.json",
+          "bytes": 9508
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "classwork",
+      "label": "Punë në Klasë",
+      "id": "pune-ne-klase",
+      "heading": "Punë në Klasë",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:c5a05e967811fde5",
+      "srcIndex": 17
+    },
+    {
+      "type": "markdown",
+      "kind": "reflect",
+      "label": "Pyetje Reflektuese",
+      "id": "pyetje-reflektuese",
+      "heading": "Pyetje Reflektuese",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:37ef3463dfbc9ac2",
+      "srcIndex": 18
+    }
+  ],
+  "imports": ["collections", "itertools", "math", "plotly", "random", "sys"],
+  "dependencies": ["plotly"],
+  "flags": {
+    "pygame": false,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": true,
+    "matplotlib": false,
+    "networkx": false,
+    "numpy": false
+  },
+  "missingScripts": [],
+  "stats": {
+    "cells": 19,
+    "markdown": 11,
+    "code": 8,
+    "codeLines": 197
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": true,
+  "assets": [
+    {
+      "file": "plotly-fdbac67e7dd9.json",
+      "bytes": 9519
+    }
+  ]
+}

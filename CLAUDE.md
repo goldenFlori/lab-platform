@@ -59,10 +59,13 @@ live in its git-ignored `zgjidhjet/`; never publish them.
 - `src/api`: the Hono API on the Cloudflare Worker. One Worker serves both; `/api/*` always reaches
   the Worker.
 - `src/api/db`: the Drizzle schema and database access; `migrations/`: the generated SQL for D1.
+- `src/notebook`: the notebook converter. It runs in the browser, uses WebAssembly, and is never
+  used in the Worker.
 - `src/shared`: request and response shapes for both sides. The app imports only types, which
   keeps Zod out of its bundle.
-- `test/`: Vitest tests that run inside workerd, each on an empty migrated database (seed with
-  `test/api/fixtures.ts`); `e2e/`: Playwright tests against the production build.
+- `test/`: Vitest in two projects. `api` runs inside workerd, each test on an empty migrated
+  database (seed with `test/api/fixtures.ts`). `notebook` runs in Node for the converter.
+  `e2e/` holds Playwright tests against the production build.
 - Commands:
   - `npm install`: also generates the Worker types (`worker-configuration.d.ts`, git-ignored).
   - `npm run dev`: app and API on http://localhost:5173.
@@ -92,6 +95,9 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   Drizzle and schema imports elsewhere in `src/api`. A new tenant table needs `org_id`,
   `(parent_id, org_id)` foreign keys, `org_id` in every unique index, and an entry in
   `test/api/tenant-isolation.test.ts`.
+- **The converter must keep making the course site's cells.** The 19 fixture notebooks and their
+  snapshots in `test/notebook/fixtures` are the specification. Change a snapshot only on
+  purpose, with `scripts/snapshot-course-notebooks.ts`.
 - **Every organization route checks a capability.** It lives under `/api/orgs/:org` behind
   `tenantAccess` and uses `requireCapability` or `c.var.access.can(…)`, passing the resource's
   course and group. Add a test for who may and who may not.

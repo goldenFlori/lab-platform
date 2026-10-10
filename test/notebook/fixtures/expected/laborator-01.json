@@ -1,0 +1,430 @@
+{
+  "title": "Laboratori 1 — Insertion Sort & Selection Sort",
+  "toc": [
+    {
+      "id": "1-teoria",
+      "title": "1. Teoria",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "cfare-eshte-sorting-renditja",
+      "title": "Çfarë është Sorting (Renditja)?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pse-eshte-i-rendesishem-sorting",
+      "title": "Pse është i rëndësishëm Sorting?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "algoritmet-qe-do-te-studiojme-sot",
+      "title": "Algoritmet që do të studiojmë sot",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "1-insertion-sort",
+      "title": "1. Insertion Sort",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "2-selection-sort",
+      "title": "2. Selection Sort",
+      "level": 3,
+      "kind": "normal"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "1-teoria",
+      "title": "1. Teoria",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "cfare-eshte-sorting-renditja",
+      "title": "Çfarë është Sorting (Renditja)?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pse-eshte-i-rendesishem-sorting",
+      "title": "Pse është i rëndësishëm Sorting?",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "algoritmet-qe-do-te-studiojme-sot",
+      "title": "Algoritmet që do të studiojmë sot",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "1-insertion-sort",
+      "title": "1. Insertion Sort",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "2-selection-sort",
+      "title": "2. Selection Sort",
+      "level": 3,
+      "kind": "normal"
+    }
+  ],
+  "sections": [
+    {
+      "id": "1-teoria",
+      "title": "1. Teoria",
+      "kind": "theory"
+    },
+    {
+      "id": "cfare-eshte-sorting-renditja",
+      "title": "Çfarë është Sorting (Renditja)?",
+      "kind": "normal"
+    },
+    {
+      "id": "pse-eshte-i-rendesishem-sorting",
+      "title": "Pse është i rëndësishëm Sorting?",
+      "kind": "normal"
+    },
+    {
+      "id": "algoritmet-qe-do-te-studiojme-sot",
+      "title": "Algoritmet që do të studiojmë sot",
+      "kind": "normal"
+    },
+    {
+      "id": "1-insertion-sort",
+      "title": "1. Insertion Sort",
+      "kind": "normal"
+    },
+    {
+      "id": "2-selection-sort",
+      "title": "2. Selection Sort",
+      "kind": "normal"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "theory",
+      "label": "Teori",
+      "id": "1-teoria",
+      "heading": "1. Teoria",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "cfare-eshte-sorting-renditja",
+      "heading": "Çfarë është Sorting (Renditja)?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:2aa774a7c9e16687",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "pse-eshte-i-rendesishem-sorting",
+      "heading": "Pse është i rëndësishëm Sorting?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:2239499ce4027477",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "algoritmet-qe-do-te-studiojme-sot",
+      "heading": "Algoritmet që do të studiojmë sot",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "1-insertion-sort",
+      "heading": "1. Insertion Sort",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:0f1b20d4f5054e12",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "2-selection-sort",
+      "heading": "2. Selection Sort",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:7605d34aa7dab9eb",
+      "srcIndex": 0
+    },
+    {
+      "type": "code",
+      "srcIndex": 1,
+      "interactive": true,
+      "html": "sha256:6c1330aff25e92ce",
+      "raw": "sha256:3edfe505ec354af3",
+      "lines": 123,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "draw"
+        },
+        {
+          "t": "def",
+          "n": "step"
+        },
+        {
+          "t": "def",
+          "n": "reset"
+        }
+      ],
+      "flags": {
+        "pygame": true,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 2,
+      "interactive": false,
+      "html": "sha256:5675624685ed1efb",
+      "raw": "sha256:28be72d2674c7275",
+      "lines": 69,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "insertion_sort"
+        },
+        {
+          "t": "def",
+          "n": "mat_kohen"
+        },
+        {
+          "t": "def",
+          "n": "crregullo"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": true,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "plotly",
+          "file": "plotly-7f743d74c485.json",
+          "bytes": 64534
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "srcIndex": 3,
+      "interactive": true,
+      "html": "sha256:496dfb4fa6cf9d96",
+      "raw": "sha256:f9f80d655b26dc80",
+      "lines": 154,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "draw"
+        },
+        {
+          "t": "def",
+          "n": "step"
+        },
+        {
+          "t": "def",
+          "n": "reset"
+        }
+      ],
+      "flags": {
+        "pygame": true,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 4,
+      "interactive": false,
+      "html": "sha256:73dd1367c57af180",
+      "raw": "sha256:9accd67b6ef2ad74",
+      "lines": 122,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "insertion_sort"
+        },
+        {
+          "t": "def",
+          "n": "selection_sort"
+        },
+        {
+          "t": "def",
+          "n": "mat_kohen"
+        },
+        {
+          "t": "def",
+          "n": "krijo_grafik"
+        },
+        {
+          "t": "def",
+          "n": "on_hover"
+        },
+        {
+          "t": "def",
+          "n": "krahasim_algoritmesh"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": true
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "======================================================================\nUSHTRIM 1: LISTA E VOGËL (10)\n======================================================================\n\nINSERTION SORT:\nRandom:  0.00000333 sek\nSorted:  0.00000092 sek (RASTI MË I MIRË)\nReverse: 0.00000271 sek (RASTI MË I KEQ)\n\nSELECTION SORT:\nRandom:  0.00000271 sek\nSorted:  0.00000212 sek\nReverse: 0.00000204 sek",
+          "truncated": false
+        },
+        {
+          "kind": "image",
+          "file": "img-1dcba779abb5.png",
+          "bytes": 35588
+        },
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "======================================================================\nUSHTRIM 2: LISTA MESATARE (100)\n======================================================================\n\nINSERTION SORT:\nRandom:  0.00012608 sek\nSorted:  0.00000525 sek (RASTI MË I MIRË)\nReverse: 0.00022729 sek (RASTI MË I KEQ)\n\nSELECTION SORT:\nRandom:  0.00012596 sek\nSorted:  0.00011354 sek\nReverse: 0.00011612 sek",
+          "truncated": false
+        },
+        {
+          "kind": "image",
+          "file": "img-da03c27e4773.png",
+          "bytes": 36735
+        },
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "======================================================================\nUSHTRIM 3: LISTA E MADHE (1000)\n======================================================================\n\nINSERTION SORT:\nRandom:  0.01125421 sek\nSorted:  0.00005304 sek (RASTI MË I MIRË)\nReverse: 0.02352396 sek (RASTI MË I KEQ)\n\nSELECTION SORT:\nRandom:  0.01173654 sek\nSorted:  0.01231571 sek\nReverse: 0.01278479 sek",
+          "truncated": false
+        },
+        {
+          "kind": "image",
+          "file": "img-e9c797728d87.png",
+          "bytes": 35064
+        },
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "======================================================================\nUSHTRIM 4: LISTA SHUMË E MADHE (10000)\n======================================================================\n\nINSERTION SORT:\nRandom:  1.30617596 sek\nSorted:  0.00058304 sek (RASTI MË I MIRË)\nReverse: 2.56276900 sek (RASTI MË I KEQ)\n\nSELECTION SORT:\nRandom:  1.22290271 sek\nSorted:  1.26330888 sek\nReverse: 1.25283613 sek",
+          "truncated": false
+        },
+        {
+          "kind": "image",
+          "file": "img-8e68bc0efb6e.png",
+          "bytes": 32192
+        },
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "======================================================================\nPËRFUNDIME KRYESORE\n======================================================================\n\n1. INSERTION SORT:\n   - Ka rast më të mirë: lista e renditur (shumë e shpejtë)\n   - Ka rast më të keq: lista kundërt (më e ngadaltë)\n   - Performancë e ndryshme sipas radhës fillestare të të dhënave\n\n2. SELECTION SORT:\n   - Ka të njëjtën kohë për të gjitha rastet!\n   - Gjithmonë bën O(n²) krahasime, pavarësisht nga input-i\n\n3. KRAHASIMI INSERTION vs SELECTION:\n   - Për lista të renditura: Insertion Sort >>> Selection Sort\n   - Për lista random: Insertion Sort ≈ Selection Sort\n   - Për lista kundërt: Selection Sort > Insertion Sort",
+          "truncated": false
+        }
+      ]
+    }
+  ],
+  "imports": ["matplotlib", "os", "plotly", "pygame", "random", "time"],
+  "dependencies": ["matplotlib", "plotly", "pygame"],
+  "flags": {
+    "pygame": true,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": true,
+    "matplotlib": true,
+    "networkx": false,
+    "numpy": false
+  },
+  "missingScripts": [],
+  "stats": {
+    "cells": 5,
+    "markdown": 1,
+    "code": 4,
+    "codeLines": 468
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": false,
+  "assets": [
+    {
+      "file": "img-1dcba779abb5.png",
+      "bytes": 35588
+    },
+    {
+      "file": "img-8e68bc0efb6e.png",
+      "bytes": 32192
+    },
+    {
+      "file": "img-da03c27e4773.png",
+      "bytes": 36735
+    },
+    {
+      "file": "img-e9c797728d87.png",
+      "bytes": 35064
+    },
+    {
+      "file": "plotly-7f743d74c485.json",
+      "bytes": 64549
+    }
+  ]
+}

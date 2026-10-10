@@ -1,0 +1,950 @@
+{
+  "title": "Laboratori 4 · Ushtrime Shtesë — Grafet: nga Urat e Königsbergut te Komponentet e Lidhura Fort",
+  "toc": [
+    {
+      "id": "kujtues-teorik-fjalori-i-leksionit",
+      "title": "Kujtues teorik — Fjalori i leksionit",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "ecje-neper-graf-slides-57-73",
+      "title": "Ecje nëpër graf (slides 57–73)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-urat-e-konigsbergut-slides-2-3-42",
+      "title": "Ushtrimi 1 — Urat e Königsbergut (slides 2–3, 42)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-lema-e-shtrengimit-te-duarve-slide-34",
+      "title": "Ushtrimi 2 — Lema e shtrëngimit të duarve (slide 34)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-grafe-speciale-slides-35-37",
+      "title": "Ushtrimi 3 — Grafe speciale (slides 35–37)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-nengrafet-klikat-dhe-bashkesite-e-pavarura-slides-36-40",
+      "title": "Ushtrimi 4 — Nëngrafet, klikat dhe bashkësitë e pavarura (slides 36–40)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-5-paraqitja-e-grafeve-slides-46-56",
+      "title": "Ushtrimi 5 — Paraqitja e grafeve (slides 46–56)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "kompromiset-graf-i-dendur-apo-i-rralle-slides-54-56",
+      "title": "Kompromiset: graf i dendur apo i rrallë? (slides 54–56)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-6-udhetim-udha-cikel-shteg-cikel-elementar-slides-57-62",
+      "title": "Ushtrimi 6 — Udhëtim, udha, cikël, shteg, cikël elementar (slides 57–62)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-7-largesa-diametri-dhe-komponentet-e-lidhura-slides-63-66",
+      "title": "Ushtrimi 7 — Largesa, diametri dhe komponentet e lidhura (slides 63–66)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-8-lidhja-te-digrafet-slides-72-73",
+      "title": "Ushtrimi 8 — Lidhja te digrafet (slides 72–73)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "kujtues-teorik-fjalori-i-leksionit",
+      "title": "Kujtues teorik — Fjalori i leksionit",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "ecje-neper-graf-slides-57-73",
+      "title": "Ecje nëpër graf (slides 57–73)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-urat-e-konigsbergut-slides-2-3-42",
+      "title": "Ushtrimi 1 — Urat e Königsbergut (slides 2–3, 42)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-lema-e-shtrengimit-te-duarve-slide-34",
+      "title": "Ushtrimi 2 — Lema e shtrëngimit të duarve (slide 34)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-grafe-speciale-slides-35-37",
+      "title": "Ushtrimi 3 — Grafe speciale (slides 35–37)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-nengrafet-klikat-dhe-bashkesite-e-pavarura-slides-36-40",
+      "title": "Ushtrimi 4 — Nëngrafet, klikat dhe bashkësitë e pavarura (slides 36–40)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-5-paraqitja-e-grafeve-slides-46-56",
+      "title": "Ushtrimi 5 — Paraqitja e grafeve (slides 46–56)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "kompromiset-graf-i-dendur-apo-i-rralle-slides-54-56",
+      "title": "Kompromiset: graf i dendur apo i rrallë? (slides 54–56)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-6-udhetim-udha-cikel-shteg-cikel-elementar-slides-57-62",
+      "title": "Ushtrimi 6 — Udhëtim, udha, cikël, shteg, cikël elementar (slides 57–62)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-7-largesa-diametri-dhe-komponentet-e-lidhura-slides-63-66",
+      "title": "Ushtrimi 7 — Largesa, diametri dhe komponentet e lidhura (slides 63–66)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-8-lidhja-te-digrafet-slides-72-73",
+      "title": "Ushtrimi 8 — Lidhja te digrafet (slides 72–73)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "sections": [
+    {
+      "id": "kujtues-teorik-fjalori-i-leksionit",
+      "title": "Kujtues teorik — Fjalori i leksionit",
+      "kind": "theory"
+    },
+    {
+      "id": "ecje-neper-graf-slides-57-73",
+      "title": "Ecje nëpër graf (slides 57–73)",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-urat-e-konigsbergut-slides-2-3-42",
+      "title": "Ushtrimi 1 — Urat e Königsbergut (slides 2–3, 42)",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-lema-e-shtrengimit-te-duarve-slide-34",
+      "title": "Ushtrimi 2 — Lema e shtrëngimit të duarve (slide 34)",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-grafe-speciale-slides-35-37",
+      "title": "Ushtrimi 3 — Grafe speciale (slides 35–37)",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-nengrafet-klikat-dhe-bashkesite-e-pavarura-slides-36-40",
+      "title": "Ushtrimi 4 — Nëngrafet, klikat dhe bashkësitë e pavarura (slides 36–40)",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-5-paraqitja-e-grafeve-slides-46-56",
+      "title": "Ushtrimi 5 — Paraqitja e grafeve (slides 46–56)",
+      "kind": "exercise"
+    },
+    {
+      "id": "kompromiset-graf-i-dendur-apo-i-rralle-slides-54-56",
+      "title": "Kompromiset: graf i dendur apo i rrallë? (slides 54–56)",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-6-udhetim-udha-cikel-shteg-cikel-elementar-slides-57-62",
+      "title": "Ushtrimi 6 — Udhëtim, udha, cikël, shteg, cikël elementar (slides 57–62)",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-7-largesa-diametri-dhe-komponentet-e-lidhura-slides-63-66",
+      "title": "Ushtrimi 7 — Largesa, diametri dhe komponentet e lidhura (slides 63–66)",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-8-lidhja-te-digrafet-slides-72-73",
+      "title": "Ushtrimi 8 — Lidhja te digrafet (slides 72–73)",
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "kind": "reflect"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:e4011d9e8c872c13",
+      "srcIndex": 0,
+      "intro": true
+    },
+    {
+      "type": "markdown",
+      "kind": "theory",
+      "label": "Teori",
+      "id": "kujtues-teorik-fjalori-i-leksionit",
+      "heading": "Kujtues teorik — Fjalori i leksionit",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:cbec72dd0333540c",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "ecje-neper-graf-slides-57-73",
+      "heading": "Ecje nëpër graf (slides 57–73)",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:b3220345807dbeb6",
+      "srcIndex": 1
+    },
+    {
+      "type": "code",
+      "srcIndex": 2,
+      "interactive": false,
+      "html": "sha256:641199fbd7c5e679",
+      "raw": "sha256:999935ceab0e6497",
+      "lines": 24,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-1-urat-e-konigsbergut-slides-2-3-42",
+      "heading": "Ushtrimi 1 — Urat e Königsbergut (slides 2–3, 42)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:3b3f80448769c135",
+      "srcIndex": 3
+    },
+    {
+      "type": "code",
+      "srcIndex": 4,
+      "interactive": false,
+      "html": "sha256:d64d80e30696bc62",
+      "raw": "sha256:fddc6e5a376609ab",
+      "lines": 12,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 5,
+      "interactive": false,
+      "html": "sha256:07b4fb7e6a2fd55a",
+      "raw": "sha256:7b6c3d5f0df2443f",
+      "lines": 11,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 6,
+      "interactive": false,
+      "html": "sha256:1fd1c68f8cd44d7f",
+      "raw": "sha256:9df8ce74696a1cc1",
+      "lines": 36,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": true,
+        "matplotlib": true
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "image",
+          "file": "img-aeaf47836a41.png",
+          "bytes": 38496
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-2-lema-e-shtrengimit-te-duarve-slide-34",
+      "heading": "Ushtrimi 2 — Lema e shtrëngimit të duarve (slide 34)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:d6ddc74be7993c4c",
+      "srcIndex": 7
+    },
+    {
+      "type": "code",
+      "srcIndex": 8,
+      "interactive": false,
+      "html": "sha256:bf6e86e98cd390b1",
+      "raw": "sha256:268e6936b599eb0f",
+      "lines": 14,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "Lema dhe rrjedhimi i saj u verifikuan për 2000 grafe të rastit.",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:6dfc8049257ff0dc",
+      "srcIndex": 9
+    },
+    {
+      "type": "code",
+      "srcIndex": 10,
+      "interactive": false,
+      "html": "sha256:467dda4775e44a06",
+      "raw": "sha256:dd6ae2cfee4f6cf3",
+      "lines": 12,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 11,
+      "interactive": false,
+      "html": "sha256:39300acc796ac09c",
+      "raw": "sha256:df63a93b99fa2b3f",
+      "lines": 13,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:67eac15de1472baf",
+      "srcIndex": 12
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-3-grafe-speciale-slides-35-37",
+      "heading": "Ushtrimi 3 — Grafe speciale (slides 35–37)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:0b466d4cbd764e0c",
+      "srcIndex": 13
+    },
+    {
+      "type": "code",
+      "srcIndex": 14,
+      "interactive": false,
+      "html": "sha256:6c83c2018f110a95",
+      "raw": "sha256:704342465ae70466",
+      "lines": 13,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 15,
+      "interactive": false,
+      "html": "sha256:7095c2c99a755e7a",
+      "raw": "sha256:bddb1bbd61dbc5f3",
+      "lines": 19,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 16,
+      "interactive": false,
+      "html": "sha256:99f43f558f968db6",
+      "raw": "sha256:a0613ebbf4672867",
+      "lines": 6,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "image",
+          "file": "img-5e577c2e4c8a.png",
+          "bytes": 50822
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-4-nengrafet-klikat-dhe-bashkesite-e-pavarura-slides-36-40",
+      "heading": "Ushtrimi 4 — Nëngrafet, klikat dhe bashkësitë e pavarura (slides 36–40)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:891187a9e8363a08",
+      "srcIndex": 17
+    },
+    {
+      "type": "code",
+      "srcIndex": 18,
+      "interactive": false,
+      "html": "sha256:33addc79c3959af1",
+      "raw": "sha256:2904e5b50fc25acb",
+      "lines": 27,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 19,
+      "interactive": false,
+      "html": "sha256:7415b20db8b692d0",
+      "raw": "sha256:3b8dbc4a26a68d00",
+      "lines": 16,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-5-paraqitja-e-grafeve-slides-46-56",
+      "heading": "Ushtrimi 5 — Paraqitja e grafeve (slides 46–56)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:820c83bf01c7606d",
+      "srcIndex": 20
+    },
+    {
+      "type": "code",
+      "srcIndex": 21,
+      "interactive": false,
+      "html": "sha256:b423bc9db850cd8e",
+      "raw": "sha256:8465ae80b578dc7a",
+      "lines": 8,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 22,
+      "interactive": false,
+      "html": "sha256:bb987a0659d5a69b",
+      "raw": "sha256:ff15d052cfa4bfa9",
+      "lines": 15,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "kompromiset-graf-i-dendur-apo-i-rralle-slides-54-56",
+      "heading": "Kompromiset: graf i dendur apo i rrallë? (slides 54–56)",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:0e4e22bf1686b2d8",
+      "srcIndex": 23
+    },
+    {
+      "type": "code",
+      "srcIndex": 24,
+      "interactive": false,
+      "html": "sha256:763833483ae7d314",
+      "raw": "sha256:8e8374ef0dce5f04",
+      "lines": 6,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "Grafi                              |          |E| | dendësia |        matrica |          lista\nrrjet rrugor (fuqi ≈ 3)            |       15,000 |    0.03% |    100,000,000 |         40,000\nrrjet social (fuqi ≈ 200)          |    1,000,000 |    2.00% |    100,000,000 |      2,010,000\ngraf i dendur (50% e çifteve)      |   24,997,500 |   50.00% |    100,000,000 |     50,005,000\ngraf i plotë K₁₀₀₀₀                |   49,995,000 |  100.00% |    100,000,000 |    100,000,000",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:c7ae13d070649ab3",
+      "srcIndex": 25
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-6-udhetim-udha-cikel-shteg-cikel-elementar-slides-57-62",
+      "heading": "Ushtrimi 6 — Udhëtim, udha, cikël, shteg, cikël elementar (slides 57–62)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:2ffa023d51bf1bb4",
+      "srcIndex": 26
+    },
+    {
+      "type": "code",
+      "srcIndex": 27,
+      "interactive": false,
+      "html": "sha256:25fc3f8e8f392c9a",
+      "raw": "sha256:b85009a83a449d17",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 28,
+      "interactive": false,
+      "html": "sha256:122afab01e9d2078",
+      "raw": "sha256:f9fc8b8de1b31a12",
+      "lines": 17,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-7-largesa-diametri-dhe-komponentet-e-lidhura-slides-63-66",
+      "heading": "Ushtrimi 7 — Largesa, diametri dhe komponentet e lidhura (slides 63–66)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:eee978bceec9d544",
+      "srcIndex": 29
+    },
+    {
+      "type": "code",
+      "srcIndex": 30,
+      "interactive": false,
+      "html": "sha256:f76e0ec67fd7807b",
+      "raw": "sha256:04421c3c32967007",
+      "lines": 30,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 31,
+      "interactive": false,
+      "html": "sha256:6b42c474a51566fd",
+      "raw": "sha256:2d8805b4e0fa69ea",
+      "lines": 13,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-8-lidhja-te-digrafet-slides-72-73",
+      "heading": "Ushtrimi 8 — Lidhja te digrafet (slides 72–73)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:99569d97648d0807",
+      "srcIndex": 32
+    },
+    {
+      "type": "code",
+      "srcIndex": 33,
+      "interactive": false,
+      "html": "sha256:3aa74ec9abace7e1",
+      "raw": "sha256:ef84223f93295df5",
+      "lines": 20,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 34,
+      "interactive": false,
+      "html": "sha256:5443dbca129df58c",
+      "raw": "sha256:7dc01c4d252686b2",
+      "lines": 15,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 35,
+      "interactive": false,
+      "html": "sha256:ce05798e19d69321",
+      "raw": "sha256:9e4e62daee228f0c",
+      "lines": 5,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "image",
+          "file": "img-865c4472513a.png",
+          "bytes": 24338
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "classwork",
+      "label": "Punë në Klasë",
+      "id": "pune-ne-klase",
+      "heading": "Punë në Klasë",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:ea61aa448b613b38",
+      "srcIndex": 36
+    },
+    {
+      "type": "markdown",
+      "kind": "reflect",
+      "label": "Pyetje Reflektuese",
+      "id": "pyetje-reflektuese",
+      "heading": "Pyetje Reflektuese",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:84a79c1c31a7f927",
+      "srcIndex": 37
+    }
+  ],
+  "imports": ["collections", "itertools", "matplotlib", "networkx", "random"],
+  "dependencies": ["matplotlib", "networkx"],
+  "flags": {
+    "pygame": false,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": false,
+    "matplotlib": true,
+    "networkx": true,
+    "numpy": false
+  },
+  "missingScripts": [],
+  "stats": {
+    "cells": 38,
+    "markdown": 16,
+    "code": 22,
+    "codeLines": 335
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": true,
+  "assets": [
+    {
+      "file": "img-5e577c2e4c8a.png",
+      "bytes": 50822
+    },
+    {
+      "file": "img-865c4472513a.png",
+      "bytes": 24338
+    },
+    {
+      "file": "img-aeaf47836a41.png",
+      "bytes": 38496
+    }
+  ]
+}

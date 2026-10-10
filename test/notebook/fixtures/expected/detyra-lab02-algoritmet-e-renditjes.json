@@ -1,0 +1,450 @@
+{
+  "title": "Detyre Shtepie — Algoritmet e Renditjes",
+  "toc": [
+    {
+      "id": "udhezime-te-pergjithshme",
+      "title": "Udhezime te Pergjithshme",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "pjesa-1-insertion-sort",
+      "title": "Pjesa 1 — Insertion Sort",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "1-1-komentoni-kodin",
+      "title": "1.1 Komentoni kodin",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "1-2-karakteristikat-e-insertion-sort",
+      "title": "1.2 Karakteristikat e Insertion Sort",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pjesa-2-selection-sort",
+      "title": "Pjesa 2 — Selection Sort",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "2-1-komentoni-kodin",
+      "title": "2.1 Komentoni kodin",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "2-2-karakteristikat-e-selection-sort",
+      "title": "2.2 Karakteristikat e Selection Sort",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pjesa-3-merge-sort",
+      "title": "Pjesa 3 — Merge Sort",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "3-1-komentoni-kodin",
+      "title": "3.1 Komentoni kodin",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "3-2-karakteristikat-e-merge-sort",
+      "title": "3.2 Karakteristikat e Merge Sort",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pjesa-4-krahasim-i-pergjithshem",
+      "title": "Pjesa 4 — Krahasim i Pergjithshem",
+      "level": 2,
+      "kind": "normal"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "udhezime-te-pergjithshme",
+      "title": "Udhezime te Pergjithshme",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "pjesa-1-insertion-sort",
+      "title": "Pjesa 1 — Insertion Sort",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "1-1-komentoni-kodin",
+      "title": "1.1 Komentoni kodin",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "1-2-karakteristikat-e-insertion-sort",
+      "title": "1.2 Karakteristikat e Insertion Sort",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pjesa-2-selection-sort",
+      "title": "Pjesa 2 — Selection Sort",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "2-1-komentoni-kodin",
+      "title": "2.1 Komentoni kodin",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "2-2-karakteristikat-e-selection-sort",
+      "title": "2.2 Karakteristikat e Selection Sort",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pjesa-3-merge-sort",
+      "title": "Pjesa 3 — Merge Sort",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "3-1-komentoni-kodin",
+      "title": "3.1 Komentoni kodin",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "3-2-karakteristikat-e-merge-sort",
+      "title": "3.2 Karakteristikat e Merge Sort",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pjesa-4-krahasim-i-pergjithshem",
+      "title": "Pjesa 4 — Krahasim i Pergjithshem",
+      "level": 2,
+      "kind": "normal"
+    }
+  ],
+  "sections": [
+    {
+      "id": "udhezime-te-pergjithshme",
+      "title": "Udhezime te Pergjithshme",
+      "kind": "normal"
+    },
+    {
+      "id": "pjesa-1-insertion-sort",
+      "title": "Pjesa 1 — Insertion Sort",
+      "kind": "normal"
+    },
+    {
+      "id": "1-1-komentoni-kodin",
+      "title": "1.1 Komentoni kodin",
+      "kind": "normal"
+    },
+    {
+      "id": "1-2-karakteristikat-e-insertion-sort",
+      "title": "1.2 Karakteristikat e Insertion Sort",
+      "kind": "normal"
+    },
+    {
+      "id": "pjesa-2-selection-sort",
+      "title": "Pjesa 2 — Selection Sort",
+      "kind": "normal"
+    },
+    {
+      "id": "2-1-komentoni-kodin",
+      "title": "2.1 Komentoni kodin",
+      "kind": "normal"
+    },
+    {
+      "id": "2-2-karakteristikat-e-selection-sort",
+      "title": "2.2 Karakteristikat e Selection Sort",
+      "kind": "normal"
+    },
+    {
+      "id": "pjesa-3-merge-sort",
+      "title": "Pjesa 3 — Merge Sort",
+      "kind": "normal"
+    },
+    {
+      "id": "3-1-komentoni-kodin",
+      "title": "3.1 Komentoni kodin",
+      "kind": "normal"
+    },
+    {
+      "id": "3-2-karakteristikat-e-merge-sort",
+      "title": "3.2 Karakteristikat e Merge Sort",
+      "kind": "normal"
+    },
+    {
+      "id": "pjesa-4-krahasim-i-pergjithshem",
+      "title": "Pjesa 4 — Krahasim i Pergjithshem",
+      "kind": "normal"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:a7fb1909e613de1d",
+      "srcIndex": 0,
+      "intro": true
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "udhezime-te-pergjithshme",
+      "heading": "Udhezime te Pergjithshme",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:1b8b91f20d8f8626",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "pjesa-1-insertion-sort",
+      "heading": "Pjesa 1 — Insertion Sort",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "1-1-komentoni-kodin",
+      "heading": "1.1 Komentoni kodin",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:63fc72e503deb5bd",
+      "srcIndex": 2
+    },
+    {
+      "type": "code",
+      "srcIndex": 3,
+      "interactive": false,
+      "html": "sha256:d9fa4bd1a01b7c82",
+      "raw": "sha256:2f94c604e85faa02",
+      "lines": 11,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "[1, 2, 3, 5, 8]",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "1-2-karakteristikat-e-insertion-sort",
+      "heading": "1.2 Karakteristikat e Insertion Sort",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:0ce0689a9f8fb021",
+      "srcIndex": 4
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "pjesa-2-selection-sort",
+      "heading": "Pjesa 2 — Selection Sort",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "2-1-komentoni-kodin",
+      "heading": "2.1 Komentoni kodin",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 6
+    },
+    {
+      "type": "code",
+      "srcIndex": 7,
+      "interactive": false,
+      "html": "sha256:2008f020847b3876",
+      "raw": "sha256:f66d0698698a7853",
+      "lines": 12,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "2-2-karakteristikat-e-selection-sort",
+      "heading": "2.2 Karakteristikat e Selection Sort",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:ad4c2339103a4409",
+      "srcIndex": 8
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 9
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "pjesa-3-merge-sort",
+      "heading": "Pjesa 3 — Merge Sort",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 9
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "3-1-komentoni-kodin",
+      "heading": "3.1 Komentoni kodin",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 10
+    },
+    {
+      "type": "code",
+      "srcIndex": 11,
+      "interactive": false,
+      "html": "sha256:cadeed88d6b57244",
+      "raw": "sha256:181b5ca555913eda",
+      "lines": 17,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "3-2-karakteristikat-e-merge-sort",
+      "heading": "3.2 Karakteristikat e Merge Sort",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:ad4c2339103a4409",
+      "srcIndex": 12
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 13
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "pjesa-4-krahasim-i-pergjithshem",
+      "heading": "Pjesa 4 — Krahasim i Pergjithshem",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:7ff3ccaea35caff0",
+      "srcIndex": 13
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:ed2359708e1a49ae",
+      "srcIndex": 14
+    }
+  ],
+  "imports": [],
+  "dependencies": [],
+  "flags": {
+    "pygame": false,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": false,
+    "matplotlib": false,
+    "networkx": false,
+    "numpy": false
+  },
+  "missingScripts": [],
+  "stats": {
+    "cells": 15,
+    "markdown": 12,
+    "code": 3,
+    "codeLines": 40
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": false,
+  "assets": []
+}

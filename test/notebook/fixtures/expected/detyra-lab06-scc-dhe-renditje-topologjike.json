@@ -1,0 +1,421 @@
+{
+  "title": "Detyra për Shtëpi 6 — Komponentet e Lidhura Fort & Renditjet Topologjike",
+  "toc": [
+    {
+      "id": "problemi-1-komponentet-e-lidhura-fort-scc",
+      "title": "Problemi 1 — Komponentet e Lidhura Fort (SCC)",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "kujtues-teorik-ushtrimi-4-i-laboratorit",
+      "title": "Kujtues teorik — Ushtrimi 4 i laboratorit",
+      "level": 3,
+      "kind": "theory"
+    },
+    {
+      "id": "a-puna-me-shkrim",
+      "title": "A — Puna me shkrim",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "problemi-2-renditjet-topologjike",
+      "title": "Problemi 2 — Renditjet Topologjike",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "kujtues-teorik-ushtrimi-5-dhe-6-i-laboratorit",
+      "title": "Kujtues teorik — Ushtrimi 5 dhe 6 i laboratorit",
+      "level": 3,
+      "kind": "theory"
+    },
+    {
+      "id": "a-puna-me-shkrim-2",
+      "title": "A — Puna me shkrim",
+      "level": 3,
+      "kind": "normal"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "problemi-1-komponentet-e-lidhura-fort-scc",
+      "title": "Problemi 1 — Komponentet e Lidhura Fort (SCC)",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "kujtues-teorik-ushtrimi-4-i-laboratorit",
+      "title": "Kujtues teorik — Ushtrimi 4 i laboratorit",
+      "level": 3,
+      "kind": "theory"
+    },
+    {
+      "id": "a-puna-me-shkrim",
+      "title": "A — Puna me shkrim",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "a1-bashkesia-e-arritshme-reach",
+      "title": "A1 — Bashkësia e arritshme (reach)",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "a2-analiza-e-scc-ve",
+      "title": "A2 — Analiza e SCC-ve",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "a3-pyetje-konceptuale",
+      "title": "A3 — Pyetje konceptuale",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "problemi-2-renditjet-topologjike",
+      "title": "Problemi 2 — Renditjet Topologjike",
+      "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "kujtues-teorik-ushtrimi-5-dhe-6-i-laboratorit",
+      "title": "Kujtues teorik — Ushtrimi 5 dhe 6 i laboratorit",
+      "level": 3,
+      "kind": "theory"
+    },
+    {
+      "id": "a-puna-me-shkrim-2",
+      "title": "A — Puna me shkrim",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "b1-gjurmimi-i-available-nodes-hap-pas-hapi",
+      "title": "B1 — Gjurmimi i `available_nodes` hap pas hapi",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "b2-shumesia-e-renditjeve",
+      "title": "B2 — Shumësia e renditjeve",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "b3-pyetje-konceptuale",
+      "title": "B3 — Pyetje konceptuale",
+      "level": 4,
+      "kind": "normal"
+    }
+  ],
+  "sections": [
+    {
+      "id": "problemi-1-komponentet-e-lidhura-fort-scc",
+      "title": "Problemi 1 — Komponentet e Lidhura Fort (SCC)",
+      "kind": "normal"
+    },
+    {
+      "id": "kujtues-teorik-ushtrimi-4-i-laboratorit",
+      "title": "Kujtues teorik — Ushtrimi 4 i laboratorit",
+      "kind": "theory"
+    },
+    {
+      "id": "a-puna-me-shkrim",
+      "title": "A — Puna me shkrim",
+      "kind": "normal"
+    },
+    {
+      "id": "a1-bashkesia-e-arritshme-reach",
+      "title": "A1 — Bashkësia e arritshme (reach)",
+      "kind": "normal"
+    },
+    {
+      "id": "a2-analiza-e-scc-ve",
+      "title": "A2 — Analiza e SCC-ve",
+      "kind": "normal"
+    },
+    {
+      "id": "a3-pyetje-konceptuale",
+      "title": "A3 — Pyetje konceptuale",
+      "kind": "normal"
+    },
+    {
+      "id": "problemi-2-renditjet-topologjike",
+      "title": "Problemi 2 — Renditjet Topologjike",
+      "kind": "normal"
+    },
+    {
+      "id": "kujtues-teorik-ushtrimi-5-dhe-6-i-laboratorit",
+      "title": "Kujtues teorik — Ushtrimi 5 dhe 6 i laboratorit",
+      "kind": "theory"
+    },
+    {
+      "id": "a-puna-me-shkrim-2",
+      "title": "A — Puna me shkrim",
+      "kind": "normal"
+    },
+    {
+      "id": "b1-gjurmimi-i-available-nodes-hap-pas-hapi",
+      "title": "B1 — Gjurmimi i `available_nodes` hap pas hapi",
+      "kind": "normal"
+    },
+    {
+      "id": "b2-shumesia-e-renditjeve",
+      "title": "B2 — Shumësia e renditjeve",
+      "kind": "normal"
+    },
+    {
+      "id": "b3-pyetje-konceptuale",
+      "title": "B3 — Pyetje konceptuale",
+      "kind": "normal"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:44c01b5923c53eb5",
+      "srcIndex": 0,
+      "intro": true
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "problemi-1-komponentet-e-lidhura-fort-scc",
+      "heading": "Problemi 1 — Komponentet e Lidhura Fort (SCC)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "theory",
+      "label": "Teori",
+      "id": "kujtues-teorik-ushtrimi-4-i-laboratorit",
+      "heading": "Kujtues teorik — Ushtrimi 4 i laboratorit",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:a48c01589d8c5347",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "a-puna-me-shkrim",
+      "heading": "A — Puna me shkrim",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:98a055218863dc5a",
+      "srcIndex": 2
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "a1-bashkesia-e-arritshme-reach",
+      "heading": "A1 — Bashkësia e arritshme (reach)",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:ea2919fce4a769a1",
+      "srcIndex": 2
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "a2-analiza-e-scc-ve",
+      "heading": "A2 — Analiza e SCC-ve",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:6e97db7fb6cbe3ba",
+      "srcIndex": 2
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "a3-pyetje-konceptuale",
+      "heading": "A3 — Pyetje konceptuale",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:cf8120b2e7e1a9d3",
+      "srcIndex": 2
+    },
+    {
+      "type": "code",
+      "srcIndex": 3,
+      "interactive": false,
+      "html": "sha256:0ac0fa21fafb12c1",
+      "raw": "sha256:774bd89b9e8b3954",
+      "lines": 99,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "bfs_reach"
+        },
+        {
+          "t": "def",
+          "n": "analyze_scc"
+        },
+        {
+          "t": "def",
+          "n": "gjej_scc_te_kulmit"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 4
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "problemi-2-renditjet-topologjike",
+      "heading": "Problemi 2 — Renditjet Topologjike",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 4
+    },
+    {
+      "type": "markdown",
+      "kind": "theory",
+      "label": "Teori",
+      "id": "kujtues-teorik-ushtrimi-5-dhe-6-i-laboratorit",
+      "heading": "Kujtues teorik — Ushtrimi 5 dhe 6 i laboratorit",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:ae7a263c213a5767",
+      "srcIndex": 4
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "a-puna-me-shkrim-2",
+      "heading": "A — Puna me shkrim",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:50b54eb0539ccc29",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "b1-gjurmimi-i-available-nodes-hap-pas-hapi",
+      "heading": "B1 — Gjurmimi i `available_nodes` hap pas hapi",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:ac4b1b8d41382072",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "b2-shumesia-e-renditjeve",
+      "heading": "B2 — Shumësia e renditjeve",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:f16bf184588d8064",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "b3-pyetje-konceptuale",
+      "heading": "B3 — Pyetje konceptuale",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:70d2553b475206a4",
+      "srcIndex": 5
+    },
+    {
+      "type": "code",
+      "srcIndex": 6,
+      "interactive": false,
+      "html": "sha256:bf4ed78cd38f14e0",
+      "raw": "sha256:77fea9a10b163d1f",
+      "lines": 79,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "build_predecessors"
+        },
+        {
+          "t": "def",
+          "n": "available_nodes"
+        },
+        {
+          "t": "def",
+          "n": "gjenero_renditjen"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    }
+  ],
+  "imports": ["collections"],
+  "dependencies": [],
+  "flags": {
+    "pygame": false,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": false,
+    "matplotlib": false,
+    "networkx": false,
+    "numpy": false
+  },
+  "missingScripts": [],
+  "stats": {
+    "cells": 7,
+    "markdown": 5,
+    "code": 2,
+    "codeLines": 178
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": false,
+  "assets": []
+}

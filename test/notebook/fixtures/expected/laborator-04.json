@@ -1,0 +1,826 @@
+{
+  "title": "Laboratori 4 — Hyrje ne Teorine e Grafeve",
+  "toc": [
+    {
+      "id": "teoria-bazat-e-teorise-se-grafeve",
+      "title": "Teoria — Bazat e Teorise se Grafeve",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "terminologjia-baze",
+      "title": "Terminologjia baze",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "llojet-kryesore-te-grafeve",
+      "title": "Llojet kryesore te grafeve",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-vizualizim-interaktiv-ndertoni-grafin-tuaj",
+      "title": "Ushtrimi 1 — Vizualizim Interaktiv: Ndërtoni Grafin Tuaj",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "qellimi",
+      "title": "Qëllimi",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "kontrollat",
+      "title": "Kontrollat",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-te-vezhgoni",
+      "title": "Çfarë të vëzhgoni",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-2-bashkesia-e-pavarur-klika-grafi-dyanesor",
+      "title": "Ushtrimi 2: Bashkesia e Pavarur, Klika & Grafi Dyanesor",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "menyra-nderto-blu-tab-per-te-kaluar",
+      "title": "Menyra Nderto (blu) — TAB per te kaluar",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "menyra-analizo-portokalli-tab-per-te-kaluar",
+      "title": "Menyra Analizo (portokalli) — TAB per te kaluar",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "provoni",
+      "title": "Provoni:",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ngjyrat-e-brinjeve-dyanesor",
+      "title": "Ngjyrat e brinjeve (dyanesor):",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-3-llojet-e-grafeve-me-networkx",
+      "title": "Ushtrimi 3 — Llojet e Grafeve me NetworkX",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "qellimi-2",
+      "title": "Qellimi",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "llojet-qe-do-te-shohim",
+      "title": "Llojet qe do te shohim",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pyetje-per-diskutim",
+      "title": "Pyetje per diskutim",
+      "level": 3,
+      "kind": "reflect"
+    },
+    {
+      "id": "ushtrimi-4-paraqitja-e-grafeve-liste-dhe-matrice-fqinjesie",
+      "title": "Ushtrimi 4 — Paraqitja e Grafeve: Liste dhe Matrice Fqinjesie",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "dy-menyrat-kryesore-te-paraqitjes",
+      "title": "Dy menyrat kryesore te paraqitjes",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "verejtje-per-digrafet",
+      "title": "Verejtje per digrafet",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pyetje",
+      "title": "Pyetje",
+      "level": 3,
+      "kind": "normal"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "teoria-bazat-e-teorise-se-grafeve",
+      "title": "Teoria — Bazat e Teorise se Grafeve",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "terminologjia-baze",
+      "title": "Terminologjia baze",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "llojet-kryesore-te-grafeve",
+      "title": "Llojet kryesore te grafeve",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-vizualizim-interaktiv-ndertoni-grafin-tuaj",
+      "title": "Ushtrimi 1 — Vizualizim Interaktiv: Ndërtoni Grafin Tuaj",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "qellimi",
+      "title": "Qëllimi",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "kontrollat",
+      "title": "Kontrollat",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-te-vezhgoni",
+      "title": "Çfarë të vëzhgoni",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-2-bashkesia-e-pavarur-klika-grafi-dyanesor",
+      "title": "Ushtrimi 2: Bashkesia e Pavarur, Klika & Grafi Dyanesor",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "menyra-nderto-blu-tab-per-te-kaluar",
+      "title": "Menyra Nderto (blu) — TAB per te kaluar",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "menyra-analizo-portokalli-tab-per-te-kaluar",
+      "title": "Menyra Analizo (portokalli) — TAB per te kaluar",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "provoni",
+      "title": "Provoni:",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ngjyrat-e-brinjeve-dyanesor",
+      "title": "Ngjyrat e brinjeve (dyanesor):",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-3-llojet-e-grafeve-me-networkx",
+      "title": "Ushtrimi 3 — Llojet e Grafeve me NetworkX",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "qellimi-2",
+      "title": "Qellimi",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "llojet-qe-do-te-shohim",
+      "title": "Llojet qe do te shohim",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pyetje-per-diskutim",
+      "title": "Pyetje per diskutim",
+      "level": 3,
+      "kind": "reflect"
+    },
+    {
+      "id": "ushtrimi-4-paraqitja-e-grafeve-liste-dhe-matrice-fqinjesie",
+      "title": "Ushtrimi 4 — Paraqitja e Grafeve: Liste dhe Matrice Fqinjesie",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "dy-menyrat-kryesore-te-paraqitjes",
+      "title": "Dy menyrat kryesore te paraqitjes",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "1-lista-e-fqinjesise-adjacency-list",
+      "title": "1. Lista e Fqinjesise *(Adjacency List)*",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "2-matrica-e-fqinjesise-adjacency-matrix",
+      "title": "2. Matrica e Fqinjesise *(Adjacency Matrix)*",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
+      "id": "verejtje-per-digrafet",
+      "title": "Verejtje per digrafet",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pyetje",
+      "title": "Pyetje",
+      "level": 3,
+      "kind": "normal"
+    }
+  ],
+  "sections": [
+    {
+      "id": "teoria-bazat-e-teorise-se-grafeve",
+      "title": "Teoria — Bazat e Teorise se Grafeve",
+      "kind": "theory"
+    },
+    {
+      "id": "terminologjia-baze",
+      "title": "Terminologjia baze",
+      "kind": "normal"
+    },
+    {
+      "id": "llojet-kryesore-te-grafeve",
+      "title": "Llojet kryesore te grafeve",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-1-vizualizim-interaktiv-ndertoni-grafin-tuaj",
+      "title": "Ushtrimi 1 — Vizualizim Interaktiv: Ndërtoni Grafin Tuaj",
+      "kind": "exercise"
+    },
+    {
+      "id": "qellimi",
+      "title": "Qëllimi",
+      "kind": "normal"
+    },
+    {
+      "id": "kontrollat",
+      "title": "Kontrollat",
+      "kind": "normal"
+    },
+    {
+      "id": "cfare-te-vezhgoni",
+      "title": "Çfarë të vëzhgoni",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-2-bashkesia-e-pavarur-klika-grafi-dyanesor",
+      "title": "Ushtrimi 2: Bashkesia e Pavarur, Klika & Grafi Dyanesor",
+      "kind": "exercise"
+    },
+    {
+      "id": "menyra-nderto-blu-tab-per-te-kaluar",
+      "title": "Menyra Nderto (blu) — TAB per te kaluar",
+      "kind": "normal"
+    },
+    {
+      "id": "menyra-analizo-portokalli-tab-per-te-kaluar",
+      "title": "Menyra Analizo (portokalli) — TAB per te kaluar",
+      "kind": "normal"
+    },
+    {
+      "id": "provoni",
+      "title": "Provoni:",
+      "kind": "normal"
+    },
+    {
+      "id": "ngjyrat-e-brinjeve-dyanesor",
+      "title": "Ngjyrat e brinjeve (dyanesor):",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-3-llojet-e-grafeve-me-networkx",
+      "title": "Ushtrimi 3 — Llojet e Grafeve me NetworkX",
+      "kind": "exercise"
+    },
+    {
+      "id": "qellimi-2",
+      "title": "Qellimi",
+      "kind": "normal"
+    },
+    {
+      "id": "llojet-qe-do-te-shohim",
+      "title": "Llojet qe do te shohim",
+      "kind": "normal"
+    },
+    {
+      "id": "pyetje-per-diskutim",
+      "title": "Pyetje per diskutim",
+      "kind": "reflect"
+    },
+    {
+      "id": "ushtrimi-4-paraqitja-e-grafeve-liste-dhe-matrice-fqinjesie",
+      "title": "Ushtrimi 4 — Paraqitja e Grafeve: Liste dhe Matrice Fqinjesie",
+      "kind": "exercise"
+    },
+    {
+      "id": "dy-menyrat-kryesore-te-paraqitjes",
+      "title": "Dy menyrat kryesore te paraqitjes",
+      "kind": "normal"
+    },
+    {
+      "id": "1-lista-e-fqinjesise-adjacency-list",
+      "title": "1. Lista e Fqinjesise *(Adjacency List)*",
+      "kind": "normal"
+    },
+    {
+      "id": "2-matrica-e-fqinjesise-adjacency-matrix",
+      "title": "2. Matrica e Fqinjesise *(Adjacency Matrix)*",
+      "kind": "normal"
+    },
+    {
+      "id": "verejtje-per-digrafet",
+      "title": "Verejtje per digrafet",
+      "kind": "normal"
+    },
+    {
+      "id": "pyetje",
+      "title": "Pyetje",
+      "kind": "normal"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:dc0f8f9389d3402b",
+      "srcIndex": 0,
+      "intro": true
+    },
+    {
+      "type": "markdown",
+      "kind": "theory",
+      "label": "Teori",
+      "id": "teoria-bazat-e-teorise-se-grafeve",
+      "heading": "Teoria — Bazat e Teorise se Grafeve",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:5c2e06876f5d30b3",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "terminologjia-baze",
+      "heading": "Terminologjia baze",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:0d248da374992d1b",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "llojet-kryesore-te-grafeve",
+      "heading": "Llojet kryesore te grafeve",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:f37a918cbdfa3637",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-1-vizualizim-interaktiv-ndertoni-grafin-tuaj",
+      "heading": "Ushtrimi 1 — Vizualizim Interaktiv: Ndërtoni Grafin Tuaj",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "qellimi",
+      "heading": "Qëllimi",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:4b86576f67efa7c3",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "kontrollat",
+      "heading": "Kontrollat",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:64e7e6507cd96d96",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "cfare-te-vezhgoni",
+      "heading": "Çfarë të vëzhgoni",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:43ac13d468b9e2c1",
+      "srcIndex": 1
+    },
+    {
+      "type": "code",
+      "srcIndex": 2,
+      "interactive": true,
+      "html": "sha256:38cd7db83faaca83",
+      "raw": "sha256:a5fe5aae68b3636e",
+      "lines": 187,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "node_at"
+        },
+        {
+          "t": "def",
+          "n": "degree"
+        },
+        {
+          "t": "def",
+          "n": "has_loop"
+        },
+        {
+          "t": "def",
+          "n": "count_parallel"
+        },
+        {
+          "t": "def",
+          "n": "draw"
+        }
+      ],
+      "flags": {
+        "pygame": true,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-2-bashkesia-e-pavarur-klika-grafi-dyanesor",
+      "heading": "Ushtrimi 2: Bashkesia e Pavarur, Klika & Grafi Dyanesor",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e025b98ad5071752",
+      "srcIndex": 3
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "menyra-nderto-blu-tab-per-te-kaluar",
+      "heading": "Menyra Nderto (blu) — TAB per te kaluar",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:fa49842cb17a4796",
+      "srcIndex": 3
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "menyra-analizo-portokalli-tab-per-te-kaluar",
+      "heading": "Menyra Analizo (portokalli) — TAB per te kaluar",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:3f97c07d67ffd59b",
+      "srcIndex": 3
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "provoni",
+      "heading": "Provoni:",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:f16994fbe0598470",
+      "srcIndex": 3
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "ngjyrat-e-brinjeve-dyanesor",
+      "heading": "Ngjyrat e brinjeve (dyanesor):",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:53e363017c402d19",
+      "srcIndex": 3
+    },
+    {
+      "type": "code",
+      "srcIndex": 4,
+      "interactive": true,
+      "html": "sha256:0329e8d46c89e68e",
+      "raw": "sha256:a23e7a7fa01d2b84",
+      "lines": 449,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "node_at"
+        },
+        {
+          "t": "def",
+          "n": "adjacency"
+        },
+        {
+          "t": "def",
+          "n": "check_bipartite"
+        },
+        {
+          "t": "def",
+          "n": "edges_in_set"
+        },
+        {
+          "t": "def",
+          "n": "max_possible"
+        },
+        {
+          "t": "def",
+          "n": "analyze"
+        },
+        {
+          "t": "def",
+          "n": "draw"
+        }
+      ],
+      "flags": {
+        "pygame": true,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-3-llojet-e-grafeve-me-networkx",
+      "heading": "Ushtrimi 3 — Llojet e Grafeve me NetworkX",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "qellimi-2",
+      "heading": "Qellimi",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:2495bb514a9590b8",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "llojet-qe-do-te-shohim",
+      "heading": "Llojet qe do te shohim",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:290658ef96e8de89",
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "reflect",
+      "label": "Pyetje Reflektuese",
+      "id": "pyetje-per-diskutim",
+      "heading": "Pyetje per diskutim",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:2538960d4e7a26ee",
+      "srcIndex": 5
+    },
+    {
+      "type": "code",
+      "srcIndex": 6,
+      "interactive": false,
+      "html": "sha256:67789ee3f3fa408d",
+      "raw": "sha256:6691ce83ef9fead1",
+      "lines": 134,
+      "collapsed": true,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": true,
+        "matplotlib": true
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "image",
+          "file": "img-f7c957eed1c1.png",
+          "bytes": 121638
+        },
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "=======================================================\nKRAHASIMI I LLOJEVE Te GRAFEVE\n=======================================================\n\nGraf i thjeshte:\n  Rendi  |V| = 5\n  Permasa |E| = 5\n  A: fuqi = 2\n  B: fuqi = 2\n  C: fuqi = 2\n  D: fuqi = 3\n  E: fuqi = 1\n\nGraf i plote K₄:\n  Rendi  |V| = 4\n  Permasa |E| = 6\n  A: fuqi = 3\n  B: fuqi = 3\n  C: fuqi = 3\n  D: fuqi = 3\n\nDigraf:\n  Rendi  |V| = 5\n  Permasa |E| = 6\n  A: fuqi-hyrese=1, fuqi-dalese=1\n  B: fuqi-hyrese=2, fuqi-dalese=2\n  C: fuqi-hyrese=1, fuqi-dalese=1\n  D: fuqi-hyrese=1, fuqi-dalese=1\n  E: fuqi-hyrese=1, fuqi-dalese=1",
+          "truncated": false
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-4-paraqitja-e-grafeve-liste-dhe-matrice-fqinjesie",
+      "heading": "Ushtrimi 4 — Paraqitja e Grafeve: Liste dhe Matrice Fqinjesie",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "dy-menyrat-kryesore-te-paraqitjes",
+      "heading": "Dy menyrat kryesore te paraqitjes",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:10f77af30c00dfe9",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "1-lista-e-fqinjesise-adjacency-list",
+      "heading": "1. Lista e Fqinjesise *(Adjacency List)*",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:9222cbf6fd3b2722",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "2-matrica-e-fqinjesise-adjacency-matrix",
+      "heading": "2. Matrica e Fqinjesise *(Adjacency Matrix)*",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:798d3ed0cc20cf07",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "verejtje-per-digrafet",
+      "heading": "Verejtje per digrafet",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:4edfb033ed8adfb4",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "pyetje",
+      "heading": "Pyetje",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:9ed0a7e5b8cad4f0",
+      "srcIndex": 7
+    },
+    {
+      "type": "code",
+      "srcIndex": 8,
+      "interactive": false,
+      "html": "sha256:eb004a0e28588033",
+      "raw": "sha256:dbbf83ca19c3aa50",
+      "lines": 330,
+      "collapsed": true,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": true,
+        "matplotlib": true
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "image",
+          "file": "img-8ecdf1753963.png",
+          "bytes": 199783
+        },
+        {
+          "kind": "stream",
+          "stream": "stdout",
+          "text": "=======================================================\nPARAQITJA TEKSTUALE E GRAFEVE\n=======================================================\n\nGraf i Padrejtuar:\n  V = ['A', 'B', 'C', 'D', 'E']\n  E = [('A', 'B'), ('A', 'C'), ('B', 'D'), ('B', 'E'), ('C', 'D'), ('D', 'E')]\n  Lista e fqinjesise:\n    A: ['B', 'C']\n    B: ['A', 'D', 'E']\n    C: ['A', 'D']\n    D: ['B', 'C', 'E']\n    E: ['B', 'D']\n\nDigraf:\n  V = ['A', 'B', 'C', 'D', 'E']\n  E = [('A', 'B'), ('B', 'C'), ('B', 'D'), ('C', 'D'), ('C', 'E'), ('D', 'E'), ('E', 'A')]\n  Lista e fqinjesise:\n    A: ['B']\n    B: ['C', 'D']\n    C: ['D', 'E']\n    D: ['E']\n    E: ['A']\n\nMultigraf:\n  V = ['A', 'B', 'C', 'D', 'E']\n  E = [('A', 'B'), ('A', 'B'), ('A', 'C'), ('B', 'C'), ('B', 'C'), ('B', 'C'), ('C', 'D'), ('D', 'E'), ('D', 'D')]  (me dublikate)\n  Lake: 1\n  Lista e fqinjesise (me multiplicitet):\n    A: [B(×2), C]\n    B: [A(×2), C(×3)]\n    C: [A, B(×3), D]\n    D: [C, D(lak), E]\n    E: [D]\n\nMatrica (vlerat > 1 tregojne brinje paralele):\n       A   B   C   D   E\n  A    0   2   1   0   0\n  B    2   0   3   0   0\n  C    1   3   0   1   0\n  D    0   0   1   2   1\n  E    0   0   0   1   0",
+          "truncated": false
+        }
+      ]
+    }
+  ],
+  "imports": ["collections", "itertools", "matplotlib", "networkx", "numpy", "pygame"],
+  "dependencies": ["matplotlib", "networkx", "numpy", "pygame"],
+  "flags": {
+    "pygame": true,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": false,
+    "matplotlib": true,
+    "networkx": true,
+    "numpy": true
+  },
+  "missingScripts": [],
+  "stats": {
+    "cells": 10,
+    "markdown": 5,
+    "code": 5,
+    "codeLines": 1100
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": false,
+  "assets": [
+    {
+      "file": "img-8ecdf1753963.png",
+      "bytes": 199783
+    },
+    {
+      "file": "img-f7c957eed1c1.png",
+      "bytes": 121638
+    }
+  ]
+}

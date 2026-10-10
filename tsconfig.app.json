@@ -22,5 +22,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src/web", "src/shared"]
+  "include": ["src/web", "src/shared", "src/notebook"]
 }
