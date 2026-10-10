@@ -1,5 +1,16 @@
 import { sql } from 'drizzle-orm';
-import { check, foreignKey, index, integer, sqliteTable, text, unique, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import {
+  check,
+  customType,
+  foreignKey,
+  index,
+  integer,
+  primaryKey,
+  sqliteTable,
+  text,
+  unique,
+  uniqueIndex,
+} from 'drizzle-orm/sqlite-core';
 
 // Conventions for every table:
 // - ids are random text (UUIDv7), never sequential;
@@ -8,6 +19,18 @@ import { check, foreignKey, index, integer, sqliteTable, text, unique, uniqueInd
 //   so the database itself refuses a row that links to another organization's data;
 // - every unique index on a tenant-owned table includes org_id, so a uniqueness check never
 //   compares rows of two organizations (its error would reveal what the other one has).
+
+/** Bytes as Uint8Array (no Node Buffer in the Worker). D1 hands blobs back as ArrayBuffer or number[]. */
+const bytes = customType<{ data: Uint8Array; driverData: ArrayBuffer }>({
+  dataType: () => 'blob',
+  toDriver: (value) => value.buffer.slice(value.byteOffset, value.byteOffset + value.byteLength) as ArrayBuffer,
+  fromDriver: (value: unknown) =>
+    value instanceof ArrayBuffer
+      ? new Uint8Array(value)
+      : Array.isArray(value)
+        ? Uint8Array.from(value as number[])
+        : new Uint8Array(value as ArrayBufferLike),
+});
 
 const createdAt = () => integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`);
 
@@ -253,3 +276,106 @@ export const roles = sqliteTable('roles', {
   capabilities: text('capabilities', { mode: 'json' }).$type<string[]>().notNull(),
   position: integer('position').notNull(),
 });
+
+/** A lab's notebook (#14): the main material, extra exercises, or the solutions. */
+export const notebooks = sqliteTable(
+  'notebooks',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    labId: text('lab_id').notNull(),
+    kind: text('kind', { enum: ['main', 'extra', 'solution'] }).notNull(),
+    title: text('title').notNull(),
+    position: integer('position').notNull(),
+    /** The uploaded file's name, for downloads. */
+    originalName: text('original_name').notNull(),
+    /** SHA-256 of the original .ipynb, to notice re-uploads of the same file. */
+    sha256: text('sha256').notNull(),
+    /** Set once all its files are uploaded; until then nobody but staff sees it. */
+    readyAt: integer('ready_at', { mode: 'timestamp' }),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    unique('notebooks_id_org_unique').on(t.id, t.orgId),
+    foreignKey({
+      name: 'notebooks_lab_fk',
+      columns: [t.labId, t.orgId],
+      foreignColumns: [labs.id, labs.orgId],
+    }).onDelete('cascade'),
+    index('notebooks_lab_idx').on(t.labId, t.orgId),
+  ],
+);
+
+/**
+ * A stored file: a notebook's original, its converted cells, or one of its images and figures.
+ * Kept in file_chunks of at most 512 KB, since D1 allows 2 MB per value. Converted cells and
+ * Plotly figures arrive gzipped from the browser and are served as they are.
+ */
+export const files = sqliteTable(
+  'files',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    notebookId: text('notebook_id'),
+    name: text('name').notNull(),
+    mime: text('mime').notNull(),
+    encoding: text('encoding', { enum: ['identity', 'gzip'] })
+      .notNull()
+      .default('identity'),
+    /** Stored bytes (after any encoding). */
+    size: integer('size').notNull(),
+    chunkCount: integer('chunk_count').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    unique('files_id_org_unique').on(t.id, t.orgId),
+    foreignKey({
+      name: 'files_notebook_fk',
+      columns: [t.notebookId, t.orgId],
+      foreignColumns: [notebooks.id, notebooks.orgId],
+    }).onDelete('cascade'),
+    uniqueIndex('files_notebook_name_unique').on(t.orgId, t.notebookId, t.name),
+  ],
+);
+
+export const fileChunks = sqliteTable(
+  'file_chunks',
+  {
+    orgId: orgId(),
+    fileId: text('file_id').notNull(),
+    n: integer('n').notNull(),
+    data: bytes('data').notNull(),
+  },
+  (t) => [
+    primaryKey({ name: 'file_chunks_pk', columns: [t.orgId, t.fileId, t.n] }),
+    foreignKey({
+      name: 'file_chunks_file_fk',
+      columns: [t.fileId, t.orgId],
+      foreignColumns: [files.id, files.orgId],
+    }).onDelete('cascade'),
+  ],
+);
+
+/** A visualization shown at one cell of a notebook (#14): which one, and with what settings. */
+export const embeds = sqliteTable(
+  'embeds',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    notebookId: text('notebook_id').notNull(),
+    /** The cell's index in the .ipynb (srcIndex). */
+    cell: integer('cell').notNull(),
+    viz: text('viz').notNull(),
+    title: text('title'),
+    props: text('props', { mode: 'json' }).$type<Record<string, unknown>>(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    foreignKey({
+      name: 'embeds_notebook_fk',
+      columns: [t.notebookId, t.orgId],
+      foreignColumns: [notebooks.id, notebooks.orgId],
+    }).onDelete('cascade'),
+    uniqueIndex('embeds_notebook_cell_unique').on(t.orgId, t.notebookId, t.cell),
+  ],
+);
