@@ -178,6 +178,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-08 | Whoever creates a course becomes its pedagog; "copy from last year" brings the labs, not the groups, members or visibility | Decided |
 | 2026-10-10 | Labs are hidden until opened, for the course or per group (a group's own setting wins), optionally scheduled; students see solutions only from a set date; staff see every lab to prepare | Decided |
 | 2026-10-08 | Imported students' passwords are made in the pedagog's browser: 12 lowercase letters and digits (easy on a phone), shown once and printed on slips, never stored or exported in plain text | Decided |
+| 2026-10-10 | The 13 visualizations are platform content, open to everyone at `/visualizations`: they hold no tenant data, are already public on the course site, and show what the product does | Decided |
 
 Decisions were delegated to Claude ("you decide"). Record new ones here with the date.
 

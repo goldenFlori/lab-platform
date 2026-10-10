@@ -13,7 +13,7 @@ Product decisions live in `platform-vision`; this skill covers how to build it.
 |---|---|
 | Frontend | React + TypeScript SPA (Vite), TanStack Router, TanStack Query, HeroUI v3 + Tailwind v4, lucide-react |
 | Notebook display | markdown-it + KaTeX + Shiki (same as `site/scripts/notebook.mjs`), DOMPurify on display, Plotly lazy-loaded |
-| Visualizations | The 13 React visualizers + kit from `site/src/viz/`, reused as-is |
+| Visualizations | The 13 React visualizers + kit from `site/src/viz/`, in `src/viz`, each loaded lazily |
 | API | Hono on Cloudflare Workers; Zod validation; typed client (Hono RPC) |
 | Database | Cloudflare D1 (SQLite) through Drizzle ORM; migrations in git |
 | Real-time | Durable Objects (SQLite-backed, WebSocket Hibernation) |
@@ -32,7 +32,7 @@ Product decisions live in `platform-vision`; this skill covers how to build it.
   - `test/` (Vitest inside workerd) and `e2e/` (Playwright)
   - `src/shared` (Zod schemas and types for the API and the app; the app imports only types)
   - `src/notebook`: the notebook converter (#13), which runs in the browser.
-  - Planned: `src/viz` (visualizers).
+  - `src/viz`: the 13 visualizations and their kit (#14).
 - Version pins with a reason:
   - **Vitest 4.x:** `@cloudflare/vitest-pool-workers` 0.22 does not support Vitest 5 yet.
   - **TypeScript 5.9:** TypeScript 7 (the native compiler) is out; upgrade deliberately, not in
@@ -321,6 +321,31 @@ Built in #8: `src/api/auth/`, data access in `src/api/db/auth.ts`, routes in
   the 13 ids in `src/shared/visualizers.ts`, replaced as a whole with
   `PUT …/notebooks/:id/embeds`. Staff edit them in the app.
 - **Re-render all:** an admin action that re-converts the originals when the converter improves.
+
+## Visualizations
+
+- **Ported from the course site** (`site/src/viz`) with the same behaviour. The only changes are
+  lint and accessibility fixes.
+- **Loading:** `src/viz/index.ts` maps each id in `src/shared/visualizers.ts` to a lazy component
+  and a one-line summary.
+  - Each visualization is its own chunk (2–9 KB gzipped), plus the shared kit.
+  - `VizEmbed` loads one when it comes within 300 px of the screen.
+  - An error boundary keeps a failing one from taking the page down. The usual cause is a deploy:
+    an open tab's old chunks are gone, so it offers a reload.
+- **Props** from an embed override the defaults (preset, mode, values). An unknown preset falls
+  back to the first one.
+- **Public gallery** at `/visualizations` and `/visualizations/:id`. The visualizations are
+  platform content, not tenant data.
+- **Accessibility:**
+  - Each visualization is a region named by its title.
+  - Keys from its controls bubble up to it for the shortcuts: ← and → step, Space plays, Home
+    and End jump.
+  - A graph canvas with clickable vertices or edges is a group of keyboard buttons; otherwise it
+    is an image. Only a canvas with draggable vertices blocks touch scrolling.
+  - With HeroUI, put a `Button` directly inside `<Tooltip>`. `Tooltip.Trigger` wraps it in a
+    second focusable "button", which doubles every tab stop.
+- **Tests:** the end-to-end tests open all 13 on desktop and at 375 px. Each must have no errors,
+  must step forward, and must not overflow.
 
 ## Search
 

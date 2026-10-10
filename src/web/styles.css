@@ -243,3 +243,37 @@
     font-size: 8pt;
   }
 }
+
+/* ---------------------------------------------------------------------
+ *  Visualizations (src/viz), as on the course site
+ * ------------------------------------------------------------------- */
+@keyframes viz-dash {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+@keyframes viz-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.15;
+  }
+}
+.viz-flow {
+  animation: viz-dash 1.1s linear infinite;
+}
+.viz-pulse {
+  animation: viz-pulse 1.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .viz-flow,
+  .viz-pulse {
+    animation: none;
+  }
+}
+.viz-shell:fullscreen {
+  padding: 0;
+  background: var(--background);
+}
