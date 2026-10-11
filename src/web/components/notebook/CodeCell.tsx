@@ -129,7 +129,8 @@ export function CodeCell({
           <>
             <Suspense fallback={code}>
               <CodeEditor
-                value={edits.code(cell)}
+                key={edits.version}
+                initialValue={edits.code(cell)}
                 onChange={(next) => edits.change(cell, next)}
                 label={t.edits.editorLabel(runnable.number)}
                 autoFocus={editing && !edited}

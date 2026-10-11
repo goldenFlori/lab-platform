@@ -9,6 +9,10 @@ import { useEffect, useRef } from 'react';
 // The code editor for a cell (#49): CodeMirror with Python, loaded only when someone edits. Its
 // colors follow the site's code (the tok-* classes in styles.css). Tab indents; Esc then Tab moves
 // on, so the keyboard is never trapped.
+//
+// The editor owns its text once it opens: copying the page's value back in after each render would
+// overwrite keys typed while that render was on its way. A reset reaches it as a new mount (a new
+// `key`), with its new starting text.
 
 const theme = EditorView.theme({
   '&': { fontSize: '0.84rem', backgroundColor: 'transparent' },
@@ -22,28 +26,27 @@ const theme = EditorView.theme({
 });
 
 export default function CodeEditor({
-  value,
+  initialValue,
   onChange,
   label,
   autoFocus = false,
 }: {
-  value: string;
+  initialValue: string;
   onChange: (code: string) => void;
   label: string;
   autoFocus?: boolean;
 }) {
   const host = useRef<HTMLDivElement>(null);
-  const view = useRef<EditorView | null>(null);
   const change = useRef(onChange);
   change.current = onChange;
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: made once; later values arrive below
+  // biome-ignore lint/correctness/useExhaustiveDependencies: made once; a reset mounts a new editor
   useEffect(() => {
     if (!host.current) return;
     const editor = new EditorView({
       parent: host.current,
       state: EditorState.create({
-        doc: value,
+        doc: initialValue,
         extensions: [
           history(),
           indentOnInput(),
@@ -61,18 +64,9 @@ export default function CodeEditor({
         ],
       }),
     });
-    view.current = editor;
     if (autoFocus) editor.focus();
     return () => editor.destroy();
   }, []);
-
-  // A reset from outside (back to the original) replaces the text.
-  useEffect(() => {
-    const editor = view.current;
-    if (editor && editor.state.doc.toString() !== value) {
-      editor.dispatch({ changes: { from: 0, to: editor.state.doc.length, insert: value } });
-    }
-  }, [value]);
 
   return <div ref={host} className="nb-editor" />;
 }

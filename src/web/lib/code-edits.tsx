@@ -21,6 +21,9 @@ type CodeEditsValue = {
   /** Cells the user has changed. */
   count: number;
   saving: SaveState;
+  /** Changes when the code changes from outside the editors (loaded, or all put back), which
+   * then start again from it. */
+  version: number;
 };
 
 const CodeEditsContext = createContext<CodeEditsValue | null>(null);
@@ -34,8 +37,10 @@ const editsPath = (ref: NotebookRef) =>
 export const codeEditsQuery = (ref: NotebookRef) => ({
   queryKey: [...notebookQuery(ref).queryKey, 'edits'],
   queryFn: () => api<{ edits: CodeEdit[] }>(editsPath(ref)),
-  // This page holds the truth while it is open; the server is only told.
+  // This page holds the truth while it is open; the server is only told. Its copy goes when the page
+  // closes, so coming back loads what was saved since.
   staleTime: Number.POSITIVE_INFINITY,
+  gcTime: 0,
 });
 
 export function CodeEditsProvider({
@@ -51,13 +56,17 @@ export function CodeEditsProvider({
   const query = useQuery(codeEditsQuery(notebookRef));
   const [edits, setEdits] = useState<ReadonlyMap<number, string>>(new Map());
   const [saving, setSaving] = useState<SaveState>('saved');
+  const [version, setVersion] = useState(0);
   const pending = useRef(new Map<number, string>());
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const path = editsPath(notebookRef);
 
-  // The saved edits, once loaded for this notebook.
+  // The saved edits, once loaded for this notebook; anything typed before they arrived stays on top.
   useEffect(() => {
-    if (query.data) setEdits(new Map(query.data.edits.map((e) => [e.cell, e.code])));
+    if (!query.data) return;
+    const saved = query.data.edits.map((e) => [e.cell, e.code] as const);
+    setEdits((typed) => new Map([...saved, ...typed]));
+    setVersion((v) => v + 1);
   }, [query.data]);
 
   const send = useCallback(
@@ -137,13 +146,15 @@ export function CodeEditsProvider({
         pending.current.clear();
         clearTimeout(timer.current);
         setEdits(new Map());
+        setVersion((v) => v + 1);
         setSaving('saved');
         void api(path, { method: 'DELETE' }).catch(() => setSaving('failed'));
       },
       count: [...edits].filter(([cell, code]) => code !== originals.get(cell)).length,
       saving,
+      version,
     };
-  }, [edits, flush, originals, path, saving]);
+  }, [edits, flush, originals, path, saving, version]);
 
   return <CodeEditsContext.Provider value={value}>{children}</CodeEditsContext.Provider>;
 }
