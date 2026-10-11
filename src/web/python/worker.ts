@@ -61,6 +61,12 @@ const display = {
     stderr.flush();
     post({ type: 'figure', id: current, kind: 'plotly', data: json });
   },
+  /** The steps vizlab recorded in this run (#69), as JSON. */
+  vizlab(json: string) {
+    stdout.flush();
+    stderr.flush();
+    post({ type: 'figure', id: current, kind: 'vizlab', data: json });
+  },
 };
 
 /** "Loading numpy, matplotlib" → the names, for the page to say in its language. */
