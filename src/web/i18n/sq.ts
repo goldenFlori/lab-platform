@@ -446,6 +446,20 @@ export const sq = {
     restartHelp: 'Fshin të gjitha variablat, si një kernel i ri.',
     clearAll: 'Shfaq rezultatet e ruajtura',
   },
+  edits: {
+    edit: 'Ndrysho kodin',
+    editorLabel: (n: number) => `Kodi i qelizës ${n}`,
+    edited: 'E ndryshuar',
+    reset: 'Rikthe kodin origjinal',
+    original: 'Shiko kodin origjinal',
+    count: (n: number) => `Keni ndryshuar ${n} ${n === 1 ? 'qelizë' : 'qeliza'}`,
+    saved: 'U ruajt në llogarinë tuaj',
+    saving: 'Duke ruajtur…',
+    failed: 'Ndryshimet nuk u ruajtën. Kontrolloni internetin; provojmë sërish me ndryshimin tjetër.',
+    resetAll: 'Rikthe gjithë kodin origjinal',
+    resetAllTitle: 'Të rikthehet gjithë kodi origjinal?',
+    resetAllText: 'Ndryshimet tuaja në këtë fletore fshihen. Kjo nuk zhbëhet.',
+  },
 };
 
 export type Messages = typeof sq;

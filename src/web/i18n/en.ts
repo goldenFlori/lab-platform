@@ -451,4 +451,18 @@ export const en: Messages = {
     restartHelp: 'Clears every variable, like a fresh kernel.',
     clearAll: 'Show the saved outputs',
   },
+  edits: {
+    edit: 'Edit the code',
+    editorLabel: (n: number) => `Code of cell ${n}`,
+    edited: 'Edited',
+    reset: 'Restore the original code',
+    original: 'See the original code',
+    count: (n: number) => `You have changed ${n} ${n === 1 ? 'cell' : 'cells'}`,
+    saved: 'Saved to your account',
+    saving: 'Saving…',
+    failed: 'Your changes were not saved. Check your connection; we try again with your next change.',
+    resetAll: 'Restore all the original code',
+    resetAllTitle: 'Restore all the original code?',
+    resetAllText: 'Your changes in this notebook are deleted. This cannot be undone.',
+  },
 };

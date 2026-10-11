@@ -45,7 +45,7 @@ export function RunButtons({ cell }: { cell: CodeCell }) {
           variant="primary"
           className="h-7 gap-1 px-2 text-xs"
           aria-label={t.python.runLabel(runnable.number)}
-          onPress={() => void python.session.run(runnable.key, runnable.code, runnable.filename)}
+          onPress={() => void python.run(cell)}
         >
           <Play className="size-3" /> {t.python.run}
         </Button>
@@ -67,7 +67,7 @@ export function useRunOutput(cell: CodeCell) {
       run={run}
       starting={state.status === 'starting'}
       packages={state.running === runnable.key ? state.packages : null}
-      timed={TIMING.test(runnable.code)}
+      timed={TIMING.test(cell.raw)}
       onAnswer={(text) => python.session.answer(text)}
       onClear={() => python.session.clear(runnable.key)}
     />

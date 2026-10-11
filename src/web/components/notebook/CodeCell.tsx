@@ -1,10 +1,16 @@
-import { Check, ChevronDown, Code2, Copy, MonitorSmartphone } from 'lucide-react';
-import { useState } from 'react';
+import { Chip } from '@heroui/react';
+import { Check, ChevronDown, Code2, Copy, MonitorSmartphone, Pencil, RotateCcw } from 'lucide-react';
+import { lazy, Suspense, useState } from 'react';
 import type { CodeCell as Cell } from '../../../notebook/types';
 import { useT } from '../../i18n';
+import { useCodeEdits } from '../../lib/code-edits';
 import { sanitize } from '../../lib/sanitize';
+import { usePython } from '../../python/PythonProvider';
 import { Output } from './Output';
 import { RunButtons, useRunOutput } from './RunControls';
+
+// Loaded the first time someone edits a cell (#49).
+const CodeEditor = lazy(() => import('./CodeEditor'));
 
 /**
  * One code cell. Short code shows in full and long code folds away. Code that opens a desktop window
@@ -22,6 +28,13 @@ export function CodeCell({
   presenting?: boolean;
 }) {
   const t = useT();
+  const edits = useCodeEdits();
+  const runnable = usePython()?.cells.get(cell);
+  const [editing, setEditing] = useState(false);
+  // On the lab page, a cell that can run can be edited; the student's own version replaces it.
+  const editable = !presenting && edits !== null && runnable !== undefined;
+  const edited = editable && edits.edited(cell);
+  const editorOpen = editable && (editing || edited);
   const code = (
     <div
       className="nb-shiki"
@@ -77,11 +90,62 @@ export function CodeCell({
             <Code2 className="size-3.5" aria-hidden="true" /> Python
           </span>
           <span className="flex items-center gap-1.5">
+            {edited && (
+              <Chip size="sm" variant="soft" color="accent" className="hidden sm:inline-flex">
+                {t.edits.edited}
+              </Chip>
+            )}
+            {editable &&
+              (edited ? (
+                <button
+                  type="button"
+                  aria-label={t.edits.reset}
+                  title={t.edits.reset}
+                  onClick={() => {
+                    edits.reset(cell);
+                    setEditing(false);
+                  }}
+                  className="grid size-7 place-items-center rounded-lg text-muted transition-colors hover:bg-default hover:text-foreground"
+                >
+                  <RotateCcw className="size-3.5" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  aria-label={t.edits.edit}
+                  aria-pressed={editing}
+                  title={t.edits.edit}
+                  onClick={() => setEditing(!editing)}
+                  className={`grid size-7 place-items-center rounded-lg transition-colors hover:bg-default hover:text-foreground ${editing ? 'bg-accent-soft text-accent' : 'text-muted'}`}
+                >
+                  <Pencil className="size-3.5" />
+                </button>
+              ))}
             {!presenting && <RunButtons cell={cell} />}
-            <CopyButton text={cell.raw} />
+            <CopyButton text={edits && editable ? edits.code(cell) : cell.raw} />
           </span>
         </div>
-        {cell.collapsed && !presenting ? (
+        {editorOpen ? (
+          <>
+            <Suspense fallback={code}>
+              <CodeEditor
+                value={edits.code(cell)}
+                onChange={(next) => edits.change(cell, next)}
+                label={t.edits.editorLabel(runnable.number)}
+                autoFocus={editing && !edited}
+              />
+            </Suspense>
+            {edited && (
+              <details className="group border-t border-[var(--code-border)]">
+                <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-2 text-xs text-muted select-none hover:text-foreground [&::-webkit-details-marker]:hidden">
+                  <ChevronDown className="size-3.5 transition-transform group-open:rotate-180" aria-hidden="true" />
+                  {t.edits.original}
+                </summary>
+                <div className="border-t border-[var(--code-border)] opacity-80">{code}</div>
+              </details>
+            )}
+          </>
+        ) : cell.collapsed && !presenting ? (
           <details className="group">
             <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-2.5 text-sm text-muted select-none hover:text-foreground [&::-webkit-details-marker]:hidden">
               <ChevronDown className="size-4 transition-transform group-open:rotate-180" aria-hidden="true" />
