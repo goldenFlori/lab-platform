@@ -154,3 +154,35 @@ describe('vizlab (#69)', () => {
     expect(text).toContain('vizlab');
   });
 });
+
+describe('vizlab on graphs (#70)', () => {
+  it('records a graph and what a traversal does on it', async () => {
+    vizlabSent.length = 0;
+    await run(
+      [
+        'import vizlab',
+        "G = vizlab.graph({'A': {'B': 2, 'C': 5}, 'B': {'C': 1}, 'C': {}})",
+        "vizlab.visit('A')",
+        "vizlab.relax('A', 'B', 2)",
+        "vizlab.mark(('A', 'B'))",
+      ].join('\n'),
+    );
+    const sent = JSON.parse(vizlabSent[0] ?? '{}') as { kind: string; events: Record<string, unknown>[] };
+    expect(sent.kind).toBe('graph');
+    expect(sent.events).toEqual([
+      {
+        op: 'graph',
+        nodes: ['A', 'B', 'C'],
+        edges: [
+          ['A', 'B', 2],
+          ['A', 'C', 5],
+          ['B', 'C', 1],
+        ],
+        directed: false,
+      },
+      { op: 'visit', node: 'A' },
+      { op: 'relax', u: 'A', v: 'B', dist: 2 },
+      { op: 'mark', u: 'A', v: 'B', state: 'tree' },
+    ]);
+  });
+});
