@@ -1,15 +1,16 @@
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import type { StoredNotebook } from '../../notebook/stored';
-import type { CodeCell } from '../../notebook/types';
+import type { Cell, CodeCell } from '../../notebook/types';
 import { cellFile } from './runner';
 import { PythonSession, type SessionState } from './session';
 
-// Running a notebook's code on the lab page (#47). One Python per notebook shown; each code cell
-// finds itself here by identity, so the notebook view needs no extra props.
+// Running a notebook's code on the lab page (#47) and in presentations (#50). One Python per
+// notebook shown; each code cell finds itself here by identity, so the notebook view needs no extra
+// props.
 
 type RunnableCell = { key: string; number: number; filename: string };
 
-type PythonContextValue = {
+export type PythonContextValue = {
   session: PythonSession;
   cells: ReadonlyMap<CodeCell, RunnableCell>;
   /** Runs one cell: the student's own code where they changed it (#49), else the notebook's. */
@@ -23,7 +24,7 @@ const PythonContext = createContext<PythonContextValue | null>(null);
 export function PythonProvider({
   notebookId,
   notebook,
-  codeFor = (cell) => cell.raw,
+  codeFor,
   children,
 }: {
   notebookId: string;
@@ -32,16 +33,31 @@ export function PythonProvider({
   codeFor?: (cell: CodeCell) => string;
   children: ReactNode;
 }) {
+  const value = useNotebookPython(notebookId, notebook.cells, codeFor);
+  return <PythonScope value={value}>{children}</PythonScope>;
+}
+
+/** Shares a notebook's Python with the cells below; for a page that also drives it (presentation). */
+export function PythonScope({ value, children }: { value: PythonContextValue; children: ReactNode }) {
+  return <PythonContext.Provider value={value}>{children}</PythonContext.Provider>;
+}
+
+/** One Python for a notebook's cells: a new notebook gets a new Python, with a fresh namespace. */
+export function useNotebookPython(
+  notebookId: string,
+  notebookCells: readonly Cell[],
+  codeFor: (cell: CodeCell) => string = (cell) => cell.raw,
+): PythonContextValue {
   const code = useRef(codeFor);
   code.current = codeFor;
   // biome-ignore lint/correctness/useExhaustiveDependencies: a new notebook gets a new Python, with a fresh namespace
   const session = useMemo(() => new PythonSession(), [notebookId]);
   useEffect(() => () => session.dispose(), [session]);
 
-  const value = useMemo<PythonContextValue>(() => {
+  return useMemo<PythonContextValue>(() => {
     const cells = new Map<CodeCell, RunnableCell>();
     const order: CodeCell[] = [];
-    for (const cell of notebook.cells) {
+    for (const cell of notebookCells) {
       if (cell.type !== 'code') continue;
       order.push(cell);
       // Desktop-window code (pygame, tkinter) cannot run here; its visualization stands in for it.
@@ -68,12 +84,10 @@ export function PythonProvider({
         }
       },
     };
-  }, [notebook, session]);
-
-  return <PythonContext.Provider value={value}>{children}</PythonContext.Provider>;
+  }, [notebookCells, session]);
 }
 
-/** The notebook's Python, where code can run here (not in presentations yet). */
+/** The notebook's Python, where code can run here: the lab page and presentations. */
 export function usePython() {
   return useContext(PythonContext);
 }
