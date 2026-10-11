@@ -18,6 +18,10 @@
     // API requests always reach the Worker; everything else is the app.
     "run_worker_first": ["/api/*"]
   },
+  // Live Lab sessions (#65): one Durable Object per session holds its connections, with WebSocket
+  // Hibernation so an idle class costs nothing. SQLite-backed, as the free plan requires.
+  "durable_objects": { "bindings": [{ "name": "LIVE", "class_name": "LiveSession" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["LiveSession"] }],
   // One shared database for all tenants. In production it is created with the EU jurisdiction,
   // so the data never leaves the EU; locally it lives in .wrangler/state.
   "d1_databases": [

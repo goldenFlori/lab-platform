@@ -34,6 +34,7 @@ import {
   labAccess,
   labActivity,
   labs,
+  liveSessions,
   memberships,
   notebooks,
   searchSections,
@@ -1026,6 +1027,45 @@ function tenantStaff(db: Db, orgId: string) {
   };
 }
 
+/** Live Lab sessions (#65): at most one running per lab. */
+function tenantLive(db: Db, orgId: string) {
+  const fields = {
+    id: liveSessions.id,
+    labId: liveSessions.labId,
+    hostId: liveSessions.hostId,
+    hostName: users.fullName,
+    startedAt: liveSessions.startedAt,
+  };
+  return {
+    async running(labId: string) {
+      const [row] = await db
+        .select(fields)
+        .from(liveSessions)
+        .innerJoin(users, eq(users.id, liveSessions.hostId))
+        .where(and(eq(liveSessions.orgId, orgId), eq(liveSessions.labId, labId), isNull(liveSessions.endedAt)));
+      return row;
+    },
+
+    /** Starts one, or gives the one already running. */
+    async start(labId: string, hostId: string) {
+      await rethrowMissingParent(
+        db
+          .insert(liveSessions)
+          .values({ id: uuidv7(), orgId, labId, hostId, startedAt: new Date() })
+          .onConflictDoNothing(),
+      );
+      return this.running(labId);
+    },
+
+    async end(id: string) {
+      await db
+        .update(liveSessions)
+        .set({ endedAt: new Date() })
+        .where(and(eq(liveSessions.orgId, orgId), eq(liveSessions.id, id), isNull(liveSessions.endedAt)));
+    },
+  };
+}
+
 export function forTenant(db: Db, orgId: string) {
   const members = tenantUsers(db, orgId);
   return {
@@ -1045,6 +1085,7 @@ export function forTenant(db: Db, orgId: string) {
     submissions: tenantSubmissions(db, orgId),
     grading: tenantGrading(db, orgId),
     staff: tenantStaff(db, orgId),
+    live: tenantLive(db, orgId),
   };
 }
 

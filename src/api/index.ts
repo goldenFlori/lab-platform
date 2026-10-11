@@ -8,6 +8,8 @@ import { authRoutes, meRoutes } from './routes/auth';
 import { joinRoutes } from './routes/join';
 import { orgRoutes } from './routes/orgs';
 
+export { LiveSession } from './live/session';
+
 export const app = new Hono<AppEnv>().basePath('/api');
 
 app.notFound(notFound);

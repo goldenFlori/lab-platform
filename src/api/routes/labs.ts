@@ -7,6 +7,7 @@ import { NotFoundError } from '../db/tenant';
 import { labActivityRoutes } from './activity';
 import { forbidden, invalidRequest } from './course-context';
 import { type Lab, type LabContext, labContext, openToViewer, visibleLab } from './lab-context';
+import { liveRoutes } from './live';
 import { notebookRoutes } from './notebooks';
 
 // Labs of a course and when they are open (#12), under /api/orgs/:org/courses/:courseId/labs.
@@ -128,4 +129,5 @@ export const labRoutes = new Hono<TenantEnv>()
   })
 
   .route('/:labId/notebooks', notebookRoutes)
-  .route('/:labId/activity', labActivityRoutes);
+  .route('/:labId/activity', labActivityRoutes)
+  .route('/:labId/live', liveRoutes);
