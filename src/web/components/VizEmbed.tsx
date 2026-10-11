@@ -45,7 +45,7 @@ export function VizEmbed({ viz, props, label }: { viz: VisualizerId; props?: Viz
   );
 }
 
-function VizPlaceholder() {
+export function VizPlaceholder() {
   const t = useT();
   return (
     <div className="grid min-h-96 place-items-center rounded-3xl border border-border bg-surface" aria-busy="true">
@@ -55,7 +55,7 @@ function VizPlaceholder() {
 }
 
 /** A visualization that fails (most often: its code changed with a new release) does not take the page down. */
-class VizErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+export class VizErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
 
   static getDerivedStateFromError() {

@@ -18,6 +18,7 @@ import { usePython, useSessionState } from '../../python/PythonProvider';
 import type { CheckResult } from '../../python/runner';
 import type { CellRun } from '../../python/session';
 import { PlotlyFigure } from './PlotlyFigure';
+import { YourCodeViz } from './YourCodeViz';
 
 // Running code on the lab page (#47): the buttons in a code cell's header, the output of a run, and
 // a bar with Python's state once it has started. Presentations (#50) run with larger buttons; the
@@ -176,6 +177,9 @@ function LiveOutput({
                 alt={t.python.figure}
                 className="my-2 block h-auto max-w-full rounded-xl bg-white p-1"
               />
+            ) : block.figure === 'vizlab' ? (
+              // biome-ignore lint/suspicious/noArrayIndexKey: output blocks only grow; i is their order
+              <YourCodeViz key={i} src={block.url} />
             ) : (
               // biome-ignore lint/suspicious/noArrayIndexKey: output blocks only grow; i is their order
               <div key={i} className="my-2 -mx-4 border-y border-separator">
