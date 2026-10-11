@@ -45,8 +45,10 @@ describe('search sections', () => {
     ]);
   });
 
-  it('indexes every course notebook within the limits, at anchors the lab page has', async () => {
-    for (const [path, raw] of Object.entries(notebooks)) {
+  // One test per notebook: together they take longer than a test may on a slow machine.
+  it.each(Object.entries(notebooks).map(([path, raw]) => [path.split('/').pop() as string, raw]))(
+    'indexes %s within the limits, at anchors the lab page has',
+    async (path, raw) => {
       const nb = toStored(await renderNotebook(raw));
       const anchors = new Set(nb.cells.flatMap((cell) => (cell.type === 'markdown' && cell.id ? [cell.id] : [])));
       const sections = searchSections(nb);
@@ -58,8 +60,8 @@ describe('search sections', () => {
         // KaTeX's drawn copy and markup never reach the index.
         expect(s.text, path).not.toMatch(/katex|class=|aria-hidden|&(amp|lt|gt|quot|nbsp);/);
       }
-    }
-  });
+    },
+  );
 });
 
 describe('matching in the search palette', () => {
