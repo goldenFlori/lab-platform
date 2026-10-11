@@ -161,6 +161,10 @@ Built in #10, under `/api/orgs/:org/courses` (`src/api/routes/courses.ts`).
   group, even in another organization, because the code is the invitation. Joining twice
   changes nothing. Codes of archived courses stop working. 10 wrong codes per user in
   15 minutes, then 429.
+- **Deleting** (`course.manage`, #80): "Fshi kursin" on the course page, after a popup that says
+  what goes with it; `DELETE /courses/:id` removes the course and the database cascades to its
+  groups, memberships, labs, notebooks and files, students' code, submissions, grades and activity.
+  Accounts stay. Archiving remains the way to end a year without losing anything.
 - **Archiving** (`course.manage`) ends the year: the course stays readable and is listed after
   the current ones. It can be undone.
 - **Pages:**
