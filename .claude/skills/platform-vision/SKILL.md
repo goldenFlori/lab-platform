@@ -222,6 +222,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-11:** #78 fixed: ▶ waits until a student's saved code has loaded (PR #79).
 - **2026-10-11:** #80 done. Staff who manage a course can delete it, after a confirmation popup that
   says what goes with it (PR #81).
+- **2026-10-11:** #82 fixed: every dropdown draws its arrow inset from the edge (PR #83).
 - **Next:** try Phase 2 and 3 in class with the FSHN course and collect pilot data for the Startup
   Albania application (see `platform-business`); then plan Phase 4 (AI), which needs funding.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
