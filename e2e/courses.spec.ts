@@ -1,5 +1,7 @@
 import { type Browser, expect, type Page, test } from '@playwright/test';
 import { E2E_ACCOUNT, E2E_STAFF } from './account';
+import { courseWithLab } from './notebooks';
+import { signIn } from './sign-in';
 
 test.beforeEach(({ page }) => {
   page.on('pageerror', (error) => {
@@ -95,4 +97,17 @@ test('an unknown course shows the 404 page', async ({ browser, isMobile }) => {
   await page.goto('/o/e2e/courses/not-a-course');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Kjo rrugë nuk ekziston në graf');
   await page.context().close();
+});
+
+test('a pedagog deletes a course after confirming in the popup', async ({ browser, isMobile }) => {
+  const staff = await signIn(browser, E2E_STAFF, isMobile);
+  const { course } = await courseWithLab(staff, 'Fshije');
+  await staff.goto(`/o/e2e/courses/${course.id}`);
+  await staff.getByRole('button', { name: 'Fshi kursin' }).click();
+  const popup = staff.getByRole('alertdialog');
+  await expect(popup).toContainText(`Të fshihet „${course.title}”?`);
+  await popup.getByRole('button', { name: 'Fshi përgjithmonë' }).click();
+  await expect(staff).toHaveURL(/\/courses$/);
+  await expect(staff.getByRole('link', { name: course.title })).toHaveCount(0);
+  await staff.context().close();
 });
