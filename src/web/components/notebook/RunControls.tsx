@@ -8,7 +8,8 @@ import type { CellRun } from '../../python/session';
 import { PlotlyFigure } from './PlotlyFigure';
 
 // Running code on the lab page (#47): the buttons in a code cell's header, the output of a run, and
-// a bar with Python's state once it has started.
+// a bar with Python's state once it has started. Presentations (#50) run with larger buttons; the
+// `run-text` classes grow the output for a projector (styles.css).
 
 /** ▶ and "run the cells above", for a cell that can run here; nothing otherwise. */
 export function RunButtons({ cell }: { cell: CodeCell }) {
@@ -51,6 +52,35 @@ export function RunButtons({ cell }: { cell: CodeCell }) {
         </Button>
       )}
     </span>
+  );
+}
+
+/** ▶ (R) and "run the cells above" on a presentation's code step, for a cell that can run. */
+export function PresentRunButtons({ cell }: { cell: CodeCell }) {
+  const t = useT();
+  const python = usePython();
+  const state = useSessionState(python?.session);
+  const runnable = python?.cells.get(cell);
+  if (!python || !runnable) return null;
+  const run = state.runs.get(runnable.key);
+  const busy = run?.state === 'running' || run?.state === 'queued';
+  return (
+    <div className="flex flex-wrap gap-2">
+      {busy ? (
+        <Button variant="secondary" onPress={() => python.session.stop()}>
+          <Square className="size-4" /> {t.present.stop}
+        </Button>
+      ) : (
+        <Button variant="primary" onPress={() => void python.run(cell)}>
+          <Play className="size-4" /> {t.present.run}
+        </Button>
+      )}
+      {runnable.number > 1 && (
+        <Button variant="ghost" onPress={() => void python.runAbove(cell)}>
+          <ListOrdered className="size-4" /> {t.python.runAbove}
+        </Button>
+      )}
+    </div>
   );
 }
 
@@ -136,7 +166,7 @@ function LiveOutput({
             <pre
               // biome-ignore lint/suspicious/noArrayIndexKey: output blocks only grow; i is their order
               key={i}
-              className={`overflow-x-auto font-mono text-[0.8rem] leading-relaxed whitespace-pre-wrap ${
+              className={`run-text overflow-x-auto font-mono text-[0.8rem] leading-relaxed whitespace-pre-wrap ${
                 block.stream === 'stderr' ? 'text-danger' : 'nb-stream text-foreground/90'
               }`}
             >
@@ -145,13 +175,13 @@ function LiveOutput({
           ),
         )}
         {outcome?.kind === 'ok' && outcome.value !== null && (
-          <pre className="nb-stream overflow-x-auto font-mono text-[0.8rem] whitespace-pre-wrap text-foreground/90">
+          <pre className="run-text nb-stream overflow-x-auto font-mono text-[0.8rem] whitespace-pre-wrap text-foreground/90">
             {outcome.value}
           </pre>
         )}
         {run.asking && <AnswerInput onAnswer={onAnswer} />}
         {waiting && !run.asking && (
-          <p className="mt-1 flex items-center gap-2 text-sm text-muted">
+          <p className="run-note mt-1 flex items-center gap-2 text-sm text-muted">
             <Spinner size="sm" />
             {run.state === 'queued'
               ? starting
@@ -162,21 +192,32 @@ function LiveOutput({
                 : t.python.running}
           </p>
         )}
-        {outcome?.kind === 'error' && (
-          <div role="alert" className="mt-1">
-            <p className="flex items-center gap-1.5 text-xs font-semibold text-danger">
-              <AlertTriangle className="size-3.5" aria-hidden="true" /> {t.python.error}
-            </p>
-            <pre className="mt-1 overflow-x-auto rounded-xl bg-danger/8 p-3 font-mono text-[0.78rem] whitespace-pre-wrap text-danger">
-              {outcome.traceback}
-            </pre>
-          </div>
-        )}
-        {outcome?.kind === 'interrupted' && <p className="mt-1 text-sm text-warning">{t.python.stopped}</p>}
+        {outcome?.kind === 'error' && <ErrorOutput traceback={outcome.traceback} />}
+        {outcome?.kind === 'interrupted' && <p className="run-note mt-1 text-sm text-warning">{t.python.stopped}</p>}
         {run.truncated && <p className="mt-1 text-xs text-muted">{t.python.truncated}</p>}
         {!waiting && run.output.length === 0 && outcome?.kind === 'ok' && outcome.value === null && (
           <p className="text-sm text-muted">✓</p>
         )}
+      </div>
+    </div>
+  );
+}
+
+/** A failed run: where it failed, then the error itself in bold, the line to read out first. */
+function ErrorOutput({ traceback }: { traceback: string }) {
+  const t = useT();
+  const lines = traceback.trimEnd().split('\n');
+  const error = lines.pop() ?? '';
+  return (
+    <div role="alert" className="mt-1">
+      <p className="flex items-center gap-1.5 text-xs font-semibold text-danger">
+        <AlertTriangle className="size-3.5" aria-hidden="true" /> {t.python.error}
+      </p>
+      <div className="mt-1 overflow-x-auto rounded-xl bg-danger/8 p-3 font-mono text-danger">
+        {lines.length > 0 && (
+          <pre className="run-text mb-1 text-[0.78rem] whitespace-pre-wrap opacity-80">{lines.join('\n')}</pre>
+        )}
+        <p className="run-text text-[0.84rem] font-semibold whitespace-pre-wrap">{error}</p>
       </div>
     </div>
   );

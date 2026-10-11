@@ -339,8 +339,11 @@ export const en: Messages = {
     nothing: 'This lab has no notebook to present yet.',
     loadFailed: 'The notebook did not load. Please try again.',
     loading: 'Loading the notebook…',
+    run: 'Run (R)',
+    stop: 'Stop (R)',
     reveal: 'Show the output (Space)',
-    keys: (solution: boolean) => `← → move · Space shows the output${solution ? ' · S solution' : ''} · Esc leave`,
+    keys: (solution: boolean) =>
+      `← → move · Space shows the output · R runs the code${solution ? ' · S solution' : ''} · Esc leave`,
     back: 'Back to the lab',
   },
   viz: {

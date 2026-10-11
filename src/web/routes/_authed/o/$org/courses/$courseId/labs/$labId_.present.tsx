@@ -4,11 +4,12 @@ import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { Eye, KeyRound, Maximize2, Minimize2, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isSolutionOf, type Slide, slidesOf } from '../../../../../../../../notebook/slides';
-import type { Cell } from '../../../../../../../../notebook/types';
+import type { Cell, CodeCell as NotebookCodeCell } from '../../../../../../../../notebook/types';
 import { isVisualizerId } from '../../../../../../../../shared/visualizers';
 import { CodeCell } from '../../../../../../../components/notebook/CodeCell';
 import { Markdown, SECTION_KINDS, sectionLabel } from '../../../../../../../components/notebook/NotebookView';
 import { Output } from '../../../../../../../components/notebook/Output';
+import { PresentRunButtons, useRunOutput } from '../../../../../../../components/notebook/RunControls';
 import { VizEmbed } from '../../../../../../../components/VizEmbed';
 import { t as messages, useT } from '../../../../../../../i18n';
 import { ApiError } from '../../../../../../../lib/api';
@@ -21,8 +22,13 @@ import {
   notebooksQuery,
   renderedQuery,
 } from '../../../../../../../lib/notebooks';
+import { PythonScope, useNotebookPython, useSessionState } from '../../../../../../../python/PythonProvider';
 
 // Presentation mode (#15): a lab's notebook in class, fullscreen, one step at a time, keyboard first.
+// Code steps run live (#50) in one Python for the notebook, so a lab runs top to bottom as in
+// Jupyter; with the solution shown, its solved code runs instead.
+
+const NO_CELLS: readonly Cell[] = [];
 
 export const Route = createFileRoute('/_authed/o/$org/courses/$courseId/labs/$labId_/present')({
   validateSearch: (search: Record<string, unknown>): { notebook?: string; step?: number } => ({
@@ -91,24 +97,40 @@ function Presenter() {
   const outputs = code?.type === 'code' ? code.outputs : [];
   const isRevealed = revealed.has(index);
 
+  const python = useNotebookPython(current?.id ?? '', notebook?.cells ?? NO_CELLS, (cell) => {
+    const solved = showSolution ? solution?.cells[notebook?.cells.indexOf(cell) ?? -1] : undefined;
+    return solved?.type === 'code' ? solved.raw : cell.raw;
+  });
+  const pythonState = useSessionState(python.session);
+  // A run belongs to the notebook's own cell, also while its solved code is shown.
+  const stepCell = slide?.kind === 'code' ? slide.cell : undefined;
+  const runnable = stepCell ? python.cells.get(stepCell) : undefined;
+  const live = runnable ? pythonState.runs.get(runnable.key) : undefined;
+  const runStep = useCallback(() => {
+    if (!stepCell || !runnable) return;
+    if (live?.state === 'running' || live?.state === 'queued') python.session.stop();
+    else void python.run(stepCell);
+  }, [python, stepCell, runnable, live?.state]);
+
   const go = useCallback(
     (to: number) => navigate({ search: (s) => ({ ...s, step: to > 0 ? to : undefined }), replace: true }),
     [navigate],
   );
+  // The saved output; a live run stands in for it until cleared.
   const toggleReveal = useCallback(() => {
-    if (outputs.length === 0) return;
+    if (outputs.length === 0 || live) return;
     setRevealed((set) => {
       const next = new Set(set);
       if (next.has(index)) next.delete(index);
       else next.add(index);
       return next;
     });
-  }, [outputs.length, index]);
-  // → shows a step's output first, like a slide that builds, then moves on.
+  }, [outputs.length, index, live]);
+  // → shows a step's output first, like a slide that builds, then moves on; a step that ran shows its own.
   const forward = useCallback(() => {
-    if (outputs.length > 0 && !revealed.has(index)) toggleReveal();
+    if (outputs.length > 0 && !revealed.has(index) && !live) toggleReveal();
     else if (index < last) go(index + 1);
-  }, [outputs.length, revealed, index, last, toggleReveal, go]);
+  }, [outputs.length, revealed, index, live, last, toggleReveal, go]);
 
   const stage = useRef<HTMLDivElement>(null);
 
@@ -185,6 +207,10 @@ function Presenter() {
         case 'S':
           if (solution) setSolved((on) => !on);
           break;
+        case 'r':
+        case 'R':
+          runStep();
+          break;
         case 'Escape':
           exit();
           break;
@@ -195,7 +221,7 @@ function Presenter() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [forward, go, index, last, toggleReveal, solution, exit]);
+  }, [forward, go, index, last, toggleReveal, solution, exit, runStep]);
 
   // Each step starts at its top, with the keyboard on the stage (so ↑ and ↓ scroll long code).
   // biome-ignore lint/correctness/useExhaustiveDependencies: runs on each new step
@@ -204,112 +230,131 @@ function Presenter() {
     stage.current?.focus({ preventScroll: true });
   }, [index]);
 
-  // An output just shown comes into view, even below long code; one already shown when coming back does not.
+  // An output just shown or run comes into view, even below long code; one already shown when coming
+  // back does not.
   const outputsRef = useRef<HTMLDivElement>(null);
-  const shownAt = useRef({ index, isRevealed });
+  const hasRun = live !== undefined;
+  const shownAt = useRef({ index, isRevealed, hasRun });
   useEffect(() => {
     const before = shownAt.current;
-    shownAt.current = { index, isRevealed };
-    if (before.index === index && !before.isRevealed && isRevealed) {
+    shownAt.current = { index, isRevealed, hasRun };
+    if (before.index === index && ((!before.isRevealed && isRevealed) || (!before.hasRun && hasRun))) {
       outputsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  }, [index, isRevealed]);
+  }, [index, isRevealed, hasRun]);
 
   // The solution's images and figures are its own files.
   const fileUrl = (name: string) =>
     notebookFileUrl(showSolution && match ? { ...ref, notebookId: match.id } : ref, name);
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={t.present.dialog(lab.title)}
-      className="presentation fixed inset-0 z-[70] flex flex-col bg-background text-foreground"
-    >
-      <header className="flex items-center gap-3 border-b border-separator px-4 py-2.5 sm:px-6">
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold">{lab.title}</p>
-          {current && <p className="truncate text-xs text-muted">{current.title}</p>}
-        </div>
-        {slides.length > 0 && (
-          <span
-            data-testid="presentation-step"
-            className="shrink-0 font-mono text-sm text-muted tabular-nums"
-            aria-live="polite"
-          >
-            {index + 1} / {slides.length}
-          </span>
-        )}
-        {solution && (
+    <PythonScope value={python}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={t.present.dialog(lab.title)}
+        className="presentation fixed inset-0 z-[70] flex flex-col bg-background text-foreground"
+      >
+        <header className="flex items-center gap-3 border-b border-separator px-4 py-2.5 sm:px-6">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold">{lab.title}</p>
+            {current && <p className="truncate text-xs text-muted">{current.title}</p>}
+          </div>
+          {slides.length > 0 && (
+            <span
+              data-testid="presentation-step"
+              className="shrink-0 font-mono text-sm text-muted tabular-nums"
+              aria-live="polite"
+            >
+              {index + 1} / {slides.length}
+            </span>
+          )}
+          {solution && (
+            <Button
+              size="sm"
+              variant={showSolution ? 'primary' : 'secondary'}
+              aria-label={t.present.solution}
+              aria-pressed={showSolution}
+              onPress={() => setSolved((on) => !on)}
+            >
+              <KeyRound className="size-4" /> <span className="hidden sm:inline">{t.present.solution}</span>
+            </Button>
+          )}
           <Button
+            isIconOnly
             size="sm"
-            variant={showSolution ? 'primary' : 'secondary'}
-            aria-label={t.present.solution}
-            aria-pressed={showSolution}
-            onPress={() => setSolved((on) => !on)}
+            variant="ghost"
+            aria-label={fullscreen ? t.present.exitFullscreen : t.present.fullscreen}
+            onPress={toggleFullscreen}
           >
-            <KeyRound className="size-4" /> <span className="hidden sm:inline">{t.present.solution}</span>
+            {fullscreen ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
           </Button>
-        )}
-        <Button
-          isIconOnly
-          size="sm"
-          variant="ghost"
-          aria-label={fullscreen ? t.present.exitFullscreen : t.present.fullscreen}
-          onPress={toggleFullscreen}
-        >
-          {fullscreen ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
-        </Button>
-        <Button isIconOnly size="sm" variant="ghost" aria-label={t.present.exit} onPress={exit}>
-          <X className="size-4" />
-        </Button>
-      </header>
+          <Button isIconOnly size="sm" variant="ghost" aria-label={t.present.exit} onPress={exit}>
+            <X className="size-4" />
+          </Button>
+        </header>
 
-      <div ref={stage} tabIndex={-1} className="min-h-0 flex-1 overflow-y-auto outline-none">
-        <div className={`mx-auto px-4 py-8 sm:px-8 sm:py-12 ${slide?.kind === 'viz' ? 'max-w-6xl' : 'max-w-5xl'}`}>
-          {!current ? (
-            <Empty text={t.present.nothing} org={org} courseId={courseId} labId={labId} />
-          ) : rendered.isError || detail.isError ? (
-            <Empty text={t.present.loadFailed} org={org} courseId={courseId} labId={labId} />
-          ) : !slide ? (
-            <p className="text-muted" aria-busy="true">
-              {t.present.loading}
-            </p>
-          ) : (
-            <Step slide={slide} code={code} fileUrl={fileUrl} />
-          )}
-          {code?.type === 'code' && outputs.length > 0 && (
-            <div ref={outputsRef} className="mt-6 flex scroll-mt-4 flex-col gap-3">
-              {isRevealed ? (
-                outputs.map((out, i) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: a cell's outputs are fixed; i is their order
-                  <Output key={`${index}-${showSolution}-${i}`} out={out} fileUrl={fileUrl} />
-                ))
-              ) : (
-                <button
-                  type="button"
-                  onClick={toggleReveal}
-                  className="flex items-center justify-center gap-2 rounded-2xl border border-dashed border-border px-4 py-6 text-muted transition-colors hover:border-accent/50 hover:text-foreground"
-                >
-                  <Eye className="size-5" aria-hidden="true" /> {t.present.reveal}
-                </button>
-              )}
-            </div>
-          )}
+        <div ref={stage} tabIndex={-1} className="min-h-0 flex-1 overflow-y-auto outline-none">
+          <div className={`mx-auto px-4 py-8 sm:px-8 sm:py-12 ${slide?.kind === 'viz' ? 'max-w-6xl' : 'max-w-5xl'}`}>
+            {!current ? (
+              <Empty text={t.present.nothing} org={org} courseId={courseId} labId={labId} />
+            ) : rendered.isError || detail.isError ? (
+              <Empty text={t.present.loadFailed} org={org} courseId={courseId} labId={labId} />
+            ) : !slide ? (
+              <p className="text-muted" aria-busy="true">
+                {t.present.loading}
+              </p>
+            ) : (
+              <Step slide={slide} code={code} fileUrl={fileUrl} />
+            )}
+            {code?.type === 'code' && (outputs.length > 0 || runnable) && (
+              <div ref={outputsRef} className="mt-6 flex scroll-mt-4 flex-col gap-3">
+                {stepCell && <PresentRunButtons cell={stepCell} />}
+                {live && pythonState.status === 'failed' && (
+                  <p role="alert" className="run-note text-sm text-danger">
+                    {t.python.failed(pythonState.failure ?? '')}
+                  </p>
+                )}
+                {live && stepCell ? (
+                  <LiveRun cell={stepCell} />
+                ) : isRevealed ? (
+                  outputs.map((out, i) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: a cell's outputs are fixed; i is their order
+                    <Output key={`${index}-${showSolution}-${i}`} out={out} fileUrl={fileUrl} />
+                  ))
+                ) : (
+                  outputs.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={toggleReveal}
+                      className="flex items-center justify-center gap-2 rounded-2xl border border-dashed border-border px-4 py-6 text-muted transition-colors hover:border-accent/50 hover:text-foreground"
+                    >
+                      <Eye className="size-5" aria-hidden="true" /> {t.present.reveal}
+                    </button>
+                  )
+                )}
+              </div>
+            )}
+          </div>
         </div>
+
+        <footer className="border-t border-separator">
+          <div className="h-1 bg-surface-secondary" aria-hidden="true">
+            <div
+              className="h-full bg-accent transition-[width]"
+              style={{ width: slides.length ? `${((index + 1) / slides.length) * 100}%` : 0 }}
+            />
+          </div>
+          <p className="hidden px-6 py-2 text-xs text-muted sm:block">{t.present.keys(Boolean(solution))}</p>
+        </footer>
       </div>
-
-      <footer className="border-t border-separator">
-        <div className="h-1 bg-surface-secondary" aria-hidden="true">
-          <div
-            className="h-full bg-accent transition-[width]"
-            style={{ width: slides.length ? `${((index + 1) / slides.length) * 100}%` : 0 }}
-          />
-        </div>
-        <p className="hidden px-6 py-2 text-xs text-muted sm:block">{t.present.keys(Boolean(solution))}</p>
-      </footer>
-    </div>
+    </PythonScope>
   );
+}
+
+/** A step's live run, in place of its saved output. */
+function LiveRun({ cell }: { cell: NotebookCodeCell }) {
+  return useRunOutput(cell);
 }
 
 function Step({ slide, code, fileUrl }: { slide: Slide; code: Cell | undefined; fileUrl: (name: string) => string }) {

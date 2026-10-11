@@ -338,8 +338,11 @@ export const sq = {
     nothing: 'Ky laborator nuk ka ende fletore për të prezantuar.',
     loadFailed: 'Fletorja nuk u ngarkua. Provoni sërish.',
     loading: 'Duke ngarkuar fletoren…',
+    run: 'Ekzekuto (R)',
+    stop: 'Ndalo (R)',
     reveal: 'Shfaq rezultatin (Hapësira)',
-    keys: (solution: boolean) => `← → lëviz · Hapësira shfaq rezultatin${solution ? ' · S zgjidhja' : ''} · Esc dil`,
+    keys: (solution: boolean) =>
+      `← → lëviz · Hapësira shfaq rezultatin · R ekzekuto kodin${solution ? ' · S zgjidhja' : ''} · Esc dil`,
     back: 'Kthehu te laboratori',
   },
   viz: {
