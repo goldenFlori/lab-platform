@@ -125,20 +125,32 @@ Built in #49.
   - a cell that only opens a section becomes a large title slide;
   - code that opens a desktop window gives way to its visualization;
   - any other visualization follows its cell.
-  - Phase 2 adds ▶ run beside reveal.
+- **Running code** (#50): on a code step that can run, **Ekzekuto (R)** runs it, and R again stops
+  it; "run the cells above" sits beside it.
+  - One Python for the notebook while presenting, so a lab runs top to bottom as in Jupyter. With
+    the solution shown, the solved code runs instead (`codeFor`), in the same namespace.
+  - A run stands in for the saved output until "Show the saved output". A step that ran shows its
+    own output, so → moves straight on.
+  - Outputs use the projector sizes (`run-text` and `run-note` in `styles.css`). An error shows
+    where it failed, then the error itself in bold (also on the lab page).
+  - The presenter holds the session itself (`useNotebookPython` + `PythonScope`), because its
+    keyboard handler drives it.
 - **Keyboard:**
   - → and PageDown (what clickers send) move on, but first show a step's hidden output, like a
     slide that builds;
   - ← and PageUp go back;
   - Space shows or hides the output;
   - Home and End jump;
+  - R runs the step's code, or stops it;
   - Esc leaves, back to the same notebook.
   - Inside a visualization its own keys apply, and Esc hands the keyboard back to the slides.
 - **Solution switch** (S, or the **Zgjidhja** button): it appears when the lab has a solution
   notebook with the same cells and text (`isSolutionOf`). All 6 course solution notebooks match
   their student versions. Each code step then shows the solved code and its real outputs. It
   follows the API's permissions: students get it only once the solutions are open.
-- **Tested:** a whole lab is presented with the keyboard alone, on desktop and phone.
+- **Tested:** a whole lab is presented with the keyboard alone, on desktop and phone; a lab is run
+  step by step with the keyboard alone: one namespace, the solved code, an error and projector
+  sizes.
 
 ## Exercises and grading
 
