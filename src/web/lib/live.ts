@@ -1,6 +1,6 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useRef, useState } from 'react';
-import type { LiveMessage, LivePresence, LiveState } from '../../shared/live';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { LiveMessage, LivePresence, LiveState, LiveStep } from '../../shared/live';
 import { api } from './api';
 
 // Live Lab sessions (#65): whether a lab is taught live now, starting and ending it, and the
@@ -52,6 +52,8 @@ export function useLiveSocket(
 ) {
   const [state, setState] = useState<SocketState>('closed');
   const [presence, setPresence] = useState<LivePresence | null>(null);
+  const [step, setStep] = useState<LiveStep | null>(null);
+  const socketRef = useRef<WebSocket | null>(null);
   const dropped = useRef(onDrop);
   dropped.current = onDrop;
 
@@ -67,6 +69,7 @@ export function useLiveSocket(
     const open = () => {
       setState('connecting');
       socket = new WebSocket(url);
+      socketRef.current = socket;
       socket.onopen = () => {
         attempts = 0;
         setState('open');
@@ -76,6 +79,7 @@ export function useLiveSocket(
         if (event.data === 'pong') return;
         const message = JSON.parse(String(event.data)) as LiveMessage;
         if (message.t === 'presence') setPresence(message);
+        if (message.t === 'step') setStep(message);
         if (message.t === 'ended') {
           stopped = true;
           dropped.current();
@@ -97,10 +101,18 @@ export function useLiveSocket(
       clearTimeout(retry);
       clearInterval(ping);
       socket?.close(1000);
+      socketRef.current = null;
       setState('closed');
       setPresence(null);
+      setStep(null);
     };
   }, [org, courseId, labId, sessionId]);
 
-  return { state, presence };
+  /** Sends a message if the socket is open; the session ignores what the sender may not say. */
+  const send = useCallback((message: LiveMessage) => {
+    const socket = socketRef.current;
+    if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message));
+  }, []);
+
+  return { state, presence, step, send };
 }

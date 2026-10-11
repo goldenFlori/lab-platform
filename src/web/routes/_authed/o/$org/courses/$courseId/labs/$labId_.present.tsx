@@ -15,6 +15,7 @@ import { t as messages, useT } from '../../../../../../../i18n';
 import { ApiError } from '../../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../../lib/brand';
 import { labQuery } from '../../../../../../../lib/labs';
+import { liveQuery, useLiveSocket } from '../../../../../../../lib/live';
 import {
   type NotebookRef,
   notebookFileUrl,
@@ -138,6 +139,15 @@ function Presenter() {
     if (outputs.length > 0 && !revealed.has(index) && !live) toggleReveal();
     else if (index < last) go(index + 1);
   }, [outputs.length, revealed, index, live, last, toggleReveal, go]);
+
+  // In a Live Lab, the host's steps lead the students' pages (#66).
+  const liveLab = useQuery(liveQuery(org, courseId, labId));
+  const hosting = liveLab.data?.session?.role === 'host' ? liveLab.data.session.id : null;
+  const liveSocket = useLiveSocket(org, courseId, labId, hosting, () => void liveLab.refetch());
+  const { send: sendLive, state: liveState } = liveSocket;
+  useEffect(() => {
+    if (slide && current && liveState === 'open') sendLive({ t: 'step', notebook: current.id, at: slide.at });
+  }, [slide, current, liveState, sendLive]);
 
   const stage = useRef<HTMLDivElement>(null);
 
@@ -267,6 +277,12 @@ function Presenter() {
             <p className="truncate text-sm font-semibold">{lab.title}</p>
             {current && <p className="truncate text-xs text-muted">{current.title}</p>}
           </div>
+          {hosting && (
+            <span className="flex shrink-0 items-center gap-1.5 text-sm text-muted" data-testid="presenter-live">
+              <span className="size-2 animate-pulse rounded-full bg-danger" aria-hidden="true" />
+              {t.live.title} · {liveSocket.presence?.students ?? 0}
+            </span>
+          )}
           {slides.length > 0 && (
             <span
               data-testid="presentation-step"
