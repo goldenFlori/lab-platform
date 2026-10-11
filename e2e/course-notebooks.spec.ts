@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { expect, type Page, test } from '@playwright/test';
 import { type ImportReport, importCourse } from '../scripts/course-import/apply';
 import { type PlannedLab, planCourse, type SiteCourse } from '../scripts/course-import/plan';
+import { detectExercises } from '../src/notebook/exercises';
 import type { GroupView } from '../src/shared/courses';
 import type { NotebookSummary } from '../src/shared/notebooks';
 import { E2E_ACCOUNT, E2E_STAFF } from './account';
@@ -125,6 +126,12 @@ for (const lab of site.labs) {
         await viz.scrollIntoViewIfNeeded();
         await expect(viz.getByRole('region')).toBeVisible();
       }
+
+      // Every exercise the notebook checks itself is one (#51).
+      const stored = plan.notebooks[i]?.stored;
+      await expect(staff.locator('article [data-testid="exercise"]')).toHaveCount(
+        stored ? detectExercises(stored).length : 0,
+      );
 
       const overflow = () =>
         staff.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);

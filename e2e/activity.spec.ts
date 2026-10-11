@@ -62,7 +62,7 @@ test('a student works in a lab and the pedagog sees it in the course activity', 
   const row = staff.getByRole('table', { name: 'Aktiviteti sipas laboratorit' }).getByRole('row', {
     name: /Algoritmet e renditjes/,
   });
-  await expect(row.getByRole('cell')).toHaveText(['1 / 1', '1 / 1', '1 / 1']);
+  await expect(row.getByRole('cell')).toHaveText(['1 / 1', '1 / 1', '1 / 1', '0 / 1']);
   await expect(staff.getByText(E2E_ACCOUNT.fullName)).toHaveCount(0);
   const overflow = await staff.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
