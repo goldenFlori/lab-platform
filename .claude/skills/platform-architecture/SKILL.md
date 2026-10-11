@@ -241,7 +241,9 @@ lab_activity(id, org_id, lab_id, user_id, kind: view|download|visualization|exer
 code_edits(id, org_id, notebook_id, user_id, cell, code, updated_at)  -- built (#49)
 exercises(id, org_id, notebook_id, cell, title, test?)  -- built (#51)
 exercise_completions(id, org_id, notebook_id, cell, user_id, created_at)  -- built (#51)
-submissions, live_sessions, ai_logs (later phases)
+assignments(id, org_id, notebook_id, group_id, due_at)  -- built (#52)
+submissions(id, org_id, notebook_id, user_id, code, solved, attempts, submitted_at)  -- built (#52)
+grades, live_sessions, ai_logs (later phases)
 login_attempts(key, window_start, count)
 ```
 

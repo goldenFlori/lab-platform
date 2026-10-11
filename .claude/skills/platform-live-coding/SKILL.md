@@ -181,8 +181,22 @@ Built in #49.
     solved versions pass (checked locally against the git-ignored solutions); end to end, a
     student solves two exercises and the pedagog sees the counts.
   - The AI hint level is set by the pedagog (see `platform-ai`).
+- **Submissions** (built in #52, `src/api/routes/submissions.ts`):
+  - **Opening:** staff with `lab.publish` open a notebook for submission to a group with a
+    deadline (`assignments`, one per notebook and group), move the deadline or close it, from
+    "Dorëzimi i kësaj fletoreje" on the lab page. Closing removes the deadline, never the work.
+  - **Handing in:** a student of a group with an open deadline (`submission.create`) presses
+    "Dorëzo punën". The page saves their last changes first; then the server copies their saved
+    code (`code_edits`) and solved exercises (`exercise_completions`) into `submissions`, one per
+    student and notebook, replaced on each resubmission (attempts counted) until the deadline;
+    after it, 409. The browser sends nothing but the request, so a submission is what the account
+    holds.
+  - **Reading:** a student sees only their own (`GET …/submission`). Staff with
+    `submission.review` in a group (pedagogs, assistants) list its students with what each handed
+    in (`GET …/submissions?group=`) and read one student's code (`GET …/submissions/:userId`) on
+    the lab's "Dorëzimet" page; other staff, other students and other groups get 403 or 404.
+  - Grading the submissions is #53.
 - **Graded work:**
-  - Submissions (code plus a metadata snapshot) are stored on the server.
   - Hidden tests are stored server-side and sent only to staff.
   - The **pedagog's browser re-runs every submission** in sandboxed Pyodide workers, in a batch.
     Results are trustworthy, and the server never executes Python.
