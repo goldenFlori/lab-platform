@@ -26,8 +26,8 @@ type PythonOptions = {
   codeFor?: (cell: CodeCell) => string;
   /** How a cell's run checks its exercise, when it is one (#51). */
   checkFor?: (cell: CodeCell) => RunCheck | undefined;
-  /** Told when a cell has run. */
-  onRun?: (cell: CodeCell, run: CellRun) => void;
+  /** Told when a cell has run, and how long it took. */
+  onRun?: (cell: CodeCell, run: CellRun, ms: number) => void;
 };
 
 export function PythonProvider({
@@ -73,13 +73,14 @@ export function useNotebookPython(
       const runnable = cells.get(cell);
       if (!runnable) return undefined;
       const { codeFor, checkFor, onRun } = latest.current;
+      const started = performance.now();
       const run = await session.run(
         runnable.key,
         codeFor ? codeFor(cell) : cell.raw,
         runnable.filename,
         checkFor?.(cell),
       );
-      onRun?.(cell, run);
+      onRun?.(cell, run, Math.round(performance.now() - started));
       return run;
     };
     return {

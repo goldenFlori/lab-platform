@@ -70,7 +70,7 @@ export function NotebookView({
           <Fragment key={i}>
             {before && viz(embed, t.notebook.interactiveFirst)}
             {/* Its position, for following the host in a Live Lab (#66); no box of its own. */}
-            <div data-at={i} className="contents">
+            <div data-at={i} data-src={cell.srcIndex} className="contents">
               {cell.type === 'markdown' ? <Markdown cell={cell} /> : <CodeCell cell={cell} fileUrl={fileUrl} />}
             </div>
             {after && viz(embed, t.notebook.tryInBrowser)}
