@@ -1,12 +1,15 @@
 import { DurableObject } from 'cloudflare:workers';
-import type {
-  LiveBoard,
-  LiveChallenge,
-  LiveEnded,
-  LivePresence,
-  LiveResult,
-  LiveRole,
-  LiveStep,
+import {
+  type LiveBoard,
+  type LiveChallenge,
+  type LiveEnded,
+  type LiveHelpQueue,
+  type LiveHelpState,
+  type LivePresence,
+  type LiveResult,
+  type LiveRole,
+  type LiveStep,
+  REACTIONS,
 } from '../../shared/live';
 
 // One Live Lab session (#65): the connections of everyone in the room. The Worker checks who may
@@ -18,12 +21,19 @@ import type {
 // - Steps: only the host moves the room; newcomers start where the host is (#66).
 // - Challenges: the host starts one on an exercise; students' checks of it send their results,
 //   and the staff see the room's board (#67).
+// - Help: a student asks, staff take and close; reactions pass to the staff, throttled (#68).
 
 /** Who a socket belongs to, kept with it across hibernation. */
 type Member = { userId: string; name: string; role: LiveRole };
 
 /** Each student's latest result in the running challenge. */
 type Results = Record<string, { name: string; status: LiveResult['status']; error: string | null }>;
+
+/** The help queue, by student. */
+type HelpQueue = Record<string, { name: string; where: string; since: number; takenBy: string | null }>;
+
+/** A student may react once in this long. */
+const REACT_EVERY_MS = 3000;
 
 /** Sent by the Worker when it hands a socket over; the object is reachable only through it. */
 export const MEMBER_HEADER = 'X-Live-Member';
@@ -33,6 +43,12 @@ export const ENDED = 4000;
 
 const record = (data: unknown) => (data && typeof data === 'object' ? (data as Record<string, unknown>) : null);
 const cellNumber = (value: unknown) => Number.isInteger(value) && (value as number) >= 0 && (value as number) <= 10_000;
+
+const helpState = (request: { takenBy: string | null }): LiveHelpState => ({
+  t: 'help-state',
+  status: request.takenBy ? 'taken' : 'waiting',
+  by: request.takenBy,
+});
 
 /** A step message as the host may send it; anything else is ignored. */
 function parseStep(data: unknown): LiveStep | null {
@@ -60,6 +76,9 @@ function parseResult(data: unknown): LiveResult | null {
 }
 
 export class LiveSession extends DurableObject<Env> {
+  /** When each student last reacted; lost when the object sleeps, which only forgives a reaction. */
+  private reacted = new Map<string, number>();
+
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     // A client's keepalive is answered without waking the object.
@@ -89,6 +108,12 @@ export class LiveSession extends DurableObject<Env> {
     ]);
     if (step && member.role !== 'host') server.send(JSON.stringify(step));
     if (challenge) server.send(JSON.stringify(challenge));
+    if (member.role === 'student') {
+      const request = (await this.helpQueue())[member.userId];
+      if (request) server.send(JSON.stringify(helpState(request)));
+    } else {
+      server.send(JSON.stringify(await this.queueMessage()));
+    }
     await this.broadcastPresence();
     return new Response(null, { status: 101, webSocket: client });
   }
@@ -124,6 +149,43 @@ export class LiveSession extends DurableObject<Env> {
       }
     }
 
+    const m = record(data);
+    if (member.role !== 'student' && (m?.t === 'help-take' || m?.t === 'help-done') && typeof m.id === 'string') {
+      const queue = await this.helpQueue();
+      const request = queue[m.id];
+      if (!request) return;
+      if (m.t === 'help-take') request.takenBy = member.name;
+      else delete queue[m.id];
+      await this.ctx.storage.put('help', queue);
+      this.sendTo(m.id, m.t === 'help-take' ? helpState(request) : { t: 'help-state', status: null, by: null });
+      this.sendStaff(await this.queueMessage());
+      return;
+    }
+    if (member.role === 'student' && m?.t === 'help') {
+      const where = typeof m.where === 'string' ? m.where.trim().slice(0, 120) : '';
+      const queue = await this.helpQueue();
+      queue[member.userId] ??= { name: member.name, where, since: Date.now(), takenBy: null };
+      await this.ctx.storage.put('help', queue);
+      this.sendTo(member.userId, helpState(queue[member.userId]));
+      this.sendStaff(await this.queueMessage());
+      return;
+    }
+    if (member.role === 'student' && m?.t === 'help-cancel') {
+      const queue = await this.helpQueue();
+      delete queue[member.userId];
+      await this.ctx.storage.put('help', queue);
+      this.sendTo(member.userId, { t: 'help-state', status: null, by: null });
+      this.sendStaff(await this.queueMessage());
+      return;
+    }
+    if (member.role === 'student' && m?.t === 'react' && (REACTIONS as readonly unknown[]).includes(m.emoji)) {
+      const now = Date.now();
+      if (now - (this.reacted.get(member.userId) ?? 0) < REACT_EVERY_MS) return;
+      this.reacted.set(member.userId, now);
+      this.sendStaff({ t: 'react', emoji: m.emoji });
+      return;
+    }
+
     const result = member.role === 'student' ? parseResult(data) : null;
     if (result) {
       const challenge = await this.ctx.storage.get<LiveChallenge>('challenge');
@@ -151,6 +213,29 @@ export class LiveSession extends DurableObject<Env> {
   private sendAll(message: object, except?: WebSocket) {
     const text = JSON.stringify(message);
     for (const ws of this.open()) if (ws !== except) ws.send(text);
+  }
+
+  /** To every socket of one user. */
+  private sendTo(userId: string, message: object) {
+    const text = JSON.stringify(message);
+    for (const ws of this.open()) if ((ws.deserializeAttachment() as Member).userId === userId) ws.send(text);
+  }
+
+  private async helpQueue() {
+    return (await this.ctx.storage.get<HelpQueue>('help')) ?? {};
+  }
+
+  private async queueMessage(): Promise<LiveHelpQueue> {
+    const items = Object.entries(await this.helpQueue())
+      .sort(([, a], [, b]) => a.since - b.since)
+      .map(([id, r]) => ({
+        id,
+        name: r.name,
+        where: r.where,
+        since: new Date(r.since).toISOString(),
+        takenBy: r.takenBy,
+      }));
+    return { t: 'help-queue', items };
   }
 
   private sendStaff(message: object, leaving?: WebSocket) {

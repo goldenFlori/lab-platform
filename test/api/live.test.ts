@@ -157,4 +157,37 @@ describe('Live Lab sessions', () => {
     host.ws?.send(JSON.stringify({ t: 'challenge-stop' }));
     await waitFor(() => a.messages.some((m) => m.t === 'challenge-stop'));
   });
+
+  it('queue help requests for the staff, and pass reactions on, throttled', async () => {
+    const { pedagog, ana, labPath, state } = await setup();
+    await pedagog.call(`${labPath}/live`, { method: 'POST' });
+    const ws = `${labPath}/live/${(await state(pedagog)).session?.id}/ws`;
+    const host = await connect(await signIn(pedagog.user.username), ws);
+    const a = await connect(await signIn(ana.user.username), ws);
+    const queue = () => host.messages.filter((m) => m.t === 'help-queue').at(-1);
+    const mine = () => a.messages.filter((m) => m.t === 'help-state').at(-1);
+
+    a.ws?.send(JSON.stringify({ t: 'help', where: 'Ushtrimi 2' }));
+    await waitFor(() => queue()?.t === 'help-queue' && (queue() as { items: unknown[] }).items.length === 1);
+    expect(queue()).toMatchObject({
+      items: [{ id: ana.user.id, name: ana.user.fullName, where: 'Ushtrimi 2', takenBy: null }],
+    });
+    expect(mine()).toEqual({ t: 'help-state', status: 'waiting', by: null });
+
+    // A student cannot take requests; staff take and close them.
+    a.ws?.send(JSON.stringify({ t: 'help-take', id: ana.user.id }));
+    host.ws?.send(JSON.stringify({ t: 'help-take', id: ana.user.id }));
+    await waitFor(() => mine()?.t === 'help-state' && (mine() as { status: string }).status === 'taken');
+    expect(mine()).toEqual({ t: 'help-state', status: 'taken', by: pedagog.user.fullName });
+    host.ws?.send(JSON.stringify({ t: 'help-done', id: ana.user.id }));
+    await waitFor(() => (mine() as { status: string | null }).status === null);
+    expect(queue()).toMatchObject({ items: [] });
+
+    a.ws?.send(JSON.stringify({ t: 'react', emoji: '👍' }));
+    a.ws?.send(JSON.stringify({ t: 'react', emoji: '🎉' }));
+    a.ws?.send(JSON.stringify({ t: 'react', emoji: '💣' }));
+    await waitFor(() => host.messages.some((m) => m.t === 'react'));
+    await new Promise((r) => setTimeout(r, 100));
+    expect(host.messages.filter((m) => m.t === 'react')).toEqual([{ t: 'react', emoji: '👍' }]);
+  });
 });
