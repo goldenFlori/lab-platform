@@ -93,6 +93,9 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   `npx npm@<CI version> install --package-lock-only` and check that only entries were added.
 - **`compatibility_date`** in `wrangler.jsonc` must not be newer than the test runtime supports,
   or the tests fail to start.
+- **`npm test` needs the network once:** `test/notebook/course-cells.test.ts` runs every course
+  cell in Pyodide and downloads its packages (from Pyodide's CDN and PyPI) into
+  `node_modules/pyodide`, where later runs find them.
 - **Vitest stays on 4.x** until `@cloudflare/vitest-pool-workers` supports 5.
 - **No interface text inline.** Every word the app shows goes through `src/web/i18n`: add it to
   `sq.ts` (the source) and `en.ts`, which the build checks for every message. Components use

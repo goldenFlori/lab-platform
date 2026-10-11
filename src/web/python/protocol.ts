@@ -11,7 +11,10 @@ export type ToWorker =
 
 export type FromWorker =
   | { type: 'ready' }
-  | { type: 'packages'; message: string }
+  /** Packages being loaded for the next run, by name. */
+  | { type: 'packages'; names: string[] }
+  | { type: 'figure'; id: number; kind: 'image'; data: Uint8Array }
+  | { type: 'figure'; id: number; kind: 'plotly'; data: string }
   | { type: 'output'; id: number; stream: 'stdout' | 'stderr'; text: string }
   | { type: 'input'; id: number }
   | { type: 'done'; id: number; outcome: import('./runner').RunOutcome }

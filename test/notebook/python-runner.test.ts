@@ -10,6 +10,7 @@ let printed: string[];
 beforeAll(async () => {
   pyodide = await loadPyodide();
   pyodide.setStdout({ batched: (text) => printed.push(text) });
+  pyodide.registerJsModule('_lab_display', { image: () => {}, plotly: () => {} });
   await pyodide.runPythonAsync(RUNNER_PY);
 }, 60_000);
 

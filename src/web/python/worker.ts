@@ -1,7 +1,8 @@
 /// <reference lib="webworker" />
 import { loadPyodide, type PyodideAPI, version } from 'pyodide';
+import type { PyProxy } from 'pyodide/ffi';
 import { type FromWorker, STDIN_HEADER, type ToWorker } from './protocol';
-import { RUNNER_PY, type RunOutcome } from './runner';
+import { MICROPIP_PACKAGES, RUNNER_PY, type RunOutcome } from './runner';
 
 // The sandbox where students' Python runs (#47): Pyodide in a Web Worker, so the page never
 // freezes and the code cannot touch it. The engine comes from our own site (its files are copied
@@ -17,6 +18,8 @@ let interrupt: Uint8Array | undefined;
 let stdinControl: Int32Array | undefined;
 let stdinData: Uint8Array | undefined;
 let current = 0;
+/** Package installs print their own progress; that is not the student's output. */
+let muted = false;
 
 /** Output goes out in pieces, not a message per print(): a loop of prints must not flood the page. */
 function stream(name: 'stdout' | 'stderr') {
@@ -31,6 +34,7 @@ function stream(name: 'stdout' | 'stderr') {
   return {
     flush,
     write(buffer: Uint8Array) {
+      if (muted) return buffer.length;
       pending += decoder.decode(buffer, { stream: true });
       if (pending.length > 4096 || Date.now() - last > 50) flush();
       return buffer.length;
@@ -40,6 +44,26 @@ function stream(name: 'stdout' | 'stderr') {
 
 const stdout = stream('stdout');
 const stderr = stream('stderr');
+const installed = new Set<string>();
+
+/** Figures, in their place among the prints. */
+const display = {
+  image(data: PyProxy) {
+    stdout.flush();
+    stderr.flush();
+    const bytes = (data.toJs() as Uint8Array).slice();
+    data.destroy();
+    self.postMessage({ type: 'figure', id: current, kind: 'image', data: bytes } satisfies FromWorker, [bytes.buffer]);
+  },
+  plotly(json: string) {
+    stdout.flush();
+    stderr.flush();
+    post({ type: 'figure', id: current, kind: 'plotly', data: json });
+  },
+};
+
+/** "Loading numpy, matplotlib" → the names, for the page to say in its language. */
+const packageNames = (message: string) => /^Loading (.+)$/.exec(message)?.[1]?.split(/,\s*/).filter(Boolean) ?? [];
 
 /** input(): ask the page and wait, in this worker, until it answers. Without shared memory, EOF. */
 function readLine() {
@@ -65,6 +89,7 @@ async function start(message: Extract<ToWorker, { type: 'init' }>) {
     pyodide.setStdout(stdout);
     pyodide.setStderr(stderr);
     pyodide.setStdin({ stdin: readLine });
+    pyodide.registerJsModule('_lab_display', display);
     if (message.interrupt) {
       interrupt = new Uint8Array(message.interrupt);
       pyodide.setInterruptBuffer(interrupt);
@@ -87,9 +112,23 @@ async function run({ id, code, filename }: Extract<ToWorker, { type: 'run' }>) {
   let outcome: RunOutcome;
   try {
     await pyodide.loadPackagesFromImports(code, {
-      messageCallback: (text) => post({ type: 'packages', message: text }),
-      errorCallback: (text) => post({ type: 'packages', message: text }),
+      messageCallback: (text) => {
+        const names = packageNames(text);
+        if (names.length) post({ type: 'packages', names });
+      },
     });
+    for (const [name, pattern] of Object.entries(MICROPIP_PACKAGES)) {
+      if (installed.has(name) || !pattern.test(code)) continue;
+      post({ type: 'packages', names: [name] });
+      muted = true;
+      try {
+        await pyodide.loadPackage('micropip', { messageCallback: () => {} });
+        await pyodide.pyimport('micropip').install(name);
+      } finally {
+        muted = false;
+      }
+      installed.add(name);
+    }
     const result = await pyodide.globals.get('_lab_run')(code, filename);
     // Python's None arrives as undefined.
     const [kind, text = null] = result.toJs() as [string, string | undefined];
