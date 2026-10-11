@@ -215,7 +215,9 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-11:** #68 done. In a Live Lab, students ask for help without raising a hand and staff
   take and close requests from a queue; quick reactions show on the host panel and the presenter
   (PR #75).
-- **Next:** #69, "your code, visualized" for sorting.
+- **2026-10-11:** #69 done. A student's own sorting code, instrumented with `vizlab`, animates in
+  the course's sorting visualizer next to the reference algorithm on the same list (PR #76).
+- **Next:** #70, "your code, visualized" for graphs.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
