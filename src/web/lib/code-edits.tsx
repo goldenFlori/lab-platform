@@ -21,6 +21,8 @@ type CodeEditsValue = {
   /** Cells the user has changed. */
   count: number;
   saving: SaveState;
+  /** Saves what is still waiting now; false when it could not be saved. */
+  flush: () => Promise<boolean>;
   /** Changes when the code changes from outside the editors (loaded, or all put back), which
    * then start again from it. */
   version: number;
@@ -92,13 +94,16 @@ export function CodeEditsProvider({
       clearTimeout(timer.current);
       const batch = [...pending.current];
       pending.current.clear();
-      if (!batch.length) return;
+      if (!batch.length) return true;
       setSaving('saving');
       try {
         const results = await Promise.all(batch.map(([cell, code]) => send(cell, code, keepalive)));
-        setSaving(results.every((r) => r.ok) && pending.current.size === 0 ? 'saved' : 'failed');
+        const ok = results.every((r) => r.ok);
+        setSaving(ok && pending.current.size === 0 ? 'saved' : 'failed');
+        return ok;
       } catch {
         setSaving('failed');
+        return false;
       }
     },
     [send],
@@ -153,6 +158,7 @@ export function CodeEditsProvider({
       count: [...edits].filter(([cell, code]) => code !== originals.get(cell)).length,
       saving,
       version,
+      flush: () => flush(),
     };
   }, [edits, flush, originals, path, saving, version]);
 

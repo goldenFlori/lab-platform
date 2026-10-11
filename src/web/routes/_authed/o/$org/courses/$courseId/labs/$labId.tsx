@@ -14,10 +14,12 @@ import {
 } from 'lucide-react';
 import { type ReactNode, type SyntheticEvent, useEffect, useMemo, useRef } from 'react';
 import type { StoredNotebook } from '../../../../../../../../notebook/stored';
+import type { GroupView } from '../../../../../../../../shared/courses';
 import type { Exercise } from '../../../../../../../../shared/exercises';
 import type { LabView } from '../../../../../../../../shared/labs';
 import { ORIGINAL_FILE } from '../../../../../../../../shared/notebook-files';
 import type { Embed, NotebookKind, NotebookSummary } from '../../../../../../../../shared/notebooks';
+import { AssignmentsEditor } from '../../../../../../../components/notebook/AssignmentsEditor';
 import { DeleteNotebook } from '../../../../../../../components/notebook/DeleteNotebook';
 import { EditsBar } from '../../../../../../../components/notebook/EditsBar';
 import { EmbedsEditor } from '../../../../../../../components/notebook/EmbedsEditor';
@@ -25,6 +27,7 @@ import { ExercisesEditor } from '../../../../../../../components/notebook/Exerci
 import { NotebookUpload } from '../../../../../../../components/notebook/NotebookUpload';
 import { embedAnchor, NotebookView } from '../../../../../../../components/notebook/NotebookView';
 import { PythonBar } from '../../../../../../../components/notebook/RunControls';
+import { SubmissionBar } from '../../../../../../../components/notebook/SubmissionBar';
 import { Toc } from '../../../../../../../components/notebook/Toc';
 import { t as messages, useT } from '../../../../../../../i18n';
 import { reportVisualizationUsed } from '../../../../../../../lib/activity';
@@ -228,6 +231,11 @@ function LabPage() {
             onVisualizationUsed={
               labList.permissions.staff ? undefined : () => reportVisualizationUsed(org, courseId, labId)
             }
+            submissions={
+              labList.permissions.staff
+                ? { staff: { groups: courseDetail.groups, canPublish: labList.permissions.publish } }
+                : { staff: null }
+            }
           />
         )}
         <LabNeighbours org={org} courseId={courseId} labId={labId} labs={labList.labs} />
@@ -266,6 +274,7 @@ function NotebookSection({
   embedsFailed,
   editor,
   onVisualizationUsed,
+  submissions,
 }: {
   notebookRef: NotebookRef;
   embeds: Embed[] | undefined;
@@ -280,6 +289,8 @@ function NotebookSection({
   } | null;
   /** Students: told the first time they use a visualization of this notebook (#18). */
   onVisualizationUsed?: () => void;
+  /** Handing in work (#52): staff open it per group; students hand in. */
+  submissions: { staff: { groups: GroupView[]; canPublish: boolean } | null };
 }) {
   const rendered = useQuery(renderedQuery(notebookRef));
   const reported = useRef<string | null>(null);
@@ -329,6 +340,16 @@ function NotebookSection({
     <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_14rem]">
       {/* Capturing, so a visualization that handles its own keys or clicks is still noticed. */}
       <article className="min-w-0" onPointerDownCapture={used} onKeyDownCapture={used}>
+        {submissions.staff && (
+          <div className="mb-3">
+            <AssignmentsEditor
+              key={`assignments-${notebookRef.notebookId}`}
+              notebookRef={notebookRef}
+              groups={submissions.staff.groups}
+              canPublish={submissions.staff.canPublish}
+            />
+          </div>
+        )}
         {editor && (
           <div className="mb-8 grid gap-3">
             <EmbedsEditor
@@ -350,6 +371,7 @@ function NotebookSection({
         <ExercisesProvider notebookRef={notebookRef} exercises={exercises}>
           <CodeEditsProvider notebookRef={notebookRef} originals={originals}>
             <EditablePython notebookId={notebookRef.notebookId} notebook={rendered.data}>
+              {!submissions.staff && <SubmissionBar notebookRef={notebookRef} />}
               <EditsBar />
               <PythonBar />
               <NotebookView
