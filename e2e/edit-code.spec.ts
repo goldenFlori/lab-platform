@@ -36,6 +36,9 @@ test('a student edits code, runs it, finds it again on any device; staff see the
   const student = await signIn(browser, E2E_ACCOUNT, isMobile);
   await apiCall(student, 'POST', '/join', { code: group.joinCode });
   await student.goto(pageUrl);
+  // As slow as a cheap phone: typing must keep every key even when the page lags behind it.
+  const cdp = await student.context().newCDPSession(student);
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 6 });
 
   // Edit the second cell; it saves on its own, and runs as edited.
   await student.getByRole('button', { name: 'Ndrysho kodin' }).nth(1).click();
