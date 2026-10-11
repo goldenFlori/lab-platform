@@ -1,5 +1,6 @@
 import { zValidator } from '@hono/zod-validator';
 import { type Context, Hono } from 'hono';
+import { type CodeEdit, codeEditInput } from '../../shared/code-edits';
 import {
   createNotebookInput,
   type Embed,
@@ -72,6 +73,12 @@ async function detail(c: Context<TenantEnv>, nb: Notebook): Promise<NotebookDeta
       .sort((a, b) => a.cell - b.cell)
       .map((e): Embed => ({ cell: e.cell, viz: e.viz, title: e.title, props: e.props })),
   };
+}
+
+/** A cell number from the URL: a notebook's own cell index. */
+function cellParam(value: string | undefined) {
+  const cell = Number(value);
+  return Number.isInteger(cell) && cell >= 0 && cell <= 10_000 ? cell : null;
 }
 
 /** A download name that cannot break the header. */
@@ -174,6 +181,43 @@ export const notebookRoutes = new Hono<TenantEnv>()
     const { ctx, nb } = await notebookInUrl(c);
     if (!canManage(c, ctx)) return forbidden(c);
     await c.var.tenant.notebooks.setSearchSections(nb.id, c.req.valid('json').sections);
+    return c.body(null, 204);
+  })
+
+  // A user's own versions of the code cells (#49): only ever their own, for anyone who may read the
+  // notebook. Staff have no way to read a student's edits; submitted work is shared on its own.
+  .get('/:notebookId/edits', async (c) => {
+    const { nb } = await notebookInUrl(c);
+    const rows = await c.var.tenant.codeEdits.ofUser(nb.id, c.var.user?.id as string);
+    return c.json({
+      edits: rows.map((row) => ({ cell: row.cell, code: row.code, updatedAt: row.updatedAt.toISOString() })),
+    } satisfies { edits: CodeEdit[] });
+  })
+
+  .put('/:notebookId/edits/:cell', zValidator('json', codeEditInput, invalidRequest), async (c) => {
+    const { nb } = await notebookInUrl(c);
+    const cell = cellParam(c.req.param('cell'));
+    if (cell === null) return c.json({ error: 'invalid_request' }, 400);
+    const updatedAt = await c.var.tenant.codeEdits.save({
+      notebookId: nb.id,
+      userId: c.var.user?.id as string,
+      cell,
+      code: c.req.valid('json').code,
+    });
+    return c.json({ cell, updatedAt: updatedAt.toISOString() });
+  })
+
+  .delete('/:notebookId/edits/:cell', async (c) => {
+    const { nb } = await notebookInUrl(c);
+    const cell = cellParam(c.req.param('cell'));
+    if (cell === null) return c.json({ error: 'invalid_request' }, 400);
+    await c.var.tenant.codeEdits.reset(nb.id, c.var.user?.id as string, cell);
+    return c.body(null, 204);
+  })
+
+  .delete('/:notebookId/edits', async (c) => {
+    const { nb } = await notebookInUrl(c);
+    await c.var.tenant.codeEdits.reset(nb.id, c.var.user?.id as string);
     return c.body(null, 204);
   })
 

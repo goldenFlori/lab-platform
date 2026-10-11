@@ -17,6 +17,7 @@ import { roleExists } from './access';
 import { uuidv7 } from './ids';
 import type { Db } from './index';
 import {
+  codeEdits,
   courses,
   courseTemplates,
   embeds,
@@ -533,6 +534,43 @@ function tenantStudents(db: Db, orgId: string) {
   };
 }
 
+/** Students' own versions of code cells (#49): each user reads and writes only their own. */
+function tenantCodeEdits(db: Db, orgId: string) {
+  const mine = (notebookId: string, userId: string) =>
+    and(eq(codeEdits.orgId, orgId), eq(codeEdits.notebookId, notebookId), eq(codeEdits.userId, userId));
+  return {
+    ofUser(notebookId: string, userId: string) {
+      return db
+        .select({ cell: codeEdits.cell, code: codeEdits.code, updatedAt: codeEdits.updatedAt })
+        .from(codeEdits)
+        .where(mine(notebookId, userId))
+        .orderBy(asc(codeEdits.cell));
+    },
+
+    /** Saves the user's code for a cell, replacing what was there. */
+    async save(row: { notebookId: string; userId: string; cell: number; code: string }) {
+      const updatedAt = new Date();
+      await rethrowMissingParent(
+        db
+          .insert(codeEdits)
+          .values({ ...row, id: uuidv7(), orgId, updatedAt })
+          .onConflictDoUpdate({
+            target: [codeEdits.orgId, codeEdits.userId, codeEdits.notebookId, codeEdits.cell],
+            set: { code: row.code, updatedAt },
+          }),
+      );
+      return updatedAt;
+    },
+
+    /** Back to the original code: one cell, or every cell of the notebook. */
+    async reset(notebookId: string, userId: string, cell?: number) {
+      await db
+        .delete(codeEdits)
+        .where(cell === undefined ? mine(notebookId, userId) : and(mine(notebookId, userId), eq(codeEdits.cell, cell)));
+    },
+  };
+}
+
 /** Learning activity (#18): recorded once per student, lab, kind and day; read only as counts. */
 function tenantActivity(db: Db, orgId: string) {
   return {
@@ -619,6 +657,7 @@ export function forTenant(db: Db, orgId: string) {
     students: tenantStudents(db, orgId),
     notebooks: tenantNotebooks(db, orgId),
     activity: tenantActivity(db, orgId),
+    codeEdits: tenantCodeEdits(db, orgId),
   };
 }
 

@@ -490,6 +490,54 @@
   color: var(--shiki-dark);
 }
 
+/* The code editor (#49): GitHub's light and dark colours, as Shiki uses for the code it shows */
+.nb-editor .cm-editor {
+  color: #24292e;
+}
+.nb-editor .tok-keyword,
+.nb-editor .tok-operator {
+  color: #d73a49;
+}
+.nb-editor .tok-string,
+.nb-editor .tok-string2 {
+  color: #032f62;
+}
+.nb-editor .tok-number,
+.nb-editor .tok-bool,
+.nb-editor .tok-atom {
+  color: #005cc5;
+}
+.nb-editor .tok-comment {
+  color: #6a737d;
+}
+.nb-editor .tok-variableName.tok-definition,
+.nb-editor .tok-className {
+  color: #6f42c1;
+}
+.dark .nb-editor .cm-editor {
+  color: #e1e4e8;
+}
+.dark .nb-editor .tok-keyword,
+.dark .nb-editor .tok-operator {
+  color: #f97583;
+}
+.dark .nb-editor .tok-string,
+.dark .nb-editor .tok-string2 {
+  color: #9ecbff;
+}
+.dark .nb-editor .tok-number,
+.dark .nb-editor .tok-bool,
+.dark .nb-editor .tok-atom {
+  color: #79b8ff;
+}
+.dark .nb-editor .tok-comment {
+  color: #959da5;
+}
+.dark .nb-editor .tok-variableName.tok-definition,
+.dark .nb-editor .tok-className {
+  color: #b392f0;
+}
+
 /* Plotly figures drawn again from the notebook's saved output */
 .plotly-figure {
   display: block;

@@ -12,11 +12,13 @@ import {
   Presentation,
   Sparkles,
 } from 'lucide-react';
-import { type SyntheticEvent, useEffect, useRef } from 'react';
+import { type ReactNode, type SyntheticEvent, useEffect, useMemo, useRef } from 'react';
+import type { StoredNotebook } from '../../../../../../../../notebook/stored';
 import type { LabView } from '../../../../../../../../shared/labs';
 import { ORIGINAL_FILE } from '../../../../../../../../shared/notebook-files';
 import type { Embed, NotebookKind, NotebookSummary } from '../../../../../../../../shared/notebooks';
 import { DeleteNotebook } from '../../../../../../../components/notebook/DeleteNotebook';
+import { EditsBar } from '../../../../../../../components/notebook/EditsBar';
 import { EmbedsEditor } from '../../../../../../../components/notebook/EmbedsEditor';
 import { NotebookUpload } from '../../../../../../../components/notebook/NotebookUpload';
 import { embedAnchor, NotebookView } from '../../../../../../../components/notebook/NotebookView';
@@ -26,6 +28,7 @@ import { t as messages, useT } from '../../../../../../../i18n';
 import { reportVisualizationUsed } from '../../../../../../../lib/activity';
 import { ApiError } from '../../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../../lib/brand';
+import { CodeEditsProvider, useCodeEdits } from '../../../../../../../lib/code-edits';
 import { courseQuery } from '../../../../../../../lib/courses';
 import { labQuery, labsQuery } from '../../../../../../../lib/labs';
 import {
@@ -273,6 +276,16 @@ function NotebookSection({
     onVisualizationUsed();
   };
   const ready = Boolean(rendered.data && embeds);
+  // The original code of each code cell, for telling a student's edit from the original (#49).
+  const originals = useMemo(
+    () =>
+      new Map(
+        (rendered.data?.cells ?? []).flatMap((cell) =>
+          cell.type === 'code' ? [[cell.srcIndex, cell.raw] as const] : [],
+        ),
+      ),
+    [rendered.data],
+  );
   const t = useT();
   const hash = useRouterState({ select: (state) => state.location.hash });
 
@@ -313,15 +326,18 @@ function NotebookSection({
             />
           </div>
         )}
-        <PythonProvider notebookId={notebookRef.notebookId} notebook={rendered.data}>
-          <PythonBar />
-          <NotebookView
-            id={notebookRef.notebookId}
-            notebook={rendered.data}
-            embeds={embeds}
-            fileUrl={(name) => notebookFileUrl(notebookRef, name)}
-          />
-        </PythonProvider>
+        <CodeEditsProvider notebookRef={notebookRef} originals={originals}>
+          <EditablePython notebookId={notebookRef.notebookId} notebook={rendered.data}>
+            <EditsBar />
+            <PythonBar />
+            <NotebookView
+              id={notebookRef.notebookId}
+              notebook={rendered.data}
+              embeds={embeds}
+              fileUrl={(name) => notebookFileUrl(notebookRef, name)}
+            />
+          </EditablePython>
+        </CodeEditsProvider>
       </article>
       <aside className="hidden lg:block">
         <Toc entries={rendered.data.toc} />
@@ -381,5 +397,23 @@ function LabNeighbours({
         </Link>
       )}
     </nav>
+  );
+}
+
+/** The notebook's Python, running each student's own version of the code where they changed it. */
+function EditablePython({
+  notebookId,
+  notebook,
+  children,
+}: {
+  notebookId: string;
+  notebook: StoredNotebook;
+  children: ReactNode;
+}) {
+  const edits = useCodeEdits();
+  return (
+    <PythonProvider notebookId={notebookId} notebook={notebook} codeFor={(cell) => edits?.code(cell) ?? cell.raw}>
+      {children}
+    </PythonProvider>
   );
 }
