@@ -96,6 +96,15 @@ export const courseRoutes = new Hono<TenantEnv>()
     return c.json(summary(updated ?? course));
   })
 
+  // Deleting removes the course with everything in it: groups, labs, notebooks, students' code,
+  // submissions, grades and activity (the database cascades). Accounts stay (#80).
+  .delete('/:courseId', async (c) => {
+    const { course } = await visibleCourse(c);
+    if (!c.var.access.can('course.manage', { courseId: course.id })) return forbidden(c);
+    await c.var.tenant.courses.remove(course.id);
+    return c.body(null, 204);
+  })
+
   // Archiving ends the year: the course stays readable, but its join codes stop working.
   .post('/:courseId/archive', async (c) => {
     const { course } = await visibleCourse(c);

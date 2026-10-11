@@ -263,3 +263,23 @@ describe('archiving', () => {
     expect(restored.archivedAt).toBeNull();
   });
 });
+
+describe('deleting a course (#80)', () => {
+  it('is for staff who manage it, and takes its groups and labs with it', async () => {
+    const seed = await seedOrganization('fshn');
+    const pedagog = await account(seed, 'pedagog', { courseId: seed.course.id });
+    const assistant = await account(seed, 'assistant', { groupId: seed.group.id });
+    const student = await account(seed, 'student', { groupId: seed.group.id });
+    const path = `/orgs/${seed.org.slug}/courses/${seed.course.id}`;
+    expect((await student.call(path, { method: 'DELETE' })).status).toBe(403);
+    expect((await assistant.call(path, { method: 'DELETE' })).status).toBe(403);
+    expect((await pedagog.call(path, { method: 'DELETE' })).status).toBe(204);
+    expect((await pedagog.call(path)).status).toBe(404);
+    expect(await seed.tenant.labs.get(seed.lab.id)).toBeUndefined();
+    expect(await seed.tenant.groups.get(seed.group.id)).toBeUndefined();
+    expect(await seed.tenant.notebooks.get(seed.notebook.id)).toBeUndefined();
+    // The student's account stays, though no longer in this course.
+    const account_ = await env.DB.prepare('SELECT id FROM users WHERE id = ?').bind(student.user.id).first();
+    expect(account_).not.toBeNull();
+  });
+});
