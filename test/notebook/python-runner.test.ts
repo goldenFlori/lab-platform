@@ -46,3 +46,73 @@ describe('running a cell', () => {
     expect(text).toContain('SyntaxError');
   });
 });
+
+async function check(code: string, test: string | null = null) {
+  printed = [];
+  const result = await pyodide.globals.get('_lab_run')(code, cellFile(9), true, test);
+  const [kind, text = null, checked = null] = result.toJs() as [string, string | undefined, string[] | undefined];
+  result.destroy();
+  return { kind, text, check: checked, printed };
+}
+
+describe('checking an exercise (#51)', () => {
+  const tests = (body: string) => `def _testet():\n${body}\n\nkontrollo("Ushtrimi 1", _testet)`;
+
+  it("runs the cell's kontrollo(…) call: passed, failed with its message, not written yet, or an error", async () => {
+    await run('def shuma(a, b):\n    raise NotImplementedError');
+    expect((await check(tests('    assert shuma(1, 2) == 3, "shuma(1, 2) duhet 3"'))).check).toEqual(['todo', '']);
+    await run('def shuma(a, b):\n    return a - b');
+    expect((await check(tests('    assert shuma(1, 2) == 3, "shuma(1, 2) duhet 3"'))).check).toEqual([
+      'fail',
+      'shuma(1, 2) duhet 3',
+    ]);
+    await run('def shuma(a, b):\n    return a + b');
+    expect(await check(tests('    assert shuma(1, 2) == 3\n    print("   tre")'))).toEqual({
+      kind: 'ok',
+      text: null,
+      check: ['pass', ''],
+      printed: ['   tre'],
+    });
+    expect((await check(tests('    assert prodhimi(2, 3) == 6'))).check).toEqual([
+      'error',
+      "NameError: name 'prodhimi' is not defined",
+    ]);
+  });
+
+  it("puts the notebook's own kontrollo back afterwards, and the first check that failed speaks for a cell", async () => {
+    await run('def kontrollo(titulli, testet):\n    print("e fletores")');
+    const both = `${tests('    assert True')}\n${tests('    assert False, "jo"')}`;
+    expect((await check(both)).check).toEqual(['fail', 'jo']);
+    expect((await run('kontrollo("x", None)')).printed).toEqual(['e fletores']);
+  });
+
+  it('runs a visible test after the cell, in its namespace', async () => {
+    expect((await check('def prodhimi(a, b):\n    return a * b', 'assert prodhimi(2, 3) == 6')).check).toEqual([
+      'pass',
+      '',
+    ]);
+    expect(
+      (await check('def prodhimi(a, b):\n    return a + b', 'assert prodhimi(2, 3) == 6, "prodhimi(2, 3) duhet 6"'))
+        .check,
+    ).toEqual(['fail', 'prodhimi(2, 3) duhet 6']);
+    // The cell's own error comes first, and nothing is checked.
+    const broken = await check('def prodhimi(a, b)\n    return a * b', 'assert True');
+    expect(broken.kind).toBe('error');
+    expect(broken.check).toBeNull();
+  });
+
+  it("finds the source of a cell's functions, as checks that look for an assert need", async () => {
+    await run('def f(a):\n    assert a\n    return a', 7);
+    const looks = tests('    import inspect\n    assert "assert" in inspect.getsource(f), "shtoni assert-in"');
+    expect((await check(looks)).check).toEqual(['pass', '']);
+  });
+
+  it('checks nothing for a run that is not an exercise', async () => {
+    await run('del kontrollo');
+    const result = await pyodide.globals.get('_lab_run')(tests('    assert True'), cellFile(9));
+    const [kind, , checked] = result.toJs() as [string, string | undefined, unknown];
+    result.destroy();
+    expect(kind).toBe('error');
+    expect(checked).toBeUndefined();
+  });
+});

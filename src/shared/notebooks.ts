@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Exercise } from './exercises';
 import { isVisualizerId } from './visualizers';
 
 // Request and response shapes for a lab's notebooks, their files and embeds (#14). The app
@@ -45,4 +46,4 @@ export type NotebookSummary = {
   ready: boolean;
 };
 
-export type NotebookDetail = NotebookSummary & { embeds: Embed[] };
+export type NotebookDetail = NotebookSummary & { embeds: Embed[]; exercises: Exercise[] };

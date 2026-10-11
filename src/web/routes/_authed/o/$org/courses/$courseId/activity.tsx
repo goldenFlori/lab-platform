@@ -185,8 +185,11 @@ function Report({ report, org, courseId }: { report: ActivityReport; org: string
                   <th scope="col" className="py-2 pr-4 font-medium">
                     {t.activity.downloaded}
                   </th>
-                  <th scope="col" className="py-2 font-medium">
+                  <th scope="col" className="py-2 pr-4 font-medium">
                     {t.activity.triedViz}
+                  </th>
+                  <th scope="col" className="py-2 font-medium">
+                    {t.activity.solved}
                   </th>
                 </tr>
               </thead>
@@ -199,7 +202,8 @@ function Report({ report, org, courseId }: { report: ActivityReport; org: string
                     <td className="py-2 pr-4 tabular-nums">{w.active}</td>
                     <td className="py-2 pr-4 tabular-nums">{w.view}</td>
                     <td className="py-2 pr-4 tabular-nums">{w.download}</td>
-                    <td className="py-2 tabular-nums">{w.visualization}</td>
+                    <td className="py-2 pr-4 tabular-nums">{w.visualization}</td>
+                    <td className="py-2 tabular-nums">{w.exercise}</td>
                   </tr>
                 ))}
               </tbody>
@@ -228,8 +232,11 @@ function Report({ report, org, courseId }: { report: ActivityReport; org: string
                   <th scope="col" className="py-2 pr-4 font-medium">
                     {t.activity.downloaded}
                   </th>
-                  <th scope="col" className="py-2 font-medium">
+                  <th scope="col" className="py-2 pr-4 font-medium">
                     {t.activity.triedViz}
+                  </th>
+                  <th scope="col" className="py-2 font-medium">
+                    {t.activity.solved}
                   </th>
                 </tr>
               </thead>
@@ -242,6 +249,7 @@ function Report({ report, org, courseId }: { report: ActivityReport; org: string
                     <Share value={lab.view} of={students} />
                     <Share value={lab.download} of={students} />
                     <Share value={lab.visualization} of={students} />
+                    <Share value={lab.exercise} of={students} />
                   </tr>
                 ))}
               </tbody>

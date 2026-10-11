@@ -1,6 +1,7 @@
 /// <reference lib="webworker" />
 import { loadPyodide, type PyodideAPI, version } from 'pyodide';
 import type { PyProxy } from 'pyodide/ffi';
+import type { CheckStatus } from '../../shared/exercises';
 import { type FromWorker, STDIN_HEADER, type ToWorker } from './protocol';
 import { MICROPIP_PACKAGES, RUNNER_PY, type RunOutcome } from './runner';
 
@@ -105,7 +106,7 @@ async function start(message: Extract<ToWorker, { type: 'init' }>) {
   }
 }
 
-async function run({ id, code, filename }: Extract<ToWorker, { type: 'run' }>) {
+async function run({ id, code, filename, check }: Extract<ToWorker, { type: 'run' }>) {
   if (!pyodide) return;
   current = id;
   if (interrupt) interrupt[0] = 0;
@@ -129,13 +130,17 @@ async function run({ id, code, filename }: Extract<ToWorker, { type: 'run' }>) {
       }
       installed.add(name);
     }
-    const result = await pyodide.globals.get('_lab_run')(code, filename);
+    const result = await pyodide.globals.get('_lab_run')(code, filename, check !== undefined, check?.test ?? undefined);
     // Python's None arrives as undefined.
-    const [kind, text = null] = result.toJs() as [string, string | undefined];
+    const [kind, text = null, checked] = result.toJs() as [
+      string,
+      string | undefined,
+      [CheckStatus, string] | undefined,
+    ];
     result.destroy();
     outcome =
       kind === 'ok'
-        ? { kind: 'ok', value: text }
+        ? { kind: 'ok', value: text, ...(checked ? { check: { status: checked[0], message: checked[1] } } : {}) }
         : kind === 'error'
           ? { kind: 'error', traceback: text ?? '' }
           : { kind: 'interrupted' };

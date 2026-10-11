@@ -237,8 +237,11 @@ notebooks(id, org_id, lab_id, kind: main|extra|solution, title, position, origin
 files(id, org_id, notebook_id?, name, mime, encoding, size, chunk_count) + file_chunks(org_id, file_id, n, data)  -- built (#14)
 embeds(id, org_id, notebook_id, cell, viz, title?, props?)  -- built (#14)
 search_sections(id, org_id, notebook_id, position, anchor?, title, text, keywords)  -- built (#17)
-lab_activity(id, org_id, lab_id, user_id, kind: view|download|visualization, day)  -- built (#18)
-submissions, exercise_results, live_sessions, ai_logs (later phases)
+lab_activity(id, org_id, lab_id, user_id, kind: view|download|visualization|exercise, day)  -- built (#18, #51)
+code_edits(id, org_id, notebook_id, user_id, cell, code, updated_at)  -- built (#49)
+exercises(id, org_id, notebook_id, cell, title, test?)  -- built (#51)
+exercise_completions(id, org_id, notebook_id, cell, user_id, created_at)  -- built (#51)
+submissions, live_sessions, ai_logs (later phases)
 login_attempts(key, window_start, count)
 ```
 
@@ -484,8 +487,9 @@ sections and the visualizations as you type.
 Built in #18: weekly activity per course for staff with `analytics.view` (pedagogs, coordinators),
 at `/o/:org/courses/:id/activity`, linked from the course page.
 
-- **What counts** (`lab_activity`): a student opened a lab's notebook, downloaded its `.ipynb`, or
-  used one of its visualizations.
+- **What counts** (`lab_activity`): a student opened a lab's notebook, downloaded its `.ipynb`,
+  used one of its visualizations, or completed one of its exercises (#51; recorded when the
+  completion is).
   - At most one row per student, lab, kind and day (`INSERT … ON CONFLICT DO NOTHING`), so a
     class of 120 stays at tens of thousands of rows a year.
   - Opening and downloading are recorded by the API as it serves the notebook's detail and its
@@ -506,7 +510,7 @@ at `/o/:org/courses/:id/activity`, linked from the course page.
     does not loop over rows.
 - **Not yet:**
   - analytics for the institution admin (who does not see courses);
-  - exercise completion and code runs (phase 2);
+  - code runs;
   - deleting old activity (see open items in `platform-vision`).
 
 ## Quality, deploy, backups

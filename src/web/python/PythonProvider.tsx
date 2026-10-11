@@ -1,8 +1,8 @@
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import type { StoredNotebook } from '../../notebook/stored';
 import type { Cell, CodeCell } from '../../notebook/types';
-import { cellFile } from './runner';
-import { PythonSession, type SessionState } from './session';
+import { cellFile, type RunCheck } from './runner';
+import { type CellRun, PythonSession, type SessionState } from './session';
 
 // Running a notebook's code on the lab page (#47) and in presentations (#50). One Python per
 // notebook shown; each code cell finds itself here by identity, so the notebook view needs no extra
@@ -21,19 +21,22 @@ export type PythonContextValue = {
 
 const PythonContext = createContext<PythonContextValue | null>(null);
 
+type PythonOptions = {
+  /** The code to run for a cell. */
+  codeFor?: (cell: CodeCell) => string;
+  /** How a cell's run checks its exercise, when it is one (#51). */
+  checkFor?: (cell: CodeCell) => RunCheck | undefined;
+  /** Told when a cell has run. */
+  onRun?: (cell: CodeCell, run: CellRun) => void;
+};
+
 export function PythonProvider({
   notebookId,
   notebook,
-  codeFor,
   children,
-}: {
-  notebookId: string;
-  notebook: StoredNotebook;
-  /** The code to run for a cell. */
-  codeFor?: (cell: CodeCell) => string;
-  children: ReactNode;
-}) {
-  const value = useNotebookPython(notebookId, notebook.cells, codeFor);
+  ...options
+}: { notebookId: string; notebook: StoredNotebook; children: ReactNode } & PythonOptions) {
+  const value = useNotebookPython(notebookId, notebook.cells, options);
   return <PythonScope value={value}>{children}</PythonScope>;
 }
 
@@ -46,10 +49,11 @@ export function PythonScope({ value, children }: { value: PythonContextValue; ch
 export function useNotebookPython(
   notebookId: string,
   notebookCells: readonly Cell[],
-  codeFor: (cell: CodeCell) => string = (cell) => cell.raw,
+  options: PythonOptions = {},
 ): PythonContextValue {
-  const code = useRef(codeFor);
-  code.current = codeFor;
+  // Read when a cell runs, so the latest code and exercises count.
+  const latest = useRef(options);
+  latest.current = options;
   // biome-ignore lint/correctness/useExhaustiveDependencies: a new notebook gets a new Python, with a fresh namespace
   const session = useMemo(() => new PythonSession(), [notebookId]);
   useEffect(() => () => session.dispose(), [session]);
@@ -67,7 +71,16 @@ export function useNotebookPython(
     }
     const runOne = async (cell: CodeCell) => {
       const runnable = cells.get(cell);
-      return runnable ? session.run(runnable.key, code.current(cell), runnable.filename) : undefined;
+      if (!runnable) return undefined;
+      const { codeFor, checkFor, onRun } = latest.current;
+      const run = await session.run(
+        runnable.key,
+        codeFor ? codeFor(cell) : cell.raw,
+        runnable.filename,
+        checkFor?.(cell),
+      );
+      onRun?.(cell, run);
+      return run;
     };
     return {
       session,

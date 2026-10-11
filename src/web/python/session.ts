@@ -1,5 +1,5 @@
 import { type FromWorker, STDIN_BYTES, STDIN_HEADER, type ToWorker } from './protocol';
-import type { RunOutcome } from './runner';
+import type { RunCheck, RunOutcome } from './runner';
 
 // One Python per notebook on the page (#47): a worker with one namespace, runs one at a time.
 // When the page is cross-origin isolated (see public/_headers), Stop interrupts the code and keeps
@@ -37,7 +37,14 @@ const OUTPUT_LIMIT = 200_000;
 /** How long an interrupt may take before the worker is replaced. */
 const STOP_GRACE_MS = 3000;
 
-type Job = { id: number; key: string; code: string; filename: string; resolve: (run: CellRun) => void };
+type Job = {
+  id: number;
+  key: string;
+  code: string;
+  filename: string;
+  check?: RunCheck;
+  resolve: (run: CellRun) => void;
+};
 
 export class PythonSession {
   private worker: Worker | null = null;
@@ -176,16 +183,22 @@ export class PythonSession {
     if (run) this.setRun(job.key, { ...run, state: 'running' });
     this.set({ running: job.key });
     this.timer = setTimeout(() => this.stop(), RUN_LIMIT_MS);
-    this.worker?.postMessage({ type: 'run', id: job.id, code: job.code, filename: job.filename } satisfies ToWorker);
+    this.worker?.postMessage({
+      type: 'run',
+      id: job.id,
+      code: job.code,
+      filename: job.filename,
+      check: job.check,
+    } satisfies ToWorker);
   }
 
-  /** Queues a cell's code; resolves when it has run (or was stopped). */
-  run(key: string, code: string, filename: string): Promise<CellRun> {
+  /** Queues a cell's code; resolves when it has run (or was stopped). An exercise's run checks it. */
+  run(key: string, code: string, filename: string, check?: RunCheck): Promise<CellRun> {
     this.start();
     this.release(key);
     this.setRun(key, { state: 'queued', output: [], asking: false, truncated: false });
     return new Promise((resolve) => {
-      this.queue.push({ id: this.nextId++, key, code, filename, resolve });
+      this.queue.push({ id: this.nextId++, key, code, filename, check, resolve });
       this.next();
     });
   }

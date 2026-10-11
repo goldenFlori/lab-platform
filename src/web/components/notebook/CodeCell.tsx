@@ -1,9 +1,21 @@
 import { Chip } from '@heroui/react';
-import { Check, ChevronDown, Code2, Copy, MonitorSmartphone, Pencil, RotateCcw } from 'lucide-react';
+import {
+  Check,
+  ChevronDown,
+  CircleCheck,
+  ClipboardCheck,
+  Code2,
+  Copy,
+  MonitorSmartphone,
+  Pencil,
+  RotateCcw,
+  Users,
+} from 'lucide-react';
 import { lazy, Suspense, useState } from 'react';
 import type { CodeCell as Cell } from '../../../notebook/types';
 import { useT } from '../../i18n';
 import { useCodeEdits } from '../../lib/code-edits';
+import { useExercises } from '../../lib/exercises';
 import { sanitize } from '../../lib/sanitize';
 import { usePython } from '../../python/PythonProvider';
 import { Output } from './Output';
@@ -112,7 +124,7 @@ export function CodeCell({
               ) : (
                 <button
                   type="button"
-                  aria-label={t.edits.edit}
+                  aria-label={t.edits.editLabel(runnable.number)}
                   aria-pressed={editing}
                   title={t.edits.edit}
                   onClick={() => setEditing(!editing)}
@@ -125,6 +137,7 @@ export function CodeCell({
             <CopyButton text={edits && editable ? edits.code(cell) : cell.raw} />
           </span>
         </div>
+        {!presenting && <ExerciseStrip cell={cell} />}
         {editorOpen ? (
           <>
             <Suspense fallback={code}>
@@ -160,6 +173,37 @@ export function CodeCell({
         )}
       </div>
       {!presenting && <Outputs cell={cell} fileUrl={fileUrl} />}
+    </div>
+  );
+}
+
+/** The exercise a cell checks (#51): its title, solved or not, and for staff how many solved it. */
+function ExerciseStrip({ cell }: { cell: Cell }) {
+  const t = useT();
+  const exercises = useExercises();
+  const exercise = exercises?.of(cell);
+  if (!exercises || !exercise) return null;
+  const progress = exercises.progress(cell);
+  return (
+    <div
+      data-testid="exercise"
+      className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[var(--code-border)] bg-accent-soft/40 px-4 py-2 text-xs"
+    >
+      <span className="flex min-w-0 items-center gap-1.5 font-semibold text-accent">
+        <ClipboardCheck className="size-3.5 shrink-0" aria-hidden="true" />
+        <span className="sr-only">{t.exercises.label}:</span>
+        <span className="truncate">{exercise.title}</span>
+      </span>
+      {exercises.solved(cell) && (
+        <span className="flex items-center gap-1 font-medium text-success">
+          <CircleCheck className="size-3.5" aria-hidden="true" /> {t.exercises.solved}
+        </span>
+      )}
+      {progress && (
+        <span className="flex items-center gap-1 text-muted">
+          <Users className="size-3.5" aria-hidden="true" /> {t.exercises.progress(progress.solved, progress.of)}
+        </span>
+      )}
     </div>
   );
 }

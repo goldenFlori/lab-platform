@@ -14,12 +14,14 @@ import {
 } from 'lucide-react';
 import { type ReactNode, type SyntheticEvent, useEffect, useMemo, useRef } from 'react';
 import type { StoredNotebook } from '../../../../../../../../notebook/stored';
+import type { Exercise } from '../../../../../../../../shared/exercises';
 import type { LabView } from '../../../../../../../../shared/labs';
 import { ORIGINAL_FILE } from '../../../../../../../../shared/notebook-files';
 import type { Embed, NotebookKind, NotebookSummary } from '../../../../../../../../shared/notebooks';
 import { DeleteNotebook } from '../../../../../../../components/notebook/DeleteNotebook';
 import { EditsBar } from '../../../../../../../components/notebook/EditsBar';
 import { EmbedsEditor } from '../../../../../../../components/notebook/EmbedsEditor';
+import { ExercisesEditor } from '../../../../../../../components/notebook/ExercisesEditor';
 import { NotebookUpload } from '../../../../../../../components/notebook/NotebookUpload';
 import { embedAnchor, NotebookView } from '../../../../../../../components/notebook/NotebookView';
 import { PythonBar } from '../../../../../../../components/notebook/RunControls';
@@ -30,6 +32,7 @@ import { ApiError } from '../../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../../lib/brand';
 import { CodeEditsProvider, useCodeEdits } from '../../../../../../../lib/code-edits';
 import { courseQuery } from '../../../../../../../lib/courses';
+import { ExercisesProvider, useExercises } from '../../../../../../../lib/exercises';
 import { labQuery, labsQuery } from '../../../../../../../lib/labs';
 import {
   type NotebookRef,
@@ -209,12 +212,16 @@ function LabPage() {
           <NotebookSection
             notebookRef={ref}
             embeds={detail.data?.embeds}
+            exercises={detail.data?.exercises}
             embedsFailed={detail.isError}
             editor={
               canManage
                 ? {
                     isPending: changes.saveEmbeds.isPending,
                     save: (embeds) => changes.saveEmbeds.mutateAsync({ notebookId: ref.notebookId, embeds }),
+                    exercisesPending: changes.saveExercises.isPending,
+                    saveExercises: (exercises) =>
+                      changes.saveExercises.mutateAsync({ notebookId: ref.notebookId, exercises }),
                   }
                 : null
             }
@@ -255,15 +262,22 @@ function NotebookTab({ nb, current }: { nb: NotebookSummary; current: boolean })
 function NotebookSection({
   notebookRef,
   embeds,
+  exercises,
   embedsFailed,
   editor,
   onVisualizationUsed,
 }: {
   notebookRef: NotebookRef;
   embeds: Embed[] | undefined;
+  exercises: Exercise[] | undefined;
   embedsFailed: boolean;
-  /** Staff who manage the course: where the visualizations go. */
-  editor: { isPending: boolean; save: (embeds: Embed[]) => Promise<unknown> } | null;
+  /** Staff who manage the course: where the visualizations go, and the exercises (#51). */
+  editor: {
+    isPending: boolean;
+    save: (embeds: Embed[]) => Promise<unknown>;
+    exercisesPending: boolean;
+    saveExercises: (exercises: Exercise[]) => Promise<unknown>;
+  } | null;
   /** Students: told the first time they use a visualization of this notebook (#18). */
   onVisualizationUsed?: () => void;
 }) {
@@ -304,7 +318,7 @@ function NotebookSection({
       </Alert>
     );
   }
-  if (!rendered.data || !embeds) {
+  if (!rendered.data || !embeds || !exercises) {
     return (
       <p className="py-10 text-sm text-muted" aria-busy="true">
         {t.lab.loadingNotebook}
@@ -316,7 +330,7 @@ function NotebookSection({
       {/* Capturing, so a visualization that handles its own keys or clicks is still noticed. */}
       <article className="min-w-0" onPointerDownCapture={used} onKeyDownCapture={used}>
         {editor && (
-          <div className="mb-8">
+          <div className="mb-8 grid gap-3">
             <EmbedsEditor
               key={notebookRef.notebookId}
               notebook={rendered.data}
@@ -324,20 +338,29 @@ function NotebookSection({
               isPending={editor.isPending}
               onSave={editor.save}
             />
+            <ExercisesEditor
+              key={`exercises-${notebookRef.notebookId}`}
+              notebook={rendered.data}
+              exercises={exercises}
+              isPending={editor.exercisesPending}
+              onSave={editor.saveExercises}
+            />
           </div>
         )}
-        <CodeEditsProvider notebookRef={notebookRef} originals={originals}>
-          <EditablePython notebookId={notebookRef.notebookId} notebook={rendered.data}>
-            <EditsBar />
-            <PythonBar />
-            <NotebookView
-              id={notebookRef.notebookId}
-              notebook={rendered.data}
-              embeds={embeds}
-              fileUrl={(name) => notebookFileUrl(notebookRef, name)}
-            />
-          </EditablePython>
-        </CodeEditsProvider>
+        <ExercisesProvider notebookRef={notebookRef} exercises={exercises}>
+          <CodeEditsProvider notebookRef={notebookRef} originals={originals}>
+            <EditablePython notebookId={notebookRef.notebookId} notebook={rendered.data}>
+              <EditsBar />
+              <PythonBar />
+              <NotebookView
+                id={notebookRef.notebookId}
+                notebook={rendered.data}
+                embeds={embeds}
+                fileUrl={(name) => notebookFileUrl(notebookRef, name)}
+              />
+            </EditablePython>
+          </CodeEditsProvider>
+        </ExercisesProvider>
       </article>
       <aside className="hidden lg:block">
         <Toc entries={rendered.data.toc} />
@@ -400,7 +423,10 @@ function LabNeighbours({
   );
 }
 
-/** The notebook's Python, running each student's own version of the code where they changed it. */
+/**
+ * The notebook's Python, running each student's own version of the code where they changed it. An
+ * exercise's run checks it, and a check that passes is kept (#51).
+ */
 function EditablePython({
   notebookId,
   notebook,
@@ -411,8 +437,20 @@ function EditablePython({
   children: ReactNode;
 }) {
   const edits = useCodeEdits();
+  const exercises = useExercises();
   return (
-    <PythonProvider notebookId={notebookId} notebook={notebook} codeFor={(cell) => edits?.code(cell) ?? cell.raw}>
+    <PythonProvider
+      notebookId={notebookId}
+      notebook={notebook}
+      codeFor={(cell) => edits?.code(cell) ?? cell.raw}
+      checkFor={(cell) => {
+        const exercise = exercises?.of(cell);
+        return exercise ? { test: exercise.test } : undefined;
+      }}
+      onRun={(cell, run) => {
+        if (run.outcome?.kind === 'ok' && run.outcome.check?.status === 'pass') exercises?.passed(cell);
+      }}
+    >
       {children}
     </PythonProvider>
   );

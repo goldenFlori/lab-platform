@@ -1,9 +1,12 @@
 import { loadPyodide, type PyodideAPI } from 'pyodide';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { renderNotebook } from '../../src/notebook';
+import { detectExercises } from '../../src/notebook/exercises';
+import { toStored } from '../../src/notebook/stored';
 import { cellFile, MICROPIP_PACKAGES, RUNNER_PY } from '../../src/web/python/runner';
 
-// #48 is done when every course notebook's runnable cells run in the browser with their figures.
+// #48 is done when every course notebook's runnable cells run in the browser with their figures;
+// #51 adds that each exercise's check runs and finds the exercise not written yet.
 // This runs them all through the same runner the browser uses, in Pyodide under Node: each notebook
 // in a fresh namespace, the desktop-window cells skipped as on the lab page. The packages come from
 // Pyodide's CDN and PyPI, as in the browser, so this test needs the network.
@@ -41,7 +44,10 @@ async function runAll(raw: string) {
   const failures: string[] = [];
   // Figures each runnable cell should show: a Plotly fig.show(), a matplotlib plt.show().
   const expected = { images: 0, plotly: 0 };
-  const cells = (await renderNotebook(raw)).cells.filter((cell) => cell.type === 'code');
+  const rendered = await renderNotebook(raw);
+  const exercises = new Set(detectExercises(toStored(rendered)).map((e) => e.cell));
+  const checks: string[] = [];
+  const cells = rendered.cells.filter((cell) => cell.type === 'code');
   for (const [i, cell] of cells.entries()) {
     if (cell.type !== 'code' || cell.interactive) continue;
     await pyodide.loadPackagesFromImports(cell.raw);
@@ -51,14 +57,16 @@ async function runAll(raw: string) {
       await pyodide.pyimport('micropip').install(name);
       installed.add(name);
     }
-    const result = await pyodide.globals.get('_lab_run')(cell.raw, cellFile(i));
-    const [kind, text = ''] = result.toJs() as [string, string | undefined];
+    const exercise = exercises.has(cell.srcIndex);
+    const result = await pyodide.globals.get('_lab_run')(cell.raw, cellFile(i), exercise);
+    const [kind, text = '', check] = result.toJs() as [string, string | undefined, string[] | undefined];
+    if (exercise) checks.push(check?.[0] ?? 'none');
     result.destroy();
     if (/plotly/.test(cell.raw) && /fig\.show\(\)/.test(cell.raw)) expected.plotly++;
     if (/plt\.show\(\)/.test(cell.raw)) expected.images++;
     if (kind !== 'ok') failures.push(`${cellFile(i)}: ${text.trim().split('\n').at(-1)}`);
   }
-  return { failures, expected, shown: { ...shown } };
+  return { failures, expected, shown: { ...shown }, checks, exercises: exercises.size };
 }
 
 const name = (path: string) => path.split('/').pop() as string;
@@ -67,7 +75,9 @@ describe('every course notebook in the browser runtime', () => {
   it.each(Object.entries(notebooks).map(([path, raw]) => [name(path), raw]))(
     '%s runs, its figures shown',
     async (file, raw) => {
-      const { failures, expected, shown } = await runAll(raw);
+      const { failures, expected, shown, checks, exercises } = await runAll(raw);
+      // Each exercise's own check runs, and finds the student version not written yet (#51).
+      expect(checks, file).toEqual(Array(exercises).fill('todo'));
       // Exercise blanks (___) are left for students to fill in; nothing else may fail.
       expect(
         failures.filter((f) => !f.includes("name '___' is not defined")),

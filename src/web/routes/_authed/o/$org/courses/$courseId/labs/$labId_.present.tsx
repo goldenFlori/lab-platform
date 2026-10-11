@@ -97,9 +97,16 @@ function Presenter() {
   const outputs = code?.type === 'code' ? code.outputs : [];
   const isRevealed = revealed.has(index);
 
-  const python = useNotebookPython(current?.id ?? '', notebook?.cells ?? NO_CELLS, (cell) => {
-    const solved = showSolution ? solution?.cells[notebook?.cells.indexOf(cell) ?? -1] : undefined;
-    return solved?.type === 'code' ? solved.raw : cell.raw;
+  const python = useNotebookPython(current?.id ?? '', notebook?.cells ?? NO_CELLS, {
+    codeFor: (cell) => {
+      const solved = showSolution ? solution?.cells[notebook?.cells.indexOf(cell) ?? -1] : undefined;
+      return solved?.type === 'code' ? solved.raw : cell.raw;
+    },
+    // An exercise's run shows its check (#51), as on the lab page.
+    checkFor: (cell) => {
+      const exercise = detail.data?.exercises.find((e) => e.cell === cell.srcIndex);
+      return exercise ? { test: exercise.test } : undefined;
+    },
   });
   const pythonState = useSessionState(python.session);
   // A run belongs to the notebook's own cell, also while its solved code is shown.

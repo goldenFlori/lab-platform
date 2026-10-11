@@ -1,5 +1,6 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { StoredNotebook } from '../../notebook/stored';
+import type { Exercise } from '../../shared/exercises';
 import { RENDERED_FILE } from '../../shared/notebook-files';
 import type { Embed, NotebookDetail, NotebookSummary } from '../../shared/notebooks';
 import { api } from './api';
@@ -58,6 +59,14 @@ export function useNotebookChanges(org: string, courseId: string, labId: string)
     saveEmbeds: useMutation({
       mutationFn: ({ notebookId, embeds }: { notebookId: string; embeds: Embed[] }) =>
         api<NotebookDetail>(`${base}/${encodeURIComponent(notebookId)}/embeds`, { method: 'PUT', body: { embeds } }),
+      onSuccess: keep,
+    }),
+    saveExercises: useMutation({
+      mutationFn: ({ notebookId, exercises }: { notebookId: string; exercises: Exercise[] }) =>
+        api<NotebookDetail>(`${base}/${encodeURIComponent(notebookId)}/exercises`, {
+          method: 'PUT',
+          body: { exercises },
+        }),
       onSuccess: keep,
     }),
     deleteNotebook: useMutation({

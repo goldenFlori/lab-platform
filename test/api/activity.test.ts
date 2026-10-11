@@ -94,8 +94,17 @@ describe('the activity report', () => {
     expect(status).toBe(200);
     expect(body?.students).toBe(2);
     expect(body?.groups.map((g) => g.name)).toEqual(['Grupi A', 'Grupi B']);
-    expect(body?.weeks.at(-1)).toEqual({ week: mondayOf(today()), active: 2, view: 2, download: 1, visualization: 1 });
-    expect(body?.labs).toEqual([{ id: seed.lab.id, n: 1, title: 'Grafet', view: 2, download: 1, visualization: 1 }]);
+    expect(body?.weeks.at(-1)).toEqual({
+      week: mondayOf(today()),
+      active: 2,
+      view: 2,
+      download: 1,
+      visualization: 1,
+      exercise: 0,
+    });
+    expect(body?.labs).toEqual([
+      { id: seed.lab.id, n: 1, title: 'Grafet', view: 2, download: 1, visualization: 1, exercise: 0 },
+    ]);
     const text = JSON.stringify(body);
     for (const who of [studentA, studentB]) {
       expect(text).not.toContain(who.user.id);
