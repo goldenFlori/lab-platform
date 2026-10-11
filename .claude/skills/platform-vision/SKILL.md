@@ -201,9 +201,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-11:** #53 done, and with it Phase 2. The pedagog sets points and hidden tests,
   grades a group's submissions in one batch run in their own browser, adjusts scores with
   feedback, and releases them; students then see their grade (PR #63).
-- **Next:** plan Phase 3 (Live Labs and "your code, visualized") as a milestone with issues. The
-  staff-management screen (adding assistants to a course or group, today only by script) is a
-  candidate to do first.
+- **2026-10-11:** Phase 3 planned as the "Phase 3: Live Labs" milestone, issues #64–#70.
+- **2026-10-11:** #64 done. Pedagogs manage their course's staff in the app: add pedagogs and
+  assistants for the course or one group, from the institution's accounts or as new accounts,
+  and remove them (PR #71).
+- **Next:** #65, Live Lab sessions.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 

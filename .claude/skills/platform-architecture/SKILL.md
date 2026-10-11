@@ -139,6 +139,12 @@ Verified 2026-10-06. Re-check before relying on them.
 
 ## Courses, groups and joining
 
+- **Staff** (#64, `src/api/routes/staff.ts`): staff with `course.manage` for the whole course list
+  its pedagogs and assistants and add them for the course or one group: an account of the
+  organization by username (another organization's accounts are never found), or a new account
+  whose password is generated and hashed in the browser and shown once. One role per person in
+  the course and in each group; the last course-wide pedagog cannot be removed.
+
 Built in #10, under `/api/orgs/:org/courses` (`src/api/routes/courses.ts`).
 
 - **Seeing a course:** staff of the course (`lab.view` or `course.manage` in it) or a student of

@@ -15,6 +15,7 @@ import { courseActivityRoutes } from './activity';
 import { forbidden, groupOf, invalidRequest, seesCourse, summary, visibleCourse } from './course-context';
 import { labRoutes } from './labs';
 import { searchRoutes } from './search';
+import { staffRoutes } from './staff';
 
 // Courses and their groups, under /api/orgs/:org/courses (#10).
 
@@ -178,6 +179,7 @@ export const courseRoutes = new Hono<TenantEnv>()
     return c.json({ joinCode });
   })
 
+  .route('/:courseId/staff', staffRoutes)
   .route('/:courseId/labs', labRoutes)
   .route('/:courseId/search', searchRoutes)
   .route('/:courseId/activity', courseActivityRoutes);
