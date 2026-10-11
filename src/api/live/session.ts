@@ -1,5 +1,5 @@
 import { DurableObject } from 'cloudflare:workers';
-import type { LivePresence, LiveRole } from '../../shared/live';
+import type { LiveEnded, LivePresence, LiveRole } from '../../shared/live';
 
 // One Live Lab session (#65): the connections of everyone in the room. The Worker checks who may
 // join and passes them here with their role; this object only holds sockets and tells the staff
@@ -26,7 +26,12 @@ export class LiveSession extends DurableObject<Env> {
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
     if (url.pathname.endsWith('/end')) {
-      for (const ws of this.ctx.getWebSockets()) ws.close(ENDED, 'ended');
+      // Said before closing: a close code does not always survive the proxies on the way.
+      const ended = JSON.stringify({ t: 'ended' } satisfies LiveEnded);
+      for (const ws of this.ctx.getWebSockets()) {
+        ws.send(ended);
+        ws.close(ENDED, 'ended');
+      }
       return new Response(null, { status: 204 });
     }
     const member = JSON.parse(request.headers.get(MEMBER_HEADER) ?? 'null') as Member | null;

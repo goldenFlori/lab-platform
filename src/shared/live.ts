@@ -12,4 +12,7 @@ export type LiveState = {
 /** To the host and assistants: who is connected. Names reach staff only. */
 export type LivePresence = { t: 'presence'; students: number; staff: number; names: string[] };
 
-export type LiveMessage = LivePresence;
+/** To everyone: the host ended the session. */
+export type LiveEnded = { t: 'ended' };
+
+export type LiveMessage = LivePresence | LiveEnded;
