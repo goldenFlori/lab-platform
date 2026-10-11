@@ -142,6 +142,13 @@ export const sq = {
     deleteGroupText:
       "Studentët e këtij grupi largohen nga kursi. Llogaritë e tyre mbeten, por do t'u duhet një kod i ri për t'u kthyer.",
     deleteGroup: 'Fshi grupin',
+    deleteCourse: 'Fshi kursin',
+    deleteCourseTitle: (title: string) => `Të fshihet „${title}”?`,
+    deleteCourseText: (groups: number) =>
+      `Fshihen përgjithmonë ${groups === 1 ? 'grupi' : `${groups} grupet`}, laboratorët, fletoret, kodi i ruajtur i studentëve, dorëzimet, notat dhe aktiviteti i këtij kursi. Kjo nuk zhbëhet.`,
+    deleteCourseKeep:
+      'Llogaritë e studentëve dhe të stafit mbeten. Për të mbyllur vitin pa humbur asgjë, përdorni „Arkivo”.',
+    deleteCourseConfirm: 'Fshi përgjithmonë',
   },
   group: {
     pageTitle: 'Grupi',

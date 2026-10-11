@@ -35,6 +35,7 @@ export function useCreateCourse(org: string) {
 
 export function useCourseChanges(org: string, courseId: string) {
   const onSuccess = useRefresh(org);
+  const queryClient = useQueryClient();
   const base = `${orgPath(org)}/courses/${encodeURIComponent(courseId)}`;
   return {
     archive: useMutation({
@@ -42,6 +43,14 @@ export function useCourseChanges(org: string, courseId: string) {
         api<CourseSummary>(`${base}/${archived ? 'archive' : 'unarchive'}`, { method: 'POST' }),
       onSuccess,
     }),
+    /** Deletes it; the page leaves before the course's data is forgotten, so it never shows "not found". */
+    remove: useMutation({
+      mutationFn: () => api<void>(base, { method: 'DELETE' }),
+    }),
+    forget: () => {
+      queryClient.removeQueries({ queryKey: courseQuery(org, courseId).queryKey });
+      void queryClient.invalidateQueries({ queryKey: coursesQuery(org).queryKey, exact: true });
+    },
     setLocale: useMutation({
       mutationFn: (locale: Locale | null) => api<CourseSummary>(base, { method: 'PATCH', body: { locale } }),
       onSuccess,

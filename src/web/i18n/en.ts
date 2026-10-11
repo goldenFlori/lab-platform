@@ -143,6 +143,12 @@ export const en: Messages = {
     deleteGroupText:
       'The students of this group leave the course. Their accounts stay, but they will need a new code to come back.',
     deleteGroup: 'Delete the group',
+    deleteCourse: 'Delete the course',
+    deleteCourseTitle: (title: string) => `Delete “${title}”?`,
+    deleteCourseText: (groups: number) =>
+      `This course's ${groups === 1 ? 'group' : `${groups} groups`}, labs, notebooks, students' saved code, submissions, grades and activity are deleted for good. This cannot be undone.`,
+    deleteCourseKeep: "Students' and staff accounts stay. To end the year without losing anything, use “Archive”.",
+    deleteCourseConfirm: 'Delete for good',
   },
   group: {
     pageTitle: 'Group',
