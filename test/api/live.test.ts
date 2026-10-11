@@ -1,6 +1,6 @@
 import { exports } from 'cloudflare:workers';
 import { describe, expect, it } from 'vitest';
-import type { LivePresence, LiveState } from '../../src/shared/live';
+import type { LiveMessage, LiveState } from '../../src/shared/live';
 import { seedOrganization } from './fixtures';
 import { account, ORIGIN, signIn } from './http';
 
@@ -28,12 +28,16 @@ async function connect(cookie: string, path: string, origin = ORIGIN) {
     headers: { Upgrade: 'websocket', Cookie: cookie, Origin: origin },
   });
   const ws = res.webSocket;
-  if (!ws) return { status: res.status, ws: null, messages: [] as LivePresence[] };
-  const messages: LivePresence[] = [];
-  ws.addEventListener('message', (event) => messages.push(JSON.parse(String(event.data)) as LivePresence));
+  if (!ws) return { status: res.status, ws: null, messages: [] as LiveMessage[] };
+  const messages: LiveMessage[] = [];
+  ws.addEventListener('message', (event) => messages.push(JSON.parse(String(event.data)) as LiveMessage));
   ws.accept();
   return { status: res.status, ws, messages };
 }
+
+/** The latest presence a socket was told. */
+const last = (socket: { messages: LiveMessage[] }) =>
+  socket.messages.filter((m) => m.t === 'presence').at(-1) as Extract<LiveMessage, { t: 'presence' }> | undefined;
 
 const waitFor = async (check: () => boolean) => {
   for (let i = 0; i < 200 && !check(); i++) await new Promise((r) => setTimeout(r, 10));
@@ -72,13 +76,13 @@ describe('Live Lab sessions', () => {
       }),
     );
     expect(students.every((s) => s.status === 101)).toBe(true);
-    await waitFor(() => host.messages.at(-1)?.students === 30);
-    expect(host.messages.at(-1)?.names).toHaveLength(30);
+    await waitFor(() => last(host)?.students === 30);
+    expect(last(host)?.names).toHaveLength(30);
     // Students are told nothing about the others.
     expect(students.every((s) => s.messages.length === 0)).toBe(true);
 
     for (const s of students.slice(0, 20)) s.ws?.close(1000);
-    await waitFor(() => host.messages.at(-1)?.students === 10);
+    await waitFor(() => last(host)?.students === 10);
 
     // Ending closes everyone's socket.
     const closed = new Promise((resolve) => host.ws?.addEventListener('close', (e) => resolve(e.code)));
@@ -96,5 +100,24 @@ describe('Live Lab sessions', () => {
     expect((await connect(await signIn(ana.user.username), `${labPath}/live/${crypto.randomUUID()}/ws`)).status).toBe(
       404,
     );
+  });
+
+  it("pass the host's step to everyone, and to each newcomer; a student cannot move the room", async () => {
+    const { pedagog, ana, labPath, state, seed } = await setup();
+    await pedagog.call(`${labPath}/live`, { method: 'POST' });
+    const ws = `${labPath}/live/${(await state(pedagog)).session?.id}/ws`;
+    const host = await connect(await signIn(pedagog.user.username), ws);
+    const student = await connect(await signIn(ana.user.username), ws);
+    host.ws?.send(JSON.stringify({ t: 'step', notebook: seed.notebook.id, at: 7 }));
+    const step = { t: 'step', notebook: seed.notebook.id, at: 7 };
+    await waitFor(() => student.messages.some((m) => m.t === 'step'));
+    expect(student.messages.filter((m) => m.t === 'step')).toEqual([step]);
+
+    student.ws?.send(JSON.stringify({ t: 'step', notebook: seed.notebook.id, at: 99 }));
+    const late = await account(seed, 'student', { groupId: seed.group.id });
+    const newcomer = await connect(await signIn(late.user.username), ws);
+    await waitFor(() => newcomer.messages.some((m) => m.t === 'step'));
+    expect(newcomer.messages.filter((m) => m.t === 'step')).toEqual([step]);
+    expect(host.messages.some((m) => m.t === 'step')).toBe(false);
   });
 });

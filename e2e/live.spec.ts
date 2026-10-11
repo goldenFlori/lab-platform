@@ -19,7 +19,7 @@ test('a pedagog runs a Live Lab and sees a student join', async ({ browser, isMo
   const student = await signIn(browser, E2E_ACCOUNT, isMobile);
   await apiCall(student, 'POST', '/join', { code: group.joinCode });
   await student.goto(`${pageUrl}?live=1`);
-  await expect(student.getByTestId('live-student')).toContainText('Jeni në Live Lab.');
+  await expect(student.getByTestId('live-student')).toContainText('Jeni në Live Lab');
   await expect(host.getByTestId('live-count')).toContainText('1 student i lidhur');
 
   await host.getByRole('button', { name: 'Mbyll sesionin' }).click();

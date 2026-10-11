@@ -1,11 +1,20 @@
 import { DurableObject } from 'cloudflare:workers';
-import type { LiveEnded, LivePresence, LiveRole } from '../../shared/live';
+import type { LiveEnded, LivePresence, LiveRole, LiveStep } from '../../shared/live';
 
 // One Live Lab session (#65): the connections of everyone in the room. The Worker checks who may
 // join and passes them here with their role; this object only holds sockets and tells the staff
 // who is connected. It uses WebSocket Hibernation: between messages it sleeps, and the sockets'
 // attachments keep who is who, so a quiet class costs nothing. Messages stay small: events, never
 // streams.
+
+/** A step message as the host may send it; anything else is ignored. */
+function parseStep(data: unknown): LiveStep | null {
+  if (!data || typeof data !== 'object') return null;
+  const { t, notebook, at } = data as Record<string, unknown>;
+  if (t !== 'step' || typeof notebook !== 'string' || notebook.length > 64) return null;
+  if (!Number.isInteger(at) || (at as number) < 0 || (at as number) > 10_000) return null;
+  return { t: 'step', notebook, at: at as number };
+}
 
 /** Who a socket belongs to, kept with it across hibernation. */
 type Member = { userId: string; name: string; role: LiveRole };
@@ -39,12 +48,29 @@ export class LiveSession extends DurableObject<Env> {
     const { 0: client, 1: server } = new WebSocketPair();
     this.ctx.acceptWebSocket(server, [member.role]);
     server.serializeAttachment(member);
+    // A newcomer starts where the host is.
+    const step = await this.ctx.storage.get<LiveStep>('step');
+    if (step && member.role !== 'host') server.send(JSON.stringify(step));
     this.broadcastPresence();
     return new Response(null, { status: 101, webSocket: client });
   }
 
-  async webSocketMessage(_ws: WebSocket, _message: string | ArrayBuffer) {
-    // Nothing to say yet; follow mode, challenges and help requests add their messages (#66–#68).
+  async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer) {
+    if (typeof message !== 'string' || message.length > 2000) return;
+    const member = ws.deserializeAttachment() as Member;
+    let data: unknown;
+    try {
+      data = JSON.parse(message);
+    } catch {
+      return;
+    }
+    // Only the host moves the room (#66).
+    const step = parseStep(data);
+    if (step && member.role === 'host') {
+      await this.ctx.storage.put('step', step);
+      const text = JSON.stringify(step);
+      for (const other of this.ctx.getWebSockets()) if (other !== ws) other.send(text);
+    }
   }
 
   async webSocketClose(ws: WebSocket, code: number) {

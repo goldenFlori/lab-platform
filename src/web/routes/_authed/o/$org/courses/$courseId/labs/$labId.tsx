@@ -165,7 +165,14 @@ function LabPage() {
           )}
 
           <div className="mt-5 flex flex-wrap gap-2.5">
-            <LiveLab org={org} courseId={courseId} labId={labId} autoJoin={live === 1} />
+            <LiveLab
+              org={org}
+              courseId={courseId}
+              labId={labId}
+              autoJoin={live === 1}
+              notebookId={current?.id ?? null}
+              onNotebook={(id) => void navigate({ search: (s) => ({ ...s, notebook: id }), replace: true })}
+            />
           </div>
 
           {canManage && (

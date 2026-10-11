@@ -207,7 +207,9 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   and remove them (PR #71).
 - **2026-10-11:** #65 done. A pedagog starts a Live Lab from the lab page; students join from a
   banner or the projector's QR code; the host sees how many are connected, and their names (PR #72).
-- **Next:** #66, follow the host.
+- **2026-10-11:** #66 done. Joined students' pages follow the step the pedagog presents or the
+  cell they stop at on the lab page; a student can work on their own and follow again (PR #73).
+- **Next:** #67, live challenges and results.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 

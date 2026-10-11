@@ -12,7 +12,13 @@ export type LiveState = {
 /** To the host and assistants: who is connected. Names reach staff only. */
 export type LivePresence = { t: 'presence'; students: number; staff: number; names: string[] };
 
+/**
+ * The step the host is on (#66): a notebook and the position of a cell in it. Sent by the host;
+ * passed to everyone else, and to each newcomer, so students' pages follow.
+ */
+export type LiveStep = { t: 'step'; notebook: string; at: number };
+
 /** To everyone: the host ended the session. */
 export type LiveEnded = { t: 'ended' };
 
-export type LiveMessage = LivePresence | LiveEnded;
+export type LiveMessage = LivePresence | LiveEnded | LiveStep;

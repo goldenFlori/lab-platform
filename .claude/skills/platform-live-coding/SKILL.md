@@ -236,7 +236,15 @@ Built in #65 (`src/api/live/session.ts`, `src/api/routes/live.ts`, `src/web/comp
 - **Students do not poll:** the page checks for a session when it opens and regains focus. A drop
   reconnects with growing pauses and re-checks that the session still runs.
 
-Planned next: follow mode (#66), challenges (#67), help and reactions (#68).
+- **Follow mode** (#66): the host's page sends `{t:'step', notebook, at}` (`at` is the cell's
+  position in the stored notebook, marked `data-at` in `NotebookView`): the presenter on each step,
+  the lab page where scrolling settles (0.6 s). The object keeps the latest step in its storage,
+  passes it to everyone else and to each newcomer, and ignores steps from anyone but the host.
+  Joined students follow by default: their page switches notebook if needed and scrolls to the
+  cell. "Puno vetë" detaches; "Ndiq pedagogun" goes to where the host is now. The presenter
+  shows the host "Live · N".
+
+Planned next: challenges (#67), help and reactions (#68).
 
 - **Infrastructure:** one Durable Object per session, using WebSocket Hibernation.
 - **Joining:** students join with a code or QR. Room roles: host, assistant, student.
