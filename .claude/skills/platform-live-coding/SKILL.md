@@ -196,10 +196,22 @@ Built in #49.
     in (`GET …/submissions?group=`) and read one student's code (`GET …/submissions/:userId`) on
     the lab's "Dorëzimet" page; other staff, other students and other groups get 403 or 404.
   - Grading the submissions is #53.
-- **Graded work:**
-  - Hidden tests are stored server-side and sent only to staff.
-  - The **pedagog's browser re-runs every submission** in sandboxed Pyodide workers, in a batch.
-    Results are trustworthy, and the server never executes Python.
+- **Grading** (built in #53, `src/api/routes/grading.ts`, `src/web/python/grade.ts`):
+  - **Setup** (`exercise_grading`, staff with `grade.edit` for the whole course): each exercise's
+    points (default 1) and an optional hidden test, never sent to students.
+  - **The batch run** happens on the "Dorëzimet" page, in the pedagog's browser. It fetches the
+    group's submissions with their code, then runs each one in a fresh Python worker (no
+    `input()`, 30 s per cell). The notebook's cells run in order with the student's code. An
+    exercise's check comes from the notebook and the server, never from the student: a cell that
+    only checks (`kontrollo`) runs as the notebook has it; one that is also left to fill
+    (`NotImplementedError`, `___`, `PLOTESO`) runs as the student wrote it. The hidden test runs
+    after a passing check. Each grade is stored as it is made (`grades`); the server never runs
+    Python, and students' own browsers never write grades.
+  - **Review:** the pedagog adjusts a score (`score` overrides the run's) and writes feedback; a
+    new run updates the run's score and keeps the adjustment.
+  - **Release** per group: students then see their grade and feedback in the submission bar.
+  - **Known limit:** a student who studies the platform's runner could tamper with the checks from
+    their own code; the pedagog reads the code, and hidden tests make guessing harder.
 - **Exercise variants:** generated per group or student (different data, same concept) so copying
   stops working. The AI copilot can draft them; the pedagog approves.
 
