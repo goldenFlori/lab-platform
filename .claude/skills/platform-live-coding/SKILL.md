@@ -11,6 +11,37 @@ This is the platform's core innovation and the main difference from Google Class
 
 ## Python in the browser (Pyodide)
 
+Built in #47: ▶ on every code cell of the lab page (not desktop-window cells), "run the cells
+above", Stop, Restart Python, and `input()` answered on the page.
+
+- **Code:** `src/web/python/`: `worker.ts` (the sandbox), `session.ts` (one per notebook shown,
+  queues runs), `runner.ts` (the Python side), `PythonProvider.tsx`; the UI is in
+  `components/notebook/RunControls.tsx`.
+- **The engine** comes from our own site: Vite copies `pyodide.asm.*`, `python_stdlib.zip` and
+  `pyodide-lock.json` from the npm package (pinned with `--save-exact`) to `/pyodide/<version>/`,
+  where Cloudflare compresses them. The packages a cell imports come from Pyodide's CDN
+  (jsdelivr) at the same version, through `packageBaseUrl`.
+- **Cross-origin isolation:** `public/_headers` (and `server.headers` in development) send
+  COOP and COEP on every page. The worker then shares memory with the page:
+  - Stop raises `KeyboardInterrupt` in the student's code and keeps the variables; Python
+    restarts only if the code does not stop within 3 s;
+  - `input()` waits in the worker (`Atomics.wait`) until the page answers.
+
+  Without isolation, Stop restarts Python and `input()` reads end of file.
+- **Each run:**
+  - goes through `eval_code_async` with the file name `<cell N>`, so tracebacks name the cell and
+    leave out Pyodide's frames;
+  - shows the last expression's value, as Jupyter does;
+  - ends after 2 minutes;
+  - keeps at most 200 kB of output.
+- **On the page:**
+  - a run's output replaces the stored outputs until "Show the saved output";
+  - the namespace lives as long as the notebook is shown.
+- **Tested:**
+  - the runner in Pyodide under Node;
+  - an end-to-end student run on desktop and phone: output, namespace, errors, Stop, `input()`,
+    restart and run-above.
+
 - **Where it runs:** a dedicated Web Worker, which is the sandbox; the UI never blocks.
   - Lazy-load on the first ▶ and keep it cached.
   - Show a clear "Python is starting…" state.
