@@ -96,7 +96,9 @@ Built in #49.
 - **What can be edited:** on the lab page, every cell that can run; ✎ opens the editor.
   - An edited cell shows the editor, an "Edited" label, ↺ to restore the original and the
     original code folded below.
-  - Run and "run the cells above" use the student's own code (`PythonProvider`'s `codeFor`).
+  - Run and "run the cells above" use the student's own code (`PythonProvider`'s `codeFor`); they
+    stay disabled until the saved edits have loaded (`ready`), so a quick click never runs the
+    original (#78).
 - **Saving** (`lib/code-edits.tsx`):
   - 0.8 s after typing stops, and at once (with `keepalive`) when the page is hidden or closed;
   - code put back exactly as it was deletes the saved copy;
