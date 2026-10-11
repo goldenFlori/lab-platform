@@ -24,9 +24,11 @@ import {
   courseTemplates,
   embeds,
   exerciseCompletions,
+  exerciseGrading,
   exercises,
   fileChunks,
   files,
+  grades,
   groups,
   labAccess,
   labActivity,
@@ -861,6 +863,86 @@ function tenantSubmissions(db: Db, orgId: string) {
   };
 }
 
+/** Points and hidden tests per exercise, and the grades of re-run submissions (#53). Staff only. */
+function tenantGrading(db: Db, orgId: string) {
+  const ofNotebook = (notebookId: string) =>
+    and(eq(exerciseGrading.orgId, orgId), eq(exerciseGrading.notebookId, notebookId));
+  const gradeOf = (notebookId: string, userId: string) =>
+    and(eq(grades.orgId, orgId), eq(grades.notebookId, notebookId), eq(grades.userId, userId));
+  return {
+    setupOf(notebookId: string) {
+      return db
+        .select({ cell: exerciseGrading.cell, points: exerciseGrading.points, hiddenTest: exerciseGrading.hiddenTest })
+        .from(exerciseGrading)
+        .where(ofNotebook(notebookId))
+        .orderBy(asc(exerciseGrading.cell));
+    },
+
+    /** Replaces the notebook's points and hidden tests at once. */
+    async setSetup(notebookId: string, list: { cell: number; points: number; hiddenTest: string | null }[]) {
+      const rows = list.map((row) => ({ ...row, id: uuidv7(), orgId, notebookId }));
+      await rethrowMissingParent(
+        db.batch([
+          db.delete(exerciseGrading).where(ofNotebook(notebookId)),
+          ...inChunks(rows).map((chunk) => db.insert(exerciseGrading).values(chunk)),
+        ]),
+      );
+    },
+
+    /** Stores a re-run's result; the pedagog's adjustment and the release stay. */
+    async record(row: {
+      notebookId: string;
+      userId: string;
+      autoScore: number;
+      maxScore: number;
+      results: { cell: number; status: string }[];
+    }) {
+      const gradedAt = new Date();
+      await rethrowMissingParent(
+        db
+          .insert(grades)
+          .values({ ...row, id: uuidv7(), orgId, gradedAt })
+          .onConflictDoUpdate({
+            target: [grades.orgId, grades.notebookId, grades.userId],
+            set: { autoScore: row.autoScore, maxScore: row.maxScore, results: row.results, gradedAt },
+          }),
+      );
+    },
+
+    /** The pedagog's score and feedback for a graded submission; false when it has no grade yet. */
+    async review(notebookId: string, userId: string, change: { score: number | null; feedback: string | null }) {
+      const updated = await db
+        .update(grades)
+        .set(change)
+        .where(gradeOf(notebookId, userId))
+        .returning({ id: grades.id });
+      return updated.length > 0;
+    },
+
+    /** Shows these students their grades. */
+    async release(notebookId: string, userIds: string[]) {
+      if (!userIds.length) return;
+      await db
+        .update(grades)
+        .set({ releasedAt: new Date() })
+        .where(and(eq(grades.orgId, orgId), eq(grades.notebookId, notebookId), inArray(grades.userId, userIds)));
+    },
+
+    ofNotebook(notebookId: string, userIds: string[]) {
+      if (!userIds.length) return Promise.resolve([]);
+      return db
+        .select()
+        .from(grades)
+        .where(and(eq(grades.orgId, orgId), eq(grades.notebookId, notebookId), inArray(grades.userId, userIds)));
+    },
+
+    async of(notebookId: string, userId: string) {
+      const [row] = await db.select().from(grades).where(gradeOf(notebookId, userId));
+      return row;
+    },
+  };
+}
+
 export function forTenant(db: Db, orgId: string) {
   const members = tenantUsers(db, orgId);
   return {
@@ -878,6 +960,7 @@ export function forTenant(db: Db, orgId: string) {
     codeEdits: tenantCodeEdits(db, orgId),
     exercises: tenantExercises(db, orgId),
     submissions: tenantSubmissions(db, orgId),
+    grading: tenantGrading(db, orgId),
   };
 }
 

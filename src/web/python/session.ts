@@ -46,7 +46,16 @@ type Job = {
   resolve: (run: CellRun) => void;
 };
 
+export type SessionOptions = {
+  /** Whether input() asks on the page; without it, input() reads end of file (grading, #53). */
+  input?: boolean;
+  /** Time a single cell may run before it is stopped. */
+  runLimitMs?: number;
+};
+
 export class PythonSession {
+  constructor(private readonly options: SessionOptions = {}) {}
+
   private worker: Worker | null = null;
   private interrupt: Uint8Array | null = null;
   private stdin: SharedArrayBuffer | null = null;
@@ -96,9 +105,11 @@ export class PythonSession {
     if (isolated) {
       const interrupt = new SharedArrayBuffer(1);
       this.interrupt = new Uint8Array(interrupt);
-      this.stdin = new SharedArrayBuffer(STDIN_HEADER + STDIN_BYTES);
       init.interrupt = interrupt;
-      init.stdin = this.stdin;
+      if (this.options.input !== false) {
+        this.stdin = new SharedArrayBuffer(STDIN_HEADER + STDIN_BYTES);
+        init.stdin = this.stdin;
+      }
     }
     worker.postMessage(init);
     this.worker = worker;
@@ -182,7 +193,7 @@ export class PythonSession {
     const run = this.state.runs.get(job.key);
     if (run) this.setRun(job.key, { ...run, state: 'running' });
     this.set({ running: job.key });
-    this.timer = setTimeout(() => this.stop(), RUN_LIMIT_MS);
+    this.timer = setTimeout(() => this.stop(), this.options.runLimitMs ?? RUN_LIMIT_MS);
     this.worker?.postMessage({
       type: 'run',
       id: job.id,
@@ -223,12 +234,15 @@ export class PythonSession {
     for (const job of this.queue.splice(0)) this.drop(job);
     const job = this.active;
     if (!job) return;
-    if (this.interrupt && this.stdin) {
+    if (this.interrupt) {
       this.interrupt[0] = 2; // SIGINT: KeyboardInterrupt in the student's code
-      const control = new Int32Array(this.stdin, 0, 2);
-      Atomics.store(control, 1, -1);
-      Atomics.store(control, 0, 1);
-      Atomics.notify(control, 0);
+      if (this.stdin) {
+        // A run waiting in input() wakes up, stopped.
+        const control = new Int32Array(this.stdin, 0, 2);
+        Atomics.store(control, 1, -1);
+        Atomics.store(control, 0, 1);
+        Atomics.notify(control, 0);
+      }
       clearTimeout(this.timer);
       this.timer = setTimeout(() => {
         if (this.active === job) this.restart(job);

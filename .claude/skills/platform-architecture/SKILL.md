@@ -243,7 +243,9 @@ exercises(id, org_id, notebook_id, cell, title, test?)  -- built (#51)
 exercise_completions(id, org_id, notebook_id, cell, user_id, created_at)  -- built (#51)
 assignments(id, org_id, notebook_id, group_id, due_at)  -- built (#52)
 submissions(id, org_id, notebook_id, user_id, code, solved, attempts, submitted_at)  -- built (#52)
-grades, live_sessions, ai_logs (later phases)
+exercise_grading(id, org_id, notebook_id, cell, points, hidden_test?)  -- built (#53)
+grades(id, org_id, notebook_id, user_id, auto_score, max_score, results, score?, feedback?, graded_at, released_at?)  -- built (#53)
+live_sessions, ai_logs (later phases)
 login_attempts(key, window_start, count)
 ```
 

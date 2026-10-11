@@ -22,6 +22,8 @@ export type SubmissionSummary = {
 /** What a student sees: their deadline, if the notebook is open to them, and what they handed in. */
 export type MySubmission = {
   dueAt: string | null;
+  /** Their grade, once released (#53). */
+  grade: import('./grading').MyGrade | null;
   /** Before the deadline: handing in (again) is possible. */
   open: boolean;
   submission: SubmissionSummary | null;

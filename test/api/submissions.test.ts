@@ -64,12 +64,12 @@ describe('opening a notebook for submission', () => {
 describe('handing in work', () => {
   it("copies the student's saved code and solved exercises, and can be repeated until the deadline", async () => {
     const { seed, pedagog, ana, open, submit, mine, edit } = await setup();
-    expect(await mine(ana)).toEqual({ dueAt: null, open: false, submission: null });
+    expect(await mine(ana)).toEqual({ dueAt: null, grade: null, open: false, submission: null });
     expect((await submit(ana)).status).toBe(403);
 
     const dueAt = at(3600);
     await open(pedagog, seed.group.id, dueAt);
-    expect(await mine(ana)).toEqual({ dueAt, open: true, submission: null });
+    expect(await mine(ana)).toEqual({ dueAt, grade: null, open: true, submission: null });
     await edit(ana, 4, 'def shuma(a, b):\n    return a + b');
     await seed.tenant.exercises.complete({ notebookId: seed.notebook.id, cell: 4, userId: ana.user.id });
     const first = await submit(ana);

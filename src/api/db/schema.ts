@@ -583,3 +583,59 @@ export const submissions = sqliteTable(
     uniqueIndex('submissions_notebook_user_unique').on(t.orgId, t.notebookId, t.userId),
   ],
 );
+
+/**
+ * How an exercise is graded (#53): its points and an optional hidden test, run after the visible
+ * check. Staff only: never sent to students.
+ */
+export const exerciseGrading = sqliteTable(
+  'exercise_grading',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    notebookId: text('notebook_id').notNull(),
+    cell: integer('cell').notNull(),
+    points: integer('points').notNull(),
+    hiddenTest: text('hidden_test'),
+  },
+  (t) => [
+    foreignKey({
+      name: 'exercise_grading_notebook_fk',
+      columns: [t.notebookId, t.orgId],
+      foreignColumns: [notebooks.id, notebooks.orgId],
+    }).onDelete('cascade'),
+    uniqueIndex('exercise_grading_unique').on(t.orgId, t.notebookId, t.cell),
+  ],
+);
+
+/**
+ * A student's grade for a notebook (#53), from the pedagog's re-run of their submission. `score`
+ * is the pedagog's adjustment, if any; students see the grade once it is released.
+ */
+export const grades = sqliteTable(
+  'grades',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    notebookId: text('notebook_id').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    autoScore: integer('auto_score').notNull(),
+    maxScore: integer('max_score').notNull(),
+    /** Each exercise's result in the re-run, by cell. */
+    results: text('results', { mode: 'json' }).$type<{ cell: number; status: string }[]>().notNull(),
+    score: integer('score'),
+    feedback: text('feedback'),
+    gradedAt: integer('graded_at', { mode: 'timestamp' }).notNull(),
+    releasedAt: integer('released_at', { mode: 'timestamp' }),
+  },
+  (t) => [
+    foreignKey({
+      name: 'grades_notebook_fk',
+      columns: [t.notebookId, t.orgId],
+      foreignColumns: [notebooks.id, notebooks.orgId],
+    }).onDelete('cascade'),
+    uniqueIndex('grades_notebook_user_unique').on(t.orgId, t.notebookId, t.userId),
+  ],
+);
