@@ -639,3 +639,30 @@ export const grades = sqliteTable(
     uniqueIndex('grades_notebook_user_unique').on(t.orgId, t.notebookId, t.userId),
   ],
 );
+
+/**
+ * A Live Lab session (#65): a lab taught live, from start to end. The connections live in the
+ * session's Durable Object; this row says who hosts it and whether it still runs. At most one
+ * running session per lab.
+ */
+export const liveSessions = sqliteTable(
+  'live_sessions',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    labId: text('lab_id').notNull(),
+    hostId: text('host_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    startedAt: integer('started_at', { mode: 'timestamp' }).notNull(),
+    endedAt: integer('ended_at', { mode: 'timestamp' }),
+  },
+  (t) => [
+    foreignKey({
+      name: 'live_sessions_lab_fk',
+      columns: [t.labId, t.orgId],
+      foreignColumns: [labs.id, labs.orgId],
+    }).onDelete('cascade'),
+    uniqueIndex('live_sessions_running_unique').on(t.orgId, t.labId).where(sql`${t.endedAt} is null`),
+  ],
+);

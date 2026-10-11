@@ -59,7 +59,7 @@ Verified 2026-10-06. Re-check before relying on them.
   - Time Travel point-in-time restore for 7 days.
 
   Limits return errors and never bill.
-- **Durable Objects:**
+- **Durable Objects** (re-checked 2026-10-11):
   - available on the free plan, SQLite backend only;
   - 100,000 requests a day, 13,000 GB-s a day, 5 GB storage;
   - incoming WebSocket messages count at a 20:1 ratio;
@@ -251,7 +251,8 @@ assignments(id, org_id, notebook_id, group_id, due_at)  -- built (#52)
 submissions(id, org_id, notebook_id, user_id, code, solved, attempts, submitted_at)  -- built (#52)
 exercise_grading(id, org_id, notebook_id, cell, points, hidden_test?)  -- built (#53)
 grades(id, org_id, notebook_id, user_id, auto_score, max_score, results, score?, feedback?, graded_at, released_at?)  -- built (#53)
-live_sessions, ai_logs (later phases)
+live_sessions(id, org_id, lab_id, host_id, started_at, ended_at?)  -- built (#65)
+ai_logs (later phases)
 login_attempts(key, window_start, count)
 ```
 

@@ -205,7 +205,9 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-11:** #64 done. Pedagogs manage their course's staff in the app: add pedagogs and
   assistants for the course or one group, from the institution's accounts or as new accounts,
   and remove them (PR #71).
-- **Next:** #65, Live Lab sessions.
+- **2026-10-11:** #65 done. A pedagog starts a Live Lab from the lab page; students join from a
+  banner or the projector's QR code; the host sees how many are connected, and their names (PR #72).
+- **Next:** #66, follow the host.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
