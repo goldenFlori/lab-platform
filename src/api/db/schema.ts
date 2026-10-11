@@ -522,3 +522,64 @@ export const exerciseCompletions = sqliteTable(
     uniqueIndex('exercise_completions_unique').on(t.orgId, t.notebookId, t.cell, t.userId),
   ],
 );
+
+/**
+ * A notebook opened for submission to one group (#52), until its deadline. Closing it removes the
+ * row; the work already handed in stays.
+ */
+export const assignments = sqliteTable(
+  'assignments',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    notebookId: text('notebook_id').notNull(),
+    groupId: text('group_id').notNull(),
+    dueAt: integer('due_at', { mode: 'timestamp' }).notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    foreignKey({
+      name: 'assignments_notebook_fk',
+      columns: [t.notebookId, t.orgId],
+      foreignColumns: [notebooks.id, notebooks.orgId],
+    }).onDelete('cascade'),
+    foreignKey({
+      name: 'assignments_group_fk',
+      columns: [t.groupId, t.orgId],
+      foreignColumns: [groups.id, groups.orgId],
+    }).onDelete('cascade'),
+    uniqueIndex('assignments_notebook_group_unique').on(t.orgId, t.notebookId, t.groupId),
+  ],
+);
+
+/**
+ * A student's work handed in for a notebook (#52): their own code for the cells they changed and
+ * the exercises solved, copied from their account at that moment. One per student and notebook,
+ * replaced on each resubmission until the deadline. Only its author and the staff who review their
+ * group read it.
+ */
+export const submissions = sqliteTable(
+  'submissions',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    notebookId: text('notebook_id').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    /** The student's code for each cell they changed, by srcIndex; the rest is the notebook's. */
+    code: text('code', { mode: 'json' }).$type<{ cell: number; code: string }[]>().notNull(),
+    /** The exercises (cells) solved when it was handed in. */
+    solved: text('solved', { mode: 'json' }).$type<number[]>().notNull(),
+    attempts: integer('attempts').notNull(),
+    submittedAt: integer('submitted_at', { mode: 'timestamp' }).notNull(),
+  },
+  (t) => [
+    foreignKey({
+      name: 'submissions_notebook_fk',
+      columns: [t.notebookId, t.orgId],
+      foreignColumns: [notebooks.id, notebooks.orgId],
+    }).onDelete('cascade'),
+    uniqueIndex('submissions_notebook_user_unique').on(t.orgId, t.notebookId, t.userId),
+  ],
+);
