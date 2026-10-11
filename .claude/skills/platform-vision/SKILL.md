@@ -220,6 +220,8 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-11:** #70 done, and with it Phase 3. A student's own BFS, DFS or Dijkstra, recorded with
   `vizlab`, animates on the course's graph canvas next to the reference on the same graph (PR #77).
 - **2026-10-11:** #78 fixed: ▶ waits until a student's saved code has loaded (PR #79).
+- **2026-10-11:** #80 done. Staff who manage a course can delete it, after a confirmation popup that
+  says what goes with it (PR #81).
 - **Next:** try Phase 2 and 3 in class with the FSHN course and collect pilot data for the Startup
   Albania application (see `platform-business`); then plan Phase 4 (AI), which needs funding.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
@@ -256,6 +258,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-11 | Practice checks run in the student's browser and are trusted only as practice: a passed check marks the exercise solved and counts in the activity, never in a grade (grades come from the pedagog's re-runs, #53) | Decided |
 | 2026-10-11 | A submission is per notebook, opened per group with a deadline. The server copies the student's saved code and solved exercises at that moment; the last one before the deadline counts, and closing a submission never deletes work | Decided |
 | 2026-10-11 | Grades come only from the pedagog's batch re-run in their browser, a fresh Python per submission, with checks from the notebook and server-side hidden tests; the pedagog can adjust them, and students see them once released | Decided |
+| 2026-10-11 | Courses can be deleted by staff who manage them, with everything in them, after a confirmation popup; archiving stays the way to end a year (owner's choice, over allowing deletion only before students join) | Decided |
 | 2026-10-10 | Search without FTS5: D1 cannot export databases with virtual tables, and backups must keep working. The server sends each user the text of what they may see; the browser matches it as they type | Decided |
 
 Decisions were delegated to Claude ("you decide"). Record new ones here with the date.

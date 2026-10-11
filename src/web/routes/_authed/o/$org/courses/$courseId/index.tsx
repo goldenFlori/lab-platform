@@ -47,6 +47,7 @@ function CoursePage() {
   const { data } = useSuspenseQuery(courseQuery(org, courseId));
   const { course, groups, permissions } = data;
   const changes = useCourseChanges(org, courseId);
+  const navigate = Route.useNavigate();
   const isStaff = permissions.manage || groups.some((g) => g.permissions.manageStudents);
   const archived = course.archivedAt !== null;
   const t = useT();
@@ -84,6 +85,22 @@ function CoursePage() {
               {archived ? <ArchiveRestore className="size-4" /> : <Archive className="size-4" />}
               {archived ? t.course.unarchive : t.course.archive}
             </Button>
+          )}
+          {permissions.manage && (
+            <DeleteCourse
+              title={course.title}
+              groups={groups.length}
+              isPending={changes.remove.isPending}
+              onDelete={async () => {
+                try {
+                  await changes.remove.mutateAsync();
+                } catch {
+                  return; // Not deleted: the course stays, as it was.
+                }
+                await navigate({ to: '/courses' });
+                changes.forget();
+              }}
+            />
           )}
         </div>
       </div>
@@ -291,6 +308,50 @@ function DeleteGroup({ group, onDelete }: { group: GroupView; onDelete: () => vo
               </Button>
               <Button slot="close" variant="danger" onPress={onDelete}>
                 {t.course.deleteGroup}
+              </Button>
+            </AlertDialog.Footer>
+          </AlertDialog.Dialog>
+        </AlertDialog.Container>
+      </AlertDialog.Backdrop>
+    </AlertDialog>
+  );
+}
+
+/** Deleting the course (#80), after a popup that says what goes with it. */
+function DeleteCourse({
+  title,
+  groups,
+  isPending,
+  onDelete,
+}: {
+  title: string;
+  groups: number;
+  isPending: boolean;
+  onDelete: () => void;
+}) {
+  const t = useT();
+  return (
+    <AlertDialog>
+      <Button variant="danger-soft" isPending={isPending}>
+        <Trash2 className="size-4" /> {t.course.deleteCourse}
+      </Button>
+      <AlertDialog.Backdrop>
+        <AlertDialog.Container>
+          <AlertDialog.Dialog>
+            <AlertDialog.Header>
+              <AlertDialog.Icon status="danger" />
+              <AlertDialog.Heading>{t.course.deleteCourseTitle(title)}</AlertDialog.Heading>
+            </AlertDialog.Header>
+            <AlertDialog.Body>
+              <p>{t.course.deleteCourseText(groups)}</p>
+              <p className="mt-2 text-sm text-muted">{t.course.deleteCourseKeep}</p>
+            </AlertDialog.Body>
+            <AlertDialog.Footer>
+              <Button slot="close" variant="tertiary">
+                {t.common.cancel}
+              </Button>
+              <Button slot="close" variant="danger" onPress={onDelete}>
+                {t.course.deleteCourseConfirm}
               </Button>
             </AlertDialog.Footer>
           </AlertDialog.Dialog>
