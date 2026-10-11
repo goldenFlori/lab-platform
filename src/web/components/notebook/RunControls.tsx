@@ -5,6 +5,7 @@ import type { CodeCell } from '../../../notebook/types';
 import { useT } from '../../i18n';
 import { usePython, useSessionState } from '../../python/PythonProvider';
 import type { CellRun } from '../../python/session';
+import { PlotlyFigure } from './PlotlyFigure';
 
 // Running code on the lab page (#47): the buttons in a code cell's header, the output of a run, and
 // a bar with Python's state once it has started.
@@ -66,24 +67,31 @@ export function useRunOutput(cell: CodeCell) {
       run={run}
       starting={state.status === 'starting'}
       packages={state.running === runnable.key ? state.packages : null}
+      timed={TIMING.test(runnable.code)}
       onAnswer={(text) => python.session.answer(text)}
       onClear={() => python.session.clear(runnable.key)}
     />
   );
 }
 
+/** Timing experiments (labs 1–3): their times come out longer in the browser. */
+const TIMING = /\btime\.(perf_counter|time|process_time)\s*\(|\btimeit\b/;
+
 function LiveOutput({
   number,
   run,
   starting,
   packages,
+  timed,
   onAnswer,
   onClear,
 }: {
   number: number;
   run: CellRun;
   starting: boolean;
-  packages: string | null;
+  packages: string[] | null;
+  /** The code measures time, which runs slower here. */
+  timed: boolean;
   onAnswer: (text: string) => void;
   onClear: () => void;
 }) {
@@ -107,17 +115,35 @@ function LiveOutput({
         )}
       </div>
       <div className="px-4 py-3" aria-live="polite">
-        {run.output.map((block, i) => (
-          <pre
-            // biome-ignore lint/suspicious/noArrayIndexKey: output blocks only grow; i is their order
-            key={i}
-            className={`overflow-x-auto font-mono text-[0.8rem] leading-relaxed whitespace-pre-wrap ${
-              block.stream === 'stderr' ? 'text-danger' : 'nb-stream text-foreground/90'
-            }`}
-          >
-            {block.text}
-          </pre>
-        ))}
+        {timed && <p className="mb-2 text-xs text-muted">{t.python.slower}</p>}
+        {run.output.map((block, i) =>
+          'figure' in block ? (
+            block.figure === 'image' ? (
+              <img
+                // biome-ignore lint/suspicious/noArrayIndexKey: output blocks only grow; i is their order
+                key={i}
+                src={block.url}
+                alt={t.python.figure}
+                className="my-2 block h-auto max-w-full rounded-xl bg-white p-1"
+              />
+            ) : (
+              // biome-ignore lint/suspicious/noArrayIndexKey: output blocks only grow; i is their order
+              <div key={i} className="my-2 -mx-4 border-y border-separator">
+                <PlotlyFigure src={block.url} />
+              </div>
+            )
+          ) : (
+            <pre
+              // biome-ignore lint/suspicious/noArrayIndexKey: output blocks only grow; i is their order
+              key={i}
+              className={`overflow-x-auto font-mono text-[0.8rem] leading-relaxed whitespace-pre-wrap ${
+                block.stream === 'stderr' ? 'text-danger' : 'nb-stream text-foreground/90'
+              }`}
+            >
+              {block.text}
+            </pre>
+          ),
+        )}
         {outcome?.kind === 'ok' && outcome.value !== null && (
           <pre className="nb-stream overflow-x-auto font-mono text-[0.8rem] whitespace-pre-wrap text-foreground/90">
             {outcome.value}
@@ -127,7 +153,13 @@ function LiveOutput({
         {waiting && !run.asking && (
           <p className="mt-1 flex items-center gap-2 text-sm text-muted">
             <Spinner size="sm" />
-            {run.state === 'queued' ? (starting ? t.python.starting : t.python.queued) : (packages ?? t.python.running)}
+            {run.state === 'queued'
+              ? starting
+                ? t.python.starting
+                : t.python.queued
+              : packages
+                ? t.python.loadingPackages(packages.join(', '))
+                : t.python.running}
           </p>
         )}
         {outcome?.kind === 'error' && (

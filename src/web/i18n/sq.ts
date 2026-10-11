@@ -439,6 +439,10 @@ export const sq = {
     ready: 'Python është gati',
     failed: (reason: string) => `Python nuk u nis: ${reason}`,
     restart: 'Rinis Python-in',
+    loadingPackages: (names: string) => `Duke ngarkuar ${names}… (vetëm herën e parë)`,
+    figure: 'Figura e prodhuar nga kodi juaj',
+    slower:
+      'Në shfletues kodi ecën më ngadalë se në kompjuter, ndaj kohët dalin më të gjata; tendencat dhe krahasimet mbeten të njëjta.',
     restartHelp: 'Fshin të gjitha variablat, si një kernel i ri.',
     clearAll: 'Shfaq rezultatet e ruajtura',
   },

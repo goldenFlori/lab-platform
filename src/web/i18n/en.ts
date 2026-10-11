@@ -444,6 +444,10 @@ export const en: Messages = {
     ready: 'Python is ready',
     failed: (reason: string) => `Python did not start: ${reason}`,
     restart: 'Restart Python',
+    loadingPackages: (names: string) => `Loading ${names}… (the first time only)`,
+    figure: 'A figure made by your code',
+    slower:
+      'Code runs slower in the browser than on a computer, so the times come out longer; the trends and comparisons stay the same.',
     restartHelp: 'Clears every variable, like a fresh kernel.',
     clearAll: 'Show the saved outputs',
   },

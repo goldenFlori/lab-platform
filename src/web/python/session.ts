@@ -7,9 +7,12 @@ import type { RunOutcome } from './runner';
 
 export type PythonStatus = 'off' | 'starting' | 'ready' | 'failed';
 
+/** Printed text, or a figure (an object URL of its PNG or Plotly JSON). */
+export type OutputBlock = { stream: 'stdout' | 'stderr'; text: string } | { figure: 'image' | 'plotly'; url: string };
+
 export type CellRun = {
   state: 'queued' | 'running' | 'done';
-  output: { stream: 'stdout' | 'stderr'; text: string }[];
+  output: OutputBlock[];
   outcome?: RunOutcome;
   /** input() waits for an answer. */
   asking: boolean;
@@ -19,8 +22,8 @@ export type CellRun = {
 
 export type SessionState = {
   status: PythonStatus;
-  /** The latest package message ("Loading numpy…"), while a run waits for its packages. */
-  packages: string | null;
+  /** The packages a run waits for, while they load. */
+  packages: string[] | null;
   failure: string | null;
   runs: ReadonlyMap<string, CellRun>;
   /** The cell running now, if any. */
@@ -45,6 +48,16 @@ export class PythonSession {
   private active: Job | null = null;
   private timer: ReturnType<typeof setTimeout> | undefined;
   private listeners = new Set<() => void>();
+  /** Figures' object URLs per cell, released when the cell runs again or is cleared. */
+  private urls = new Map<string, string[]>();
+
+  private release(key?: string) {
+    for (const [k, list] of this.urls) {
+      if (key !== undefined && k !== key) continue;
+      for (const url of list) URL.revokeObjectURL(url);
+      this.urls.delete(k);
+    }
+  }
   private state: SessionState = { status: 'off', packages: null, failure: null, runs: new Map(), running: null };
 
   subscribe = (listener: () => void) => {
@@ -95,13 +108,26 @@ export class PythonSession {
         this.set({ status: 'failed', failure: message.message });
         return;
       case 'packages':
-        this.set({ packages: message.message });
+        this.set({ packages: message.names });
         return;
+      case 'figure': {
+        if (!job || job.id !== message.id) return;
+        const run = this.state.runs.get(job.key);
+        if (!run) return;
+        const blob =
+          message.kind === 'image'
+            ? new Blob([message.data as BlobPart], { type: 'image/png' })
+            : new Blob([message.data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        this.urls.set(job.key, [...(this.urls.get(job.key) ?? []), url]);
+        this.setRun(job.key, { ...run, output: [...run.output, { figure: message.kind, url }] });
+        return;
+      }
       case 'output': {
         if (!job || job.id !== message.id) return;
         const run = this.state.runs.get(job.key);
         if (!run) return;
-        const used = run.output.reduce((n, o) => n + o.text.length, 0);
+        const used = run.output.reduce((n, o) => n + ('text' in o ? o.text.length : 0), 0);
         if (used >= OUTPUT_LIMIT) {
           if (!run.truncated) this.setRun(job.key, { ...run, truncated: true });
           return;
@@ -110,7 +136,7 @@ export class PythonSession {
         const last = run.output.at(-1);
         // Consecutive pieces of the same stream read as one block.
         const output =
-          last && last.stream === message.stream
+          last && 'stream' in last && last.stream === message.stream
             ? [...run.output.slice(0, -1), { stream: last.stream, text: last.text + text }]
             : [...run.output, { stream: message.stream, text }];
         this.setRun(job.key, { ...run, output, truncated: text.length < message.text.length });
@@ -156,6 +182,7 @@ export class PythonSession {
   /** Queues a cell's code; resolves when it has run (or was stopped). */
   run(key: string, code: string, filename: string): Promise<CellRun> {
     this.start();
+    this.release(key);
     this.setRun(key, { state: 'queued', output: [], asking: false, truncated: false });
     return new Promise((resolve) => {
       this.queue.push({ id: this.nextId++, key, code, filename, resolve });
@@ -225,6 +252,7 @@ export class PythonSession {
 
   /** Forgets a cell's run, so its stored outputs show again. */
   clear(key: string) {
+    this.release(key);
     const runs = new Map(this.state.runs);
     runs.delete(key);
     this.set({ runs });
@@ -232,10 +260,12 @@ export class PythonSession {
 
   /** Forgets every run, so the stored outputs show again. */
   clearAll() {
+    this.release();
     this.set({ runs: new Map() });
   }
 
   dispose() {
+    this.release();
     clearTimeout(this.timer);
     this.worker?.terminate();
     this.worker = null;
