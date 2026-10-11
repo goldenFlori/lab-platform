@@ -4,6 +4,7 @@ import type { CodeCell as Cell } from '../../../notebook/types';
 import { useT } from '../../i18n';
 import { sanitize } from '../../lib/sanitize';
 import { Output } from './Output';
+import { RunButtons, useRunOutput } from './RunControls';
 
 /**
  * One code cell. Short code shows in full and long code folds away. Code that opens a desktop window
@@ -75,7 +76,10 @@ export function CodeCell({
           <span className="flex items-center gap-2 text-xs font-medium text-muted">
             <Code2 className="size-3.5" aria-hidden="true" /> Python
           </span>
-          <CopyButton text={cell.raw} />
+          <span className="flex items-center gap-1.5">
+            {!presenting && <RunButtons cell={cell} />}
+            <CopyButton text={cell.raw} />
+          </span>
         </div>
         {cell.collapsed && !presenting ? (
           <details className="group">
@@ -90,13 +94,19 @@ export function CodeCell({
           code
         )}
       </div>
-      {!presenting &&
-        cell.outputs.map((out, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: a cell's outputs are fixed; i is their order
-          <Output key={i} out={out} fileUrl={fileUrl} />
-        ))}
+      {!presenting && <Outputs cell={cell} fileUrl={fileUrl} />}
     </div>
   );
+}
+
+/** A run's output once the cell has run on this page (#47), else the notebook's saved outputs. */
+function Outputs({ cell, fileUrl }: { cell: Cell; fileUrl: (name: string) => string }) {
+  const run = useRunOutput(cell);
+  if (run) return run;
+  return cell.outputs.map((out, i) => (
+    // biome-ignore lint/suspicious/noArrayIndexKey: a cell's outputs are fixed; i is their order
+    <Output key={i} out={out} fileUrl={fileUrl} />
+  ));
 }
 
 function CopyButton({ text }: { text: string }) {
