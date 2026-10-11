@@ -37,10 +37,31 @@ above", Stop, Restart Python, and `input()` answered on the page.
 - **On the page:**
   - a run's output replaces the stored outputs until "Show the saved output";
   - the namespace lives as long as the notebook is shown.
+- **Packages and figures** (#48):
+  - Pyodide's own packages (numpy, matplotlib, networkx…) load from a cell's imports;
+  - plotly is installed with micropip from PyPI (`MICROPIP_PACKAGES` in `runner.ts`), its
+    progress kept out of the student's output;
+  - matplotlib draws off-screen (Agg): each `plt.show()`, or a figure left open when the cell ends,
+    becomes a PNG in place, and matplotlib's own deprecation notices while saving stay out;
+  - plotly's `fig.show()` sends the figure's JSON, drawn with the same `PlotlyFigure` as saved
+    outputs;
+  - a figure as a cell's last value shows as a figure;
+  - figures reach the page through the worker's `_lab_display` module as object URLs, released
+    when the cell runs again or is cleared;
+  - code that measures time (`time.perf_counter()` and the like) gets a note that the browser runs
+    it slower, while the trends stay the same.
+- **Caching:** the engine's files are served with a year-long `Cache-Control` (`public/_headers`):
+  their path names the version, so they never change in place. About 6 MB on the first run
+  (the WebAssembly compresses from 9.6 MB to 3.5 MB).
 - **Tested:**
   - the runner in Pyodide under Node;
+  - every runnable cell of the 19 course notebooks, through the same runner under Node
+    (`test/notebook/course-cells.test.ts`): only exercise blanks (`___`) may fail, and every
+    Plotly `fig.show()` shows its figure. It needs the network once; packages are then cached in
+    `node_modules/pyodide`;
   - an end-to-end student run on desktop and phone: output, namespace, errors, Stop, `input()`,
-    restart and run-above.
+    restart and run-above;
+  - numpy, a matplotlib image, a Plotly figure and the timing note in the browser.
 
 - **Where it runs:** a dedicated Web Worker, which is the sandbox; the UI never blocks.
   - Lazy-load on the first ▶ and keep it cached.

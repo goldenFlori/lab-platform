@@ -181,7 +181,10 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-11:** #47 done. Students run a notebook's code on the lab page, in their own browser:
   output and errors in place, one namespace per notebook, Stop for runaway loops and `input()`
   answered on the page (PR #54).
-- **Next:** #48, scientific packages and figures in the browser.
+- **2026-10-11:** #48 done. numpy, networkx, matplotlib and plotly work in the browser, with their
+  figures in place. Every runnable cell of the 19 course notebooks runs, apart from the exercise
+  blanks left for students (PR #55).
+- **Next:** #49, editing code and keeping the edits.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
