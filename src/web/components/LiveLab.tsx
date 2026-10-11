@@ -1,113 +1,33 @@
 import { Button } from '@heroui/react';
-import { useQuery } from '@tanstack/react-query';
-import { QrCode as QrIcon, Radio, Users } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { CircleCheck, CircleX, Hourglass, QrCode as QrIcon, Radio, Trophy, Users } from 'lucide-react';
+import { useState } from 'react';
+import type { LiveBoard } from '../../shared/live';
 import { useT } from '../i18n';
-import { liveQuery, useLiveChanges, useLiveSocket } from '../lib/live';
+import { goTo, useLive } from '../lib/live-context';
 import { QrCode } from './QrCode';
 
-// A lab taught live (#65). Staff who may host start the session here; the host and assistants see
-// who is connected and show a QR code that brings students into the lab and the session. Students
-// see a banner and join with one tap, or at once when they came from the QR code.
-//
-// Following the host (#66): the host's page says which cell it is on (where its scrolling stops;
-// the presenter says each step), and joined students' pages go there, switching notebook if needed,
-// until they choose to work on their own.
+// A lab taught live (#65), in the lab page's header. Staff who may host start the session here;
+// the host and assistants see who is connected, show a QR code that brings students into the lab
+// and the session, and follow a running challenge's board (#67). Students see a banner, join with
+// one tap (or at once from the QR code), follow the host (#66) and see the challenge.
 
-/** The cell at this position in the notebook shown: scrolls to it once it is on the page. */
-function goToCell(at: number) {
-  let tries = 0;
-  const look = () => {
-    const marker = document.querySelector(`[data-at="${at}"]`);
-    const target = marker?.firstElementChild;
-    if (target) return target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    if (tries++ < 50) setTimeout(look, 100);
-  };
-  look();
-}
-
-/** The cell nearest the top of the window, below the site header. */
-function cellInView() {
-  for (const marker of document.querySelectorAll<HTMLElement>('[data-at]')) {
-    const box = marker.firstElementChild?.getBoundingClientRect();
-    if (box && box.bottom > 120) return Number(marker.dataset.at);
-  }
-  return null;
-}
-
-export function LiveLab({
-  org,
-  courseId,
-  labId,
-  autoJoin,
-  notebookId,
-  onNotebook,
-}: {
-  org: string;
-  courseId: string;
-  labId: string;
-  autoJoin: boolean;
-  /** The notebook shown, and how to show another one, for following the host. */
-  notebookId: string | null;
-  onNotebook: (id: string) => void;
-}) {
+export function LiveLab({ org, courseId, labId }: { org: string; courseId: string; labId: string }) {
   const t = useT();
-  const query = useQuery(liveQuery(org, courseId, labId));
-  const changes = useLiveChanges(org, courseId, labId);
-  const [joined, setJoined] = useState(autoJoin);
+  const live = useLive();
   const [showQr, setShowQr] = useState(false);
-  const [following, setFollowing] = useState(true);
-  const session = query.data?.session ?? null;
-  const staff = session !== null && session.role !== 'student';
-  const socket = useLiveSocket(org, courseId, labId, session && (staff || joined) ? session.id : null, () => {
-    void query.refetch();
-  });
+  if (!live?.state) return null;
+  const { session, socket, changes, challengeHere } = live;
 
-  const isHost = session?.role === 'host';
-  const { step, send, state } = socket;
-
-  // A student who follows goes where the host is.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: moves only when the host moves, or on rejoining
-  useEffect(() => {
-    if (staff || !joined || !following || !step) return;
-    if (step.notebook !== notebookId) onNotebook(step.notebook);
-    goToCell(step.at);
-  }, [step, following, joined, staff]);
-
-  // The host's page says where it is once its scrolling settles.
-  useEffect(() => {
-    if (!isHost || state !== 'open' || !notebookId) return;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    let last: number | null = null;
-    const settle = () => {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        const at = cellInView();
-        if (at === null || at === last) return;
-        last = at;
-        send({ t: 'step', notebook: notebookId, at });
-      }, 600);
-    };
-    settle();
-    window.addEventListener('scroll', settle, { passive: true });
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('scroll', settle);
-    };
-  }, [isHost, state, notebookId, send]);
-
-  if (!query.data) return null;
   if (!session) {
-    return query.data.canHost ? (
+    return live.state.canHost ? (
       <Button variant="tertiary" onPress={() => changes.start.mutate()} isPending={changes.start.isPending}>
         <Radio className="size-4" /> {t.live.start}
       </Button>
     ) : null;
   }
 
-  if (staff) {
+  if (live.staff) {
     const link = `${location.origin}/o/${org}/courses/${courseId}/labs/${labId}?live=1`;
-    const students = socket.presence?.students ?? 0;
     return (
       <section
         aria-label={t.live.title}
@@ -119,14 +39,14 @@ export function LiveLab({
             <span className="size-2.5 animate-pulse rounded-full bg-danger" aria-hidden="true" />
             {t.live.title}
             <span className="font-normal text-muted" data-testid="live-count" aria-live="polite">
-              · {t.live.connected(students)}
+              · {t.live.connected(socket.presence?.students ?? 0)}
             </span>
           </p>
           <div className="flex flex-wrap gap-2">
             <Button size="sm" variant="secondary" onPress={() => setShowQr(!showQr)} aria-pressed={showQr}>
               <QrIcon className="size-4" /> {t.live.qr}
             </Button>
-            {query.data.canHost && (
+            {live.state.canHost && (
               <Button
                 size="sm"
                 variant="danger-soft"
@@ -144,6 +64,7 @@ export function LiveLab({
             <p className="text-sm text-muted">{t.live.scan}</p>
           </div>
         )}
+        {challengeHere && <Board title={challengeHere.title} board={socket.board} onStop={live.stopChallenge} />}
         {socket.presence && socket.presence.names.length > 0 && (
           <details className="mt-3 text-sm">
             <summary className="flex cursor-pointer items-center gap-1.5 text-muted">
@@ -156,40 +77,101 @@ export function LiveLab({
     );
   }
 
+  const { joined, following } = live;
   return (
     <section
       aria-label={t.live.title}
       data-testid="live-student"
-      className="flex w-full flex-wrap items-center justify-between gap-3 rounded-2xl border border-accent/40 bg-accent-soft/40 px-4 py-3"
+      className="w-full rounded-2xl border border-accent/40 bg-accent-soft/40 px-4 py-3"
     >
-      <p className="flex items-center gap-2 text-sm">
-        <span className="size-2.5 animate-pulse rounded-full bg-danger" aria-hidden="true" />
-        {joined && socket.state === 'open'
-          ? following
-            ? t.live.following
-            : t.live.onYourOwn
-          : t.live.running(session.hostName)}
-      </p>
-      {joined ? (
-        <div className="flex flex-wrap gap-2">
-          {following ? (
-            <Button size="sm" variant="secondary" onPress={() => setFollowing(false)}>
-              {t.live.detach}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="flex items-center gap-2 text-sm">
+          <span className="size-2.5 animate-pulse rounded-full bg-danger" aria-hidden="true" />
+          {joined && socket.state === 'open'
+            ? following
+              ? t.live.following
+              : t.live.onYourOwn
+            : t.live.running(session.hostName)}
+        </p>
+        {joined ? (
+          <div className="flex flex-wrap gap-2">
+            {following ? (
+              <Button size="sm" variant="secondary" onPress={() => live.setFollowing(false)}>
+                {t.live.detach}
+              </Button>
+            ) : (
+              <Button size="sm" variant="primary" onPress={() => live.setFollowing(true)}>
+                {t.live.follow}
+              </Button>
+            )}
+            <Button size="sm" variant="ghost" onPress={() => live.setJoined(false)}>
+              {t.live.leave}
             </Button>
-          ) : (
-            <Button size="sm" variant="primary" onPress={() => setFollowing(true)}>
-              {t.live.follow}
-            </Button>
-          )}
-          <Button size="sm" variant="ghost" onPress={() => setJoined(false)}>
-            {t.live.leave}
+          </div>
+        ) : (
+          <Button size="sm" variant="primary" onPress={() => live.setJoined(true)}>
+            {t.live.join}
+          </Button>
+        )}
+      </div>
+      {joined && challengeHere && (
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-surface px-3 py-2">
+          <p className="flex items-center gap-2 text-sm font-semibold" data-testid="live-challenge">
+            <Trophy className="size-4 text-warning" aria-hidden="true" /> {t.live.challenge(challengeHere.title)}
+          </p>
+          <Button size="sm" variant="secondary" onPress={() => goTo(`[data-src="${challengeHere.cell}"]`)}>
+            {t.live.goToChallenge}
           </Button>
         </div>
-      ) : (
-        <Button size="sm" variant="primary" onPress={() => setJoined(true)}>
-          {t.live.join}
-        </Button>
       )}
     </section>
+  );
+}
+
+/** How the room is doing on the challenge: counts, the most common error, names on request. */
+function Board({ title, board, onStop }: { title: string; board: LiveBoard | null; onStop: () => void }) {
+  const t = useT();
+  const [names, setNames] = useState(false);
+  return (
+    <div className="mt-4 rounded-xl bg-surface p-3" data-testid="live-board">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="flex items-center gap-2 text-sm font-semibold">
+          <Trophy className="size-4 text-warning" aria-hidden="true" /> {t.live.challenge(title)}
+        </p>
+        <Button size="sm" variant="ghost" onPress={onStop}>
+          {t.live.stopChallenge}
+        </Button>
+      </div>
+      <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-lg font-semibold tabular-nums" aria-live="polite">
+        <span className="flex items-center gap-1.5 text-success" data-testid="board-passed">
+          <CircleCheck className="size-5" aria-hidden="true" /> {board?.passed ?? 0}
+        </span>
+        <span className="flex items-center gap-1.5 text-danger" data-testid="board-failed">
+          <CircleX className="size-5" aria-hidden="true" /> {board?.failed ?? 0}
+        </span>
+        <span className="flex items-center gap-1.5 text-muted">
+          <Hourglass className="size-5" aria-hidden="true" /> {board?.waiting ?? 0}
+        </span>
+      </div>
+      <p className="mt-1 text-xs text-muted">{t.live.boardKey}</p>
+      {board?.topError && (
+        <p className="mt-2 text-sm" data-testid="board-error">
+          {t.live.topError(board.topError.type, board.topError.count)}
+        </p>
+      )}
+      {board && board.passed + board.failed > 0 && (
+        <div className="mt-2 text-sm">
+          <Button size="sm" variant="ghost" onPress={() => setNames(!names)} aria-pressed={names}>
+            {names ? t.live.hideNames : t.live.showNames}
+          </Button>
+          {names && (
+            <div className="mt-1 grid gap-1">
+              <p className="text-success">✓ {board.names.passed.join(', ') || '—'}</p>
+              <p className="text-danger">✗ {board.names.failed.join(', ') || '—'}</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

@@ -9,6 +9,7 @@ import {
   MonitorSmartphone,
   Pencil,
   RotateCcw,
+  Trophy,
   Users,
 } from 'lucide-react';
 import { lazy, Suspense, useState } from 'react';
@@ -16,6 +17,7 @@ import type { CodeCell as Cell } from '../../../notebook/types';
 import { useT } from '../../i18n';
 import { useCodeEdits } from '../../lib/code-edits';
 import { useExercises } from '../../lib/exercises';
+import { useLive } from '../../lib/live-context';
 import { sanitize } from '../../lib/sanitize';
 import { usePython } from '../../python/PythonProvider';
 import { Output } from './Output';
@@ -181,14 +183,25 @@ export function CodeCell({
 function ExerciseStrip({ cell }: { cell: Cell }) {
   const t = useT();
   const exercises = useExercises();
+  const live = useLive();
   const exercise = exercises?.of(cell);
   if (!exercises || !exercise) return null;
   const progress = exercises.progress(cell);
+  // A Live Lab's challenge on this exercise (#67).
+  const challenged = live?.challengeHere?.cell === cell.srcIndex;
+  const canChallenge = live?.isHost && live.socket.state === 'open';
   return (
     <div
       data-testid="exercise"
-      className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[var(--code-border)] bg-accent-soft/40 px-4 py-2 text-xs"
+      className={`flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[var(--code-border)] px-4 py-2 text-xs ${
+        challenged ? 'bg-warning/15 ring-2 ring-warning/60 ring-inset' : 'bg-accent-soft/40'
+      }`}
     >
+      {challenged && (
+        <span className="flex items-center gap-1 font-semibold text-warning">
+          <Trophy className="size-3.5" aria-hidden="true" /> {t.live.challengeLabel}
+        </span>
+      )}
       <span className="flex min-w-0 items-center gap-1.5 font-semibold text-accent">
         <ClipboardCheck className="size-3.5 shrink-0" aria-hidden="true" />
         <span className="sr-only">{t.exercises.label}:</span>
@@ -203,6 +216,15 @@ function ExerciseStrip({ cell }: { cell: Cell }) {
         <span className="flex items-center gap-1 text-muted">
           <Users className="size-3.5" aria-hidden="true" /> {t.exercises.progress(progress.solved, progress.of)}
         </span>
+      )}
+      {canChallenge && (
+        <button
+          type="button"
+          onClick={() => (challenged ? live.stopChallenge() : live.startChallenge(cell.srcIndex, exercise.title))}
+          className="ml-auto rounded-lg px-2 py-1 font-medium text-accent hover:bg-default"
+        >
+          {challenged ? t.live.stopChallenge : t.live.startChallenge}
+        </button>
       )}
     </div>
   );

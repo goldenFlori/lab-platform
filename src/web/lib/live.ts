@@ -1,6 +1,6 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { LiveMessage, LivePresence, LiveState, LiveStep } from '../../shared/live';
+import type { LiveBoard, LiveChallenge, LiveMessage, LivePresence, LiveState, LiveStep } from '../../shared/live';
 import { api } from './api';
 
 // Live Lab sessions (#65): whether a lab is taught live now, starting and ending it, and the
@@ -53,6 +53,8 @@ export function useLiveSocket(
   const [state, setState] = useState<SocketState>('closed');
   const [presence, setPresence] = useState<LivePresence | null>(null);
   const [step, setStep] = useState<LiveStep | null>(null);
+  const [challenge, setChallenge] = useState<LiveChallenge | null>(null);
+  const [board, setBoard] = useState<LiveBoard | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
   const dropped = useRef(onDrop);
   dropped.current = onDrop;
@@ -80,6 +82,12 @@ export function useLiveSocket(
         const message = JSON.parse(String(event.data)) as LiveMessage;
         if (message.t === 'presence') setPresence(message);
         if (message.t === 'step') setStep(message);
+        if (message.t === 'challenge') {
+          setChallenge(message);
+          setBoard(null);
+        }
+        if (message.t === 'challenge-stop') setChallenge(null);
+        if (message.t === 'board') setBoard(message);
         if (message.t === 'ended') {
           stopped = true;
           dropped.current();
@@ -105,6 +113,8 @@ export function useLiveSocket(
       setState('closed');
       setPresence(null);
       setStep(null);
+      setChallenge(null);
+      setBoard(null);
     };
   }, [org, courseId, labId, sessionId]);
 
@@ -114,5 +124,5 @@ export function useLiveSocket(
     if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message));
   }, []);
 
-  return { state, presence, step, send };
+  return { state, presence, step, challenge, board, send };
 }

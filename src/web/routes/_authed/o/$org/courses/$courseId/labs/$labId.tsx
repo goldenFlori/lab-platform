@@ -38,6 +38,7 @@ import { CodeEditsProvider, useCodeEdits } from '../../../../../../../lib/code-e
 import { courseQuery } from '../../../../../../../lib/courses';
 import { ExercisesProvider, useExercises } from '../../../../../../../lib/exercises';
 import { labQuery, labsQuery } from '../../../../../../../lib/labs';
+import { LiveProvider, useLive } from '../../../../../../../lib/live-context';
 import {
   type NotebookRef,
   notebookFileUrl,
@@ -100,7 +101,14 @@ function LabPage() {
   const firstEmbed = detail.data?.embeds[0];
 
   return (
-    <>
+    <LiveProvider
+      org={org}
+      courseId={courseId}
+      labId={labId}
+      autoJoin={live === 1}
+      notebookId={current?.id ?? null}
+      onNotebook={(id) => void navigate({ search: (s) => ({ ...s, notebook: id }), replace: true })}
+    >
       <div className="relative">
         <div
           className="pointer-events-none absolute inset-x-0 top-0 h-[420px] opacity-70"
@@ -165,14 +173,7 @@ function LabPage() {
           )}
 
           <div className="mt-5 flex flex-wrap gap-2.5">
-            <LiveLab
-              org={org}
-              courseId={courseId}
-              labId={labId}
-              autoJoin={live === 1}
-              notebookId={current?.id ?? null}
-              onNotebook={(id) => void navigate({ search: (s) => ({ ...s, notebook: id }), replace: true })}
-            />
+            <LiveLab org={org} courseId={courseId} labId={labId} />
           </div>
 
           {canManage && (
@@ -254,7 +255,7 @@ function LabPage() {
         )}
         <LabNeighbours org={org} courseId={courseId} labId={labId} labs={labList.labs} />
       </section>
-    </>
+    </LiveProvider>
   );
 }
 
@@ -474,6 +475,7 @@ function EditablePython({
 }) {
   const edits = useCodeEdits();
   const exercises = useExercises();
+  const live = useLive();
   return (
     <PythonProvider
       notebookId={notebookId}
@@ -483,8 +485,20 @@ function EditablePython({
         const exercise = exercises?.of(cell);
         return exercise ? { test: exercise.test } : undefined;
       }}
-      onRun={(cell, run) => {
-        if (run.outcome?.kind === 'ok' && run.outcome.check?.status === 'pass') exercises?.passed(cell);
+      onRun={(cell, run, ms) => {
+        const outcome = run.outcome;
+        if (outcome?.kind === 'ok' && outcome.check?.status === 'pass') exercises?.passed(cell);
+        // In a live challenge, only the result goes to the room (#67).
+        if (!outcome || outcome.kind === 'interrupted' || !exercises?.of(cell)) return;
+        const check = outcome.kind === 'ok' ? outcome.check : undefined;
+        const status = check?.status ?? 'error';
+        const message = check
+          ? check.message
+          : outcome.kind === 'error'
+            ? (outcome.traceback.trim().split('\n').at(-1) ?? '')
+            : '';
+        const error = status === 'error' ? (/^([A-Za-z_][\w.]*)/.exec(message)?.[1] ?? null) : null;
+        live?.report({ cell: cell.srcIndex, status, error, ms });
       }}
     >
       {children}

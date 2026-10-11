@@ -18,7 +18,41 @@ export type LivePresence = { t: 'presence'; students: number; staff: number; nam
  */
 export type LiveStep = { t: 'step'; notebook: string; at: number };
 
+/** A live challenge on an exercise (#67): started and stopped by the host, shown to everyone. */
+export type LiveChallenge = { t: 'challenge'; notebook: string; cell: number; title: string };
+export type LiveChallengeStop = { t: 'challenge-stop' };
+
+/**
+ * A student's check of the challenge's exercise: only its result, the error's type and how long it
+ * took; never code or keystrokes.
+ */
+export type LiveResult = {
+  t: 'result';
+  cell: number;
+  status: 'pass' | 'fail' | 'todo' | 'error';
+  error: string | null;
+  ms: number;
+};
+
+/** To the host and assistants: how the room is doing on the challenge. Names reach staff only. */
+export type LiveBoard = {
+  t: 'board';
+  passed: number;
+  failed: number;
+  /** Connected students without a result yet, or not finished. */
+  waiting: number;
+  topError: { type: string; count: number } | null;
+  names: { passed: string[]; failed: string[] };
+};
+
 /** To everyone: the host ended the session. */
 export type LiveEnded = { t: 'ended' };
 
-export type LiveMessage = LivePresence | LiveEnded | LiveStep;
+export type LiveMessage =
+  | LivePresence
+  | LiveEnded
+  | LiveStep
+  | LiveChallenge
+  | LiveChallengeStop
+  | LiveResult
+  | LiveBoard;

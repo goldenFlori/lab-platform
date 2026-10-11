@@ -1,29 +1,63 @@
 import { DurableObject } from 'cloudflare:workers';
-import type { LiveEnded, LivePresence, LiveRole, LiveStep } from '../../shared/live';
+import type {
+  LiveBoard,
+  LiveChallenge,
+  LiveEnded,
+  LivePresence,
+  LiveResult,
+  LiveRole,
+  LiveStep,
+} from '../../shared/live';
 
 // One Live Lab session (#65): the connections of everyone in the room. The Worker checks who may
-// join and passes them here with their role; this object only holds sockets and tells the staff
-// who is connected. It uses WebSocket Hibernation: between messages it sleeps, and the sockets'
-// attachments keep who is who, so a quiet class costs nothing. Messages stay small: events, never
-// streams.
-
-/** A step message as the host may send it; anything else is ignored. */
-function parseStep(data: unknown): LiveStep | null {
-  if (!data || typeof data !== 'object') return null;
-  const { t, notebook, at } = data as Record<string, unknown>;
-  if (t !== 'step' || typeof notebook !== 'string' || notebook.length > 64) return null;
-  if (!Number.isInteger(at) || (at as number) < 0 || (at as number) > 10_000) return null;
-  return { t: 'step', notebook, at: at as number };
-}
+// join and passes them here with their role; this object only holds sockets and passes small
+// messages on. It uses WebSocket Hibernation: between messages it sleeps, and the sockets'
+// attachments and the storage keep what it needs, so a quiet class costs nothing.
+//
+// - Presence: the staff learn who is connected (#65).
+// - Steps: only the host moves the room; newcomers start where the host is (#66).
+// - Challenges: the host starts one on an exercise; students' checks of it send their results,
+//   and the staff see the room's board (#67).
 
 /** Who a socket belongs to, kept with it across hibernation. */
 type Member = { userId: string; name: string; role: LiveRole };
+
+/** Each student's latest result in the running challenge. */
+type Results = Record<string, { name: string; status: LiveResult['status']; error: string | null }>;
 
 /** Sent by the Worker when it hands a socket over; the object is reachable only through it. */
 export const MEMBER_HEADER = 'X-Live-Member';
 
 /** The socket closes with this when the host ends the session. */
 export const ENDED = 4000;
+
+const record = (data: unknown) => (data && typeof data === 'object' ? (data as Record<string, unknown>) : null);
+const cellNumber = (value: unknown) => Number.isInteger(value) && (value as number) >= 0 && (value as number) <= 10_000;
+
+/** A step message as the host may send it; anything else is ignored. */
+function parseStep(data: unknown): LiveStep | null {
+  const m = record(data);
+  if (m?.t !== 'step' || typeof m.notebook !== 'string' || m.notebook.length > 64 || !cellNumber(m.at)) return null;
+  return { t: 'step', notebook: m.notebook, at: m.at as number };
+}
+
+function parseChallenge(data: unknown): LiveChallenge | null {
+  const m = record(data);
+  if (m?.t !== 'challenge' || typeof m.notebook !== 'string' || m.notebook.length > 64 || !cellNumber(m.cell))
+    return null;
+  if (typeof m.title !== 'string' || !m.title.trim() || m.title.length > 160) return null;
+  return { t: 'challenge', notebook: m.notebook, cell: m.cell as number, title: m.title };
+}
+
+const STATUSES = new Set(['pass', 'fail', 'todo', 'error']);
+
+function parseResult(data: unknown): LiveResult | null {
+  const m = record(data);
+  if (m?.t !== 'result' || !cellNumber(m.cell) || !STATUSES.has(m.status as string)) return null;
+  const error = typeof m.error === 'string' && /^[A-Za-z_][\w.]{0,59}$/.test(m.error) ? m.error : null;
+  const ms = Number.isInteger(m.ms) && (m.ms as number) >= 0 ? Math.min(m.ms as number, 600_000) : 0;
+  return { t: 'result', cell: m.cell as number, status: m.status as LiveResult['status'], error, ms };
+}
 
 export class LiveSession extends DurableObject<Env> {
   constructor(ctx: DurableObjectState, env: Env) {
@@ -48,10 +82,14 @@ export class LiveSession extends DurableObject<Env> {
     const { 0: client, 1: server } = new WebSocketPair();
     this.ctx.acceptWebSocket(server, [member.role]);
     server.serializeAttachment(member);
-    // A newcomer starts where the host is.
-    const step = await this.ctx.storage.get<LiveStep>('step');
+    // A newcomer starts where the host is, and sees the running challenge.
+    const [step, challenge] = await Promise.all([
+      this.ctx.storage.get<LiveStep>('step'),
+      this.ctx.storage.get<LiveChallenge>('challenge'),
+    ]);
     if (step && member.role !== 'host') server.send(JSON.stringify(step));
-    this.broadcastPresence();
+    if (challenge) server.send(JSON.stringify(challenge));
+    await this.broadcastPresence();
     return new Response(null, { status: 101, webSocket: client });
   }
 
@@ -64,39 +102,111 @@ export class LiveSession extends DurableObject<Env> {
     } catch {
       return;
     }
-    // Only the host moves the room (#66).
-    const step = parseStep(data);
-    if (step && member.role === 'host') {
-      await this.ctx.storage.put('step', step);
-      const text = JSON.stringify(step);
-      for (const other of this.ctx.getWebSockets()) if (other !== ws) other.send(text);
+
+    if (member.role === 'host') {
+      const step = parseStep(data);
+      if (step) {
+        await this.ctx.storage.put('step', step);
+        this.sendAll(step, ws);
+        return;
+      }
+      const challenge = parseChallenge(data);
+      if (challenge) {
+        await this.ctx.storage.put({ challenge, results: {} satisfies Results });
+        this.sendAll(challenge);
+        await this.broadcastBoard();
+        return;
+      }
+      if (record(data)?.t === 'challenge-stop') {
+        await this.ctx.storage.delete(['challenge', 'results']);
+        this.sendAll({ t: 'challenge-stop' });
+        return;
+      }
+    }
+
+    const result = member.role === 'student' ? parseResult(data) : null;
+    if (result) {
+      const challenge = await this.ctx.storage.get<LiveChallenge>('challenge');
+      if (!challenge || challenge.cell !== result.cell) return;
+      const results = (await this.ctx.storage.get<Results>('results')) ?? {};
+      results[member.userId] = { name: member.name, status: result.status, error: result.error };
+      await this.ctx.storage.put('results', results);
+      await this.broadcastBoard();
     }
   }
 
   async webSocketClose(ws: WebSocket, code: number) {
     if (code !== ENDED) ws.close(code === 1006 ? 1000 : code, 'bye');
-    this.broadcastPresence(ws);
+    await this.broadcastPresence(ws);
   }
 
   async webSocketError(ws: WebSocket) {
-    this.broadcastPresence(ws);
+    await this.broadcastPresence(ws);
+  }
+
+  private open(leaving?: WebSocket) {
+    return this.ctx.getWebSockets().filter((ws) => ws !== leaving && ws.readyState === WebSocket.OPEN);
+  }
+
+  private sendAll(message: object, except?: WebSocket) {
+    const text = JSON.stringify(message);
+    for (const ws of this.open()) if (ws !== except) ws.send(text);
+  }
+
+  private sendStaff(message: object, leaving?: WebSocket) {
+    const text = JSON.stringify(message);
+    for (const ws of this.open(leaving)) {
+      if ((ws.deserializeAttachment() as Member).role !== 'student') ws.send(text);
+    }
+  }
+
+  /** Connected students, one entry per person though they may have two tabs open. */
+  private students(leaving?: WebSocket) {
+    const members = this.open(leaving).map((ws) => ws.deserializeAttachment() as Member);
+    return {
+      students: new Map(members.filter((m) => m.role === 'student').map((m) => [m.userId, m.name])),
+      staff: new Set(members.filter((m) => m.role !== 'student').map((m) => m.userId)).size,
+    };
   }
 
   /** The staff in the room learn how many are connected, and the students' names. */
-  private broadcastPresence(leaving?: WebSocket) {
-    const open = this.ctx.getWebSockets().filter((ws) => ws !== leaving && ws.readyState === WebSocket.OPEN);
-    const members = open.map((ws) => ws.deserializeAttachment() as Member);
-    const students = members.filter((m) => m.role === 'student');
-    // One entry per person, though a student may have two tabs open.
-    const names = [...new Map(students.map((m) => [m.userId, m.name])).values()].sort((a, b) => a.localeCompare(b));
+  private async broadcastPresence(leaving?: WebSocket) {
+    const { students, staff } = this.students(leaving);
     const presence: LivePresence = {
       t: 'presence',
-      students: names.length,
-      staff: new Set(members.filter((m) => m.role !== 'student').map((m) => m.userId)).size,
-      names,
+      students: students.size,
+      staff,
+      names: [...students.values()].sort((a, b) => a.localeCompare(b)),
     };
-    const message = JSON.stringify(presence);
-    for (const ws of this.ctx.getWebSockets('host')) if (ws !== leaving) ws.send(message);
-    for (const ws of this.ctx.getWebSockets('assistant')) if (ws !== leaving) ws.send(message);
+    this.sendStaff(presence, leaving);
+    await this.broadcastBoard(leaving);
+  }
+
+  /** How the room is doing on the running challenge, for the staff. */
+  private async broadcastBoard(leaving?: WebSocket) {
+    const challenge = await this.ctx.storage.get<LiveChallenge>('challenge');
+    if (!challenge) return;
+    const results = (await this.ctx.storage.get<Results>('results')) ?? {};
+    const { students } = this.students(leaving);
+    const entries = Object.entries(results);
+    const passed = entries.filter(([, r]) => r.status === 'pass');
+    const failed = entries.filter(([, r]) => r.status === 'fail' || r.status === 'error');
+    const done = new Set([...passed, ...failed].map(([id]) => id));
+    const errors = new Map<string, number>();
+    for (const [, r] of failed) {
+      const type = r.status === 'fail' ? 'AssertionError' : (r.error ?? 'Error');
+      errors.set(type, (errors.get(type) ?? 0) + 1);
+    }
+    const top = [...errors].sort((a, b) => b[1] - a[1])[0];
+    const byName = (list: typeof entries) => list.map(([, r]) => r.name).sort((a, b) => a.localeCompare(b));
+    const board: LiveBoard = {
+      t: 'board',
+      passed: passed.length,
+      failed: failed.length,
+      waiting: [...students.keys()].filter((id) => !done.has(id)).length,
+      topError: top ? { type: top[0], count: top[1] } : null,
+      names: { passed: byName(passed), failed: byName(failed) },
+    };
+    this.sendStaff(board, leaving);
   }
 }

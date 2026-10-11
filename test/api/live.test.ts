@@ -120,4 +120,41 @@ describe('Live Lab sessions', () => {
     expect(newcomer.messages.filter((m) => m.t === 'step')).toEqual([step]);
     expect(host.messages.some((m) => m.t === 'step')).toBe(false);
   });
+
+  it('run a challenge: students send results, the staff see the board, names only to staff', async () => {
+    const { seed, pedagog, ana, labPath, state } = await setup();
+    await pedagog.call(`${labPath}/live`, { method: 'POST' });
+    const ws = `${labPath}/live/${(await state(pedagog)).session?.id}/ws`;
+    const host = await connect(await signIn(pedagog.user.username), ws);
+    const a = await connect(await signIn(ana.user.username), ws);
+    const besa = await account(seed, 'student', { groupId: seed.group.id });
+    const b = await connect(await signIn(besa.user.username), ws);
+    const cima = await account(seed, 'student', { groupId: seed.group.id });
+    const c = await connect(await signIn(cima.user.username), ws);
+    const board = () => host.messages.filter((m) => m.t === 'board').at(-1);
+
+    // A student cannot start one.
+    a.ws?.send(JSON.stringify({ t: 'challenge', notebook: seed.notebook.id, cell: 4, title: 'X' }));
+    host.ws?.send(JSON.stringify({ t: 'challenge', notebook: seed.notebook.id, cell: 4, title: 'Ushtrimi 1' }));
+    await waitFor(() => b.messages.some((m) => m.t === 'challenge'));
+    expect(b.messages.filter((m) => m.t === 'challenge')).toEqual([
+      { t: 'challenge', notebook: seed.notebook.id, cell: 4, title: 'Ushtrimi 1' },
+    ]);
+    await waitFor(() => board()?.waiting === 3);
+
+    a.ws?.send(JSON.stringify({ t: 'result', cell: 4, status: 'pass', error: null, ms: 120 }));
+    b.ws?.send(JSON.stringify({ t: 'result', cell: 4, status: 'error', error: 'NameError', ms: 80 }));
+    c.ws?.send(JSON.stringify({ t: 'result', cell: 9, status: 'pass', error: null, ms: 80 }));
+    await waitFor(() => board()?.passed === 1 && board()?.failed === 1);
+    expect(board()).toMatchObject({
+      waiting: 1,
+      topError: { type: 'NameError', count: 1 },
+      names: { passed: [ana.user.fullName], failed: [besa.user.fullName] },
+    });
+    // Students never see the board.
+    expect(a.messages.some((m) => m.t === 'board')).toBe(false);
+
+    host.ws?.send(JSON.stringify({ t: 'challenge-stop' }));
+    await waitFor(() => a.messages.some((m) => m.t === 'challenge-stop'));
+  });
 });
