@@ -190,7 +190,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-11:** #50 done. The pedagog runs each code step live from the presenter (R, or the
   button), in one namespace for the notebook, with the solved code when the solution is shown;
   outputs and errors at projector size (PR #58).
-- **Next:** #51, exercises with instant checks.
+- **2026-10-11:** #51 done. Exercises are checked as soon as their cell runs: ✓, ✗ with the
+  failing case, or not written yet. The course notebooks' `kontrollo(…)` checks are found on
+  their own, staff can add exercises with visible tests, and the pedagog sees how many students
+  solved each, as counts in the lab and the course activity (PR #60).
+- **Next:** #52, submissions.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
@@ -222,6 +226,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-11 | The app is cross-origin isolated (COOP + COEP), so Stop keeps a student's variables and `input()` works; every cross-origin resource must send CORS or CORP headers | Decided |
 | 2026-10-10 | Activity counts students, not clicks: at most one record per student, lab, kind (opened, downloaded, tried a visualization) and day, shown only as weekly counts to staff with analytics rights, for the groups they may see. Staff are not counted | Decided |
 | 2026-10-10 | The interface's messages are typed objects in the code (Albanian the source, English checked against it by the build), not an i18n library: two languages, a tiny team, and no extraction step. Language: the user's choice, else the device's, else the course's, else Albanian | Decided |
+| 2026-10-11 | Practice checks run in the student's browser and are trusted only as practice: a passed check marks the exercise solved and counts in the activity, never in a grade (grades come from the pedagog's re-runs, #53) | Decided |
 | 2026-10-10 | Search without FTS5: D1 cannot export databases with virtual tables, and backups must keep working. The server sends each user the text of what they may see; the browser matches it as they type | Decided |
 
 Decisions were delegated to Claude ("you decide"). Record new ones here with the date.

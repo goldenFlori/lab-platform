@@ -154,9 +154,32 @@ Built in #49.
 
 ## Exercises and grading
 
-- **Practice:**
-  - Visible tests run in the student's browser for instant feedback (✓ or ✗ with the failing
-    case).
+- **Practice** (built in #51):
+  - **An exercise** is a cell whose run checks it (`exercises`, one row per notebook and cell):
+    either the cell calls `kontrollo(title, tests)` itself, as the course's supplementary
+    notebooks do, or staff wrote a visible test (Python, usually asserts) that runs right after
+    the cell, in its namespace.
+  - **Found where the notebook is converted** (`detectExercises` in `src/notebook/exercises.ts`):
+    the upload in the app and the course import save the `kontrollo(…)` cells; the import fills
+    kept notebooks only when they have none, so a list staff changed stays. Staff change the list
+    on the lab page ("Ushtrimet në këtë fletore", with "Gjej në fletore"), and
+    `PUT …/notebooks/:id/exercises` replaces it.
+  - **The check runs in Python** (`_lab_run` in `runner.ts`): while an exercise runs, the
+    namespace's `kontrollo` is ours, and a visible test runs as a function after the cell. A check
+    passes, fails with its assert's message (the failing case), finds the exercise not written
+    yet (`NotImplementedError`), or names the error. A `NameError` offers "run the cells above".
+    Each cell's source is kept in `linecache`, as Jupyter does, so checks that read a function's
+    source (`inspect.getsource`) work.
+  - **On the page:** the exercise's cell shows its title, "Solved" once its check has passed, and
+    for staff with analytics "N of M students have solved it" (their groups only, counts only).
+    The check shows as a card in the run's output; presentations show it too.
+  - **Completion** (`POST …/exercises/:cell/done`): kept once per student and exercise
+    (`exercise_completions`) the first time a check passes, and recorded as `exercise` activity.
+    It is practice: the browser is trusted with it, it never counts for a grade, and staff are not
+    counted.
+  - **Tested:** every course check runs and finds the student version not written yet; all 29
+    solved versions pass (checked locally against the git-ignored solutions); end to end, a
+    student solves two exercises and the pedagog sees the counts.
   - The AI hint level is set by the pedagog (see `platform-ai`).
 - **Graded work:**
   - Submissions (code plus a metadata snapshot) are stored on the server.
