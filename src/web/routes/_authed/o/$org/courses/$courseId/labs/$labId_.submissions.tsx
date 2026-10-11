@@ -4,16 +4,21 @@ import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { ArrowLeft, ChevronDown, CircleCheck, Clock } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { StoredNotebook } from '../../../../../../../../notebook/stored';
+import type { Exercise } from '../../../../../../../../shared/exercises';
+import type { ExerciseGrading, StaffGrade } from '../../../../../../../../shared/grading';
 import type { SubmissionList } from '../../../../../../../../shared/submissions';
+import { GradeChip, GradeGroupBar, GradeReview, GradingSetup } from '../../../../../../../components/notebook/Grading';
 import { t as messages, useT } from '../../../../../../../i18n';
 import { ApiError } from '../../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../../lib/brand';
+import { gradesQuery, gradingSetupQuery } from '../../../../../../../lib/grading';
 import { formatMoment, labQuery } from '../../../../../../../lib/labs';
 import { type NotebookRef, notebookQuery, notebooksQuery, renderedQuery } from '../../../../../../../lib/notebooks';
 import { submissionDetailQuery, submissionListQuery } from '../../../../../../../lib/submissions';
 
 // What a lab's students handed in (#52), for staff who review their groups: one group at a time,
-// who handed in and when, and each one's code. Students never reach this page's data.
+// who handed in and when, and each one's code. Staff who grade also grade here (#53). Students
+// never reach this page's data.
 
 export const Route = createFileRoute('/_authed/o/$org/courses/$courseId/labs/$labId_/submissions')({
   validateSearch: (search: Record<string, unknown>): { notebook?: string; group?: string } => ({
@@ -54,6 +59,8 @@ function SubmissionsPage() {
   const submissions = useQuery({ ...submissionListQuery(ref, group), enabled: !!current, retry: false });
   const detail = useQuery({ ...notebookQuery(ref), enabled: !!current });
   const rendered = useQuery({ ...renderedQuery(ref), enabled: !!current });
+  // Staff who grade get the points and hidden tests; others are refused, and do not grade here.
+  const setup = useQuery({ ...gradingSetupQuery(ref), enabled: !!current });
   const forbidden = submissions.error instanceof ApiError && submissions.error.status === 403;
 
   return (
@@ -107,8 +114,9 @@ function SubmissionsPage() {
         <Group
           data={submissions.data}
           notebookRef={ref}
-          exercises={detail.data?.exercises.length ?? 0}
+          exercises={detail.data?.exercises ?? []}
           notebook={rendered.data}
+          setup={setup.data?.exercises ?? null}
         />
       )}
     </section>
@@ -148,13 +156,18 @@ function Group({
   notebookRef,
   exercises,
   notebook,
+  setup,
 }: {
   data: SubmissionList;
   notebookRef: NotebookRef;
-  exercises: number;
+  exercises: Exercise[];
   notebook: StoredNotebook | undefined;
+  /** Points and hidden tests, for staff who grade (#53); null for staff who do not. */
+  setup: ExerciseGrading[] | null;
 }) {
   const t = useT();
+  const grades = useQuery({ ...gradesQuery(notebookRef, data.group ?? ''), enabled: setup !== null && !!data.group });
+  const gradeOf = new Map((grades.data?.grades ?? []).map((g) => [g.userId, g]));
   const { org, courseId, labId } = notebookRef;
   const shown = data.groups.find((g) => g.id === data.group);
   const handedIn = data.students.filter((s) => s.submission).length;
@@ -173,6 +186,15 @@ function Group({
           ))}
         </nav>
       )}
+      {setup && data.group && (
+        <GradingSetup
+          key={data.group}
+          notebookRef={notebookRef}
+          group={data.group}
+          exercises={exercises}
+          setup={setup}
+        />
+      )}
       <div className="mt-6 rounded-3xl border border-border bg-surface p-5 shadow-surface sm:p-7">
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
           <h2 className="text-lg font-semibold tracking-tight">{shown?.name}</h2>
@@ -186,6 +208,17 @@ function Group({
           <Clock className="size-4" aria-hidden="true" />
           {shown?.dueAt ? t.submissions.openUntil(formatMoment(shown.dueAt)) : t.submissions.noDeadline}
         </p>
+        {setup && data.group && handedIn > 0 && (
+          <GradeGroupBar
+            notebookRef={notebookRef}
+            group={data.group}
+            groupName={shown?.name ?? ''}
+            notebook={notebook}
+            exercises={exercises}
+            setup={setup}
+            graded={gradeOf.size}
+          />
+        )}
         {data.students.length === 0 ? (
           <p className="mt-4 text-sm text-muted">{t.submissions.noStudents}</p>
         ) : (
@@ -197,6 +230,7 @@ function Group({
                 notebookRef={notebookRef}
                 exercises={exercises}
                 notebook={notebook}
+                grading={setup && data.group ? { group: data.group, grade: gradeOf.get(student.id) } : null}
               />
             ))}
           </ul>
@@ -211,11 +245,13 @@ function Student({
   notebookRef,
   exercises,
   notebook,
+  grading,
 }: {
   student: SubmissionList['students'][number];
   notebookRef: NotebookRef;
-  exercises: number;
+  exercises: Exercise[];
   notebook: StoredNotebook | undefined;
+  grading: { group: string; grade: StaffGrade | undefined } | null;
 }) {
   const t = useT();
   const [open, setOpen] = useState(false);
@@ -237,13 +273,14 @@ function Student({
                 </span>
               )}
             </p>
-            {exercises > 0 && (
-              <p className="text-xs text-muted">{t.submissions.solvedOf(submission.solved.length, exercises)}</p>
+            {exercises.length > 0 && (
+              <p className="text-xs text-muted">{t.submissions.solvedOf(submission.solved.length, exercises.length)}</p>
             )}
           </div>
         ) : (
           <p className="text-sm text-muted">{t.submissions.missing}</p>
         )}
+        {submission && grading && <GradeChip grade={grading.grade} />}
         {submission && (
           <Button
             isIconOnly
@@ -257,6 +294,9 @@ function Student({
           </Button>
         )}
       </div>
+      {open && grading?.grade && (
+        <GradeReview notebookRef={notebookRef} group={grading.group} grade={grading.grade} exercises={exercises} />
+      )}
       {open && <SubmittedCode userId={student.id} notebookRef={notebookRef} notebook={notebook} />}
     </li>
   );

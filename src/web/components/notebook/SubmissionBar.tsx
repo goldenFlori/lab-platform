@@ -1,6 +1,6 @@
 import { AlertDialog, Button } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
-import { CalendarClock, CircleCheck, Send } from 'lucide-react';
+import { Award, CalendarClock, CircleCheck, Send } from 'lucide-react';
 import { useState } from 'react';
 import { useT } from '../../i18n';
 import { ApiError } from '../../lib/api';
@@ -11,7 +11,8 @@ import { mySubmissionQuery, useSubmit } from '../../lib/submissions';
 
 /**
  * Above the notebook, for a student whose group has it open for submission (#52): the deadline,
- * what they handed in, and handing in, after their last changes are saved.
+ * what they handed in, and handing in, after their last changes are saved. Their grade and the
+ * pedagog's feedback show here once released (#53).
  */
 export function SubmissionBar({ notebookRef }: { notebookRef: NotebookRef }) {
   const t = useT();
@@ -92,6 +93,14 @@ export function SubmissionBar({ notebookRef }: { notebookRef: NotebookRef }) {
           </AlertDialog>
         )}
       </div>
+      {data.grade && (
+        <div className="mt-3 rounded-xl bg-success/10 px-3 py-2" data-testid="my-grade">
+          <p className="flex items-center gap-1.5 font-semibold text-success">
+            <Award className="size-4" aria-hidden="true" /> {t.grading.yourGrade(data.grade.score, data.grade.maxScore)}
+          </p>
+          {data.grade.feedback && <p className="mt-1 whitespace-pre-wrap text-foreground/90">{data.grade.feedback}</p>}
+        </div>
+      )}
       {message && (
         <p role="status" className={`mt-2 text-sm ${message.tone === 'danger' ? 'text-danger' : 'text-success'}`}>
           {message.text}
