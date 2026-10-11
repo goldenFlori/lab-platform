@@ -567,8 +567,12 @@
   font-size: clamp(1.15rem, 0.8rem + 0.9vw, 1.6rem);
 }
 .presentation .nb-shiki pre,
-.presentation .nb-stream {
+.presentation .nb-stream,
+.presentation .run-text {
   font-size: clamp(0.95rem, 0.7rem + 0.6vw, 1.25rem);
+}
+.presentation .run-note {
+  font-size: clamp(0.9rem, 0.75rem + 0.4vw, 1.1rem);
 }
 .presentation .notebook-step h2 {
   font-size: clamp(1.75rem, 1rem + 2vw, 2.75rem);

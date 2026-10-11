@@ -186,8 +186,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   blanks left for students (PR #55).
 - **2026-10-11:** #49 done. Students edit the code cells; their changes are saved to their account
   as they type, run in place of the original, come back on any device, and can be restored to the
-  original. Staff never see them (PR #56).
-- **Next:** #50, running code in presentation mode.
+  original. Staff never see them (PRs #56 and #57).
+- **2026-10-11:** #50 done. The pedagog runs each code step live from the presenter (R, or the
+  button), in one namespace for the notebook, with the solved code when the solution is shown;
+  outputs and errors at projector size (PR #58).
+- **Next:** #51, exercises with instant checks.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
