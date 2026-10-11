@@ -135,6 +135,18 @@
   }
 }
 
+/* Dropdowns (#82): the browser draws its arrow at the very edge, whatever the padding. Every
+ * select draws its own chevron instead, inset from the edge, with room for it. Outside any layer,
+ * so it wins over a field's px-* utility; a grey that reads on light and dark backgrounds. */
+select:not([multiple]):not([size]) {
+  appearance: none;
+  padding-right: 2.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b8f99' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 1rem;
+}
+
 /* ---------------------------------------------------------------------
  *  Utilities used across pages
  * ------------------------------------------------------------------- */
