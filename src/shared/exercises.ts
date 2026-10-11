@@ -1,11 +1,10 @@
 import { z } from 'zod';
+import { MAX_EXERCISES, MAX_TEST } from './exercise-limits';
 
 // A notebook's exercises (#51): which cells check a student's work, and how. The app imports only
-// types from this file.
+// types from this file; its limits are in exercise-limits.ts.
 
-/** Longest visible test staff may write for one exercise. */
-export const MAX_TEST = 20_000;
-export const MAX_EXERCISES = 100;
+export { MAX_EXERCISES, MAX_TEST };
 
 /**
  * One exercise: running `cell` checks it. With no `test`, the cell itself calls

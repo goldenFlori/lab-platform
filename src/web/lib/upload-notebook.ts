@@ -105,8 +105,13 @@ export async function uploadNotebook(
     await putFile(path, f.name, f.body, f.type, f.gzipped);
   }
   onProgress({ phase: 'finishing' });
-  // Its search index (#17), made here like the rest.
-  const { searchSections } = await import('../../notebook/search');
+  // Its search index (#17) and the exercises it checks itself (#51), made here like the rest.
+  const [{ searchSections }, { detectExercises }] = await Promise.all([
+    import('../../notebook/search'),
+    import('../../notebook/exercises'),
+  ]);
   await api(`${path}/search`, { method: 'PUT', body: { sections: searchSections(stored) } });
+  const exercises = detectExercises(stored);
+  if (exercises.length) await api(`${path}/exercises`, { method: 'PUT', body: { exercises } });
   return api<NotebookDetail>(`${path}/ready`, { method: 'POST' });
 }

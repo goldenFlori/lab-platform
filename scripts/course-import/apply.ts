@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
+import { detectExercises } from '../../src/notebook/exercises.ts';
 import { searchSections } from '../../src/notebook/search.ts';
 import type { StoredNotebook } from '../../src/notebook/stored.ts';
 import type { CourseSummary } from '../../src/shared/courses.ts';
@@ -76,6 +77,8 @@ export async function uploadNotebook(
     if (!res.ok) throw new Error(`PUT ${file.name} of ${notebook.originalName}: ${res.status} ${await res.text()}`);
   }
   await call(api, 'PUT', `${path}/search`, { sections: searchSections(notebook.stored) });
+  const exercises = detectExercises(notebook.stored);
+  if (exercises.length) await call(api, 'PUT', `${path}/exercises`, { exercises });
   await call(api, 'POST', `${path}/ready`);
   return created;
 }
@@ -132,6 +135,13 @@ export async function importCourse(
         await call(api, 'PUT', `${labPath}/notebooks/${nb.id}/search`, { sections: searchSections(stored) });
       const embeds: Embed[] = planned.notebooks[i]?.embeds ?? [];
       const current = await call<NotebookDetail>(api, 'GET', `${labPath}/notebooks/${nb.id}`);
+      // Kept notebooks without exercises get the ones they check themselves (#51); a list staff
+      // changed in the app stays as it is.
+      const exercises = stored ? detectExercises(stored) : [];
+      if (kept && current.exercises.length === 0 && exercises.length) {
+        await call(api, 'PUT', `${labPath}/notebooks/${nb.id}/exercises`, { exercises });
+        if (change === 'unchanged') change = 'updated';
+      }
       if (JSON.stringify(current.embeds) === JSON.stringify(embeds)) continue;
       await call(api, 'PUT', `${labPath}/notebooks/${nb.id}/embeds`, { embeds });
       if (change === 'unchanged') change = 'updated';
