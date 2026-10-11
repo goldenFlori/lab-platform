@@ -13,6 +13,7 @@ import {
 import { type FormEvent, useState } from 'react';
 import type { CodeCell } from '../../../notebook/types';
 import { useT } from '../../i18n';
+import { useCodeEdits } from '../../lib/code-edits';
 import { useExercises } from '../../lib/exercises';
 import { usePython, useSessionState } from '../../python/PythonProvider';
 import type { CheckResult } from '../../python/runner';
@@ -30,6 +31,8 @@ export function RunButtons({ cell }: { cell: CodeCell }) {
   const python = usePython();
   const state = useSessionState(python?.session);
   const runnable = python?.cells.get(cell);
+  // A student's saved code is still loading: running now would run the original (#78).
+  const loading = useCodeEdits()?.ready === false;
   if (!python || !runnable) return null;
   const run = state.runs.get(runnable.key);
   const busy = run?.state === 'running' || run?.state === 'queued';
@@ -45,7 +48,7 @@ export function RunButtons({ cell }: { cell: CodeCell }) {
         className="size-7 min-w-7"
         aria-label={t.python.runAbove}
         onPress={() => void python.runAbove(cell)}
-        isDisabled={runnable.number === 1}
+        isDisabled={runnable.number === 1 || loading}
       >
         <ListOrdered className="size-3.5" />
       </Button>
@@ -60,6 +63,7 @@ export function RunButtons({ cell }: { cell: CodeCell }) {
           className="h-7 gap-1 px-2 text-xs"
           aria-label={t.python.runLabel(runnable.number)}
           onPress={() => void python.run(cell)}
+          isDisabled={loading}
         >
           <Play className="size-3" /> {t.python.run}
         </Button>

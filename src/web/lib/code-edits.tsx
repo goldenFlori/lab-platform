@@ -21,6 +21,8 @@ type CodeEditsValue = {
   /** Cells the user has changed. */
   count: number;
   saving: SaveState;
+  /** The saved edits are in place (or could not be loaded): runs use the student's code (#78). */
+  ready: boolean;
   /** Saves what is still waiting now; false when it could not be saved. */
   flush: () => Promise<boolean>;
   /** Changes when the code changes from outside the editors (loaded, or all put back), which
@@ -59,6 +61,7 @@ export function CodeEditsProvider({
   const [edits, setEdits] = useState<ReadonlyMap<number, string>>(new Map());
   const [saving, setSaving] = useState<SaveState>('saved');
   const [version, setVersion] = useState(0);
+  const [loaded, setLoaded] = useState(false);
   const pending = useRef(new Map<number, string>());
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const path = editsPath(notebookRef);
@@ -69,6 +72,7 @@ export function CodeEditsProvider({
     const saved = query.data.edits.map((e) => [e.cell, e.code] as const);
     setEdits((typed) => new Map([...saved, ...typed]));
     setVersion((v) => v + 1);
+    setLoaded(true);
   }, [query.data]);
 
   const send = useCallback(
@@ -158,9 +162,10 @@ export function CodeEditsProvider({
       count: [...edits].filter(([cell, code]) => code !== originals.get(cell)).length,
       saving,
       version,
+      ready: loaded || query.isError,
       flush: () => flush(),
     };
-  }, [edits, flush, originals, path, saving, version]);
+  }, [edits, flush, originals, path, saving, version, loaded, query.isError]);
 
   return <CodeEditsContext.Provider value={value}>{children}</CodeEditsContext.Provider>;
 }
