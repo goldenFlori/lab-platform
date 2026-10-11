@@ -9,6 +9,7 @@ import {
   inArray,
   isNull,
   like,
+  ne,
   or,
   type SQL,
   sql,
@@ -462,23 +463,25 @@ function inChunks<T>(list: T[], size = ROWS_PER_INSERT) {
 type NewStudent = { fullName: string; username: string; passwordHash: string };
 
 /** Students of a group: imported accounts, their list, and password resets by staff (#11). */
+/** The account rows to insert: each username numbered where it is already taken ("ana.kola2"). */
+async function freeUsernames(db: Db, rows: NewStudent[]) {
+  const bases = [...new Set(rows.map((row) => row.username))];
+  // Usernames are [a-z.] only, so the base contains no LIKE wildcards.
+  const existing = await db
+    .select({ username: users.username })
+    .from(users)
+    .where(or(...bases.map((base) => like(users.username, `${base}%`))));
+  const taken = new Set(existing.map((row) => row.username));
+  return rows.map((row) => {
+    let username = row.username;
+    for (let n = 2; taken.has(username); n++) username = `${row.username}${n}`;
+    taken.add(username);
+    return { id: uuidv7(), fullName: row.fullName, username, passwordHash: row.passwordHash };
+  });
+}
+
 function tenantStudents(db: Db, orgId: string) {
-  /** The account rows to insert: each username numbered where it is already taken ("ana.kola2"). */
-  async function withFreeUsernames(rows: NewStudent[]) {
-    const bases = [...new Set(rows.map((row) => row.username))];
-    // Usernames are [a-z.] only, so the base contains no LIKE wildcards.
-    const existing = await db
-      .select({ username: users.username })
-      .from(users)
-      .where(or(...bases.map((base) => like(users.username, `${base}%`))));
-    const taken = new Set(existing.map((row) => row.username));
-    return rows.map((row) => {
-      let username = row.username;
-      for (let n = 2; taken.has(username); n++) username = `${row.username}${n}`;
-      taken.add(username);
-      return { id: uuidv7(), fullName: row.fullName, username, passwordHash: row.passwordHash };
-    });
-  }
+  const withFreeUsernames = (rows: NewStudent[]) => freeUsernames(db, rows);
 
   return {
     async ofGroup(groupId: string) {
@@ -943,6 +946,86 @@ function tenantGrading(db: Db, orgId: string) {
   };
 }
 
+/** Teaching staff of a course (#64): pedagogs and assistants, for the whole course or one group. */
+function tenantStaff(db: Db, orgId: string) {
+  const ofCourse = (courseId: string) =>
+    or(
+      eq(memberships.courseId, courseId),
+      inArray(
+        memberships.groupId,
+        db
+          .select({ id: groups.id })
+          .from(groups)
+          .where(and(eq(groups.orgId, orgId), eq(groups.courseId, courseId))),
+      ),
+    );
+  return {
+    list(courseId: string) {
+      return db
+        .select({
+          id: memberships.id,
+          userId: users.id,
+          fullName: users.fullName,
+          username: users.username,
+          role: memberships.role,
+          groupId: memberships.groupId,
+        })
+        .from(memberships)
+        .innerJoin(users, eq(users.id, memberships.userId))
+        .where(and(eq(memberships.orgId, orgId), ofCourse(courseId), ne(memberships.role, 'student')))
+        .orderBy(asc(users.fullName));
+    },
+
+    /** A member of this organization by username; another organization's accounts are not found. */
+    async findMember(username: string) {
+      const [row] = await db
+        .selectDistinct({ id: users.id })
+        .from(users)
+        .innerJoin(memberships, eq(memberships.userId, users.id))
+        .where(and(eq(memberships.orgId, orgId), eq(users.username, username.toLowerCase())))
+        .limit(1);
+      return row?.id;
+    },
+
+    /** A new account with only this role in the course or group; its username numbered if taken. */
+    async createInto(
+      scope: { courseId: string } | { groupId: string },
+      role: string,
+      account: { fullName: string; username: string; passwordHash: string },
+    ) {
+      await assertRole(db, role);
+      const [user] = await freeUsernames(db, [account]);
+      if (!user) throw new Error('No account to create');
+      await db.batch([
+        db.insert(users).values(user),
+        db.insert(memberships).values({ id: uuidv7(), orgId, userId: user.id, role, ...scope }),
+      ]);
+      return { id: user.id, fullName: user.fullName, username: user.username };
+    },
+
+    /** Whether the user already has a role in exactly this course or group. */
+    async hasRoleIn(userId: string, scope: { courseId: string } | { groupId: string }) {
+      const where =
+        'courseId' in scope ? eq(memberships.courseId, scope.courseId) : eq(memberships.groupId, scope.groupId);
+      const [row] = await db
+        .select({ id: memberships.id })
+        .from(memberships)
+        .where(and(eq(memberships.orgId, orgId), eq(memberships.userId, userId), where))
+        .limit(1);
+      return row !== undefined;
+    },
+
+    /** The course-wide pedagogs, so the last one is never removed. */
+    async pedagogs(courseId: string) {
+      const rows = await db
+        .select({ id: memberships.id })
+        .from(memberships)
+        .where(and(eq(memberships.orgId, orgId), eq(memberships.courseId, courseId), eq(memberships.role, 'pedagog')));
+      return rows.map((row) => row.id);
+    },
+  };
+}
+
 export function forTenant(db: Db, orgId: string) {
   const members = tenantUsers(db, orgId);
   return {
@@ -961,6 +1044,7 @@ export function forTenant(db: Db, orgId: string) {
     exercises: tenantExercises(db, orgId),
     submissions: tenantSubmissions(db, orgId),
     grading: tenantGrading(db, orgId),
+    staff: tenantStaff(db, orgId),
   };
 }
 
