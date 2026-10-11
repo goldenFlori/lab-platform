@@ -41,8 +41,7 @@ test('a student sees their own insertion sort animate next to the reference', as
   await apiCall(student, 'POST', '/join', { code: group.joinCode });
   await apiCall(student, 'PUT', `${labPath}/notebooks/${nb.id}/edits/0`, { code: SORT });
   await student.goto(pageUrl);
-  // The student's own code has loaded into the cell.
-  await expect(student.getByRole('textbox', { name: 'Kodi i qelizës 1' })).toContainText('vizlab');
+  // At once: ▶ waits until the student's saved code has loaded, so their code runs (#78).
   await student.getByRole('button', { name: 'Ekzekuto qelizën 1' }).click();
 
   const viz = student.getByTestId('vizlab');
