@@ -58,3 +58,12 @@ export function visibleLab(c: Context<TenantEnv>, ctx: LabContext) {
   if (!lab || (!ctx.staff && !openToViewer(ctx, lab))) throw new NotFoundError();
   return lab;
 }
+
+/** The lab and notebook in the URL as this user may see them, or 404. */
+export async function notebookInUrl(c: Context<TenantEnv>) {
+  const ctx = await labContext(c);
+  const lab = visibleLab(c, ctx);
+  const nb = await c.var.tenant.notebooks.get(c.req.param('notebookId') ?? '');
+  if (!nb || nb.labId !== lab.id || !mayReadNotebook(ctx, lab, nb)) throw new NotFoundError();
+  return { ctx, lab, nb };
+}

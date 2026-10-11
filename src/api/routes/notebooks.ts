@@ -18,7 +18,8 @@ import type { TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
 import { recordActivity } from './activity';
 import { forbidden, invalidRequest } from './course-context';
-import { type LabContext, labContext, mayReadNotebook, visibleLab } from './lab-context';
+import { type LabContext, labContext, mayReadNotebook, notebookInUrl, visibleLab } from './lab-context';
+import { submissionRoutes } from './submissions';
 
 // A lab's notebooks (#14), under /api/orgs/:org/courses/:courseId/labs/:labId/notebooks.
 //
@@ -53,15 +54,6 @@ const summary = (nb: Notebook): NotebookSummary => ({
   originalName: nb.originalName,
   ready: nb.readyAt !== null,
 });
-
-/** The lab and notebook in the URL as this user may see them, or 404. */
-async function notebookInUrl(c: Context<TenantEnv>) {
-  const ctx = await labContext(c);
-  const lab = visibleLab(c, ctx);
-  const nb = await c.var.tenant.notebooks.get(c.req.param('notebookId') ?? '');
-  if (!nb || nb.labId !== lab.id || !mayReadNotebook(ctx, lab, nb)) throw new NotFoundError();
-  return { ctx, lab, nb };
-}
 
 const canManage = (c: Context<TenantEnv>, ctx: LabContext) =>
   c.var.access.can('course.manage', { courseId: ctx.course.id });
@@ -273,6 +265,8 @@ export const notebookRoutes = new Hono<TenantEnv>()
     }
     return c.body(null, 204);
   })
+
+  .route('/:notebookId', submissionRoutes)
 
   .delete('/:notebookId', async (c) => {
     const { ctx, nb } = await notebookInUrl(c);

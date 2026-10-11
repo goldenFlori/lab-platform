@@ -18,6 +18,7 @@ import { roleExists } from './access';
 import { uuidv7 } from './ids';
 import type { Db } from './index';
 import {
+  assignments,
   codeEdits,
   courses,
   courseTemplates,
@@ -34,6 +35,7 @@ import {
   notebooks,
   searchSections,
   sessions,
+  submissions,
   users,
 } from './schema';
 
@@ -744,6 +746,121 @@ function tenantExercises(db: Db, orgId: string) {
   };
 }
 
+/**
+ * Notebooks opened for submission per group, and the work handed in (#52). A submission is read by
+ * its author, or by staff for the students of groups they review.
+ */
+function tenantSubmissions(db: Db, orgId: string) {
+  const summary = {
+    userId: submissions.userId,
+    solved: submissions.solved,
+    attempts: submissions.attempts,
+    submittedAt: submissions.submittedAt,
+    code: submissions.code,
+  };
+  return {
+    assignmentsOf(notebookId: string) {
+      return db
+        .select({ groupId: assignments.groupId, dueAt: assignments.dueAt })
+        .from(assignments)
+        .where(and(eq(assignments.orgId, orgId), eq(assignments.notebookId, notebookId)));
+    },
+
+    /** Opens the notebook to the group until `dueAt`, or moves the deadline. */
+    async open(notebookId: string, groupId: string, dueAt: Date) {
+      await rethrowMissingParent(
+        db
+          .insert(assignments)
+          .values({ id: uuidv7(), orgId, notebookId, groupId, dueAt })
+          .onConflictDoUpdate({
+            target: [assignments.orgId, assignments.notebookId, assignments.groupId],
+            set: { dueAt },
+          }),
+      );
+    },
+
+    async close(notebookId: string, groupId: string) {
+      await db
+        .delete(assignments)
+        .where(
+          and(eq(assignments.orgId, orgId), eq(assignments.notebookId, notebookId), eq(assignments.groupId, groupId)),
+        );
+    },
+
+    /** Hands in the user's work, replacing what they handed in before. */
+    async submit(row: {
+      notebookId: string;
+      userId: string;
+      code: { cell: number; code: string }[];
+      solved: number[];
+    }) {
+      const submittedAt = new Date();
+      await rethrowMissingParent(
+        db
+          .insert(submissions)
+          .values({ ...row, id: uuidv7(), orgId, attempts: 1, submittedAt })
+          .onConflictDoUpdate({
+            target: [submissions.orgId, submissions.notebookId, submissions.userId],
+            set: { code: row.code, solved: row.solved, submittedAt, attempts: sql`${submissions.attempts} + 1` },
+          }),
+      );
+    },
+
+    async of(notebookId: string, userId: string) {
+      const [row] = await db
+        .select(summary)
+        .from(submissions)
+        .where(
+          and(eq(submissions.orgId, orgId), eq(submissions.notebookId, notebookId), eq(submissions.userId, userId)),
+        );
+      return row;
+    },
+
+    /** The group's students, each with what they handed in, if anything. */
+    ofGroup(notebookId: string, groupId: string) {
+      return db
+        .select({
+          id: users.id,
+          fullName: users.fullName,
+          username: users.username,
+          solved: submissions.solved,
+          attempts: submissions.attempts,
+          submittedAt: submissions.submittedAt,
+        })
+        .from(memberships)
+        .innerJoin(users, eq(users.id, memberships.userId))
+        .leftJoin(
+          submissions,
+          and(
+            eq(submissions.orgId, orgId),
+            eq(submissions.notebookId, notebookId),
+            eq(submissions.userId, memberships.userId),
+          ),
+        )
+        .where(and(eq(memberships.orgId, orgId), eq(memberships.groupId, groupId), eq(memberships.role, 'student')))
+        .orderBy(asc(users.fullName));
+    },
+
+    /** Whether the user is a student of one of these groups. */
+    async isStudentOf(userId: string, groupIds: string[]) {
+      if (!groupIds.length) return false;
+      const [row] = await db
+        .select({ id: memberships.id })
+        .from(memberships)
+        .where(
+          and(
+            eq(memberships.orgId, orgId),
+            eq(memberships.userId, userId),
+            eq(memberships.role, 'student'),
+            inArray(memberships.groupId, groupIds),
+          ),
+        )
+        .limit(1);
+      return row !== undefined;
+    },
+  };
+}
+
 export function forTenant(db: Db, orgId: string) {
   const members = tenantUsers(db, orgId);
   return {
@@ -760,6 +877,7 @@ export function forTenant(db: Db, orgId: string) {
     activity: tenantActivity(db, orgId),
     codeEdits: tenantCodeEdits(db, orgId),
     exercises: tenantExercises(db, orgId),
+    submissions: tenantSubmissions(db, orgId),
   };
 }
 

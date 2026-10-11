@@ -1,0 +1,167 @@
+import { zValidator } from '@hono/zod-validator';
+import { type Context, Hono } from 'hono';
+import {
+  type Assignment,
+  assignmentInput,
+  MAX_SUBMISSION_CODE,
+  type MySubmission,
+  type SubmissionDetail,
+  type SubmissionList,
+  type SubmissionSummary,
+} from '../../shared/submissions';
+import type { TenantEnv } from '../auth/access';
+import { NotFoundError } from '../db/tenant';
+import { forbidden, invalidRequest } from './course-context';
+import { type LabContext, notebookInUrl } from './lab-context';
+
+// Handing in work (#52), under …/labs/:labId/notebooks/:notebookId.
+//
+// Staff who may publish a lab open its notebook for submission to a group, with a deadline. Until
+// then, a student of that group hands in their work: the server copies their saved code and the
+// exercises they solved, replacing what they handed in before. A submission is read by its author,
+// and by staff who review the student's group (submission.review); never by other students.
+
+const summaryOf = (row: { solved: number[]; attempts: number; submittedAt: Date }): SubmissionSummary => ({
+  submittedAt: row.submittedAt.toISOString(),
+  attempts: row.attempts,
+  solved: row.solved,
+});
+
+/** The course's groups in which this user may do `capability`. */
+const groupsWhere = (c: Context<TenantEnv>, ctx: LabContext, capability: 'lab.publish' | 'submission.review') =>
+  ctx.groups.filter((g) => c.var.access.can(capability, { courseId: ctx.course.id, groupId: g.id }));
+
+/** The latest deadline among the user's own groups, and whether one of them is still open. */
+async function deadlineFor(c: Context<TenantEnv>, ctx: LabContext, notebookId: string) {
+  const mine = new Set(
+    ctx.groups
+      .filter((g) => c.var.access.can('submission.create', { courseId: ctx.course.id, groupId: g.id }))
+      .map((g) => g.id),
+  );
+  const due = (await c.var.tenant.submissions.assignmentsOf(notebookId))
+    .filter((a) => mine.has(a.groupId))
+    .map((a) => a.dueAt.getTime());
+  if (!due.length) return null;
+  const latest = Math.max(...due);
+  return { dueAt: new Date(latest), open: latest > Date.now() };
+}
+
+export const submissionRoutes = new Hono<TenantEnv>()
+  // The groups' deadlines, for staff who may open it or review it.
+  .get('/assignments', async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    const seen = new Set(
+      [...groupsWhere(c, ctx, 'lab.publish'), ...groupsWhere(c, ctx, 'submission.review')].map((g) => g.id),
+    );
+    if (!seen.size) return forbidden(c);
+    const list = await c.var.tenant.submissions.assignmentsOf(nb.id);
+    return c.json(
+      list
+        .filter((a) => seen.has(a.groupId))
+        .map((a): Assignment => ({ groupId: a.groupId, dueAt: a.dueAt.toISOString() })),
+    );
+  })
+
+  // Opens it to a group until the deadline, or moves the deadline.
+  .put('/assignments/:groupId', zValidator('json', assignmentInput, invalidRequest), async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    const groupId = c.req.param('groupId');
+    if (!ctx.groups.some((g) => g.id === groupId)) throw new NotFoundError();
+    if (!c.var.access.can('lab.publish', { courseId: ctx.course.id, groupId })) return forbidden(c);
+    const dueAt = c.req.valid('json').dueAt;
+    await c.var.tenant.submissions.open(nb.id, groupId, new Date(dueAt));
+    return c.json({ groupId, dueAt: new Date(dueAt).toISOString() } satisfies Assignment);
+  })
+
+  // Closes it; what was handed in stays.
+  .delete('/assignments/:groupId', async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    const groupId = c.req.param('groupId');
+    if (!ctx.groups.some((g) => g.id === groupId)) throw new NotFoundError();
+    if (!c.var.access.can('lab.publish', { courseId: ctx.course.id, groupId })) return forbidden(c);
+    await c.var.tenant.submissions.close(nb.id, groupId);
+    return c.body(null, 204);
+  })
+
+  // The user's own: their deadline and what they handed in.
+  .get('/submission', async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    const [deadline, row] = await Promise.all([
+      deadlineFor(c, ctx, nb.id),
+      c.var.tenant.submissions.of(nb.id, c.var.user?.id as string),
+    ]);
+    return c.json({
+      dueAt: deadline?.dueAt.toISOString() ?? null,
+      open: deadline?.open ?? false,
+      submission: row ? summaryOf(row) : null,
+    } satisfies MySubmission);
+  })
+
+  // Hands in the user's saved code and solved exercises, before the deadline.
+  .post('/submission', async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    const userId = c.var.user?.id as string;
+    const deadline = await deadlineFor(c, ctx, nb.id);
+    if (!deadline) return forbidden(c);
+    if (!deadline.open) return c.json({ error: 'closed' }, 409);
+    const [edits, solved] = await Promise.all([
+      c.var.tenant.codeEdits.ofUser(nb.id, userId),
+      c.var.tenant.exercises.doneBy(nb.id, userId),
+    ]);
+    const code = edits.map((e) => ({ cell: e.cell, code: e.code }));
+    if (code.reduce((n, e) => n + e.code.length, 0) > MAX_SUBMISSION_CODE) return c.json({ error: 'too_large' }, 413);
+    await c.var.tenant.submissions.submit({ notebookId: nb.id, userId, code, solved });
+    const row = await c.var.tenant.submissions.of(nb.id, userId);
+    return c.json({
+      dueAt: deadline.dueAt.toISOString(),
+      open: true,
+      submission: row ? summaryOf(row) : null,
+    } satisfies MySubmission);
+  })
+
+  // A group's students and what each handed in, for staff who review the group.
+  .get('/submissions', async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    const allowed = groupsWhere(c, ctx, 'submission.review').sort((a, b) => a.name.localeCompare(b.name));
+    if (!allowed.length) return forbidden(c);
+    const group = c.req.query('group') || allowed[0]?.id || null;
+    if (!allowed.some((g) => g.id === group)) return forbidden(c);
+    const [deadlines, rows] = await Promise.all([
+      c.var.tenant.submissions.assignmentsOf(nb.id),
+      c.var.tenant.submissions.ofGroup(nb.id, group as string),
+    ]);
+    return c.json({
+      groups: allowed.map((g) => ({
+        id: g.id,
+        name: g.name,
+        dueAt: deadlines.find((d) => d.groupId === g.id)?.dueAt.toISOString() ?? null,
+      })),
+      group,
+      students: rows.map((row) => ({
+        id: row.id,
+        fullName: row.fullName,
+        username: row.username,
+        submission:
+          row.submittedAt && row.solved && row.attempts !== null
+            ? summaryOf({ solved: row.solved, attempts: row.attempts, submittedAt: row.submittedAt })
+            : null,
+      })),
+    } satisfies SubmissionList);
+  })
+
+  // One student's submission, with their code, for staff who review a group of theirs.
+  .get('/submissions/:userId', async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    const allowed = groupsWhere(c, ctx, 'submission.review').map((g) => g.id);
+    if (!allowed.length) return forbidden(c);
+    const userId = c.req.param('userId');
+    if (!(await c.var.tenant.submissions.isStudentOf(userId, allowed))) throw new NotFoundError();
+    const [row, user] = await Promise.all([c.var.tenant.submissions.of(nb.id, userId), c.var.tenant.users.get(userId)]);
+    if (!row || !user) throw new NotFoundError();
+    return c.json({
+      ...summaryOf(row),
+      fullName: user.fullName,
+      username: user.username,
+      code: row.code,
+    } satisfies SubmissionDetail);
+  });
