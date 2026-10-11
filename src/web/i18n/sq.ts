@@ -585,6 +585,20 @@ export const sq = {
     slip: (username: string, password: string) =>
       `Llogaria u krijua. Përdoruesi: ${username} · Fjalëkalimi: ${password}. Shfaqet vetëm tani: jepjani personit.`,
   },
+  live: {
+    title: 'Live Lab',
+    start: 'Fillo Live Lab',
+    end: 'Mbyll sesionin',
+    connected: (n: number) => `${n} ${n === 1 ? 'student i lidhur' : 'studentë të lidhur'}`,
+    qr: 'Kodi QR',
+    qrLabel: 'Kodi QR për t’u bashkuar me Live Lab',
+    scan: 'Studentët e skanojnë, hyjnë në llogari dhe bashkohen menjëherë.',
+    who: 'Kush është i lidhur',
+    running: (host: string) => `${host} po zhvillon një Live Lab tani.`,
+    joined: 'Jeni në Live Lab.',
+    join: 'Bashkohu',
+    leave: 'Largohu',
+  },
   edits: {
     edit: 'Ndrysho kodin',
     editLabel: (n: number) => `Ndrysho kodin e qelizës ${n}`,

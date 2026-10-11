@@ -19,6 +19,7 @@ import type { Exercise } from '../../../../../../../../shared/exercises';
 import type { LabView } from '../../../../../../../../shared/labs';
 import { ORIGINAL_FILE } from '../../../../../../../../shared/notebook-files';
 import type { Embed, NotebookKind, NotebookSummary } from '../../../../../../../../shared/notebooks';
+import { LiveLab } from '../../../../../../../components/LiveLab';
 import { AssignmentsEditor } from '../../../../../../../components/notebook/AssignmentsEditor';
 import { DeleteNotebook } from '../../../../../../../components/notebook/DeleteNotebook';
 import { EditsBar } from '../../../../../../../components/notebook/EditsBar';
@@ -48,8 +49,10 @@ import {
 import { PythonProvider } from '../../../../../../../python/PythonProvider';
 
 export const Route = createFileRoute('/_authed/o/$org/courses/$courseId/labs/$labId')({
-  validateSearch: (search: Record<string, unknown>): { notebook?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { notebook?: string; live?: number } => ({
     notebook: typeof search.notebook === 'string' ? search.notebook : undefined,
+    // From the Live Lab's QR code (#65): join the session at once.
+    live: search.live === 1 || search.live === '1' ? 1 : undefined,
   }),
   loader: async ({ context: { queryClient }, params: { org, courseId, labId } }) => {
     try {
@@ -77,7 +80,7 @@ const labTag = (lab: LabView) => `LAB ${String(lab.n).padStart(2, '0')}`;
 
 function LabPage() {
   const { org, courseId, labId } = Route.useParams();
-  const { notebook: chosen } = Route.useSearch();
+  const { notebook: chosen, live } = Route.useSearch();
   const { data: lab } = useSuspenseQuery(labQuery(org, courseId, labId));
   const { data: courseDetail } = useSuspenseQuery(courseQuery(org, courseId));
   const { data: list } = useSuspenseQuery(notebooksQuery(org, courseId, labId));
@@ -160,6 +163,10 @@ function LabPage() {
               )}
             </div>
           )}
+
+          <div className="mt-5 flex flex-wrap gap-2.5">
+            <LiveLab org={org} courseId={courseId} labId={labId} autoJoin={live === 1} />
+          </div>
 
           {canManage && (
             <div className="mt-7 flex flex-wrap items-start gap-2.5">

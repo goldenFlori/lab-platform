@@ -590,6 +590,20 @@ export const en: Messages = {
     slip: (username: string, password: string) =>
       `The account was created. Username: ${username} · Password: ${password}. Shown only now: give it to the person.`,
   },
+  live: {
+    title: 'Live Lab',
+    start: 'Start a Live Lab',
+    end: 'End the session',
+    connected: (n: number) => `${n} ${n === 1 ? 'student connected' : 'students connected'}`,
+    qr: 'QR code',
+    qrLabel: 'QR code to join the Live Lab',
+    scan: 'Students scan it, sign in and join at once.',
+    who: 'Who is connected',
+    running: (host: string) => `${host} is running a Live Lab now.`,
+    joined: 'You are in the Live Lab.',
+    join: 'Join',
+    leave: 'Leave',
+  },
   edits: {
     edit: 'Edit the code',
     editLabel: (n: number) => `Edit the code of cell ${n}`,
