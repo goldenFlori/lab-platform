@@ -7,7 +7,8 @@ export type ToWorker =
       interrupt?: SharedArrayBuffer;
       stdin?: SharedArrayBuffer;
     }
-  | { type: 'run'; id: number; code: string; filename: string };
+  /** `check`: the run is an exercise's, and checks it (#51). */
+  | { type: 'run'; id: number; code: string; filename: string; check?: import('./runner').RunCheck };
 
 export type FromWorker =
   | { type: 'ready' }
