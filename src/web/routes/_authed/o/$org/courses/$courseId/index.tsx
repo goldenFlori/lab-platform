@@ -19,6 +19,7 @@ import type { CourseDetail, GroupView } from '../../../../../../../shared/course
 import { formatJoinCode } from '../../../../../../../shared/join-code';
 import { isLocale, LOCALES } from '../../../../../../../shared/locale';
 import { CourseLabs } from '../../../../../../components/CourseLabs';
+import { CourseStaff } from '../../../../../../components/CourseStaff';
 import { PresentJoinCode } from '../../../../../../components/PresentJoinCode';
 import { LANGUAGE_NAMES, t as messages, useT } from '../../../../../../i18n';
 import { ApiError } from '../../../../../../lib/api';
@@ -118,6 +119,8 @@ function CoursePage() {
       )}
 
       <CourseLabs org={org} courseId={courseId} groups={groups} />
+
+      {permissions.manage && <CourseStaff org={org} courseId={courseId} groups={groups} />}
     </section>
   );
 }
