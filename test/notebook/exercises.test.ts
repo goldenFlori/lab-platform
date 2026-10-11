@@ -27,18 +27,17 @@ describe('exercises a notebook checks itself', () => {
     expect(found.map((e) => e.cell)).toEqual([8, 14, 18, 23]);
   });
 
-  it('finds every check of the course, and none where there is none', async () => {
-    const counts = Object.fromEntries(
-      await Promise.all([...byName.keys()].map(async (name) => [name, (await detect(name)).length] as const)),
-    );
-    expect(Object.fromEntries(Object.entries(counts).filter(([, n]) => n > 0))).toEqual({
-      'laborator-01-ushtrime-shtese.ipynb': 4,
-      'laborator-02-ushtrime-shtese.ipynb': 4,
-      'laborator-03-ushtrime-shtese.ipynb': 3,
-      'laborator-04-ushtrime-shtese.ipynb': 8,
-      'laborator-09-ushtrime-shtese.ipynb': 7,
-      'laborator-10.ipynb': 3,
-    });
+  // One test per notebook: together they take longer than a test may on a slow machine.
+  const CHECKS: Record<string, number> = {
+    'laborator-01-ushtrime-shtese.ipynb': 4,
+    'laborator-02-ushtrime-shtese.ipynb': 4,
+    'laborator-03-ushtrime-shtese.ipynb': 3,
+    'laborator-04-ushtrime-shtese.ipynb': 8,
+    'laborator-09-ushtrime-shtese.ipynb': 7,
+    'laborator-10.ipynb': 3,
+  };
+  it.each([...byName.keys()])('finds every check of %s, and none where there is none', async (name) => {
+    expect(await detect(name)).toHaveLength(CHECKS[name] ?? 0);
   });
 
   it('ignores the helper that defines kontrollo and mentions of it', async () => {
