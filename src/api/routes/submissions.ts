@@ -1,5 +1,6 @@
 import { zValidator } from '@hono/zod-validator';
 import { type Context, Hono } from 'hono';
+import type { MyGrade } from '../../shared/grading';
 import {
   type Assignment,
   assignmentInput,
@@ -46,6 +47,14 @@ async function deadlineFor(c: Context<TenantEnv>, ctx: LabContext, notebookId: s
   return { dueAt: new Date(latest), open: latest > Date.now() };
 }
 
+/** A grade as its student sees it: only once released. */
+const released = (
+  row:
+    | { autoScore: number; maxScore: number; score: number | null; feedback: string | null; releasedAt: Date | null }
+    | undefined,
+): MyGrade | null =>
+  row?.releasedAt ? { score: row.score ?? row.autoScore, maxScore: row.maxScore, feedback: row.feedback } : null;
+
 export const submissionRoutes = new Hono<TenantEnv>()
   // The groups' deadlines, for staff who may open it or review it.
   .get('/assignments', async (c) => {
@@ -86,12 +95,15 @@ export const submissionRoutes = new Hono<TenantEnv>()
   // The user's own: their deadline and what they handed in.
   .get('/submission', async (c) => {
     const { ctx, nb } = await notebookInUrl(c);
-    const [deadline, row] = await Promise.all([
+    const userId = c.var.user?.id as string;
+    const [deadline, row, grade] = await Promise.all([
       deadlineFor(c, ctx, nb.id),
-      c.var.tenant.submissions.of(nb.id, c.var.user?.id as string),
+      c.var.tenant.submissions.of(nb.id, userId),
+      c.var.tenant.grading.of(nb.id, userId),
     ]);
     return c.json({
       dueAt: deadline?.dueAt.toISOString() ?? null,
+      grade: released(grade),
       open: deadline?.open ?? false,
       submission: row ? summaryOf(row) : null,
     } satisfies MySubmission);
@@ -114,6 +126,7 @@ export const submissionRoutes = new Hono<TenantEnv>()
     const row = await c.var.tenant.submissions.of(nb.id, userId);
     return c.json({
       dueAt: deadline.dueAt.toISOString(),
+      grade: released(await c.var.tenant.grading.of(nb.id, userId)),
       open: true,
       submission: row ? summaryOf(row) : null,
     } satisfies MySubmission);

@@ -18,6 +18,7 @@ import type { TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
 import { recordActivity } from './activity';
 import { forbidden, invalidRequest } from './course-context';
+import { gradingRoutes } from './grading';
 import { type LabContext, labContext, mayReadNotebook, notebookInUrl, visibleLab } from './lab-context';
 import { submissionRoutes } from './submissions';
 
@@ -267,6 +268,7 @@ export const notebookRoutes = new Hono<TenantEnv>()
   })
 
   .route('/:notebookId', submissionRoutes)
+  .route('/:notebookId', gradingRoutes)
 
   .delete('/:notebookId', async (c) => {
     const { ctx, nb } = await notebookInUrl(c);
