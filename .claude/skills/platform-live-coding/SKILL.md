@@ -87,10 +87,31 @@ above", Stop, Restart Python, and `input()` answered on the page.
 
 ## Editing and autosave
 
-- Student edits are saved per user, cell and lab version, debounced, in D1. Payloads are small:
-  code text only.
-- Students can always reset, or compare with the original.
-- Staff never see private scratch work unless it is submitted.
+Built in #49.
+
+- **Editor:** CodeMirror 6 with Python (`components/notebook/CodeEditor.tsx`), its own chunk
+  (about 120 kB gzipped), loaded the first time someone edits.
+  - Colors follow the site's code (the `tok-*` classes in `styles.css`).
+  - Tab indents; Esc then Tab moves on.
+- **What can be edited:** on the lab page, every cell that can run; ✎ opens the editor.
+  - An edited cell shows the editor, an "Edited" label, ↺ to restore the original and the
+    original code folded below.
+  - Run and "run the cells above" use the student's own code (`PythonProvider`'s `codeFor`).
+- **Saving** (`lib/code-edits.tsx`):
+  - 0.8 s after typing stops, and at once (with `keepalive`) when the page is hidden or closed;
+  - code put back exactly as it was deletes the saved copy;
+  - a bar above the notebook shows how many cells changed, whether they are saved, and "restore
+    all", which asks first.
+- **Storage:** `code_edits`, one row per user, notebook and cell (srcIndex), code only, at most
+  100,000 characters.
+  - `GET/PUT/DELETE …/notebooks/:id/edits[/:cell]` serve only the signed-in user's own rows, to
+    anyone who may read the notebook.
+  - Staff have no route to a student's edits; submitted work is shared on its own (#52).
+  - A notebook uploaded again is a new notebook, so old edits never land on changed cells.
+- **Tested:**
+  - API: per-cell saves, resets, privacy between students and staff, limits, tenant isolation;
+  - end-to-end: a student edits, runs the edit, finds it after a reload and on another device;
+    staff see the original; one cell and then all are restored.
 
 ## Presentation mode (built in #15; works without Pyodide)
 

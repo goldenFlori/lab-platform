@@ -184,7 +184,10 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-11:** #48 done. numpy, networkx, matplotlib and plotly work in the browser, with their
   figures in place. Every runnable cell of the 19 course notebooks runs, apart from the exercise
   blanks left for students (PR #55).
-- **Next:** #49, editing code and keeping the edits.
+- **2026-10-11:** #49 done. Students edit the code cells; their changes are saved to their account
+  as they type, run in place of the original, come back on any device, and can be restored to the
+  original. Staff never see them (PR #56).
+- **Next:** #50, running code in presentation mode.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
@@ -211,6 +214,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-10 | The 13 visualizations are platform content, open to everyone at `/visualizations`: they hold no tenant data, are already public on the course site, and show what the product does | Decided |
 | 2026-10-10 | Course content is imported through the API with a pedagog's sign-in, never written straight into the database: the same permission checks and storage as the app, for any environment. Re-running it is safe, and it never opens labs | Decided |
 | 2026-10-10 | When the site shows parts of one notebook in two labs, each lab gets its own notebook of those cells, so students download only their lab's part | Decided |
+| 2026-10-11 | A student's code edits are private to them, saved per cell as they type; staff see code only once it is submitted | Decided |
 | 2026-10-11 | Python runs in the student's browser (Pyodide in a Web Worker). Its engine is served from our own site, pinned to the npm version; the packages a cell imports come from Pyodide's CDN at the same version for now | Decided |
 | 2026-10-11 | The app is cross-origin isolated (COOP + COEP), so Stop keeps a student's variables and `input()` works; every cross-origin resource must send CORS or CORP headers | Decided |
 | 2026-10-10 | Activity counts students, not clicks: at most one record per student, lab, kind (opened, downloaded, tried a visualization) and day, shown only as weekly counts to staff with analytics rights, for the groups they may see. Staff are not counted | Decided |
