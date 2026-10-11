@@ -22,7 +22,7 @@ const shorten = (text: string, max = 70) => {
  * A short way to recognise each notebook cell: a heading or the start of a text, and for code the
  * section it belongs to (its first line, such as an import, rarely says which exercise it is).
  */
-function cellChoices(t: Messages, notebook: StoredNotebook) {
+export function cellChoices(t: Messages, notebook: StoredNotebook) {
   const choices = new Map<number, string>();
   const parser = new DOMParser();
   let section: string | null = null;

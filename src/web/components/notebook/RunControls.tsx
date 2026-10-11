@@ -1,9 +1,21 @@
 import { Button, Spinner } from '@heroui/react';
-import { AlertTriangle, ListOrdered, Play, RotateCcw, Square, Terminal } from 'lucide-react';
+import {
+  AlertTriangle,
+  CircleCheck,
+  CircleX,
+  Hourglass,
+  ListOrdered,
+  Play,
+  RotateCcw,
+  Square,
+  Terminal,
+} from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import type { CodeCell } from '../../../notebook/types';
 import { useT } from '../../i18n';
+import { useExercises } from '../../lib/exercises';
 import { usePython, useSessionState } from '../../python/PythonProvider';
+import type { CheckResult } from '../../python/runner';
 import type { CellRun } from '../../python/session';
 import { PlotlyFigure } from './PlotlyFigure';
 
@@ -90,10 +102,13 @@ export function useRunOutput(cell: CodeCell) {
   const state = useSessionState(python?.session);
   const runnable = python?.cells.get(cell);
   const run = runnable ? state.runs.get(runnable.key) : undefined;
+  const exercise = useExercises()?.of(cell);
   if (!python || !runnable || !run) return null;
   return (
     <LiveOutput
       number={runnable.number}
+      exercise={exercise?.title}
+      onRunAbove={runnable.number > 1 ? () => void python.runAbove(cell) : undefined}
       run={run}
       starting={state.status === 'starting'}
       packages={state.running === runnable.key ? state.packages : null}
@@ -109,6 +124,8 @@ const TIMING = /\btime\.(perf_counter|time|process_time)\s*\(|\btimeit\b/;
 
 function LiveOutput({
   number,
+  exercise,
+  onRunAbove,
   run,
   starting,
   packages,
@@ -117,6 +134,9 @@ function LiveOutput({
   onClear,
 }: {
   number: number;
+  /** The exercise this cell checks, by its title (#51). */
+  exercise?: string;
+  onRunAbove?: () => void;
   run: CellRun;
   starting: boolean;
   packages: string[] | null;
@@ -179,6 +199,9 @@ function LiveOutput({
             {outcome.value}
           </pre>
         )}
+        {outcome?.kind === 'ok' && outcome.check && (
+          <CheckCard title={exercise ?? t.exercises.check} check={outcome.check} onRunAbove={onRunAbove} />
+        )}
         {run.asking && <AnswerInput onAnswer={onAnswer} />}
         {waiting && !run.asking && (
           <p className="run-note mt-1 flex items-center gap-2 text-sm text-muted">
@@ -195,8 +218,60 @@ function LiveOutput({
         {outcome?.kind === 'error' && <ErrorOutput traceback={outcome.traceback} />}
         {outcome?.kind === 'interrupted' && <p className="run-note mt-1 text-sm text-warning">{t.python.stopped}</p>}
         {run.truncated && <p className="mt-1 text-xs text-muted">{t.python.truncated}</p>}
-        {!waiting && run.output.length === 0 && outcome?.kind === 'ok' && outcome.value === null && (
+        {!waiting && run.output.length === 0 && outcome?.kind === 'ok' && outcome.value === null && !outcome.check && (
           <p className="text-sm text-muted">✓</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+const CHECK_LOOK = {
+  pass: { Icon: CircleCheck, tone: 'border-success/40 bg-success/10 text-success' },
+  fail: { Icon: CircleX, tone: 'border-danger/40 bg-danger/8 text-danger' },
+  todo: { Icon: Hourglass, tone: 'border-warning/40 bg-warning/10 text-warning' },
+  error: { Icon: CircleX, tone: 'border-danger/40 bg-danger/8 text-danger' },
+} as const;
+
+/** An exercise's check (#51): ✓, ✗ with the case that failed, not written yet, or the error. */
+function CheckCard({ title, check, onRunAbove }: { title: string; check: CheckResult; onRunAbove?: () => void }) {
+  const t = useT();
+  const { Icon, tone } = CHECK_LOOK[check.status];
+  const text =
+    check.status === 'pass'
+      ? t.exercises.pass
+      : check.status === 'todo'
+        ? t.exercises.todo
+        : check.status === 'error'
+          ? t.exercises.error
+          : check.message
+            ? t.exercises.failWith
+            : t.exercises.fail;
+  // A name not defined usually means the cells above have not run yet.
+  const missing = check.status === 'error' && check.message.startsWith('NameError') && onRunAbove;
+  return (
+    <div
+      role="status"
+      data-testid="check-result"
+      data-status={check.status}
+      className={`mt-2 flex gap-3 rounded-xl border p-3 ${tone}`}
+    >
+      <Icon className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
+      <div className="min-w-0 flex-1">
+        <p className="run-text text-sm font-semibold">{title}</p>
+        <p className="run-note text-sm text-foreground/90">{text}</p>
+        {check.message && check.status !== 'pass' && check.status !== 'todo' && (
+          <pre className="run-text mt-1 font-mono text-[0.8rem] whitespace-pre-wrap text-foreground">
+            {check.message}
+          </pre>
+        )}
+        {missing && (
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <p className="run-note text-xs text-muted">{t.exercises.runAboveHint}</p>
+            <Button size="sm" variant="secondary" onPress={onRunAbove}>
+              <ListOrdered className="size-3.5" /> {t.python.runAbove}
+            </Button>
+          </div>
         )}
       </div>
     </div>
