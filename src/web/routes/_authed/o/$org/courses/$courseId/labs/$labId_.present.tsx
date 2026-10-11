@@ -5,6 +5,7 @@ import { Eye, KeyRound, Maximize2, Minimize2, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isSolutionOf, type Slide, slidesOf } from '../../../../../../../../notebook/slides';
 import type { Cell, CodeCell as NotebookCodeCell } from '../../../../../../../../notebook/types';
+import { REACTIONS } from '../../../../../../../../shared/live';
 import { isVisualizerId } from '../../../../../../../../shared/visualizers';
 import { CodeCell } from '../../../../../../../components/notebook/CodeCell';
 import { Markdown, SECTION_KINDS, sectionLabel } from '../../../../../../../components/notebook/NotebookView';
@@ -281,6 +282,17 @@ function Presenter() {
             <span className="flex shrink-0 items-center gap-1.5 text-sm text-muted" data-testid="presenter-live">
               <span className="size-2 animate-pulse rounded-full bg-danger" aria-hidden="true" />
               {t.live.title} · {liveSocket.presence?.students ?? 0}
+              {/* Reactions and help requests reach the presenter too (#68). */}
+              {REACTIONS.filter((emoji) => (liveSocket.reactions[emoji] ?? 0) > 0).map((emoji) => (
+                <span key={emoji} className="tabular-nums" data-testid="presenter-reaction">
+                  {emoji} {liveSocket.reactions[emoji]}
+                </span>
+              ))}
+              {liveSocket.helpQueue.length > 0 && (
+                <span className="text-warning" title={t.live.helpQueue(liveSocket.helpQueue.length)}>
+                  ✋ {liveSocket.helpQueue.length}
+                </span>
+              )}
             </span>
           )}
           {slides.length > 0 && (

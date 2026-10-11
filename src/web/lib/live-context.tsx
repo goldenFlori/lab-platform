@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
-import type { LiveResult } from '../../shared/live';
+import type { LiveResult, Reaction } from '../../shared/live';
 import { liveQuery, useLiveChanges, useLiveSocket } from './live';
 
 // A lab taught live, for the whole lab page (#65–#67): the session, the socket, following the host,
@@ -15,6 +15,18 @@ export function goTo(selector: string) {
     if (tries++ < 50) setTimeout(look, 100);
   };
   look();
+}
+
+/** The heading of the section the student is reading, to say where they are stuck (#68). */
+function whereNow() {
+  const at = cellInView();
+  if (at === null) return '';
+  const markers = [...document.querySelectorAll<HTMLElement>('[data-at]')].filter((m) => Number(m.dataset.at) <= at);
+  for (const marker of markers.reverse()) {
+    const heading = marker.querySelector('h2, h3');
+    if (heading?.textContent) return heading.textContent.trim();
+  }
+  return '';
 }
 
 /** The cell nearest the top of the window, below the site header. */
@@ -102,6 +114,11 @@ function useLiveValue({
       if (notebookId) send({ t: 'challenge', notebook: notebookId, cell, title });
     },
     stopChallenge: () => send({ t: 'challenge-stop' }),
+    askHelp: () => send({ t: 'help', where: whereNow() }),
+    cancelHelp: () => send({ t: 'help-cancel' }),
+    takeHelp: (id: string) => send({ t: 'help-take', id }),
+    closeHelp: (id: string) => send({ t: 'help-done', id }),
+    react: (emoji: Reaction) => send({ t: 'react', emoji }),
     /** A joined student's check of the challenge: only its result goes. */
     report: (result: Omit<LiveResult, 't'>) => {
       if (!staff && joined && challenge && challenge.notebook === notebookId && challenge.cell === result.cell)
