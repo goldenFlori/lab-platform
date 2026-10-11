@@ -253,7 +253,13 @@ Built in #65 (`src/api/live/session.ts`, `src/api/routes/live.ts`, `src/web/comp
 - **The lab page's live state** is one `LiveProvider` (`lib/live-context.tsx`): the header panel,
   the exercise strips and the runs read it with `useLive()`.
 
-Planned next: help and reactions (#68).
+- **Help and reactions** (#68): "Jam bllokuar" sends `{t:'help', where}` (the heading of the
+  section the student is reading) and joins a queue kept in the object's storage; staff get
+  `{t:'help-queue', items}` (also on connecting), take a request ("E marr": the student learns who
+  is coming, `{t:'help-state'}`) and close it ("U zgjidh"); the student can cancel. Reactions
+  (👍 ❓ 🎉, `REACTIONS`) pass to the staff, one per student every 3 s, and show as passing
+  counts for 8 s on the host panel and in the presenter's header, with the number asking for help.
+  Students never see each other's requests or reactions.
 
 - **Infrastructure:** one Durable Object per session, using WebSocket Hibernation.
 - **Joining:** students join with a code or QR. Room roles: host, assistant, student.

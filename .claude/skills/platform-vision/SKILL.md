@@ -212,7 +212,10 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-11:** #67 done. The pedagog starts a challenge on an exercise in a Live Lab; students'
   checks send only their results, and the pedagog's board shows passed, failed, not yet and the
   most common error, with names on request (PR #74).
-- **Next:** #68, help requests and reactions.
+- **2026-10-11:** #68 done. In a Live Lab, students ask for help without raising a hand and staff
+  take and close requests from a queue; quick reactions show on the host panel and the presenter
+  (PR #75).
+- **Next:** #69, "your code, visualized" for sorting.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 

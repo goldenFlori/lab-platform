@@ -1,4 +1,4 @@
-// Live Lab sessions (#65): what the API and the session's sockets say. Types only.
+// Live Lab sessions (#65): what the API and the session's sockets say. Types, and the reactions.
 
 /** A role in the room: whoever started it hosts; other staff assist; the rest are students. */
 export type LiveRole = 'host' | 'assistant' | 'student';
@@ -45,6 +45,25 @@ export type LiveBoard = {
   names: { passed: string[]; failed: string[] };
 };
 
+/** Help requests (#68): a student asks or cancels; staff take and close. */
+export type LiveHelp = { t: 'help'; where: string } | { t: 'help-cancel' };
+export type LiveHelpTake = { t: 'help-take'; id: string } | { t: 'help-done'; id: string };
+
+/** To staff: the queue, oldest first. `id` is the student's account. */
+export type LiveHelpQueue = {
+  t: 'help-queue';
+  items: { id: string; name: string; where: string; since: string; takenBy: string | null }[];
+};
+
+/** To the student who asked: whether they wait, or who is coming. */
+export type LiveHelpState = { t: 'help-state'; status: 'waiting' | 'taken' | null; by: string | null };
+
+export const REACTIONS = ['👍', '❓', '🎉'] as const;
+export type Reaction = (typeof REACTIONS)[number];
+
+/** A student's reaction (#68), passed to the staff; one per student every few seconds. */
+export type LiveReact = { t: 'react'; emoji: Reaction };
+
 /** To everyone: the host ended the session. */
 export type LiveEnded = { t: 'ended' };
 
@@ -55,4 +74,9 @@ export type LiveMessage =
   | LiveChallenge
   | LiveChallengeStop
   | LiveResult
-  | LiveBoard;
+  | LiveBoard
+  | LiveHelp
+  | LiveHelpTake
+  | LiveHelpQueue
+  | LiveHelpState
+  | LiveReact;

@@ -1,7 +1,7 @@
 import { Button } from '@heroui/react';
-import { CircleCheck, CircleX, Hourglass, QrCode as QrIcon, Radio, Trophy, Users } from 'lucide-react';
+import { CircleCheck, CircleX, Hand, Hourglass, QrCode as QrIcon, Radio, Trophy, Users } from 'lucide-react';
 import { useState } from 'react';
-import type { LiveBoard } from '../../shared/live';
+import { type LiveBoard, type LiveHelpQueue, REACTIONS, type Reaction } from '../../shared/live';
 import { useT } from '../i18n';
 import { goTo, useLive } from '../lib/live-context';
 import { QrCode } from './QrCode';
@@ -9,7 +9,8 @@ import { QrCode } from './QrCode';
 // A lab taught live (#65), in the lab page's header. Staff who may host start the session here;
 // the host and assistants see who is connected, show a QR code that brings students into the lab
 // and the session, and follow a running challenge's board (#67). Students see a banner, join with
-// one tap (or at once from the QR code), follow the host (#66) and see the challenge.
+// one tap (or at once from the QR code), follow the host (#66) and see the challenge. Students ask
+// for help and react; staff see the help queue and the passing reactions (#68).
 
 export function LiveLab({ org, courseId, labId }: { org: string; courseId: string; labId: string }) {
   const t = useT();
@@ -64,7 +65,11 @@ export function LiveLab({ org, courseId, labId }: { org: string; courseId: strin
             <p className="text-sm text-muted">{t.live.scan}</p>
           </div>
         )}
+        <Reactions counts={socket.reactions} />
         {challengeHere && <Board title={challengeHere.title} board={socket.board} onStop={live.stopChallenge} />}
+        {socket.helpQueue.length > 0 && (
+          <HelpQueue items={socket.helpQueue} onTake={live.takeHelp} onClose={live.closeHelp} />
+        )}
         {socket.presence && socket.presence.names.length > 0 && (
           <details className="mt-3 text-sm">
             <summary className="flex cursor-pointer items-center gap-1.5 text-muted">
@@ -114,6 +119,7 @@ export function LiveLab({ org, courseId, labId }: { org: string; courseId: strin
           </Button>
         )}
       </div>
+      {joined && socket.state === 'open' && <AskAndReact />}
       {joined && challengeHere && (
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-surface px-3 py-2">
           <p className="flex items-center gap-2 text-sm font-semibold" data-testid="live-challenge">
@@ -172,6 +178,110 @@ function Board({ title, board, onStop }: { title: string; board: LiveBoard | nul
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+/** The reactions of the last few seconds, as passing counts. */
+export function Reactions({ counts }: { counts: Partial<Record<Reaction, number>> }) {
+  const t = useT();
+  const shown = REACTIONS.filter((emoji) => (counts[emoji] ?? 0) > 0);
+  if (!shown.length) return null;
+  return (
+    <p className="mt-3 flex gap-3 text-lg" data-testid="live-reactions">
+      <span className="sr-only">{t.live.reactions}:</span>
+      {shown.map((emoji) => (
+        <span key={emoji} className="tabular-nums">
+          {emoji} {counts[emoji]}
+        </span>
+      ))}
+    </p>
+  );
+}
+
+/** Who asked for help, oldest first: staff take a request, then close it. */
+function HelpQueue({
+  items,
+  onTake,
+  onClose,
+}: {
+  items: LiveHelpQueue['items'];
+  onTake: (id: string) => void;
+  onClose: (id: string) => void;
+}) {
+  const t = useT();
+  return (
+    <div className="mt-4 rounded-xl bg-surface p-3" data-testid="help-queue">
+      <p className="flex items-center gap-2 text-sm font-semibold">
+        <Hand className="size-4 text-warning" aria-hidden="true" /> {t.live.helpQueue(items.length)}
+      </p>
+      <ul className="mt-2 divide-y divide-separator">
+        {items.map((item) => (
+          <li key={item.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
+            <span className="min-w-0">
+              <span className="font-medium">{item.name}</span>
+              {item.where && <span className="text-muted"> · {item.where}</span>}
+              {item.takenBy && <span className="block text-xs text-success">{t.live.takenBy(item.takenBy)}</span>}
+            </span>
+            {item.takenBy ? (
+              <Button size="sm" variant="secondary" onPress={() => onClose(item.id)}>
+                {t.live.helpDone}
+              </Button>
+            ) : (
+              <Button size="sm" variant="primary" onPress={() => onTake(item.id)}>
+                {t.live.helpTake}
+              </Button>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** "I'm stuck", and the quick reactions, for a joined student. */
+function AskAndReact() {
+  const t = useT();
+  const live = useLive();
+  const [resting, setResting] = useState(false);
+  if (!live) return null;
+  const help = live.socket.help;
+  const react = (emoji: Reaction) => {
+    live.react(emoji);
+    setResting(true);
+    setTimeout(() => setResting(false), 3000);
+  };
+  return (
+    <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+      {help?.status ? (
+        <p className="flex flex-wrap items-center gap-2 text-sm" data-testid="help-state">
+          <Hand className="size-4 text-warning" aria-hidden="true" />
+          {help.status === 'taken' && help.by ? t.live.comingToYou(help.by) : t.live.waitingForHelp}
+          <Button size="sm" variant="ghost" onPress={live.cancelHelp}>
+            {t.live.cancelHelp}
+          </Button>
+        </p>
+      ) : (
+        <Button size="sm" variant="secondary" onPress={live.askHelp}>
+          <Hand className="size-4" /> {t.live.stuck}
+        </Button>
+      )}
+      <fieldset className="flex gap-1">
+        <legend className="sr-only">{t.live.reactions}</legend>
+        {REACTIONS.map((emoji) => (
+          <Button
+            key={emoji}
+            isIconOnly
+            size="sm"
+            variant="ghost"
+            isDisabled={resting}
+            aria-label={t.live.react(emoji)}
+            onPress={() => react(emoji)}
+          >
+            <span className="text-lg">{emoji}</span>
+          </Button>
+        ))}
+      </fieldset>
     </div>
   );
 }

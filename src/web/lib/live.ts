@@ -1,6 +1,16 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { LiveBoard, LiveChallenge, LiveMessage, LivePresence, LiveState, LiveStep } from '../../shared/live';
+import type {
+  LiveBoard,
+  LiveChallenge,
+  LiveHelpQueue,
+  LiveHelpState,
+  LiveMessage,
+  LivePresence,
+  LiveState,
+  LiveStep,
+  Reaction,
+} from '../../shared/live';
 import { api } from './api';
 
 // Live Lab sessions (#65): whether a lab is taught live now, starting and ending it, and the
@@ -35,6 +45,9 @@ export function useLiveChanges(org: string, courseId: string, labId: string) {
 
 export type SocketState = 'connecting' | 'open' | 'closed';
 
+/** How long a reaction counts on the staff's screens. */
+const REACTION_MS = 8000;
+
 /** A keepalive the session answers without waking up. */
 const PING_MS = 45_000;
 
@@ -55,6 +68,10 @@ export function useLiveSocket(
   const [step, setStep] = useState<LiveStep | null>(null);
   const [challenge, setChallenge] = useState<LiveChallenge | null>(null);
   const [board, setBoard] = useState<LiveBoard | null>(null);
+  const [helpQueue, setHelpQueue] = useState<LiveHelpQueue['items']>([]);
+  const [help, setHelp] = useState<LiveHelpState | null>(null);
+  // Reactions of the last few seconds, as passing counts.
+  const [reactions, setReactions] = useState<Partial<Record<Reaction, number>>>({});
   const socketRef = useRef<WebSocket | null>(null);
   const dropped = useRef(onDrop);
   dropped.current = onDrop;
@@ -88,6 +105,13 @@ export function useLiveSocket(
         }
         if (message.t === 'challenge-stop') setChallenge(null);
         if (message.t === 'board') setBoard(message);
+        if (message.t === 'help-queue') setHelpQueue(message.items);
+        if (message.t === 'help-state') setHelp(message);
+        if (message.t === 'react') {
+          const { emoji } = message;
+          setReactions((r) => ({ ...r, [emoji]: (r[emoji] ?? 0) + 1 }));
+          setTimeout(() => setReactions((r) => ({ ...r, [emoji]: Math.max(0, (r[emoji] ?? 1) - 1) })), REACTION_MS);
+        }
         if (message.t === 'ended') {
           stopped = true;
           dropped.current();
@@ -115,6 +139,9 @@ export function useLiveSocket(
       setStep(null);
       setChallenge(null);
       setBoard(null);
+      setHelpQueue([]);
+      setHelp(null);
+      setReactions({});
     };
   }, [org, courseId, labId, sessionId]);
 
@@ -124,5 +151,5 @@ export function useLiveSocket(
     if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message));
   }, []);
 
-  return { state, presence, step, challenge, board, send };
+  return { state, presence, step, challenge, board, helpQueue, help, reactions, send };
 }
