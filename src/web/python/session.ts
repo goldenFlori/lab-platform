@@ -8,7 +8,9 @@ import type { RunCheck, RunOutcome } from './runner';
 export type PythonStatus = 'off' | 'starting' | 'ready' | 'failed';
 
 /** Printed text, or a figure (an object URL of its PNG or Plotly JSON). */
-export type OutputBlock = { stream: 'stdout' | 'stderr'; text: string } | { figure: 'image' | 'plotly'; url: string };
+export type OutputBlock =
+  | { stream: 'stdout' | 'stderr'; text: string }
+  | { figure: 'image' | 'plotly' | 'vizlab'; url: string };
 
 export type CellRun = {
   state: 'queued' | 'running' | 'done';

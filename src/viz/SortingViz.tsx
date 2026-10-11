@@ -182,7 +182,7 @@ export default function SortingViz({
   );
 }
 
-function Bars({ step }: { step: SortStep }) {
+export function Bars({ step }: { step: SortStep }) {
   const arr = step.arr;
   const lo = Math.min(...arr, 0);
   const hi = Math.max(...arr, 1);

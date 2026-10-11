@@ -6,11 +6,16 @@ import { cellFile, RUNNER_PY } from '../../src/web/python/runner';
 
 let pyodide: PyodideAPI;
 let printed: string[];
+const vizlabSent: string[] = [];
 
 beforeAll(async () => {
   pyodide = await loadPyodide();
   pyodide.setStdout({ batched: (text) => printed.push(text) });
-  pyodide.registerJsModule('_lab_display', { image: () => {}, plotly: () => {} });
+  pyodide.registerJsModule('_lab_display', {
+    image: () => {},
+    plotly: () => {},
+    vizlab: (json: string) => vizlabSent.push(json),
+  });
   await pyodide.runPythonAsync(RUNNER_PY);
 }, 60_000);
 
@@ -114,5 +119,38 @@ describe('checking an exercise (#51)', () => {
     result.destroy();
     expect(kind).toBe('error');
     expect(checked).toBeUndefined();
+  });
+});
+
+describe('vizlab (#69)', () => {
+  it("records what a student's sort does to a tracked list, and sends it when the cell ends", async () => {
+    const sent = vizlabSent;
+    sent.length = 0;
+    await run(
+      [
+        'import vizlab',
+        'A = vizlab.track([3, 1, 2])',
+        'vizlab.compare(0, 1)',
+        'vizlab.swap(0, 1)',
+        'A[2] = 5',
+        'vizlab.done(0)',
+      ].join('\n'),
+    );
+    expect(sent).toHaveLength(1);
+    const { kind, events } = JSON.parse(sent[0] ?? '{}') as { kind: string; events: { op: string; arr: number[] }[] };
+    expect(kind).toBe('sorting');
+    expect(events.map((e) => [e.op, e.arr])).toEqual([
+      ['start', [3, 1, 2]],
+      ['compare', [3, 1, 2]],
+      ['swap', [1, 3, 2]],
+      ['write', [1, 3, 5]],
+      ['done', [1, 3, 5]],
+    ]);
+    // Nothing is sent from a cell that does not track a list.
+    await run('x = 1');
+    expect(sent).toHaveLength(1);
+    const { kind: error, text } = await run('import vizlab\nvizlab.compare(0, 9)');
+    expect(error).toBe('error');
+    expect(text).toContain('vizlab');
   });
 });

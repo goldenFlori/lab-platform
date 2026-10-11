@@ -279,6 +279,19 @@ Built in #65 (`src/api/live/session.ts`, `src/api/routes/live.ts`, `src/web/comp
 
 ## "Your code, visualized" (phase 3)
 
+Sorting built in #69:
+
+- **`vizlab`** is preloaded in every Python (`RUNNER_PY`): `A = vizlab.track(list)` returns a copy
+  whose writes are recorded on their own; `vizlab.compare(i, j)` records a comparison and returns
+  True (so it fits inside a condition), `vizlab.swap(i, j)` swaps and records, `vizlab.done(i, …)`
+  marks final positions. At most 5,000 events per run.
+- When the cell ends, the events go to the page as a `vizlab` figure (JSON, like Plotly's).
+  `vizlabSteps` (`src/viz/algorithms/vizlab.ts`) turns them into the sorting visualizer's steps,
+  with notes in both languages and a last step that says whether the list ended sorted.
+- `YourSortViz` plays the student's run next to the reference (Insertion, Selection or Merge, from
+  `SORT_RUN`) on the same list, under one player, with both counts of comparisons and writes. It
+  loads in its own chunk, in the run's output on the lab page and in presentation mode.
+
 - A small Python module, working name `vizlab`, preloaded in Pyodide. Its hooks post events to the
   page:
   - `vizlab.visit(node)`

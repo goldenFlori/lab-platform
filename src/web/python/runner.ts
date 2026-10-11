@@ -7,6 +7,9 @@
 //   exercise not written yet (NotImplementedError), or reports the error that stopped it.
 // - A traceback keeps only the student's own lines; the `<cell N>` file names say which cell failed,
 //   and each cell's source is kept for tracebacks and `inspect`.
+// - "Your code, visualized" (#69): the `vizlab` module records what a student's sort does to a list
+//   they track; when the cell ends, the steps go to the page, which plays them with the course's
+//   sorting visualizer.
 // - Figures go to the page through the `_lab_display` module the worker provides: matplotlib draws
 //   off-screen and each `plt.show()` (or figure left open at the end) becomes a PNG; plotly's
 //   `fig.show()` sends the figure's JSON. A figure as a cell's last value shows as a figure.
@@ -15,6 +18,7 @@ import type { CheckStatus } from '../../shared/exercises';
 
 export const RUNNER_PY = `
 import io
+import json
 import linecache
 import os
 import sys
@@ -25,10 +29,91 @@ import warnings
 # Pyodide sets its own canvas backend; figures here are drawn off-screen instead.
 os.environ["MPLBACKEND"] = "AGG"
 
+import types
+
 import _lab_display
 from pyodide.code import eval_code_async
 
 _lab_namespace = {"__name__": "__main__"}
+
+# vizlab (#69): what a student's code does to a list it tracks, for the page to play.
+_vizlab_events = []
+_vizlab_list = [None]
+_VIZLAB_LIMIT = 5000
+
+
+def _vizlab_number(value):
+    return value if isinstance(value, (int, float)) and not isinstance(value, bool) else 0
+
+
+def _vizlab_record(op, **details):
+    if _vizlab_list[0] is None or len(_vizlab_events) >= _VIZLAB_LIMIT:
+        return
+    _vizlab_events.append({"op": op, "arr": [_vizlab_number(v) for v in _vizlab_list[0]], **details})
+
+
+class _VizlabList(list):
+    """A list whose writes are recorded."""
+
+    def __setitem__(self, index, value):
+        super().__setitem__(index, value)
+        if self is _vizlab_list[0] and isinstance(index, int):
+            _vizlab_record("write", i=index % len(self))
+
+
+def _vizlab_index(i):
+    lst = _vizlab_list[0]
+    if lst is None:
+        raise RuntimeError("vizlab: thirrni fillimisht vizlab.track(lista)")
+    i = int(i)
+    if not -len(lst) <= i < len(lst):
+        raise IndexError(f"vizlab: indeksi {i} është jashtë listës")
+    return i % len(lst)
+
+
+def _vizlab_track(values):
+    """Starts recording: returns a copy of the list whose writes are shown."""
+    _vizlab_events.clear()
+    _vizlab_list[0] = _VizlabList(values)
+    _vizlab_record("start")
+    return _vizlab_list[0]
+
+
+def _vizlab_compare(i, j):
+    """Shows a comparison of A[i] and A[j]; always True, so it fits inside a condition."""
+    _vizlab_record("compare", i=_vizlab_index(i), j=_vizlab_index(j))
+    return True
+
+
+def _vizlab_swap(i, j):
+    """Swaps A[i] and A[j], and shows it."""
+    i, j = _vizlab_index(i), _vizlab_index(j)
+    lst = _vizlab_list[0]
+    a, b = lst[i], lst[j]
+    list.__setitem__(lst, i, b)
+    list.__setitem__(lst, j, a)
+    _vizlab_record("swap", i=i, j=j)
+
+
+def _vizlab_done(*indices):
+    """Shows these positions as final."""
+    _vizlab_record("done", indices=[_vizlab_index(i) for i in indices])
+
+
+vizlab = types.ModuleType("vizlab", "Shfaqni si e rendit kodi juaj një listë (track, compare, swap, done).")
+vizlab.track = _vizlab_track
+vizlab.compare = _vizlab_compare
+vizlab.swap = _vizlab_swap
+vizlab.done = _vizlab_done
+sys.modules["vizlab"] = vizlab
+
+
+def _vizlab_flush():
+    if _vizlab_events:
+        truncated = len(_vizlab_events) >= _VIZLAB_LIMIT
+        _lab_display.vizlab(json.dumps({"kind": "sorting", "events": _vizlab_events, "truncated": truncated}))
+    _vizlab_events.clear()
+    _vizlab_list[0] = None
 
 
 def _lab_show_figures(*args, **kwargs):
@@ -130,6 +215,7 @@ async def _lab_run(code, filename, exercise=False, test=None):
             _lab_show_figures()
         except Exception:
             pass
+        _vizlab_flush()
     # Several checks in one cell: the first that did not pass speaks for all.
     check = next((c for c in checks if c[0] != "pass"), checks[0] if checks else None)
     return ("ok", shown, check)
