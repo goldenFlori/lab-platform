@@ -41,10 +41,12 @@ test('a student sees their own insertion sort animate next to the reference', as
   await apiCall(student, 'POST', '/join', { code: group.joinCode });
   await apiCall(student, 'PUT', `${labPath}/notebooks/${nb.id}/edits/0`, { code: SORT });
   await student.goto(pageUrl);
+  // The student's own code has loaded into the cell.
+  await expect(student.getByRole('textbox', { name: 'Kodi i qelizës 1' })).toContainText('vizlab');
   await student.getByRole('button', { name: 'Ekzekuto qelizën 1' }).click();
 
   const viz = student.getByTestId('vizlab');
-  await expect(viz.getByText('Kodi juaj, i vizualizuar')).toBeVisible({ timeout: 90_000 });
+  await expect(viz.getByText('Kodi juaj, i vizualizuar', { exact: true })).toBeVisible({ timeout: 90_000 });
   await expect(viz).toContainText('Referenca: Insertion Sort');
   await expect(viz).toContainText('Lista juaj në fillim: [6, 4, 3, 8, 5].');
   // To the last step: the list ended sorted.
