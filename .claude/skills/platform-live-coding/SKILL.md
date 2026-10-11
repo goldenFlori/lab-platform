@@ -244,7 +244,16 @@ Built in #65 (`src/api/live/session.ts`, `src/api/routes/live.ts`, `src/web/comp
   cell. "Puno vetë" detaches; "Ndiq pedagogun" goes to where the host is now. The presenter
   shows the host "Live · N".
 
-Planned next: challenges (#67), help and reactions (#68).
+- **Challenges** (#67): the host starts one from an exercise's strip ("Fillo sfidën";
+  `{t:'challenge', notebook, cell, title}`), stops it the same way; everyone sees it highlighted,
+  newcomers too. A joined student's run of that exercise sends `{t:'result', cell, status, error,
+  ms}` (the error's type only, never code), from `EditablePython`'s `onRun`. The object keeps each
+  student's latest result and sends the staff `{t:'board', passed, failed, waiting, topError,
+  names}`; the panel shows counts and the most common error, and names only on "Shfaq emrat".
+- **The lab page's live state** is one `LiveProvider` (`lib/live-context.tsx`): the header panel,
+  the exercise strips and the runs read it with `useLive()`.
+
+Planned next: help and reactions (#68).
 
 - **Infrastructure:** one Durable Object per session, using WebSocket Hibernation.
 - **Joining:** students join with a code or QR. Room roles: host, assistant, student.
