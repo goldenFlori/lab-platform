@@ -217,6 +217,27 @@ Built in #49.
 
 ## Live Lab sessions (phase 3)
 
+Built in #65 (`src/api/live/session.ts`, `src/api/routes/live.ts`, `src/web/components/LiveLab.tsx`):
+
+- **A session** is a `live_sessions` row (lab, host, started, ended; at most one running per lab)
+  plus one `LiveSession` Durable Object (`idFromName(sessionId)`, binding `LIVE`, SQLite class).
+- **Start and end:** staff with `live.host` ("Fillo Live Lab" on the lab page). Ending sends
+  `{t:'ended'}` to every socket and closes it (code 4000); a close code alone does not always
+  survive the proxies.
+- **Joining:** `GET …/labs/:labId/live/:id/ws`, from our own Origin, for users who may see the lab.
+  The Worker hands the socket to the object with the member (`X-Live-Member`: user, name, role);
+  the object is reachable only through the Worker. Students join from the banner, or at once from
+  the QR code, which opens the lab page with `?live=1`; no extra code, since they are course
+  members already.
+- **Hibernation:** `acceptWebSocket` with the role as tag and the member as attachment; `ping` is
+  answered by an auto-response that does not wake the object (the page sends one every 45 s).
+- **Presence:** the host and assistants get `{t:'presence', students, staff, names}` on every join
+  and leave; students get nothing about each other.
+- **Students do not poll:** the page checks for a session when it opens and regains focus. A drop
+  reconnects with growing pauses and re-checks that the session still runs.
+
+Planned next: follow mode (#66), challenges (#67), help and reactions (#68).
+
 - **Infrastructure:** one Durable Object per session, using WebSocket Hibernation.
 - **Joining:** students join with a code or QR. Room roles: host, assistant, student.
 - **Message types (keep them small):**
