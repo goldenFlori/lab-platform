@@ -7,9 +7,9 @@
 //   exercise not written yet (NotImplementedError), or reports the error that stopped it.
 // - A traceback keeps only the student's own lines; the `<cell N>` file names say which cell failed,
 //   and each cell's source is kept for tracebacks and `inspect`.
-// - "Your code, visualized" (#69): the `vizlab` module records what a student's sort does to a list
-//   they track; when the cell ends, the steps go to the page, which plays them with the course's
-//   sorting visualizer.
+// - "Your code, visualized" (#69, #70): the `vizlab` module records what a student's sort does to a
+//   list they track, or what their traversal does on a graph; when the cell ends, the steps go to
+//   the page, which plays them with the course's visualizers.
 // - Figures go to the page through the `_lab_display` module the worker provides: matplotlib draws
 //   off-screen and each `plt.show()` (or figure left open at the end) becomes a PNG; plotly's
 //   `fig.show()` sends the figure's JSON. A figure as a cell's last value shows as a figure.
@@ -74,6 +74,7 @@ def _vizlab_index(i):
 def _vizlab_track(values):
     """Starts recording: returns a copy of the list whose writes are shown."""
     _vizlab_events.clear()
+    _vizlab_graph_on[0] = False
     _vizlab_list[0] = _VizlabList(values)
     _vizlab_record("start")
     return _vizlab_list[0]
@@ -100,7 +101,75 @@ def _vizlab_done(*indices):
     _vizlab_record("done", indices=[_vizlab_index(i) for i in indices])
 
 
-vizlab = types.ModuleType("vizlab", "Shfaqni si e rendit kodi juaj një listë (track, compare, swap, done).")
+_vizlab_graph_on = [False]
+
+
+def _vizlab_graph_record(op, **details):
+    if not _vizlab_graph_on[0] or len(_vizlab_events) >= _VIZLAB_LIMIT:
+        return
+    _vizlab_events.append({"op": op, **details})
+
+
+def _vizlab_graph(graph, directed=False):
+    """Starts recording on a graph: a dict of neighbours (or of {neighbour: weight}), or a list of edges."""
+    nodes, edges, seen = [], [], set()
+
+    def node(x):
+        x = str(x)
+        if x not in nodes:
+            nodes.append(x)
+        return x
+
+    def edge(u, v, w=None):
+        u, v = node(u), node(v)
+        key = (u, v) if directed else tuple(sorted((u, v)))
+        if key in seen:
+            return
+        seen.add(key)
+        edges.append([u, v, _vizlab_number(w) if w is not None else None])
+
+    if isinstance(graph, dict):
+        for u, around in graph.items():
+            node(u)
+            pairs = around.items() if isinstance(around, dict) else ((v, None) for v in around)
+            for v, w in pairs:
+                edge(u, v, w)
+    else:
+        for item in graph:
+            edge(*item[:3])
+    if len(nodes) > 60 or len(edges) > 300:
+        raise ValueError("vizlab: grafi është shumë i madh për t'u shfaqur (deri në 60 kulme dhe 300 brinjë)")
+    _vizlab_events.clear()
+    _vizlab_list[0] = None
+    _vizlab_graph_on[0] = True
+    _vizlab_graph_record("graph", nodes=nodes, edges=edges, directed=bool(directed))
+    return graph
+
+
+def _vizlab_visit(node):
+    """Shows that the code visits this vertex."""
+    _vizlab_graph_record("visit", node=str(node))
+
+
+def _vizlab_relax(u, v, dist):
+    """Shows the edge u→v relaxed, with v's new distance."""
+    _vizlab_graph_record("relax", u=str(u), v=str(v), dist=_vizlab_number(dist))
+
+
+def _vizlab_mark(edge, state="tree"):
+    """Shows an edge (u, v) as part of the tree ("tree") or looked at ("seen")."""
+    u, v = edge[0], edge[1]
+    _vizlab_graph_record("mark", u=str(u), v=str(v), state="seen" if state == "seen" else "tree")
+
+
+vizlab = types.ModuleType(
+    "vizlab",
+    "Shfaqni si punon kodi juaj: renditja (track, compare, swap, done) dhe grafet (graph, visit, relax, mark).",
+)
+vizlab.graph = _vizlab_graph
+vizlab.visit = _vizlab_visit
+vizlab.relax = _vizlab_relax
+vizlab.mark = _vizlab_mark
 vizlab.track = _vizlab_track
 vizlab.compare = _vizlab_compare
 vizlab.swap = _vizlab_swap
@@ -111,9 +180,11 @@ sys.modules["vizlab"] = vizlab
 def _vizlab_flush():
     if _vizlab_events:
         truncated = len(_vizlab_events) >= _VIZLAB_LIMIT
-        _lab_display.vizlab(json.dumps({"kind": "sorting", "events": _vizlab_events, "truncated": truncated}))
+        kind = "graph" if _vizlab_graph_on[0] else "sorting"
+        _lab_display.vizlab(json.dumps({"kind": kind, "events": _vizlab_events, "truncated": truncated}))
     _vizlab_events.clear()
     _vizlab_list[0] = None
+    _vizlab_graph_on[0] = False
 
 
 def _lab_show_figures(*args, **kwargs):

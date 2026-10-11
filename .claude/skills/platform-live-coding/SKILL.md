@@ -279,7 +279,7 @@ Built in #65 (`src/api/live/session.ts`, `src/api/routes/live.ts`, `src/web/comp
 
 ## "Your code, visualized" (phase 3)
 
-Sorting built in #69:
+Built in #69 (sorting) and #70 (graphs):
 
 - **`vizlab`** is preloaded in every Python (`RUNNER_PY`): `A = vizlab.track(list)` returns a copy
   whose writes are recorded on their own; `vizlab.compare(i, j)` records a comparison and returns
@@ -288,6 +288,13 @@ Sorting built in #69:
 - When the cell ends, the events go to the page as a `vizlab` figure (JSON, like Plotly's).
   `vizlabSteps` (`src/viz/algorithms/vizlab.ts`) turns them into the sorting visualizer's steps,
   with notes in both languages and a last step that says whether the list ended sorted.
+- **Graphs** (#70): `vizlab.graph(g, directed=False)` takes a dict of neighbours (or of
+  `{neighbour: weight}`) or a list of edges (at most 60 vertices, 300 edges) and returns it;
+  `visit(node)`, `relax(u, v, dist)` and `mark((u, v), 'tree' | 'seen')` record the run. The run's
+  kind is then `graph`; `vizlab-graph.ts` lays the vertices on a circle and turns the events into
+  frames, and the reference's BFS, DFS or Dijkstra steps (from the vertex the student visited
+  first) into the same frames. `YourGraphViz` draws both on `GraphCanvas` under one player:
+  visited vertices numbered, the tree, the edge being looked at, and distances for Dijkstra.
 - `YourSortViz` plays the student's run next to the reference (Insertion, Selection or Merge, from
   `SORT_RUN`) on the same list, under one player, with both counts of comparisons and writes. It
   loads in its own chunk, in the run's output on the lab page and in presentation mode.
