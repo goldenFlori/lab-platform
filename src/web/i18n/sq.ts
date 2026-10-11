@@ -420,6 +420,28 @@ export const sq = {
     noLabs: 'Ky kurs nuk ka ende laboratorë.',
     lab: 'Laboratori',
   },
+  python: {
+    run: 'Ekzekuto',
+    runLabel: (n: number) => `Ekzekuto qelizën ${n}`,
+    stop: 'Ndalo',
+    runAbove: 'Ekzekuto qelizat sipër',
+    cell: (n: number) => `Qeliza ${n}`,
+    queued: 'Në pritje…',
+    starting: 'Python po niset… (vetëm herën e parë)',
+    running: 'Duke u ekzekutuar…',
+    yourOutput: 'Rezultati juaj',
+    error: 'Gabim',
+    stopped: 'Ekzekutimi u ndal.',
+    truncated: 'Rezultati ishte shumë i gjatë dhe u shkurtua.',
+    clear: 'Shfaq rezultatin e ruajtur',
+    inputLabel: 'Përgjigja për input()',
+    send: 'Dërgo',
+    ready: 'Python është gati',
+    failed: (reason: string) => `Python nuk u nis: ${reason}`,
+    restart: 'Rinis Python-in',
+    restartHelp: 'Fshin të gjitha variablat, si një kernel i ri.',
+    clearAll: 'Shfaq rezultatet e ruajtura',
+  },
 };
 
 export type Messages = typeof sq;

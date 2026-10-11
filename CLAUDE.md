@@ -98,6 +98,9 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   `sq.ts` (the source) and `en.ts`, which the build checks for every message. Components use
   `useT()`, page titles and error texts `t()`. A visualization keeps its own `bilingual()` text
   beside it (`src/viz/kit/text.ts`). Course content (notebooks, titles) is not translated.
+- **The app is cross-origin isolated** (COOP and COEP in `public/_headers` and in Vite's dev
+  server), so the Python worker can share memory with the page. Anything loaded from another
+  origin must send CORS or `Cross-Origin-Resource-Policy` headers, or it will not load.
 - **Static assets are public.** Protected content must come from `/api` after a permission check.
 - **Every tenant-owned query goes through `forTenant()`** (`src/api/db/tenant.ts`); lint blocks
   Drizzle and schema imports elsewhere in `src/api`. A new tenant table needs `org_id`,

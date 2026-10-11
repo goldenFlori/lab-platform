@@ -177,8 +177,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   those who have not chosen (PR #45).
 - **2026-10-10:** #19 done. The 13 visualizations speak both languages too, their step-by-step
   explanations and pseudocode included. Phase 1 (foundation) is complete (PR #46).
-- **Next:** plan phase 2, live coding (Pyodide runs and edits, autosave, exercises with checks), as
-  GitHub issues in a new milestone.
+- **2026-10-11:** Phase 2 planned as the "Phase 2: Live coding" milestone, issues #47–#53.
+- **2026-10-11:** #47 done. Students run a notebook's code on the lab page, in their own browser:
+  output and errors in place, one namespace per notebook, Stop for runaway loops and `input()`
+  answered on the page (PR #54).
+- **Next:** #48, scientific packages and figures in the browser.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
@@ -205,6 +208,8 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-10 | The 13 visualizations are platform content, open to everyone at `/visualizations`: they hold no tenant data, are already public on the course site, and show what the product does | Decided |
 | 2026-10-10 | Course content is imported through the API with a pedagog's sign-in, never written straight into the database: the same permission checks and storage as the app, for any environment. Re-running it is safe, and it never opens labs | Decided |
 | 2026-10-10 | When the site shows parts of one notebook in two labs, each lab gets its own notebook of those cells, so students download only their lab's part | Decided |
+| 2026-10-11 | Python runs in the student's browser (Pyodide in a Web Worker). Its engine is served from our own site, pinned to the npm version; the packages a cell imports come from Pyodide's CDN at the same version for now | Decided |
+| 2026-10-11 | The app is cross-origin isolated (COOP + COEP), so Stop keeps a student's variables and `input()` works; every cross-origin resource must send CORS or CORP headers | Decided |
 | 2026-10-10 | Activity counts students, not clicks: at most one record per student, lab, kind (opened, downloaded, tried a visualization) and day, shown only as weekly counts to staff with analytics rights, for the groups they may see. Staff are not counted | Decided |
 | 2026-10-10 | The interface's messages are typed objects in the code (Albanian the source, English checked against it by the build), not an i18n library: two languages, a tiny team, and no extraction step. Language: the user's choice, else the device's, else the course's, else Albanian | Decided |
 | 2026-10-10 | Search without FTS5: D1 cannot export databases with virtual tables, and backups must keep working. The server sends each user the text of what they may see; the browser matches it as they type | Decided |

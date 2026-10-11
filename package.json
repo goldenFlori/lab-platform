@@ -55,6 +55,7 @@
     "lucide-react": "^1.52.0",
     "markdown-it": "^15.0.2",
     "plotly.js-dist-min": "^4.1.2",
+    "pyodide": "314.0.7",
     "react": "^19.3.0",
     "react-aria": "^3.52.1",
     "react-aria-components": "^1.21.1",

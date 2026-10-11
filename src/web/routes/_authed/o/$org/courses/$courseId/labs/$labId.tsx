@@ -20,6 +20,7 @@ import { DeleteNotebook } from '../../../../../../../components/notebook/DeleteN
 import { EmbedsEditor } from '../../../../../../../components/notebook/EmbedsEditor';
 import { NotebookUpload } from '../../../../../../../components/notebook/NotebookUpload';
 import { embedAnchor, NotebookView } from '../../../../../../../components/notebook/NotebookView';
+import { PythonBar } from '../../../../../../../components/notebook/RunControls';
 import { Toc } from '../../../../../../../components/notebook/Toc';
 import { t as messages, useT } from '../../../../../../../i18n';
 import { reportVisualizationUsed } from '../../../../../../../lib/activity';
@@ -35,6 +36,7 @@ import {
   renderedQuery,
   useNotebookChanges,
 } from '../../../../../../../lib/notebooks';
+import { PythonProvider } from '../../../../../../../python/PythonProvider';
 
 export const Route = createFileRoute('/_authed/o/$org/courses/$courseId/labs/$labId')({
   validateSearch: (search: Record<string, unknown>): { notebook?: string } => ({
@@ -311,12 +313,15 @@ function NotebookSection({
             />
           </div>
         )}
-        <NotebookView
-          id={notebookRef.notebookId}
-          notebook={rendered.data}
-          embeds={embeds}
-          fileUrl={(name) => notebookFileUrl(notebookRef, name)}
-        />
+        <PythonProvider notebookId={notebookRef.notebookId} notebook={rendered.data}>
+          <PythonBar />
+          <NotebookView
+            id={notebookRef.notebookId}
+            notebook={rendered.data}
+            embeds={embeds}
+            fileUrl={(name) => notebookFileUrl(notebookRef, name)}
+          />
+        </PythonProvider>
       </article>
       <aside className="hidden lg:block">
         <Toc entries={rendered.data.toc} />
