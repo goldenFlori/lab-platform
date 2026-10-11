@@ -428,7 +428,7 @@ export const labActivity = sqliteTable(
     userId: text('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    kind: text('kind', { enum: ['view', 'download', 'visualization'] }).notNull(),
+    kind: text('kind', { enum: ['view', 'download', 'visualization', 'exercise'] }).notNull(),
     /** YYYY-MM-DD in the institution's time zone. */
     day: text('day').notNull(),
   },
@@ -468,5 +468,57 @@ export const codeEdits = sqliteTable(
       foreignColumns: [notebooks.id, notebooks.orgId],
     }).onDelete('cascade'),
     uniqueIndex('code_edits_unique').on(t.orgId, t.userId, t.notebookId, t.cell),
+  ],
+);
+
+/**
+ * A notebook's exercises (#51): running `cell` checks the student's work, with the cell's own
+ * `kontrollo(…)` call or with `test`, a visible test staff wrote. Found when the notebook is
+ * converted; staff can change them.
+ */
+export const exercises = sqliteTable(
+  'exercises',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    notebookId: text('notebook_id').notNull(),
+    /** The cell's index in the .ipynb (srcIndex). */
+    cell: integer('cell').notNull(),
+    title: text('title').notNull(),
+    test: text('test'),
+  },
+  (t) => [
+    foreignKey({
+      name: 'exercises_notebook_fk',
+      columns: [t.notebookId, t.orgId],
+      foreignColumns: [notebooks.id, notebooks.orgId],
+    }).onDelete('cascade'),
+    uniqueIndex('exercises_notebook_cell_unique').on(t.orgId, t.notebookId, t.cell),
+  ],
+);
+
+/**
+ * A student completed an exercise (#51): kept once, the first time its check passed in their
+ * browser. Practice, not grading: staff see only how many completed each.
+ */
+export const exerciseCompletions = sqliteTable(
+  'exercise_completions',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    notebookId: text('notebook_id').notNull(),
+    cell: integer('cell').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    completedAt: createdAt(),
+  },
+  (t) => [
+    foreignKey({
+      name: 'exercise_completions_notebook_fk',
+      columns: [t.notebookId, t.orgId],
+      foreignColumns: [notebooks.id, notebooks.orgId],
+    }).onDelete('cascade'),
+    uniqueIndex('exercise_completions_unique').on(t.orgId, t.notebookId, t.cell, t.userId),
   ],
 );

@@ -1,6 +1,7 @@
 import { zValidator } from '@hono/zod-validator';
 import { type Context, Hono } from 'hono';
 import { type CodeEdit, codeEditInput } from '../../shared/code-edits';
+import { type ExerciseProgress, exercisesInput } from '../../shared/exercises';
 import {
   createNotebookInput,
   type Embed,
@@ -66,9 +67,13 @@ const canManage = (c: Context<TenantEnv>, ctx: LabContext) =>
   c.var.access.can('course.manage', { courseId: ctx.course.id });
 
 async function detail(c: Context<TenantEnv>, nb: Notebook): Promise<NotebookDetail> {
-  const embeds = await c.var.tenant.notebooks.embedsOf(nb.id);
+  const [embeds, exercises] = await Promise.all([
+    c.var.tenant.notebooks.embedsOf(nb.id),
+    c.var.tenant.exercises.of(nb.id),
+  ]);
   return {
     ...summary(nb),
+    exercises,
     embeds: embeds
       .sort((a, b) => a.cell - b.cell)
       .map((e): Embed => ({ cell: e.cell, viz: e.viz, title: e.title, props: e.props })),
@@ -218,6 +223,54 @@ export const notebookRoutes = new Hono<TenantEnv>()
   .delete('/:notebookId/edits', async (c) => {
     const { nb } = await notebookInUrl(c);
     await c.var.tenant.codeEdits.reset(nb.id, c.var.user?.id as string);
+    return c.body(null, 204);
+  })
+
+  // Its exercises (#51): found where it was converted, changed by staff; replaces the old list.
+  .put('/:notebookId/exercises', zValidator('json', exercisesInput, invalidRequest), async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    if (!canManage(c, ctx)) return forbidden(c);
+    await c.var.tenant.exercises.set(nb.id, c.req.valid('json').exercises);
+    return c.json(await detail(c, nb));
+  })
+
+  // Progress on them: the exercises this user completed, and for staff who may see the course's
+  // activity, how many of their groups' students completed each, as counts only.
+  .get('/:notebookId/exercises/progress', async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    const { access, tenant } = c.var;
+    const courseId = ctx.course.id;
+    const wholeCourse = access.can('analytics.view', { courseId });
+    const allowed = ctx.groups.filter((g) => access.can('analytics.view', { courseId, groupId: g.id }));
+    const [done, counted] = await Promise.all([
+      tenant.exercises.doneBy(nb.id, c.var.user?.id as string),
+      wholeCourse || allowed.length > 0
+        ? tenant.exercises.counts({
+            notebookId: nb.id,
+            courseId,
+            groupIds: wholeCourse ? null : allowed.map((g) => g.id),
+          })
+        : null,
+    ]);
+    return c.json({
+      done,
+      counts: counted?.counts ?? null,
+      students: counted?.students ?? null,
+    } satisfies ExerciseProgress);
+  })
+
+  // A student's check passed in their browser: kept once, and counted in the course's activity.
+  // Practice only, so the browser is trusted with it; staff are not counted.
+  .post('/:notebookId/exercises/:cell/done', async (c) => {
+    const { ctx, lab, nb } = await notebookInUrl(c);
+    const cell = cellParam(c.req.param('cell'));
+    if (cell === null) return c.json({ error: 'invalid_request' }, 400);
+    const exercises = await c.var.tenant.exercises.of(nb.id);
+    if (!exercises.some((e) => e.cell === cell)) throw new NotFoundError();
+    if (!ctx.staff) {
+      await c.var.tenant.exercises.complete({ notebookId: nb.id, cell, userId: c.var.user?.id as string });
+      recordActivity(c, ctx, lab.id, 'exercise');
+    }
     return c.body(null, 204);
   })
 

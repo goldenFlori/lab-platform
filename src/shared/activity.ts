@@ -3,8 +3,11 @@ import { z } from 'zod';
 // Learning activity (#18): what students do in a course, kept as at most one row per student, lab,
 // kind and day, and shown to staff only as totals. The app imports only types from this file.
 
-/** Opened a lab's notebook; downloaded its .ipynb (to work on it); used one of its visualizations. */
-export const ACTIVITY_KINDS = ['view', 'download', 'visualization'] as const;
+/**
+ * Opened a lab's notebook; downloaded its .ipynb (to work on it); used one of its visualizations;
+ * completed one of its exercises (#51).
+ */
+export const ACTIVITY_KINDS = ['view', 'download', 'visualization', 'exercise'] as const;
 export type ActivityKind = (typeof ACTIVITY_KINDS)[number];
 
 /** Days and weeks (Monday to Sunday) are counted in the institution's time. One zone for now. */

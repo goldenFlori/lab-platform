@@ -13,6 +13,7 @@ import {
   type SQL,
   sql,
 } from 'drizzle-orm';
+import type { ActivityKind } from '../../shared/activity';
 import { roleExists } from './access';
 import { uuidv7 } from './ids';
 import type { Db } from './index';
@@ -21,6 +22,8 @@ import {
   courses,
   courseTemplates,
   embeds,
+  exerciseCompletions,
+  exercises,
   fileChunks,
   files,
   groups,
@@ -571,11 +574,33 @@ function tenantCodeEdits(db: Db, orgId: string) {
   };
 }
 
+/**
+ * The students of a course's groups (all of its groups when `groupIds` is null): `students` as a
+ * subquery of user ids, and `inGroups` as the condition on memberships.
+ */
+function studentsOf(db: Db, orgId: string, courseId: string, groupIds: string[] | null) {
+  const inGroups =
+    groupIds === null
+      ? inArray(
+          memberships.groupId,
+          db
+            .select({ id: groups.id })
+            .from(groups)
+            .where(and(eq(groups.orgId, orgId), eq(groups.courseId, courseId))),
+        )
+      : inArray(memberships.groupId, groupIds.length ? groupIds : ['']);
+  const students = db
+    .selectDistinct({ id: memberships.userId })
+    .from(memberships)
+    .where(and(eq(memberships.orgId, orgId), eq(memberships.role, 'student'), inGroups));
+  return { inGroups, students };
+}
+
 /** Learning activity (#18): recorded once per student, lab, kind and day; read only as counts. */
 function tenantActivity(db: Db, orgId: string) {
   return {
     /** Records that the student did this today; doing it again the same day changes nothing. */
-    async record(row: { labId: string; userId: string; kind: 'view' | 'download' | 'visualization'; day: string }) {
+    async record(row: { labId: string; userId: string; kind: ActivityKind; day: string }) {
       await rethrowMissingParent(
         db
           .insert(labActivity)
@@ -594,20 +619,7 @@ function tenantActivity(db: Db, orgId: string) {
         .select({ id: labs.id })
         .from(labs)
         .where(and(eq(labs.orgId, orgId), eq(labs.courseId, courseId)));
-      const inGroups =
-        groupIds === null
-          ? inArray(
-              memberships.groupId,
-              db
-                .select({ id: groups.id })
-                .from(groups)
-                .where(and(eq(groups.orgId, orgId), eq(groups.courseId, courseId))),
-            )
-          : inArray(memberships.groupId, groupIds.length ? groupIds : ['']);
-      const students = db
-        .selectDistinct({ id: memberships.userId })
-        .from(memberships)
-        .where(and(eq(memberships.orgId, orgId), eq(memberships.role, 'student'), inGroups));
+      const { inGroups, students } = studentsOf(db, orgId, courseId, groupIds);
       const counted = and(
         eq(labActivity.orgId, orgId),
         inArray(labActivity.labId, courseLabs),
@@ -643,6 +655,95 @@ function tenantActivity(db: Db, orgId: string) {
   };
 }
 
+/** A notebook's exercises and their completions (#51); completions are read back only as counts. */
+function tenantExercises(db: Db, orgId: string) {
+  const ofNotebook = (notebookId: string) => and(eq(exercises.orgId, orgId), eq(exercises.notebookId, notebookId));
+  return {
+    of(notebookId: string) {
+      return db
+        .select({ cell: exercises.cell, title: exercises.title, test: exercises.test })
+        .from(exercises)
+        .where(ofNotebook(notebookId))
+        .orderBy(asc(exercises.cell));
+    },
+
+    /** Replaces all exercises of the notebook at once: at most 100, 11 statements. */
+    async set(notebookId: string, list: { cell: number; title: string; test: string | null }[]) {
+      const rows = list.map((exercise) => ({ ...exercise, id: uuidv7(), orgId, notebookId }));
+      await rethrowMissingParent(
+        db.batch([
+          db.delete(exercises).where(ofNotebook(notebookId)),
+          ...inChunks(rows).map((chunk) => db.insert(exercises).values(chunk)),
+        ]),
+      );
+    },
+
+    /** Records that the user completed it; completing it again changes nothing. */
+    async complete(row: { notebookId: string; cell: number; userId: string }) {
+      await rethrowMissingParent(
+        db
+          .insert(exerciseCompletions)
+          .values({ ...row, id: uuidv7(), orgId })
+          .onConflictDoNothing(),
+      );
+    },
+
+    async doneBy(notebookId: string, userId: string) {
+      const rows = await db
+        .select({ cell: exerciseCompletions.cell })
+        .from(exerciseCompletions)
+        .where(
+          and(
+            eq(exerciseCompletions.orgId, orgId),
+            eq(exerciseCompletions.notebookId, notebookId),
+            eq(exerciseCompletions.userId, userId),
+          ),
+        )
+        .orderBy(asc(exerciseCompletions.cell));
+      return rows.map((row) => row.cell);
+    },
+
+    /**
+     * How many students of `groupIds` (all the course's groups when null) completed each of the
+     * notebook's current exercises, made in SQL so no student is named.
+     */
+    async counts({
+      notebookId,
+      courseId,
+      groupIds,
+    }: {
+      notebookId: string;
+      courseId: string;
+      groupIds: string[] | null;
+    }) {
+      const { inGroups, students } = studentsOf(db, orgId, courseId, groupIds);
+      const [enrolled, rows] = await Promise.all([
+        db
+          .select({ n: countDistinct(memberships.userId) })
+          .from(memberships)
+          .where(and(eq(memberships.orgId, orgId), eq(memberships.role, 'student'), inGroups)),
+        db
+          .select({ cell: exerciseCompletions.cell, students: countDistinct(exerciseCompletions.userId) })
+          .from(exerciseCompletions)
+          .where(
+            and(
+              eq(exerciseCompletions.orgId, orgId),
+              eq(exerciseCompletions.notebookId, notebookId),
+              inArray(exerciseCompletions.userId, students),
+              inArray(
+                exerciseCompletions.cell,
+                db.select({ cell: exercises.cell }).from(exercises).where(ofNotebook(notebookId)),
+              ),
+            ),
+          )
+          .groupBy(exerciseCompletions.cell)
+          .orderBy(asc(exerciseCompletions.cell)),
+      ]);
+      return { students: enrolled[0]?.n ?? 0, counts: rows };
+    },
+  };
+}
+
 export function forTenant(db: Db, orgId: string) {
   const members = tenantUsers(db, orgId);
   return {
@@ -658,6 +759,7 @@ export function forTenant(db: Db, orgId: string) {
     notebooks: tenantNotebooks(db, orgId),
     activity: tenantActivity(db, orgId),
     codeEdits: tenantCodeEdits(db, orgId),
+    exercises: tenantExercises(db, orgId),
   };
 }
 
