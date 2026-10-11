@@ -441,3 +441,32 @@ export const labActivity = sqliteTable(
     uniqueIndex('lab_activity_unique').on(t.orgId, t.labId, t.userId, t.kind, t.day),
   ],
 );
+
+/**
+ * A student's own version of a notebook's code cell (#49), saved as they type. Private: only its
+ * author reads it; staff see a student's code only once it is submitted. Gone with the notebook or
+ * the user.
+ */
+export const codeEdits = sqliteTable(
+  'code_edits',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    notebookId: text('notebook_id').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    /** The cell's index in the .ipynb (srcIndex). */
+    cell: integer('cell').notNull(),
+    code: text('code').notNull(),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+  },
+  (t) => [
+    foreignKey({
+      name: 'code_edits_notebook_fk',
+      columns: [t.notebookId, t.orgId],
+      foreignColumns: [notebooks.id, notebooks.orgId],
+    }).onDelete('cascade'),
+    uniqueIndex('code_edits_unique').on(t.orgId, t.userId, t.notebookId, t.cell),
+  ],
+);
