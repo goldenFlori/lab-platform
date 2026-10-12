@@ -61,10 +61,33 @@ function fromEvents(body: ReadableStream<Uint8Array>): AiStream {
   return { text, neurons: () => used };
 }
 
-/** Answers at once with the question's start, and reports 3 neurons. */
+/** A variant a pedagog could save: its solution passes its tests and its starter does not. */
+const FAKE_VARIANT = `### TITLE
+Shuma e numrave çift
+### TASK
+Shkruani \`shuma_cift(lista)\` që kthen shumën e numrave çift të listës.
+### STARTER
+\`\`\`python
+def shuma_cift(lista):
+    # TODO
+    pass
+\`\`\`
+### SOLUTION
+\`\`\`python
+def shuma_cift(lista):
+    return sum(x for x in lista if x % 2 == 0)
+\`\`\`
+### TESTS
+assert shuma_cift([1, 2, 3, 4]) == 6, "shuma_cift([1, 2, 3, 4]) duhet 6"
+assert shuma_cift([]) == 0, "lista bosh jep 0"
+`;
+
+/** Answers at once (a variant when asked for one, else the question's start), and reports 3 neurons. */
 const fakeProvider: AiProvider = {
   async stream(_model, messages) {
-    const words = `Përgjigje prove: ${messages.at(-1)?.content.slice(0, 60) ?? ''}`.split(' ');
+    const asksVariant = messages[0]?.content.includes('### SOLUTION');
+    const answer = asksVariant ? FAKE_VARIANT : `Përgjigje prove: ${messages.at(-1)?.content.slice(0, 60) ?? ''}`;
+    const words = answer.split(' ');
     const text = new ReadableStream<string>({
       start(controller) {
         for (const word of words) controller.enqueue(`${word} `);

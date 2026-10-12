@@ -1,8 +1,8 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import { type AiStatus, copilotInput } from '../../shared/ai';
+import { type AiStatus, copilotInput, variantInput } from '../../shared/ai';
 import { dailyLimit, streamAi, today } from '../ai/gateway';
-import { copilotSystem } from '../ai/purposes';
+import { copilotSystem, variantMessages } from '../ai/purposes';
 import type { TenantEnv } from '../auth/access';
 import { forbidden, invalidRequest, visibleCourse } from './course-context';
 
@@ -22,4 +22,12 @@ export const aiRoutes = new Hono<TenantEnv>()
     if (!c.var.access.can('lab.publish', { courseId: course.id })) return forbidden(c);
     const messages = [copilotSystem(course.title, course.locale), ...c.req.valid('json').messages];
     return streamAi(c, { course, staff: true, purpose: 'copilot', messages });
+  })
+
+  // A variant of an exercise (#85), written under fixed headings that the browser reads.
+  .post('/variant', zValidator('json', variantInput, invalidRequest), async (c) => {
+    const { course } = await visibleCourse(c);
+    if (!c.var.access.can('lab.publish', { courseId: course.id })) return forbidden(c);
+    const messages = variantMessages(c.req.valid('json'), course.locale);
+    return streamAi(c, { course, staff: true, purpose: 'variant', messages });
   });

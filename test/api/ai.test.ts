@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { AI_DAILY_REQUESTS, type AiStatus, ORG_DAILY_NEURONS } from '../../src/shared/ai';
 import type { CourseSummary } from '../../src/shared/courses';
+import { VARIANT_SECTIONS } from '../../src/shared/variant-sections';
 import { seedOrganization } from './fixtures';
 import { account } from './http';
 
@@ -49,6 +50,24 @@ describe('AI in a course', () => {
     // Each organization counts only its own use.
     expect((await seed.tenant.ai.today(pedagog.user.id, day())).orgNeurons).toBeGreaterThan(0);
     expect((await other.tenant.ai.today(outsider.user.id, day())).orgNeurons).toBe(0);
+  });
+
+  it('writes a variant of an exercise for staff only, under its headings', async () => {
+    const { pedagog, student, course } = await setup();
+    await pedagog.call(course, { method: 'PATCH', body: { ai: true } });
+    const exercise = {
+      title: 'Ushtrimi 1',
+      statement: 'Shkruani shuma(a, b).',
+      code: 'def shuma(a, b):\n    pass',
+      test: null,
+    };
+
+    const res = await pedagog.call(`${course}/ai/variant`, { method: 'POST', body: exercise });
+    expect(res.status).toBe(200);
+    const text = await res.text();
+    for (const heading of VARIANT_SECTIONS) expect(text).toContain(`### ${heading}`);
+    expect((await student.call(`${course}/ai/variant`, { method: 'POST', body: exercise })).status).toBe(403);
+    expect((await pedagog.call(`${course}/ai/variant`, { method: 'POST', body: { title: 'X' } })).status).toBe(400);
   });
 
   it("refuses once the user's or the organization's limit for the day is reached, before calling the model", async () => {
