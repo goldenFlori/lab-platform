@@ -18,6 +18,7 @@ import { labRoutes } from './labs';
 import { progressRoutes } from './progress';
 import { searchRoutes } from './search';
 import { staffRoutes } from './staff';
+import { surveyRoutes } from './surveys';
 
 // Courses and their groups, under /api/orgs/:org/courses (#10).
 
@@ -202,4 +203,5 @@ export const courseRoutes = new Hono<TenantEnv>()
   .route('/:courseId/activity', courseActivityRoutes)
   .route('/:courseId/ai', aiRoutes)
   .route('/:courseId/progress', progressRoutes)
-  .route('/:courseId/report', pilotReportRoutes);
+  .route('/:courseId/report', pilotReportRoutes)
+  .route('/:courseId/survey', surveyRoutes);

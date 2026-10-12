@@ -50,6 +50,10 @@ import {
   searchSections,
   sessions,
   submissions,
+  surveyComments,
+  surveyRatings,
+  surveyRespondents,
+  surveys,
   users,
 } from './schema';
 
@@ -1511,6 +1515,101 @@ function tenantPersonal(db: Db, orgId: string) {
   };
 }
 
+/** A course's end-of-semester survey (#102): answered anonymously, read only as totals. */
+function tenantSurveys(db: Db, orgId: string) {
+  return {
+    async ofCourse(courseId: string) {
+      const [survey] = await db
+        .select()
+        .from(surveys)
+        .where(and(eq(surveys.orgId, orgId), eq(surveys.courseId, courseId)));
+      return survey;
+    },
+
+    /** Opens the course's survey until `closesAt`, or moves its closing. */
+    async open(courseId: string, closesAt: Date) {
+      await rethrowMissingParent(
+        db
+          .insert(surveys)
+          .values({ id: uuidv7(), orgId, courseId, closesAt })
+          .onConflictDoUpdate({ target: [surveys.orgId, surveys.courseId], set: { closesAt } }),
+      );
+    },
+
+    async answered(surveyId: string, userId: string) {
+      const [row] = await db
+        .select({ userId: surveyRespondents.userId })
+        .from(surveyRespondents)
+        .where(
+          and(
+            eq(surveyRespondents.orgId, orgId),
+            eq(surveyRespondents.surveyId, surveyId),
+            eq(surveyRespondents.userId, userId),
+          ),
+        );
+      return row !== undefined;
+    },
+
+    /**
+     * Records an answer in one transaction: who answered (refused a second time), each rating as a
+     * count, and the comment under a random id. False when the user had answered already.
+     */
+    async answer(surveyId: string, userId: string, ratings: [string, number][], comment: string | null) {
+      try {
+        await db.batch([
+          db.insert(surveyRespondents).values({ orgId, surveyId, userId }),
+          ...ratings.map(([question, score]) =>
+            db
+              .insert(surveyRatings)
+              .values({ orgId, surveyId, question, score, n: 1 })
+              .onConflictDoUpdate({
+                target: [surveyRatings.orgId, surveyRatings.surveyId, surveyRatings.question, surveyRatings.score],
+                set: { n: sql`${surveyRatings.n} + 1` },
+              }),
+          ),
+          ...(comment
+            ? [db.insert(surveyComments).values({ id: crypto.randomUUID(), orgId, surveyId, text: comment })]
+            : []),
+        ]);
+        return true;
+      } catch (error) {
+        if (/UNIQUE|PRIMARY KEY/i.test(String((error as Error)?.message ?? error))) return false;
+        throw error;
+      }
+    },
+
+    /** The totals: respondents, the rating counts and the comments (in no meaningful order). */
+    async results(surveyId: string) {
+      const [respondents, ratings, comments] = await db.batch([
+        db
+          .select({ n: sql<number>`count(*)` })
+          .from(surveyRespondents)
+          .where(and(eq(surveyRespondents.orgId, orgId), eq(surveyRespondents.surveyId, surveyId))),
+        db
+          .select({ question: surveyRatings.question, score: surveyRatings.score, n: surveyRatings.n })
+          .from(surveyRatings)
+          .where(and(eq(surveyRatings.orgId, orgId), eq(surveyRatings.surveyId, surveyId))),
+        db
+          .select({ text: surveyComments.text })
+          .from(surveyComments)
+          .where(and(eq(surveyComments.orgId, orgId), eq(surveyComments.surveyId, surveyId)))
+          .orderBy(asc(surveyComments.id)),
+      ]);
+      return { respondents: Number(respondents[0]?.n ?? 0), ratings, comments: comments.map((c) => c.text) };
+    },
+
+    /** Students of the course, for "N of M answered". */
+    async students(courseId: string) {
+      const { inGroups } = studentsOf(db, orgId, courseId, null);
+      const [row] = await db
+        .select({ n: countDistinct(memberships.userId) })
+        .from(memberships)
+        .where(and(eq(memberships.orgId, orgId), eq(memberships.role, 'student'), inGroups));
+      return row?.n ?? 0;
+    },
+  };
+}
+
 export function forTenant(db: Db, orgId: string) {
   const members = tenantUsers(db, orgId);
   return {
@@ -1534,6 +1633,7 @@ export function forTenant(db: Db, orgId: string) {
     ai: tenantAi(db, orgId),
     progress: tenantProgress(db, orgId),
     personal: tenantPersonal(db, orgId),
+    surveys: tenantSurveys(db, orgId),
   };
 }
 
