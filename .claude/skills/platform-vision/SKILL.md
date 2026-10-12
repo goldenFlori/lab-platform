@@ -247,9 +247,14 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-12:** #89 done, and with it Phase 4. The app installs from the browser on phones and
   laptops (an "Install the app" entry, with steps for iPhone). It keeps the Python engine, so a lab's
   code runs at once after reopening, and it shows an offline page without a connection (PR #97).
-- **Next:** before the March 2027 semester: a dry run with the FSHN course, a progress page for
-  students, a landing page with a short demo, and a privacy page. In January, a mini-pilot and the
-  Startup Albania application (see `platform-business`).
+- **2026-10-12:** Phase 5 planned as the "Phase 5: Ready for the pilot" milestone, issues #98–#103:
+  what the March 2027 semester and the grant application need. The owner also runs a dry run with
+  the FSHN course before the semester, and in January a mini-pilot and the Startup Albania
+  application (see `platform-business`).
+- **2026-10-12:** #98 done. The lab header has an "AI" menu for staff that opens each copilot tool
+  and says what it needs. A notebook whose exercises were never saved shows a bar to save them in
+  one click, and the copilot section always says what is missing (PR #104).
+- **Next:** #99, a "My progress" page for students.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
