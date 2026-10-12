@@ -1,5 +1,6 @@
 import { zValidator } from '@hono/zod-validator';
 import { type Context, Hono } from 'hono';
+import { explainInput } from '../../shared/ai';
 import { type CodeEdit, codeEditInput } from '../../shared/code-edits';
 import { type ExerciseProgress, exercisesInput } from '../../shared/exercises';
 import {
@@ -14,12 +15,21 @@ import {
   RENDERED_FILE,
 } from '../../shared/notebooks';
 import { searchSectionsInput } from '../../shared/search';
+import { streamAi } from '../ai/gateway';
+import { explainMessages } from '../ai/purposes';
 import type { TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
 import { recordActivity } from './activity';
 import { forbidden, invalidRequest } from './course-context';
 import { gradingRoutes } from './grading';
-import { type LabContext, labContext, mayReadNotebook, notebookInUrl, visibleLab } from './lab-context';
+import {
+  type LabContext,
+  labContext,
+  mayReadNotebook,
+  notebookInUrl,
+  solutionsOpenTo,
+  visibleLab,
+} from './lab-context';
 import { submissionRoutes } from './submissions';
 
 // A lab's notebooks (#14), under /api/orgs/:org/courses/:courseId/labs/:labId/notebooks.
@@ -265,6 +275,35 @@ export const notebookRoutes = new Hono<TenantEnv>()
       recordActivity(c, ctx, lab.id, 'exercise');
     }
     return c.body(null, 204);
+  })
+
+  // "Explain my error" (#86): hints by default; the full fix only on an exercise set to it, once
+  // the lab's solutions are open to the user; nothing on an exercise set to off. A student's
+  // question is kept with its answer for the staff who review their group.
+  .post('/:notebookId/explain', zValidator('json', explainInput, invalidRequest), async (c) => {
+    const { ctx, lab, nb } = await notebookInUrl(c);
+    const question = c.req.valid('json');
+    const exercise = (await c.var.tenant.exercises.of(nb.id)).find((e) => e.cell === question.cell);
+    const mode = exercise?.ai ?? 'hints';
+    if (mode === 'off') return c.json({ error: 'ai_off' }, 403);
+    const { cell, code, error } = question;
+    const keep = (answer: string) =>
+      c.var.tenant.ai.ask({
+        courseId: ctx.course.id,
+        notebookId: nb.id,
+        userId: c.var.user?.id as string,
+        cell,
+        code,
+        error,
+        answer,
+      });
+    return streamAi(c, {
+      course: ctx.course,
+      staff: c.var.access.can('lab.publish', { courseId: ctx.course.id }),
+      purpose: 'explain',
+      messages: explainMessages(question, mode === 'full' && solutionsOpenTo(ctx, lab) ? 'full' : 'hints', ctx.course),
+      onAnswer: ctx.staff ? undefined : keep,
+    });
   })
 
   .route('/:notebookId', submissionRoutes)

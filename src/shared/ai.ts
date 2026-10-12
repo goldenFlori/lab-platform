@@ -44,3 +44,27 @@ export const variantInput = z.object({
 });
 
 export type VariantInput = z.infer<typeof variantInput>;
+
+/** "Explain my error" (#86): the cell, the code that ran, its error, and the text just above it. */
+export const explainInput = z.object({
+  cell: z.number().int().min(0).max(10_000),
+  code: z.string().min(1).max(8000),
+  error: z.string().trim().min(1).max(4000),
+  context: z.string().max(2000),
+});
+
+export type ExplainInput = z.infer<typeof explainInput>;
+
+/** A student's question, as the course's staff read it. */
+export type AiQuestion = {
+  id: string;
+  name: string;
+  lab: string;
+  notebook: string;
+  cell: number;
+  code: string;
+  error: string;
+  answer: string;
+  /** ISO time. */
+  at: string;
+};

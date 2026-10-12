@@ -52,11 +52,15 @@ describe("a notebook's exercises", () => {
     expect((await set(assistant, EXERCISES)).status).toBe(403);
     const res = await set(pedagog, EXERCISES);
     expect(res.status).toBe(200);
-    expect(((await res.json()) as NotebookDetail).exercises).toEqual(EXERCISES);
-    expect(((await (await ana.call(nbPath)).json()) as NotebookDetail).exercises).toEqual(EXERCISES);
+    // Hints for "Explain my error" unless staff choose otherwise (#86).
+    const saved = EXERCISES.map((e) => ({ ...e, ai: 'hints' }));
+    expect(((await res.json()) as NotebookDetail).exercises).toEqual(saved);
+    expect(((await (await ana.call(nbPath)).json()) as NotebookDetail).exercises).toEqual(saved);
     // Replaced as a whole.
-    await set(pedagog, [EXERCISES[1]]);
-    expect(((await (await ana.call(nbPath)).json()) as NotebookDetail).exercises).toEqual([EXERCISES[1]]);
+    await set(pedagog, [{ ...EXERCISES[1], ai: 'off' }]);
+    expect(((await (await ana.call(nbPath)).json()) as NotebookDetail).exercises).toEqual([
+      { ...EXERCISES[1], ai: 'off' },
+    ]);
   });
 
   it('refuse a list that is not one exercise per cell, a title missing or a test too long', async () => {

@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { cleanUpExpired, session } from './auth/session';
 import { createDb, isDatabaseReachable } from './db';
+import { deleteOldAiQuestions } from './db/platform';
 import type { AppEnv } from './env';
 import { handleError, notFound } from './errors';
 import { sameOrigin } from './middleware/same-origin';
@@ -32,5 +33,6 @@ export default {
   // Daily (see triggers in wrangler.jsonc).
   async scheduled(_controller, env, ctx) {
     ctx.waitUntil(cleanUpExpired(env));
+    ctx.waitUntil(deleteOldAiQuestions(createDb(env.DB)));
   },
 } satisfies ExportedHandler<Env>;

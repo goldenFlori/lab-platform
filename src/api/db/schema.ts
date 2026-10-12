@@ -489,6 +489,10 @@ export const exercises = sqliteTable(
     cell: integer('cell').notNull(),
     title: text('title').notNull(),
     test: text('test'),
+    /** What "Explain my error" may say on this exercise (#86): nothing, hints, or the full fix. */
+    aiMode: text('ai_mode', { enum: ['off', 'hints', 'full'] })
+      .notNull()
+      .default('hints'),
   },
   (t) => [
     foreignKey({
@@ -696,5 +700,41 @@ export const aiUsage = sqliteTable(
     }).onDelete('cascade'),
     index('ai_usage_org_day_idx').on(t.orgId, t.day),
     index('ai_usage_user_day_idx').on(t.orgId, t.userId, t.day),
+  ],
+);
+
+/**
+ * A student's "Explain my error" (#86): their code, the error and the answer, which staff who
+ * review the student's group may read (students are told). Deleted after 180 days.
+ */
+export const aiQuestions = sqliteTable(
+  'ai_questions',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    courseId: text('course_id').notNull(),
+    notebookId: text('notebook_id').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    cell: integer('cell').notNull(),
+    code: text('code').notNull(),
+    error: text('error').notNull(),
+    answer: text('answer').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    foreignKey({
+      name: 'ai_questions_course_fk',
+      columns: [t.courseId, t.orgId],
+      foreignColumns: [courses.id, courses.orgId],
+    }).onDelete('cascade'),
+    foreignKey({
+      name: 'ai_questions_notebook_fk',
+      columns: [t.notebookId, t.orgId],
+      foreignColumns: [notebooks.id, notebooks.orgId],
+    }).onDelete('cascade'),
+    index('ai_questions_course_idx').on(t.orgId, t.courseId, t.createdAt),
+    index('ai_questions_created_idx').on(t.createdAt),
   ],
 );

@@ -124,6 +124,17 @@ describe('cross-tenant isolation: links to another organization', () => {
       a.tenant.grading.setSetup(b.notebook.id, [{ cell: 1, points: 1, hiddenTest: null }]),
     ).rejects.toBeInstanceOf(NotFoundError);
     await expect(
+      a.tenant.ai.ask({
+        courseId: a.course.id,
+        notebookId: b.notebook.id,
+        userId: a.user.id,
+        cell: 1,
+        code: 'x',
+        error: 'E',
+        answer: 'A',
+      }),
+    ).rejects.toBeInstanceOf(NotFoundError);
+    await expect(
       a.tenant.ai.record({ courseId: b.course.id, userId: a.user.id, day: '2026-10-12', requests: 1, neurons: 1 }),
     ).rejects.toBeInstanceOf(NotFoundError);
   });
