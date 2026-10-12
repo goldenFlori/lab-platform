@@ -29,6 +29,37 @@ const dayFormat = new Intl.DateTimeFormat('en-CA', {
 /** Today in the institution's time, as YYYY-MM-DD. */
 export const today = (now = new Date()) => dayFormat.format(now);
 
+const clockFormat = new Intl.DateTimeFormat('en-US', {
+  timeZone: ACTIVITY_TIME_ZONE,
+  hourCycle: 'h23',
+  year: 'numeric',
+  month: 'numeric',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+  second: 'numeric',
+});
+
+/** How far the institution's clock is ahead of UTC at `instant`, in milliseconds. */
+function zoneOffset(instant: number) {
+  const p = Object.fromEntries(
+    clockFormat.formatToParts(new Date(instant)).map((part) => [part.type, Number(part.value)]),
+  );
+  return (
+    Date.UTC(p.year ?? 0, (p.month ?? 1) - 1, p.day, p.hour, p.minute, p.second) - Math.floor(instant / 1000) * 1000
+  );
+}
+
+/**
+ * The moment a YYYY-MM-DD day begins in the institution's time (#112): timestamps are compared with
+ * this, never with the UTC midnight, which is an hour or two later in Tirana.
+ */
+export function startOfDay(day: string) {
+  const midnightUtc = Date.parse(`${day}T00:00:00Z`);
+  const first = midnightUtc - zoneOffset(midnightUtc);
+  return new Date(midnightUtc - zoneOffset(first));
+}
+
 /** The Monday of the week of a YYYY-MM-DD day. */
 export function mondayOf(day: string) {
   const date = new Date(`${day}T00:00:00Z`);
@@ -147,7 +178,14 @@ export const pilotReportRoutes = new Hono<TenantEnv>().get('/', async (c) => {
     return c.json({ error: 'invalid_request' }, 400);
   }
 
-  const data = await tenant.activity.pilot({ courseId: course.id, groupIds, from, to });
+  const data = await tenant.activity.pilot({
+    courseId: course.id,
+    groupIds,
+    from,
+    to,
+    start: startOfDay(from),
+    end: new Date(startOfDay(addDays(to, 1)).getTime() - 1),
+  });
   const kind = (k: ActivityKind): PilotCount => {
     const row = data.perKind.find((r) => r.kind === k);
     return { students: row?.students ?? 0, total: Number(row?.total ?? 0) };
