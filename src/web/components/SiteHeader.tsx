@@ -1,6 +1,16 @@
 import { Button, Dropdown, Kbd, Label, Modal } from '@heroui/react';
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
-import { Check, GraduationCap, Languages, LogOut, Menu, Search, Smartphone, Waypoints } from 'lucide-react';
+import {
+  Check,
+  GraduationCap,
+  Languages,
+  LogOut,
+  Menu,
+  Search,
+  ShieldCheck,
+  Smartphone,
+  Waypoints,
+} from 'lucide-react';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import type { Me } from '../../shared/auth';
 import { LOCALES } from '../../shared/locale';
@@ -145,6 +155,7 @@ function AccountMenu({ me }: { me: Me }) {
             onAction={(key) => {
               if (key === 'logout') logout.mutate(undefined, { onSettled: () => navigate({ to: '/' }) });
               else if (key === 'install') installable === 'apple' ? setAppleSteps(true) : void install();
+              else if (key === 'data') navigate({ to: '/account/data' });
               else if (key === 'sq' || key === 'en') choose(key);
             }}
           >
@@ -163,6 +174,10 @@ function AccountMenu({ me }: { me: Me }) {
                 <Label>{t.install.item}</Label>
               </Dropdown.Item>
             ) : null}
+            <Dropdown.Item id="data" textValue={t.myData.title}>
+              <ShieldCheck className="size-4" />
+              <Label>{t.myData.title}</Label>
+            </Dropdown.Item>
             <Dropdown.Item id="logout" textValue={t.header.signOut}>
               <LogOut className="size-4" />
               <Label>{t.header.signOut}</Label>

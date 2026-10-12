@@ -6,6 +6,7 @@ import { type FormEvent, useState } from 'react';
 import type { Me } from '../../../shared/auth';
 import type { CourseSummary } from '../../../shared/courses';
 import { isLocale, LOCALES } from '../../../shared/locale';
+import { DeletionRequests } from '../../components/DeletionRequests';
 import { LANGUAGE_NAMES, t as messages, useT } from '../../i18n';
 import { useMe } from '../../lib/auth';
 import { APP_NAME } from '../../lib/brand';
@@ -32,6 +33,7 @@ function CoursesPage() {
       courses: courses[i]?.data ?? [],
       failed: courses[i]?.isError ?? false,
       canCreate: access[i]?.data?.capabilities.organization.includes('course.create') ?? false,
+      admin: access[i]?.data?.capabilities.organization.includes('org.manage') ?? false,
     }))
     .filter((section) => section.courses.length > 0 || section.failed || section.canCreate);
 
@@ -48,8 +50,11 @@ function CoursesPage() {
       ) : sections.length === 0 ? (
         <NoCourses />
       ) : (
-        sections.map((section) => (
-          <OrganizationCourses key={section.org.id} {...section} showName={sections.length > 1} />
+        sections.map(({ admin, ...section }) => (
+          <div key={section.org.id}>
+            <OrganizationCourses {...section} showName={sections.length > 1} />
+            {admin && <DeletionRequests org={section.org.slug} />}
+          </div>
         ))
       )}
     </section>

@@ -544,6 +544,96 @@ export const en: Messages = {
     missed: (when) => `Closed on ${when}, not handed in`,
     grade: (score, of) => `Grade: ${score}/${of}`,
   },
+  privacy: {
+    title: 'Privacy',
+    updated: 'Updated on 12 October 2026',
+    intro:
+      "This page says what data Lab Platform keeps, why, where, for how long and who sees it. Your institution (a faculty, say) decides about its students' data; the platform processes it on its behalf.",
+    sections: [
+      {
+        heading: 'What we keep',
+        items: [
+          'Your account: full name, username and the password only as a hash (never the password itself); your email, if any.',
+          'The institutions, courses and groups you belong to, and your role.',
+          'The code you change in notebooks, so you find it on any device. Staff do not see it until you hand it in.',
+          'The exercises you solve, the work you hand in, and your grades.',
+          'Activity as counts: at most one record a day for each lab and kind (opened, downloaded, tried a visualization, solved an exercise).',
+          '"Explain the error" questions with the AI\'s answer, and how many AI requests you make a day.',
+          'One sign-in cookie, which keeps you signed in.',
+        ],
+      },
+      {
+        heading: 'Who sees it',
+        items: [
+          'You: all of it, in "My progress" and "My data".',
+          "Your course's or group's staff: the work you hand in, your grades, your AI questions and, during a Live Lab, your name when you are connected or ask for help. Activity reports show only counts, never names.",
+          'Other students: nothing of yours.',
+          "The platform's owner: only for support and backups.",
+        ],
+      },
+      {
+        heading: 'Where it is kept',
+        items: [
+          "At Cloudflare. The database is in the European Union's jurisdiction, so the data does not leave the EU.",
+          'Weekly backups are encrypted before they leave Cloudflare and kept for 90 days.',
+        ],
+      },
+      {
+        heading: 'AI',
+        items: [
+          'The AI runs at Cloudflare (Workers AI) and is switched on by the teacher for each course.',
+          'It gets only the code, the error and the lab text; never your name.',
+          'For exercises it gives hints, not the solution, and it never grades.',
+        ],
+      },
+      {
+        heading: 'For how long',
+        items: [
+          'Sign-in: 30 days without use.',
+          'AI questions: 180 days.',
+          'The rest: as long as the course exists. When the institution deletes a course, its data goes with it.',
+        ],
+      },
+      {
+        heading: 'No tracking',
+        items: ['No ads, no third-party analytics, no cookie other than the sign-in one.'],
+      },
+      {
+        heading: 'Your rights',
+        items: [
+          'Download everything kept about you as one file, in "My data".',
+          "Ask for your data to be deleted: the request goes to your institution's administrator.",
+          "Ask for a correction: through your teacher or your institution's administrator.",
+        ],
+      },
+    ],
+    myData: 'My data',
+  },
+  myData: {
+    title: 'My data',
+    lead: 'Everything kept about you, in every institution you belong to.',
+    downloadTitle: 'Download your data',
+    downloadText: 'A JSON file with your account, courses, your code, submissions, released grades and AI questions.',
+    download: 'Download (JSON)',
+    deleteTitle: 'Ask for deletion',
+    deleteText:
+      "The request goes to your institution's administrator, who handles it. A grade may have to stay in the institution's records.",
+    note: 'A note for the administrator (optional)',
+    request: 'Send the request',
+    sent: "The request was sent. Your institution's administrator will handle it.",
+    failed: 'The request was not sent. Try again.',
+    privacy: 'Read the privacy policy',
+  },
+  deletions: {
+    title: (open) => `Requests to delete data (${open} open)`,
+    help: "Users who asked for their data in this institution to be deleted. Remove them from courses and groups; for a full deletion of the account, contact the platform's owner. Then mark it handled.",
+    asked: (when) => `Asked on ${when}`,
+    handled: (when) => `Handled on ${when}`,
+    markHandled: 'Mark handled',
+  },
+  footer: {
+    privacy: 'Privacy',
+  },
   install: {
     item: 'Install the app',
     appleTitle: 'Install the app on an iPhone or iPad',
