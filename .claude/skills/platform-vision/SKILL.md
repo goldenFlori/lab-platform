@@ -277,6 +277,8 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   Albanian and English: the pitch, a real visualization to try (the maze, BFS versus DFS), six
   features, and a section for institutions. The demo video and the contact address show once the
   owner sets `DEMO_VIDEO` and `CONTACT_EMAIL` in `src/web/lib/brand.ts` (PR #111).
+- **2026-10-13:** #112 fixed: the pilot report counts submissions, exercises and AI questions from
+  Tirana's midnight, not UTC's, so work done between 00:00 and 02:00 is no longer missed (PR #113).
 - **Next (the owner):** record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
   the Startup Albania application (see `platform-business`).
