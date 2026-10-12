@@ -1,4 +1,4 @@
-import { AlertDialog, Button, Chip, FieldError, Form, Input, TextField } from '@heroui/react';
+import { AlertDialog, Button, Chip, FieldError, Form, Input, Label, Switch, TextField } from '@heroui/react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import {
@@ -127,6 +127,28 @@ function CoursePage() {
           </select>
           <span id="course-locale-help" className="text-xs text-muted">
             {t.course.languageHelp}
+          </span>
+        </div>
+      )}
+
+      {permissions.configureAi && (
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <Switch
+            isSelected={course.ai}
+            isDisabled={changes.setAi.isPending}
+            onChange={(on) => changes.setAi.mutate(on)}
+            aria-describedby="course-ai-help"
+            className="flex-row items-center gap-2"
+          >
+            <Switch.Control>
+              <Switch.Thumb />
+            </Switch.Control>
+            <Switch.Content>
+              <Label className="text-sm font-medium">{t.course.ai}</Label>
+            </Switch.Content>
+          </Switch>
+          <span id="course-ai-help" className="text-xs text-muted">
+            {t.course.aiHelp}
           </span>
         </div>
       )}

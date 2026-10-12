@@ -55,6 +55,10 @@ export function useCourseChanges(org: string, courseId: string) {
       mutationFn: (locale: Locale | null) => api<CourseSummary>(base, { method: 'PATCH', body: { locale } }),
       onSuccess,
     }),
+    setAi: useMutation({
+      mutationFn: (ai: boolean) => api<CourseSummary>(base, { method: 'PATCH', body: { ai } }),
+      onSuccess,
+    }),
     addGroup: useMutation({
       mutationFn: (name: string) => api<GroupView>(`${base}/groups`, { method: 'POST', body: { name } }),
       onSuccess,
