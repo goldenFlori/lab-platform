@@ -81,6 +81,18 @@ describe('AI in a course', () => {
     expect((await student.call(`${course}/ai/quiz`, { method: 'POST', body: part })).status).toBe(403);
   });
 
+  it('translates the parts of a notebook for staff only, each under its mark', async () => {
+    const { pedagog, student, course } = await setup();
+    await pedagog.call(course, { method: 'PATCH', body: { ai: true } });
+    const body = { to: 'en', parts: ['## Renditja', '# Ngjyrat e shigjetave'] };
+    const res = await pedagog.call(`${course}/ai/translate`, { method: 'POST', body });
+    expect(res.status).toBe(200);
+    expect(await res.text()).toBe('[[1]]\nEN: ## Renditja\n\n[[2]]\nEN: # Ngjyrat e shigjetave ');
+    expect((await student.call(`${course}/ai/translate`, { method: 'POST', body })).status).toBe(403);
+    const tooLong = { to: 'en', parts: ['x'.repeat(5000), 'y'.repeat(5000)] };
+    expect((await pedagog.call(`${course}/ai/translate`, { method: 'POST', body: tooLong })).status).toBe(400);
+  });
+
   it("refuses once the user's or the organization's limit for the day is reached, before calling the model", async () => {
     const { seed, pedagog, course, status } = await setup();
     await pedagog.call(course, { method: 'PATCH', body: { ai: true } });

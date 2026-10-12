@@ -114,15 +114,22 @@ Grumbulli
 A
 `;
 
-/** Answers at once (a variant or questions when asked, else the question's start), and reports 3 neurons. */
+/** A translation that marks each part as translated, keeping its marks and its first line. */
+const fakeTranslation = (parts: string) =>
+  parts.replace(/^(\[\[\d+\]\]\n)(.*)$/gm, (_, mark: string, line: string) => `${mark}EN: ${line}`);
+
+/** Answers at once (a variant, questions or a translation when asked, else the question's start), and reports 3 neurons. */
 const fakeProvider: AiProvider = {
   async stream(_model, messages) {
     const system = messages[0]?.content ?? '';
+    const last = messages.at(-1)?.content ?? '';
     const answer = system.includes('### SOLUTION')
       ? FAKE_VARIANT
       : system.includes('### ANSWER')
         ? FAKE_QUIZ
-        : `Përgjigje prove: ${messages.at(-1)?.content.slice(0, 60) ?? ''}`;
+        : system.includes('You translate')
+          ? fakeTranslation(last)
+          : `Përgjigje prove: ${last.slice(0, 60)}`;
     const words = answer.split(' ');
     const text = new ReadableStream<string>({
       start(controller) {
