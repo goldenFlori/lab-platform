@@ -34,8 +34,12 @@ function workersAi(ai: Runner): AiProvider {
   };
 }
 
-/** Workers AI streams server-sent events: text in `response`, and the total `usage` in the last one. */
-function fromEvents(body: ReadableStream<Uint8Array>): AiStream {
+/**
+ * Workers AI streams server-sent events: text in `response`, and the total `usage` in the last one.
+ * A token that looks like a number comes as a JSON number (`"response":4`), so it is turned back
+ * into text; dropping it lost every digit.
+ */
+export function fromEvents(body: ReadableStream<Uint8Array>): AiStream {
   let buffer = '';
   let used: number | null = null;
   const text = body.pipeThrough(new TextDecoderStream()).pipeThrough(
@@ -49,7 +53,8 @@ function fromEvents(body: ReadableStream<Uint8Array>): AiStream {
           if (!data || data === '[DONE]') continue;
           try {
             const event = JSON.parse(data) as { response?: unknown; usage?: { neurons?: unknown } };
-            if (typeof event.response === 'string' && event.response) out.enqueue(event.response);
+            const token = event.response;
+            if (typeof token === 'number' || (typeof token === 'string' && token)) out.enqueue(String(token));
             if (typeof event.usage?.neurons === 'number') used = event.usage.neurons;
           } catch {
             // Not an event we know: skip it.
