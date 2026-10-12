@@ -489,6 +489,11 @@ export const sq = {
     saveFailed: 'Ushtrimet nuk u ruajtën. Provoni sërish.',
     pickBoth: (n: number) => `Zgjidhni qelizën dhe shkruani titullin te rreshti ${n}.`,
     oneEach: 'Një qelizë mund të jetë vetëm një ushtrim.',
+    found: (n: number) =>
+      n === 1
+        ? 'Kjo fletore ka një ushtrim me kontroll, por nuk është ruajtur ende.'
+        : `Kjo fletore ka ${n} ushtrime me kontroll, por nuk janë ruajtur ende.`,
+    saveFound: 'Ruaji ushtrimet',
     ai: 'AI për gabimet',
     aiModes: {
       off: 'E fikur (p.sh. për provim)',
@@ -502,6 +507,19 @@ export const sq = {
     limitOrg: 'AI ka arritur kufirin falas të sotëm për institucionin. Provoni nesër.',
     unavailable: 'AI nuk u përgjigj tani. Provoni pas pak.',
     network: 'Lidhja u ndërpre. Kontrolloni internetin dhe provoni sërish.',
+  },
+  aiTools: {
+    button: 'AI',
+    menu: 'Mjetet me AI',
+    off: 'AI është e fikur për këtë kurs. Ndizeni te cilësimet e kursit.',
+    variant: 'Variant i një ushtrimi',
+    variantHelp: 'I njëjti koncept me të dhëna të reja, me teste.',
+    translate: 'Përkthe fletoren',
+    translateHelp: 'Shqip ↔ English; kodi mbetet i njëjtë.',
+    quiz: 'Pyetje e shpejtë për klasën',
+    quizHelp: 'Tri pyetje nga pjesa që keni në ekran.',
+    quizNeedsLive: 'Nisni një Live Lab për ta përdorur.',
+    settings: 'Cilësimet e AI te kursi',
   },
   install: {
     item: 'Instalo aplikacionin',
@@ -577,6 +595,7 @@ export const sq = {
     title: 'Variant me kopilotin',
     help: 'I njëjti koncept me të dhëna të reja, me testet dhe zgjidhjen. E kontrolloni para se ta ruani.',
     needsAi: 'Me AI të ndezur te faqja e kursit, kopiloti bën variante të ushtrimeve, me teste.',
+    needsExercises: 'Ruani të paktën një ushtrim në këtë fletore për të bërë variante.',
     of: 'Variant i ushtrimit',
     make: 'Bëj një variant',
     another: 'Bëj një tjetër',

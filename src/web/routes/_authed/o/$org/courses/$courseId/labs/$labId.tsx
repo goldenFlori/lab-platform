@@ -19,6 +19,7 @@ import type { Exercise } from '../../../../../../../../shared/exercises';
 import type { LabView } from '../../../../../../../../shared/labs';
 import { ORIGINAL_FILE } from '../../../../../../../../shared/notebook-files';
 import type { Embed, NotebookKind, NotebookSummary } from '../../../../../../../../shared/notebooks';
+import { AiTools } from '../../../../../../../components/AiTools';
 import { LiveLab } from '../../../../../../../components/LiveLab';
 import { AssignmentsEditor } from '../../../../../../../components/notebook/AssignmentsEditor';
 import { DeleteNotebook } from '../../../../../../../components/notebook/DeleteNotebook';
@@ -175,6 +176,7 @@ function LabPage() {
           )}
 
           <div className="mt-5 flex flex-wrap gap-2.5">
+            {canManage && <AiTools org={org} courseId={courseId} />}
             <LiveLab org={org} courseId={courseId} labId={labId} />
           </div>
 

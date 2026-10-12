@@ -8,6 +8,7 @@ import type { NotebookDetail, NotebookSummary } from '../../../shared/notebooks'
 import { LANGUAGE_NAMES, useT } from '../../i18n';
 import { aiErrorText, aiPath, aiStatusQuery, streamAi } from '../../lib/ai';
 import { api } from '../../lib/api';
+import { revealSoon, useLabTool } from '../../lib/lab-tools';
 import { batches, partsOf, type Segment, segmentsOf, translated } from '../../lib/translate';
 import { uploadNotebook } from '../../lib/upload-notebook';
 
@@ -44,6 +45,10 @@ export function NotebookTranslate({
   const [title, setTitle] = useState('');
   const [error, setError] = useState<string | null>(null);
   const abort = useRef<AbortController | null>(null);
+  useLabTool('translate', () => {
+    setOpen(true);
+    revealSoon('[data-testid="translate"]');
+  });
 
   if (!open) {
     return (

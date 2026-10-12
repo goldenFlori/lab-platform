@@ -493,6 +493,11 @@ export const en: Messages = {
     saveFailed: 'The exercises were not saved. Please try again.',
     pickBoth: (n: number) => `Choose the cell and write the title in row ${n}.`,
     oneEach: 'A cell can be only one exercise.',
+    found: (n) =>
+      n === 1
+        ? 'This notebook has an exercise with a check that is not saved yet.'
+        : `This notebook has ${n} exercises with checks that are not saved yet.`,
+    saveFound: 'Save the exercises',
     ai: 'AI for errors',
     aiModes: {
       off: 'Off (e.g. for an exam)',
@@ -506,6 +511,19 @@ export const en: Messages = {
     limitOrg: "AI has reached today's free limit for the institution. Try again tomorrow.",
     unavailable: 'AI did not answer just now. Try again shortly.',
     network: 'The connection dropped. Check the internet and try again.',
+  },
+  aiTools: {
+    button: 'AI',
+    menu: 'AI tools',
+    off: "AI is off for this course. Turn it on in the course's settings.",
+    variant: 'A variant of an exercise',
+    variantHelp: 'The same concept with new data, with tests.',
+    translate: 'Translate the notebook',
+    translateHelp: 'Albanian ↔ English; the code stays the same.',
+    quiz: 'A quick question for the class',
+    quizHelp: 'Three questions from the part on your screen.',
+    quizNeedsLive: 'Start a Live Lab to use it.',
+    settings: 'AI settings in the course',
   },
   install: {
     item: 'Install the app',
@@ -581,6 +599,7 @@ export const en: Messages = {
     title: 'A variant with the copilot',
     help: 'The same concept with new data, with its tests and solution. You check it before saving.',
     needsAi: "With AI on in the course's page, the copilot makes variants of exercises, with tests.",
+    needsExercises: 'Save at least one exercise in this notebook to make variants.',
     of: 'Variant of the exercise',
     make: 'Make a variant',
     another: 'Make another',
