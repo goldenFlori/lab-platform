@@ -531,6 +531,28 @@ export const en: Messages = {
     youWereRight: 'Right! 🎉',
     youWereWrong: 'Not this time: see the right answer.',
   },
+  translate: {
+    open: 'Translate the notebook',
+    title: 'Translating the notebook',
+    titleOf: (title) => `Translate “${title}”`,
+    needsAi: "Turn AI on in the course's page to translate the notebook with the copilot.",
+    help: 'The copilot translates the text and the code comments; the code, outputs and visualizations stay the same. Then you review it part by part and save it as a new notebook.',
+    to: 'Into',
+    start: 'Translate',
+    left: (n) => `You have ${n} AI requests left today. A notebook usually takes 3–5.`,
+    loadFailed: 'The notebook could not be read. Try again.',
+    progress: (n, of) => `Translating part ${n} of ${of}…`,
+    review: (missing) =>
+      missing
+        ? `Check the translation. ${missing} parts were not translated and keep the original text.`
+        : 'Check the translation: the original on the left, the translation you can edit on the right.',
+    newTitle: "The new notebook's title",
+    partLabel: (n) => `Translation of part ${n}`,
+    notTranslated: 'Not translated: this is the original text.',
+    comments: (n) => `Comments in the code (${n})`,
+    save: 'Save as a new notebook',
+    saveFailed: 'The translation was not saved. Try again.',
+  },
   explain: {
     ask: 'Explain the error',
     title: 'Assistant',
