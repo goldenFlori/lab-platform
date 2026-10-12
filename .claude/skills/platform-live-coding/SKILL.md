@@ -263,6 +263,15 @@ Built in #65 (`src/api/live/session.ts`, `src/api/routes/live.ts`, `src/web/comp
   counts for 8 s on the host panel and in the presenter's header, with the number asking for help.
   Students never see each other's requests or reactions.
 
+- **Quick questions** (#87):
+  - The host sends `{t:'quiz', question, options, correct}` (2–4 options, `QUIZ_LIMITS`). The object
+    gives it an id and sends students `correct: null`.
+  - A student's first `{t:'answer', id, choice}` counts and comes back as `{t:'quiz-mine'}`.
+  - Staff get `{t:'quiz-tally', counts, waiting, names}`. `{t:'quiz-reveal'}` sends everyone the
+    right option and the counts.
+  - Newcomers get the question, their answer and any reveal.
+  - The copilot drafts questions from the section on the host's screen (`platform-ai`).
+
 - **Infrastructure:** one Durable Object per session, using WebSocket Hibernation.
 - **Joining:** students join with a code or QR. Room roles: host, assistant, student.
 - **Message types (keep them small):**

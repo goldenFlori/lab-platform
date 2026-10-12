@@ -238,7 +238,10 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   their groups' questions on the course page (PR #92).
 - **2026-10-12:** #93 fixed: AI answers keep their numbers. Workers AI streams number tokens as JSON
   numbers, which the gateway had dropped (PR #94).
-- **Next:** #87, quick quizzes in a Live Lab, drafted by the copilot.
+- **2026-10-12:** #87 done. In a Live Lab the host asks a quick multiple-choice question, written or
+  taken from 3 drafts the copilot makes from the section on screen. Students answer once on their
+  phones; staff see the counts live and the host reveals the answer to everyone (PR #95).
+- **Next:** #88, the copilot translates a lab notebook.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
