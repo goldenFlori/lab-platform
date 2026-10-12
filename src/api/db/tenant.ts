@@ -676,7 +676,8 @@ function tenantActivity(db: Db, orgId: string) {
     },
 
     /**
-     * The pilot report's counts (#101) from `from` to `to` (YYYY-MM-DD, both included), for the
+     * The pilot report's counts (#101) from `from` to `to` (the institution's YYYY-MM-DD days, both
+     * included; `start` and `end` are their first and last moments, for timestamps), for the
      * students of `groupIds` (all the course's groups when null), in one batch.
      */
     async pilot({
@@ -684,11 +685,15 @@ function tenantActivity(db: Db, orgId: string) {
       groupIds,
       from,
       to,
+      start,
+      end,
     }: {
       courseId: string;
       groupIds: string[] | null;
       from: string;
       to: string;
+      start: Date;
+      end: Date;
     }) {
       const courseLabs = db
         .select({ id: labs.id })
@@ -707,9 +712,8 @@ function tenantActivity(db: Db, orgId: string) {
         inPeriod,
       );
       const week = sql<string>`date(${labActivity.day}, '-' || ((cast(strftime('%w', ${labActivity.day}) as integer) + 6) % 7) || ' days')`;
-      // Timestamps (Unix seconds) within the period's days, UTC.
-      const start = new Date(`${from}T00:00:00Z`);
-      const end = new Date(`${to}T23:59:59Z`);
+      // AI use is kept per UTC day: the UTC days the period touches.
+      const [usageFrom, usageTo] = [start, end].map((d) => d.toISOString().slice(0, 10)) as [string, string];
       const [enrolled, perWeek, active, perKind, solved, handed, asked, requested] = await db.batch([
         db
           .select({ n: countDistinct(memberships.userId) })
@@ -773,8 +777,8 @@ function tenantActivity(db: Db, orgId: string) {
               eq(aiUsage.orgId, orgId),
               eq(aiUsage.courseId, courseId),
               inArray(aiUsage.userId, students),
-              gte(aiUsage.day, from),
-              lte(aiUsage.day, to),
+              gte(aiUsage.day, usageFrom),
+              lte(aiUsage.day, usageTo),
             ),
           ),
       ]);

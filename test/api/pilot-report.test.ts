@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { today } from '../../src/api/routes/activity';
+import { startOfDay, today } from '../../src/api/routes/activity';
 import type { PilotReport } from '../../src/shared/activity';
 import { seedOrganization } from './fixtures';
 import { account } from './http';
@@ -72,5 +72,20 @@ describe('the pilot report', () => {
     expect((await report(ana)).status).toBe(403);
     expect((await report(pedagog, '?from=2026-10-12&to=2026-01-01')).status).toBe(400);
     expect((await report(pedagog, '?from=2025-01-01&to=2026-10-12')).status).toBe(400);
+  });
+});
+
+// #112: the period runs from Tirana's midnight, not UTC's, so late-evening work is counted.
+describe("the institution's days", () => {
+  it('begin at midnight in Tirana, in summer and in winter time', () => {
+    expect(startOfDay('2026-10-13').toISOString()).toBe('2026-10-12T22:00:00.000Z');
+    expect(startOfDay('2026-12-01').toISOString()).toBe('2026-11-30T23:00:00.000Z');
+    // The days the clocks change.
+    expect(startOfDay('2026-03-29').toISOString()).toBe('2026-03-28T23:00:00.000Z');
+    expect(startOfDay('2026-10-25').toISOString()).toBe('2026-10-24T22:00:00.000Z');
+    // Something done at 00:30 Tirana time belongs to that day, and to its period.
+    const lateEvening = new Date('2026-10-12T22:30:00Z');
+    expect(today(lateEvening)).toBe('2026-10-13');
+    expect(lateEvening >= startOfDay('2026-10-13')).toBe(true);
   });
 });
