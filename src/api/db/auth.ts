@@ -28,6 +28,22 @@ export async function findAccount(db: Db, username: string) {
   return account;
 }
 
+/** The account as its owner downloads it (#100): never the password hash. */
+export async function accountOf(db: Db, userId: string) {
+  const [account] = await db
+    .select({
+      username: users.username,
+      fullName: users.fullName,
+      email: users.email,
+      locale: users.locale,
+      since: users.createdAt,
+    })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  return account;
+}
+
 /** The user's interface language, or null to follow the course and the default (#19). */
 export async function setLocale(db: Db, userId: string, locale: Locale | null) {
   await db.update(users).set({ locale }).where(eq(users.id, userId));

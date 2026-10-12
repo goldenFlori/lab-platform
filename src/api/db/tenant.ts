@@ -16,9 +16,11 @@ import {
   type SQL,
   sql,
 } from 'drizzle-orm';
+import type { SQLiteColumn } from 'drizzle-orm/sqlite-core';
 import type { ActivityKind } from '../../shared/activity';
 import type { AiQuestion } from '../../shared/ai';
 import type { AiMode } from '../../shared/exercise-limits';
+import type { DeletionRequestView, OrganizationData } from '../../shared/my-data';
 import { roleExists } from './access';
 import { uuidv7 } from './ids';
 import type { Db } from './index';
@@ -29,6 +31,7 @@ import {
   codeEdits,
   courses,
   courseTemplates,
+  deletionRequests,
   embeds,
   exerciseCompletions,
   exerciseGrading,
@@ -1248,6 +1251,150 @@ function tenantProgress(db: Db, orgId: string) {
   };
 }
 
+const iso = (date: Date) => date.toISOString();
+
+/** A user's own data in the organization (#100): to download it, and to ask for it to be deleted. */
+function tenantPersonal(db: Db, orgId: string) {
+  return {
+    async export(userId: string): Promise<Omit<OrganizationData, 'organization'>> {
+      const nb = (column: SQLiteColumn) => and(eq(notebooks.id, column), eq(notebooks.orgId, orgId));
+      const [member, opened, edits, solved, handed, graded, asked, used, requests] = await db.batch([
+        db
+          .select({ role: memberships.role, course: courses.title, group: groups.name, since: memberships.createdAt })
+          .from(memberships)
+          .leftJoin(courses, and(eq(courses.id, memberships.courseId), eq(courses.orgId, orgId)))
+          .leftJoin(groups, and(eq(groups.id, memberships.groupId), eq(groups.orgId, orgId)))
+          .where(and(eq(memberships.orgId, orgId), eq(memberships.userId, userId))),
+        db
+          .select({ lab: labs.title, kind: labActivity.kind, day: labActivity.day })
+          .from(labActivity)
+          .innerJoin(labs, and(eq(labs.id, labActivity.labId), eq(labs.orgId, orgId)))
+          .where(and(eq(labActivity.orgId, orgId), eq(labActivity.userId, userId)))
+          .orderBy(asc(labActivity.day)),
+        db
+          .select({
+            notebook: notebooks.title,
+            cell: codeEdits.cell,
+            code: codeEdits.code,
+            savedAt: codeEdits.updatedAt,
+          })
+          .from(codeEdits)
+          .innerJoin(notebooks, nb(codeEdits.notebookId))
+          .where(and(eq(codeEdits.orgId, orgId), eq(codeEdits.userId, userId))),
+        db
+          .select({ notebook: notebooks.title, cell: exerciseCompletions.cell, at: exerciseCompletions.completedAt })
+          .from(exerciseCompletions)
+          .innerJoin(notebooks, nb(exerciseCompletions.notebookId))
+          .where(and(eq(exerciseCompletions.orgId, orgId), eq(exerciseCompletions.userId, userId))),
+        db
+          .select({
+            notebook: notebooks.title,
+            code: submissions.code,
+            solved: submissions.solved,
+            attempts: submissions.attempts,
+            at: submissions.submittedAt,
+          })
+          .from(submissions)
+          .innerJoin(notebooks, nb(submissions.notebookId))
+          .where(and(eq(submissions.orgId, orgId), eq(submissions.userId, userId))),
+        db
+          .select({
+            notebook: notebooks.title,
+            autoScore: grades.autoScore,
+            score: grades.score,
+            maxScore: grades.maxScore,
+            feedback: grades.feedback,
+            releasedAt: grades.releasedAt,
+          })
+          .from(grades)
+          .innerJoin(notebooks, nb(grades.notebookId))
+          .where(and(eq(grades.orgId, orgId), eq(grades.userId, userId), isNotNull(grades.releasedAt))),
+        db
+          .select({
+            notebook: notebooks.title,
+            cell: aiQuestions.cell,
+            code: aiQuestions.code,
+            error: aiQuestions.error,
+            answer: aiQuestions.answer,
+            at: aiQuestions.createdAt,
+          })
+          .from(aiQuestions)
+          .innerJoin(notebooks, nb(aiQuestions.notebookId))
+          .where(and(eq(aiQuestions.orgId, orgId), eq(aiQuestions.userId, userId))),
+        db
+          .select({ course: courses.title, day: aiUsage.day, requests: aiUsage.requests })
+          .from(aiUsage)
+          .innerJoin(courses, and(eq(courses.id, aiUsage.courseId), eq(courses.orgId, orgId)))
+          .where(and(eq(aiUsage.orgId, orgId), eq(aiUsage.userId, userId))),
+        db
+          .select({
+            note: deletionRequests.note,
+            at: deletionRequests.createdAt,
+            handledAt: deletionRequests.handledAt,
+          })
+          .from(deletionRequests)
+          .where(and(eq(deletionRequests.orgId, orgId), eq(deletionRequests.userId, userId))),
+      ]);
+      return {
+        memberships: member.map((m) => ({ ...m, since: iso(m.since) })),
+        labsOpened: opened,
+        codeEdits: edits.map((e) => ({ ...e, savedAt: iso(e.savedAt) })),
+        exercisesSolved: solved.map((s) => ({ ...s, at: iso(s.at) })),
+        submissions: handed.map((s) => ({ ...s, at: iso(s.at) })),
+        grades: graded.map(({ autoScore, score, releasedAt, ...g }) => ({
+          ...g,
+          score: score ?? autoScore,
+          releasedAt: iso(releasedAt as Date),
+        })),
+        aiQuestions: asked.map((q) => ({ ...q, at: iso(q.at) })),
+        aiUse: used,
+        deletionRequests: requests.map((r) => ({
+          ...r,
+          at: iso(r.at),
+          handledAt: r.handledAt ? iso(r.handledAt) : null,
+        })),
+      };
+    },
+
+    /** Asks the organization to delete the user's data; asking again while one is open changes nothing. */
+    async requestDeletion(userId: string, note: string | null) {
+      await db.insert(deletionRequests).values({ id: uuidv7(), orgId, userId, note }).onConflictDoNothing();
+    },
+
+    /** The organization's requests: open ones first, then the latest handled. */
+    async deletionRequests(): Promise<DeletionRequestView[]> {
+      const rows = await db
+        .select({
+          id: deletionRequests.id,
+          name: users.fullName,
+          username: users.username,
+          note: deletionRequests.note,
+          createdAt: deletionRequests.createdAt,
+          handledAt: deletionRequests.handledAt,
+        })
+        .from(deletionRequests)
+        .innerJoin(users, eq(users.id, deletionRequests.userId))
+        .where(eq(deletionRequests.orgId, orgId))
+        .orderBy(sql`${deletionRequests.handledAt} is not null`, desc(deletionRequests.createdAt))
+        .limit(200);
+      return rows.map((r) => ({
+        ...r,
+        createdAt: iso(r.createdAt),
+        handledAt: r.handledAt ? iso(r.handledAt) : null,
+      }));
+    },
+
+    async handleDeletion(id: string, by: string) {
+      const done = await db
+        .update(deletionRequests)
+        .set({ handledAt: new Date(), handledBy: by })
+        .where(and(eq(deletionRequests.orgId, orgId), eq(deletionRequests.id, id), isNull(deletionRequests.handledAt)))
+        .returning({ id: deletionRequests.id });
+      return done.length > 0;
+    },
+  };
+}
+
 export function forTenant(db: Db, orgId: string) {
   const members = tenantUsers(db, orgId);
   return {
@@ -1270,6 +1417,7 @@ export function forTenant(db: Db, orgId: string) {
     live: tenantLive(db, orgId),
     ai: tenantAi(db, orgId),
     progress: tenantProgress(db, orgId),
+    personal: tenantPersonal(db, orgId),
   };
 }
 

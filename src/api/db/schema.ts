@@ -738,3 +738,27 @@ export const aiQuestions = sqliteTable(
     index('ai_questions_created_idx').on(t.createdAt),
   ],
 );
+
+/**
+ * A user asked their institution to delete their data (#100). The institution's admin sees it and
+ * marks it handled; nothing is deleted on its own, since a grade may have to stay in its records.
+ * At most one open request per user and organization.
+ */
+export const deletionRequests = sqliteTable(
+  'deletion_requests',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    note: text('note'),
+    createdAt: createdAt(),
+    handledAt: integer('handled_at', { mode: 'timestamp' }),
+    handledBy: text('handled_by').references(() => users.id, { onDelete: 'set null' }),
+  },
+  (t) => [
+    uniqueIndex('deletion_requests_open_unique').on(t.orgId, t.userId).where(sql`${t.handledAt} is null`),
+    index('deletion_requests_org_idx').on(t.orgId, t.createdAt),
+  ],
+);
