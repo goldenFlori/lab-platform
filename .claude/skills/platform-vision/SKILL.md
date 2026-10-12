@@ -273,7 +273,13 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   ratings from 1 to 5 (running code, visualizations, Live Labs, AI) and a comment. Students answer
   once from their course page. Staff see the averages and comments from five answers, also in the
   pilot report (PR #110).
-- **Next:** #103, the landing page with a short demo.
+- **2026-10-12:** #103 done, and with it Phase 5's issues. The front page explains the platform in
+  Albanian and English: the pitch, a real visualization to try (the maze, BFS versus DFS), six
+  features, and a section for institutions. The demo video and the contact address show once the
+  owner sets `DEMO_VIDEO` and `CONTACT_EMAIL` in `src/web/lib/brand.ts` (PR #111).
+- **Next (the owner):** record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
+  contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
+  the Startup Albania application (see `platform-business`).
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 

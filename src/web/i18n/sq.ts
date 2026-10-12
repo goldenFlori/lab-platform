@@ -32,9 +32,55 @@ export const sq = {
     eyebrow: 'Laboratori i programimit dhe algoritmeve',
     titleStart: 'Shihni algoritmin',
     titleEnd: 'në lëvizje',
-    lead: 'Fletore laboratori me rezultate reale, vizualizime interaktive dhe pedagogu që vendos çfarë hapet për klasën.',
+    lead: 'Classroom ndan skedarë; kjo platformë mëson. Studentët ekzekutojnë kod të vërtetë Python në çdo telefon, shohin algoritmin e tyre të lëvizë dhe marrin ndihmë në shqip, ndërsa pedagogu vendos gjithçka.',
     myCourses: 'Kurset e mia',
     visualizations: 'Vizualizimet',
+    signIn: 'Hyr',
+    seeIt: 'Shikojeni në punë',
+    demoTitle: 'Provojeni këtu',
+    demoLead:
+      'Një nga 13 vizualizimet e kursit, siç e shohin studentët: luajeni hap pas hapi, ndryshoni labirintin dhe krahasoni BFS me DFS.',
+    demoVideoLead: 'Dy minuta: një orë laboratori, nga kodi te vizualizimi dhe Live Lab.',
+    demoLabel: 'Labirinti — BFS kundrejt DFS',
+    allVisualizations: 'Të gjitha vizualizimet',
+    featuresTitle: 'Çfarë bën',
+    features: {
+      python: {
+        title: 'Python i vërtetë, në çdo pajisje',
+        text: "Kodi ekzekutohet në shfletuesin e studentit, edhe në telefon, pa instaluar asgjë. Kushton pothuajse zero për t'u mbajtur.",
+      },
+      yourCode: {
+        title: 'Kodi juaj, i vizualizuar',
+        text: 'Renditja, BFS ose Dijkstra që shkruan studenti lëviz në të njëjtin vizualizim si algoritmi i leksionit, krahas tij.',
+      },
+      live: {
+        title: 'Orë Live Lab',
+        text: 'Studentët ndjekin pedagogun nga telefoni, zgjidhin sfida, përgjigjen pyetjeve të shpejta dhe kërkojnë ndihmë pa ngritur dorën.',
+      },
+      ai: {
+        title: 'AI që jep udhëzime në shqip',
+        text: 'Shpjegon gabimin pa dhënë zgjidhjen dhe ndihmon pedagogun me variante ushtrimesh, pyetje dhe përkthime. E ndez pedagogu.',
+      },
+      control: {
+        title: 'Pedagogu vendos',
+        text: 'Çfarë hapet dhe kur, zgjidhjet, dorëzimet me afat dhe notat, që llogariten në kompjuterin e pedagogut.',
+      },
+      privacy: {
+        title: 'Privatësi që në fillim',
+        text: 'Të dhënat në BE, pa reklama dhe pa gjurmim. Raportet tregojnë numra, jo emra.',
+      },
+    },
+    whoTitle: 'Për universitete dhe shkolla',
+    whoText:
+      'Ndërtuar dhe përdorur në klasë nga një pedagog i laboratorit në FSHN, për lëndën "Struktura Diskrete & Algoritme". Çdo institucion merr hapësirën e vet.',
+    whoPoints: [
+      'Falas për një kurs.',
+      'Llogari për studentët pa email: pedagogu i krijon dhe i printon.',
+      'Laboratorët vijnë nga fletoret .ipynb që keni tashmë.',
+      'Shqip dhe anglisht.',
+    ],
+    contact: 'Na shkruani për një pilot',
+    privacy: 'Privatësia',
   },
   notFound: {
     title: 'Kjo rrugë nuk ekziston në graf',

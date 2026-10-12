@@ -33,9 +33,55 @@ export const en: Messages = {
     eyebrow: 'The programming and algorithms lab',
     titleStart: 'See the algorithm',
     titleEnd: 'in motion',
-    lead: 'Lab notebooks with real outputs, interactive visualizations, and a teacher who decides what opens for the class.',
+    lead: 'Classroom shares files; this platform teaches. Students run real Python on any phone, watch their own algorithm move, and get help in Albanian, while the teacher decides everything.',
     myCourses: 'My courses',
     visualizations: 'Visualizations',
+    signIn: 'Sign in',
+    seeIt: 'See it at work',
+    demoTitle: 'Try it here',
+    demoLead:
+      "One of the course's 13 visualizations, as students see it: play it step by step, change the maze, and compare BFS with DFS.",
+    demoVideoLead: 'Two minutes: a lab class, from code to visualization and Live Lab.',
+    demoLabel: 'The maze — BFS versus DFS',
+    allVisualizations: 'All visualizations',
+    featuresTitle: 'What it does',
+    features: {
+      python: {
+        title: 'Real Python, on any device',
+        text: "Code runs in the student's browser, even on a phone, with nothing to install. It costs almost nothing to run.",
+      },
+      yourCode: {
+        title: 'Your code, visualized',
+        text: "The sort, BFS or Dijkstra a student writes moves in the same visualization as the lecture's algorithm, side by side.",
+      },
+      live: {
+        title: 'Live Lab classes',
+        text: 'Students follow the teacher from their phones, solve challenges, answer quick questions and ask for help without raising a hand.',
+      },
+      ai: {
+        title: 'AI that gives hints in Albanian',
+        text: 'It explains an error without giving the solution, and helps the teacher with exercise variants, questions and translations. The teacher switches it on.',
+      },
+      control: {
+        title: 'The teacher decides',
+        text: "What opens and when, solutions, submissions with deadlines, and grades, worked out on the teacher's own computer.",
+      },
+      privacy: {
+        title: 'Privacy from the start',
+        text: 'Data in the EU, no ads and no tracking. Reports show counts, not names.',
+      },
+    },
+    whoTitle: 'For universities and schools',
+    whoText:
+      'Built and used in class by a lab teacher at FSHN (University of Tirana) for "Discrete Structures & Algorithms". Every institution gets its own space.',
+    whoPoints: [
+      'Free for one course.',
+      'Student accounts without email: the teacher creates and prints them.',
+      'Labs come from the .ipynb notebooks you already have.',
+      'Albanian and English.',
+    ],
+    contact: 'Write to us for a pilot',
+    privacy: 'Privacy',
   },
   notFound: {
     title: 'This path does not exist in the graph',
