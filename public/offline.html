@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="sq">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pa lidhje · Lab Platform</title>
+    <meta name="theme-color" content="#14141f" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <style>
+      :root { color-scheme: light dark; --bg: #f7f7fb; --fg: #1b1b2a; --muted: #5d6070; --accent: #5b3fe0; }
+      @media (prefers-color-scheme: dark) { :root { --bg: #14141f; --fg: #ececf3; --muted: #a2a5b4; --accent: #9d8cff; } }
+      body { margin: 0; min-height: 100dvh; display: grid; place-items: center; background: var(--bg); color: var(--fg);
+        font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+      main { max-width: 26rem; padding: 2rem 1rem; text-align: center; }
+      img { width: 56px; height: 56px; }
+      h1 { font-size: 1.4rem; margin: 1rem 0 0.5rem; }
+      p { color: var(--muted); margin: 0.5rem 0; }
+      button { margin-top: 1.25rem; padding: 0.6rem 1.2rem; border: 0; border-radius: 999px; background: var(--accent);
+        color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <!-- Shown by the service worker (#89) when a page cannot be reached. Everything in the app comes
+         from the server after a permission check, so it needs a connection. -->
+    <main>
+      <img src="/favicon.svg" alt="" />
+      <h1>Nuk ka lidhje me internetin</h1>
+      <p>Laboratorët, kodi juaj dhe orët live vijnë nga serveri, ndaj duhet internet. Lidhuni dhe provoni sërish.</p>
+      <p lang="en">You are offline. Labs, your code and live classes come from the server, so they need a connection.</p>
+      <button type="button" onclick="location.reload()">Provo sërish · Try again</button>
+    </main>
+  </body>
+</html>
