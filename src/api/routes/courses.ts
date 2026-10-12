@@ -12,6 +12,7 @@ import { type GroupStudent, importStudentsInput, resetPasswordInput } from '../.
 import type { TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
 import { courseActivityRoutes } from './activity';
+import { aiRoutes } from './ai';
 import { forbidden, groupOf, invalidRequest, seesCourse, summary, visibleCourse } from './course-context';
 import { labRoutes } from './labs';
 import { searchRoutes } from './search';
@@ -85,6 +86,7 @@ export const courseRoutes = new Hono<TenantEnv>()
           course.id,
           groups.map((g) => g.id),
         ),
+        configureAi: access.can('ai.configure', { courseId: course.id }),
       },
     } satisfies CourseDetail);
   })
@@ -92,7 +94,12 @@ export const courseRoutes = new Hono<TenantEnv>()
   .patch('/:courseId', zValidator('json', updateCourseInput, invalidRequest), async (c) => {
     const { course } = await visibleCourse(c);
     if (!c.var.access.can('course.manage', { courseId: course.id })) return forbidden(c);
-    const updated = await c.var.tenant.courses.update(course.id, c.req.valid('json'));
+    const { ai, ...changes } = c.req.valid('json');
+    if (ai !== undefined && !c.var.access.can('ai.configure', { courseId: course.id })) return forbidden(c);
+    const updated = await c.var.tenant.courses.update(course.id, {
+      ...changes,
+      ...(ai === undefined ? {} : { aiEnabled: ai }),
+    });
     return c.json(summary(updated ?? course));
   })
 
@@ -191,4 +198,5 @@ export const courseRoutes = new Hono<TenantEnv>()
   .route('/:courseId/staff', staffRoutes)
   .route('/:courseId/labs', labRoutes)
   .route('/:courseId/search', searchRoutes)
-  .route('/:courseId/activity', courseActivityRoutes);
+  .route('/:courseId/activity', courseActivityRoutes)
+  .route('/:courseId/ai', aiRoutes);

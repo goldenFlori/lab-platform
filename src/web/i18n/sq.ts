@@ -122,6 +122,9 @@ export const sq = {
     unarchive: 'Rikthe kursin',
     language: 'Gjuha e kursit',
     languageHelp: 'Për ata që nuk kanë zgjedhur vetë një gjuhë.',
+    ai: 'Inteligjenca artificiale',
+    aiHelp:
+      'Kopiloti i stafit dhe ndihma për gabimet, me një kuotë ditore falas. Emrat e studentëve nuk dërgohen kurrë.',
     groups: 'Grupet',
     archivedNote: 'Kursi është arkivuar: kodet e regjistrimit nuk pranohen më.',
     noGroups: 'Ky kurs nuk ka ende grupe.',

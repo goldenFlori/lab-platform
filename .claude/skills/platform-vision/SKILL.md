@@ -223,8 +223,13 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-11:** #80 done. Staff who manage a course can delete it, after a confirmation popup that
   says what goes with it (PR #81).
 - **2026-10-11:** #82 fixed: every dropdown draws its arrow inset from the edge (PR #83).
-- **Next:** try Phase 2 and 3 in class with the FSHN course and collect pilot data for the Startup
-  Albania application (see `platform-business`); then plan Phase 4 (AI), which needs funding.
+- **2026-10-12:** Phase 4 planned as the "Phase 4: AI and mobile" milestone, issues #84–#89, to be
+  ready for the March 2027 semester. The grant application follows in early 2027, with a January
+  mini-pilot (see `platform-business`).
+- **2026-10-12:** #84 done. Staff who may configure AI switch it on per course. Every AI call goes
+  through one metered gateway on Workers AI's free allocation, with daily limits per user and per
+  organization, and a staff copilot that streams its answers (PR #90).
+- **Next:** #85, copilot exercise variants with tests checked in the browser.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
@@ -260,6 +265,9 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-11 | A submission is per notebook, opened per group with a deadline. The server copies the student's saved code and solved exercises at that moment; the last one before the deadline counts, and closing a submission never deletes work | Decided |
 | 2026-10-11 | Grades come only from the pedagog's batch re-run in their browser, a fresh Python per submission, with checks from the notebook and server-side hidden tests; the pedagog can adjust them, and students see them once released | Decided |
 | 2026-10-11 | Courses can be deleted by staff who manage them, with everything in them, after a confirmation popup; archiving stays the way to end a year (owner's choice, over allowing deletion only before students join) | Decided |
+| 2026-10-12 | AI runs on Workers AI's free allocation first (no key, no bill, no names sent), with Llama 4 Scout as the default after an Albanian test; paid models (Claude) only with grant or licence money | Decided |
+| 2026-10-12 | AI quotas per day: 50 requests for staff who publish labs, 10 for students, 9,000 neurons per organization; counted per user, course and day, as counts only | Decided |
+| 2026-10-12 | A real mobile app means an installable web app (PWA) first; a store app (Capacitor) only if a need appears | Decided |
 | 2026-10-10 | Search without FTS5: D1 cannot export databases with virtual tables, and backups must keep working. The server sends each user the text of what they may see; the browser matches it as they type | Decided |
 
 Decisions were delegated to Claude ("you decide"). Record new ones here with the date.

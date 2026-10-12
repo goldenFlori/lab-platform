@@ -123,6 +123,8 @@ export const en: Messages = {
     unarchive: 'Restore the course',
     language: 'Course language',
     languageHelp: 'For those who have not chosen a language themselves.',
+    ai: 'Artificial intelligence',
+    aiHelp: "The staff copilot and help with errors, on a free daily quota. Students' names are never sent.",
     groups: 'Groups',
     archivedNote: 'The course is archived: join codes are no longer accepted.',
     noGroups: 'This course has no groups yet.',

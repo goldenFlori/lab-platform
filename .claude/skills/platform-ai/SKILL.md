@@ -5,8 +5,8 @@ description: AI features of the lab platform. Covers the student tutor (explain 
 
 # AI in the platform
 
-AI is not needed for the first version. Design for it now and switch it on in phase 4, per
-course. Context: `platform-vision`.
+Phase 4 switches AI on, per course, on Workers AI's free allocation first; paid models (Claude)
+come with grant or licence money. Context: `platform-vision`.
 
 ## Rules (non-negotiable)
 
@@ -46,16 +46,29 @@ course. Context: `platform-vision`.
 
 ## Providers and costs
 
-Verified 2026-10-06. Re-check before relying on them.
+**Now (decided 2026-10-12): Workers AI only.** It needs no API key or bill, runs inside the
+Worker, and gets no names. The free allocation is 10,000 neurons a day for the whole Cloudflare
+account; on the free plan, going over fails (error 4006) instead of charging.
+
+| Model (Workers AI) | Neurons per million tokens (input / output) | Albanian test, 2026-10-12 |
+|---|---|---|
+| Llama 4 Scout 17B (**default**) | 24,545 / 77,273 | Clear, kept to hints, 1.8 s, ~12 neurons |
+| gpt-oss-120b | 31,818 / 68,182 | Strongest reasoning, but leaked the fixed line, 8 s |
+| Mistral Small 3.1 24B | 31,876 / 50,488 | Gave the full solution in hints mode |
+| Llama 3.3 70B | 26,668 / 204,805 | Kept to hints, but vague |
+| Gemma 3 12B | 31,371 / 50,560 | Not available on this account |
+
+- A short hint uses about 15–70 neurons. That is roughly 150–600 a day for the whole platform.
+- The test used one `UnboundLocalError` prompt in hints mode. Extend it into the evaluation set
+  (below) before changing the default.
+
+**Later, paid** (verified 2026-10-06; re-check before relying on them):
 
 | Use | Model | Price per million tokens (input / output) |
 |---|---|---|
 | Student tutor | Claude Haiku 4.5 | $1 / $5 (cache read $0.10) |
 | Pedagog copilot (generation, variants with tests) | Claude Sonnet 5.5 | $2 / $10 (cache read $0.20) |
-| Free quota (free plan, small courses) | Cloudflare Workers AI | 10,000 neurons a day included |
 
-- **Workers AI capacity:** Llama 3.1 8B costs 25,608 neurons per million input tokens and 75,147 per
-  million output tokens. That is roughly 90 short answers a day, and its Albanian is weaker.
 - **Batch API:** 50% off. Use it for bulk feedback and for generating variants.
 - **Estimated tutor cost:** about 30 questions per active student per month, at about 4k input
   (mostly cached lab context) + 400 output tokens each. That works out to **$0.10–0.20 per active
@@ -64,9 +77,18 @@ Verified 2026-10-06. Re-check before relying on them.
 
 ## Implementation notes
 
-- **One interface:** `ai.complete({ purpose, courseId, context, messages })`.
-  - Providers are adapters chosen per purpose and per tenant plan.
-  - Log tokens and cost per call; enforce quotas before calling.
+- **Built in #84** (`src/api/ai/`):
+  - `streamAi()` (`gateway.ts`) checks that the course has AI on, checks the user's requests today
+    and the organization's neurons today, and reserves the most the call can use.
+  - Once the answer ends, `streamAi()` records the neurons Workers AI actually reports in its
+    last event.
+  - `purposes.ts` maps each purpose to a model, a token limit and its prompts. `provider.ts` holds
+    the adapters: Workers AI, and a fake one for tests (`AI_PROVIDER=fake`).
+  - Quotas live in `src/shared/ai.ts`: 50 requests a day for staff who may publish labs, 10 for
+    students, and 9,000 neurons a day per organization. Usage is counted per user, course and day
+    in `ai_usage`, as counts only.
+  - The browser receives plain text, so the provider's format never reaches the app.
+  - The course switch needs `ai.configure`; the copilot needs `lab.publish`.
 - **Prompt caching:** put the stable lab context first so it is cached across students.
 - **Context building:**
   - Include: the current block's code and output, the lab section text, the exercise mode, and the

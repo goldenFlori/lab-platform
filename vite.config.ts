@@ -58,7 +58,11 @@ export default defineConfig({
     react(),
     tailwindcss(),
     // LOCAL_STATE points dev or preview at another local database folder (the end-to-end tests use one).
-    cloudflare({ persistState: process.env.LOCAL_STATE ? { path: process.env.LOCAL_STATE } : true }),
+    // That folder also means no remote bindings, so no Cloudflare sign-in is needed (Workers AI is one).
+    cloudflare({
+      persistState: process.env.LOCAL_STATE ? { path: process.env.LOCAL_STATE } : true,
+      remoteBindings: !process.env.LOCAL_STATE,
+    }),
     pyodideEngine(),
   ],
   server: { headers: ISOLATION },

@@ -111,3 +111,16 @@ test('a pedagog deletes a course after confirming in the popup', async ({ browse
   await expect(staff.getByRole('link', { name: course.title })).toHaveCount(0);
   await staff.context().close();
 });
+
+test('a pedagog switches AI on for a course', async ({ browser, isMobile }) => {
+  const staff = await signIn(browser, E2E_STAFF, isMobile);
+  const { course } = await courseWithLab(staff, 'AI');
+  await staff.goto(`/o/e2e/courses/${course.id}`);
+  const ai = staff.getByRole('switch', { name: 'Inteligjenca artificiale' });
+  await expect(ai).not.toBeChecked();
+  await ai.click({ force: true });
+  await expect(ai).toBeChecked();
+  await staff.reload();
+  await expect(staff.getByRole('switch', { name: 'Inteligjenca artificiale' })).toBeChecked();
+  await staff.context().close();
+});

@@ -123,6 +123,9 @@ describe('cross-tenant isolation: links to another organization', () => {
     await expect(
       a.tenant.grading.setSetup(b.notebook.id, [{ cell: 1, points: 1, hiddenTest: null }]),
     ).rejects.toBeInstanceOf(NotFoundError);
+    await expect(
+      a.tenant.ai.record({ courseId: b.course.id, userId: a.user.id, day: '2026-10-12', requests: 1, neurons: 1 }),
+    ).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it("does not give memberships to another organization's users", async () => {
