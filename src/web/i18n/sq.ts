@@ -527,6 +527,28 @@ export const sq = {
     youWereRight: 'E saktë! 🎉',
     youWereWrong: 'Jo këtë herë: shikoni përgjigjen e saktë.',
   },
+  translate: {
+    open: 'Përkthe fletoren',
+    title: 'Përkthimi i fletores',
+    titleOf: (title: string) => `Përkthe „${title}”`,
+    needsAi: 'Ndizni AI te faqja e kursit për ta përkthyer fletoren me kopilotin.',
+    help: 'Kopiloti përkthen tekstet dhe komentet e kodit; kodi, rezultatet dhe vizualizimet mbeten të njëjta. Pastaj i shihni pjesë për pjesë dhe e ruani si fletore të re.',
+    to: 'Në gjuhën',
+    start: 'Përkthe',
+    left: (n: number) => `Ju mbeten ${n} kërkesa me AI sot. Një fletore merr zakonisht 3–5.`,
+    loadFailed: 'Fletorja nuk u lexua. Provoni sërish.',
+    progress: (n: number, of: number) => `Po përkthehet pjesa ${n} nga ${of}…`,
+    review: (missing: number) =>
+      missing
+        ? `Kontrolloni përkthimin. ${missing} pjesë nuk u përkthyen dhe kanë tekstin origjinal.`
+        : 'Kontrolloni përkthimin: majtas origjinali, djathtas përkthimi që mund ta ndryshoni.',
+    newTitle: 'Titulli i fletores së re',
+    partLabel: (n: number) => `Përkthimi i pjesës ${n}`,
+    notTranslated: 'Nuk u përkthye: është teksti origjinal.',
+    comments: (n: number) => `Komentet në kod (${n})`,
+    save: 'Ruaj si fletore të re',
+    saveFailed: 'Përkthimi nuk u ruajt. Provoni sërish.',
+  },
   explain: {
     ask: 'Shpjego gabimin',
     title: 'Asistenti',

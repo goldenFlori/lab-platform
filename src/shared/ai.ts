@@ -1,5 +1,7 @@
 import { z } from 'zod';
+import { TRANSLATE_CHARS } from './ai-limits';
 import { MAX_TEST } from './exercise-limits';
+import { LOCALES } from './locale';
 
 // AI in a course (#84): the switch, the quotas and the copilot's request. Every call runs on
 // Workers AI's free daily allocation (10,000 neurons for the whole platform).
@@ -44,6 +46,18 @@ export const variantInput = z.object({
 });
 
 export type VariantInput = z.infer<typeof variantInput>;
+
+/** Parts of a notebook to translate into `to`: its text cells and its code comments, in order. */
+export const translateInput = z.object({
+  to: z.enum(LOCALES),
+  parts: z
+    .array(z.string().max(TRANSLATE_CHARS))
+    .min(1)
+    .max(80)
+    .refine((parts) => parts.reduce((sum, p) => sum + p.length, 0) <= TRANSLATE_CHARS),
+});
+
+export type TranslateInput = z.infer<typeof translateInput>;
 
 /** Quick questions (#87): the part of the lab being presented, as the copilot reads it. */
 export const quizInput = z.object({

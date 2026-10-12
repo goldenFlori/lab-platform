@@ -1,8 +1,8 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import { type AiQuestion, type AiStatus, copilotInput, quizInput, variantInput } from '../../shared/ai';
+import { type AiQuestion, type AiStatus, copilotInput, quizInput, translateInput, variantInput } from '../../shared/ai';
 import { dailyLimit, streamAi, today } from '../ai/gateway';
-import { copilotSystem, quizMessages, variantMessages } from '../ai/purposes';
+import { copilotSystem, quizMessages, translateMessages, variantMessages } from '../ai/purposes';
 import type { TenantEnv } from '../auth/access';
 import { forbidden, invalidRequest, visibleCourse } from './course-context';
 
@@ -50,4 +50,11 @@ export const aiRoutes = new Hono<TenantEnv>()
     if (!c.var.access.can('lab.publish', { courseId: course.id })) return forbidden(c);
     const messages = quizMessages(c.req.valid('json'), course.locale);
     return streamAi(c, { course, staff: true, purpose: 'quiz', messages });
+  })
+
+  // Parts of a notebook translated (#88); the browser sends a notebook in several requests.
+  .post('/translate', zValidator('json', translateInput, invalidRequest), async (c) => {
+    const { course } = await visibleCourse(c);
+    if (!c.var.access.can('lab.publish', { courseId: course.id })) return forbidden(c);
+    return streamAi(c, { course, staff: true, purpose: 'translate', messages: translateMessages(c.req.valid('json')) });
   });

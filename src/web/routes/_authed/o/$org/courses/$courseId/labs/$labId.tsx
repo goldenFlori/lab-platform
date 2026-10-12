@@ -25,6 +25,7 @@ import { DeleteNotebook } from '../../../../../../../components/notebook/DeleteN
 import { EditsBar } from '../../../../../../../components/notebook/EditsBar';
 import { EmbedsEditor } from '../../../../../../../components/notebook/EmbedsEditor';
 import { ExercisesEditor } from '../../../../../../../components/notebook/ExercisesEditor';
+import { NotebookTranslate } from '../../../../../../../components/notebook/NotebookTranslate';
 import { NotebookUpload } from '../../../../../../../components/notebook/NotebookUpload';
 import { embedAnchor, NotebookView } from '../../../../../../../components/notebook/NotebookView';
 import { PythonBar } from '../../../../../../../components/notebook/RunControls';
@@ -187,6 +188,19 @@ function LabPage() {
                   await navigate({ search: { notebook: nb.id } });
                 }}
               />
+              {current?.ready && (
+                <NotebookTranslate
+                  key={current.id}
+                  org={org}
+                  courseId={courseId}
+                  base={changes.base}
+                  notebook={current}
+                  onSaved={async (nb) => {
+                    await changes.uploaded(nb);
+                    await navigate({ search: { notebook: nb.id } });
+                  }}
+                />
+              )}
               {current && (
                 <DeleteNotebook
                   title={current.title}

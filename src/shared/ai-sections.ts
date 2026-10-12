@@ -5,5 +5,12 @@
 /** An exercise variant (#85). */
 export const VARIANT_SECTIONS = ['TITLE', 'TASK', 'STARTER', 'SOLUTION', 'TESTS'] as const;
 
+/**
+ * A part of a translation (#88): `[[n]]` on a line of its own, numbered from 1. Not a Markdown
+ * heading, which the notebooks' own text is full of.
+ */
+export const partMark = (n: number) => `[[${n}]]`;
+export const PART_MARK = /^\[\[(\d+)\]\]\s*$/gm;
+
 /** One quiz question (#87); a draft has several, each starting with QUESTION. */
 export const QUIZ_SECTIONS = ['QUESTION', 'A', 'B', 'C', 'D', 'ANSWER'] as const;
