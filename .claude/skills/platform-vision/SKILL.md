@@ -254,7 +254,10 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-12:** #98 done. The lab header has an "AI" menu for staff that opens each copilot tool
   and says what it needs. A notebook whose exercises were never saved shows a bar to save them in
   one click, and the copilot section always says what is missing (PR #104).
-- **Next:** #99, a "My progress" page for students.
+- **2026-10-12:** #99 done. Students open "My progress" from their course. It shows the labs they
+  opened, the exercises solved per notebook, their deadlines and hand-ins, and their released grades
+  with feedback. Only their own data, gathered in one batch of queries (PR #105).
+- **Next:** #100, the privacy page and "My data".
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
