@@ -9,6 +9,8 @@ import { type NotebookRef, notebookQuery, notebooksPath } from './notebooks';
 // this student has solved, and for staff with analytics how many of their students have.
 
 type ExercisesValue = {
+  /** The notebook they belong to. */
+  notebookRef: NotebookRef;
   of: (cell: CodeCell) => Exercise | undefined;
   solved: (cell: CodeCell) => boolean;
   /** Staff with analytics: how many of their students solved it, of how many. */
@@ -47,6 +49,7 @@ export function ExercisesProvider({
     const counts = query.data?.counts ? new Map(query.data.counts.map((c) => [c.cell, c.students])) : null;
     const of = query.data?.students ?? 0;
     return {
+      notebookRef,
       of: (cell) => byCell.get(cell.srcIndex),
       solved: (cell) => solved.has(cell.srcIndex),
       progress: (cell) => (counts && byCell.has(cell.srcIndex) ? { solved: counts.get(cell.srcIndex) ?? 0, of } : null),
@@ -61,7 +64,7 @@ export function ExercisesProvider({
         );
       },
     };
-  }, [exercises, query.data, queryClient]);
+  }, [notebookRef, exercises, query.data, queryClient]);
 
   return <ExercisesContext.Provider value={value}>{children}</ExercisesContext.Provider>;
 }

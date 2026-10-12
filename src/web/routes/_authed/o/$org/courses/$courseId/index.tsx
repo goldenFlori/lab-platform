@@ -18,6 +18,7 @@ import { type FormEvent, useState } from 'react';
 import type { CourseDetail, GroupView } from '../../../../../../../shared/courses';
 import { formatJoinCode } from '../../../../../../../shared/join-code';
 import { isLocale, LOCALES } from '../../../../../../../shared/locale';
+import { AiQuestions } from '../../../../../../components/AiQuestions';
 import { CourseLabs } from '../../../../../../components/CourseLabs';
 import { CourseStaff } from '../../../../../../components/CourseStaff';
 import { PresentJoinCode } from '../../../../../../components/PresentJoinCode';
@@ -158,6 +159,8 @@ function CoursePage() {
       )}
 
       <CourseLabs org={org} courseId={courseId} groups={groups} />
+
+      {isStaff && course.ai && <AiQuestions org={org} courseId={courseId} />}
 
       {permissions.manage && <CourseStaff org={org} courseId={courseId} groups={groups} />}
     </section>

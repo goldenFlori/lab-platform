@@ -9,7 +9,7 @@ import type { Exercise } from '../../../shared/exercises';
 import type { NotebookDetail } from '../../../shared/notebooks';
 import { VARIANT_SECTIONS } from '../../../shared/variant-sections';
 import { useT } from '../../i18n';
-import { aiErrorText, aiStatusQuery, streamAi } from '../../lib/ai';
+import { aiErrorText, aiPath, aiStatusQuery, streamAi } from '../../lib/ai';
 import { api } from '../../lib/api';
 import { uploadNotebook } from '../../lib/upload-notebook';
 import {
@@ -96,9 +96,7 @@ export function VariantMaker({
     abort.current = new AbortController();
     try {
       const text = await streamAi(
-        target.org,
-        target.courseId,
-        'variant',
+        `${aiPath(target.org, target.courseId)}/variant`,
         context,
         (so) => setPhase({ at: 'writing', sections: sectionsWritten(so) }),
         abort.current.signal,

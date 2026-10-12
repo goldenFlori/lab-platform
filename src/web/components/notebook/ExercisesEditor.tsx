@@ -3,7 +3,7 @@ import { ClipboardCheck, Plus, ScanSearch, Trash2 } from 'lucide-react';
 import { type FormEvent, useMemo, useState } from 'react';
 import { detectExercises } from '../../../notebook/exercises';
 import type { StoredNotebook } from '../../../notebook/stored';
-import { MAX_EXERCISES, MAX_TEST } from '../../../shared/exercise-limits';
+import { AI_MODES, type AiMode, MAX_EXERCISES, MAX_TEST } from '../../../shared/exercise-limits';
 import type { Exercise } from '../../../shared/exercises';
 import { type Messages, useT } from '../../i18n';
 import { cellChoices } from './EmbedsEditor';
@@ -12,16 +12,27 @@ import { VariantMaker, type VariantTarget } from './VariantMaker';
 // Staff choose a notebook's exercises (#51): the cell whose run checks each one, its title, and a
 // visible test where the cell does not check itself with kontrollo(…).
 
-type Row = { key: string; cell: string; title: string; test: string };
+type Row = { key: string; cell: string; title: string; test: string; ai: AiMode };
 
 const toRows = (exercises: Exercise[]): Row[] =>
-  exercises.map((e) => ({ key: crypto.randomUUID(), cell: String(e.cell), title: e.title, test: e.test ?? '' }));
+  exercises.map((e) => ({
+    key: crypto.randomUUID(),
+    cell: String(e.cell),
+    title: e.title,
+    test: e.test ?? '',
+    ai: e.ai ?? 'hints',
+  }));
 
 function parseRows(t: Messages, rows: Row[]): Exercise[] | string {
   const exercises: Exercise[] = [];
   for (const [i, row] of rows.entries()) {
     if (row.cell === '' || !row.title.trim()) return t.exercises.pickBoth(i + 1);
-    exercises.push({ cell: Number(row.cell), title: row.title.trim(), test: row.test.trim() ? row.test : null });
+    exercises.push({
+      cell: Number(row.cell),
+      title: row.title.trim(),
+      test: row.test.trim() ? row.test : null,
+      ai: row.ai,
+    });
   }
   if (new Set(exercises.map((e) => e.cell)).size !== exercises.length) return t.exercises.oneEach;
   return exercises.sort((a, b) => a.cell - b.cell);
@@ -117,6 +128,20 @@ export function ExercisesEditor({
                   />
                   <span className="text-xs text-muted">{t.exercises.testHelp}</span>
                 </label>
+                <label className="grid min-w-0 gap-1 text-sm sm:col-span-2">
+                  <span className="font-medium">{t.exercises.ai}</span>
+                  <select
+                    value={row.ai}
+                    onChange={(e) => change(row.key, 'ai', e.target.value)}
+                    className={`${field} h-10`}
+                  >
+                    {AI_MODES.map((mode) => (
+                      <option key={mode} value={mode}>
+                        {t.exercises.aiModes[mode]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <div className="sm:col-span-2">
                   <Button
                     size="sm"
@@ -135,7 +160,9 @@ export function ExercisesEditor({
             <Button
               size="sm"
               variant="secondary"
-              onPress={() => setRows((list) => [...list, { key: crypto.randomUUID(), cell: '', title: '', test: '' }])}
+              onPress={() =>
+                setRows((list) => [...list, { key: crypto.randomUUID(), cell: '', title: '', test: '', ai: 'hints' }])
+              }
             >
               <Plus className="size-4" /> {t.exercises.add}
             </Button>
