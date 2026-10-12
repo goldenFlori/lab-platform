@@ -101,9 +101,11 @@ describe('the activity report', () => {
       download: 1,
       visualization: 1,
       exercise: 0,
+      run: 0,
+      live: 0,
     });
     expect(body?.labs).toEqual([
-      { id: seed.lab.id, n: 1, title: 'Grafet', view: 2, download: 1, visualization: 1, exercise: 0 },
+      { id: seed.lab.id, n: 1, title: 'Grafet', view: 2, download: 1, visualization: 1, exercise: 0, run: 0, live: 0 },
     ]);
     const text = JSON.stringify(body);
     for (const who of [studentA, studentB]) {
