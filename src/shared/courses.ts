@@ -25,6 +25,8 @@ export const updateCourseInput = z.object({
   title: title.optional(),
   academicYear: academicYear.optional(),
   locale: locale.optional(),
+  /** AI features on or off (#84); needs the ai.configure capability. */
+  ai: z.boolean().optional(),
 });
 
 export const groupInput = z.object({ name: z.string().trim().min(1).max(60) });
@@ -43,6 +45,8 @@ export type CourseSummary = {
   /** ISO time, or null while the course is current. */
   archivedAt: string | null;
   locale: Locale | null;
+  /** AI features are on (#84). */
+  ai: boolean;
 };
 
 export type GroupView = {
@@ -57,7 +61,8 @@ export type CourseDetail = {
   course: CourseSummary;
   groups: GroupView[];
   /** analytics: may see the course's activity, for the whole course or some of its groups (#18). */
-  permissions: { manage: boolean; analytics: boolean };
+  /** configureAi: may switch the course's AI features on and off (#84). */
+  permissions: { manage: boolean; analytics: boolean; configureAi: boolean };
 };
 
 export type JoinResult = {

@@ -6,6 +6,7 @@ import {
   index,
   integer,
   primaryKey,
+  real,
   sqliteTable,
   text,
   unique,
@@ -94,6 +95,8 @@ export const courses = sqliteTable(
     archivedAt: integer('archived_at', { mode: 'timestamp' }),
     /** The interface language for those who have not chosen one (#19); null is the default. */
     locale: text('locale', { enum: ['sq', 'en'] }),
+    /** AI features (#84), off until staff who may configure AI switch them on. */
+    aiEnabled: integer('ai_enabled', { mode: 'boolean' }).notNull().default(false),
     createdAt: createdAt(),
   },
   (t) => [
@@ -664,5 +667,34 @@ export const liveSessions = sqliteTable(
       foreignColumns: [labs.id, labs.orgId],
     }).onDelete('cascade'),
     uniqueIndex('live_sessions_running_unique').on(t.orgId, t.labId).where(sql`${t.endedAt} is null`),
+  ],
+);
+
+/**
+ * AI use per user, course and day (#84): requests and Workers AI neurons, so quotas are checked
+ * before every call. Counts only, never the question or the answer.
+ */
+export const aiUsage = sqliteTable(
+  'ai_usage',
+  {
+    orgId: orgId(),
+    courseId: text('course_id').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    /** UTC, as YYYY-MM-DD. */
+    day: text('day').notNull(),
+    requests: integer('requests').notNull().default(0),
+    neurons: real('neurons').notNull().default(0),
+  },
+  (t) => [
+    primaryKey({ name: 'ai_usage_pk', columns: [t.orgId, t.courseId, t.userId, t.day] }),
+    foreignKey({
+      name: 'ai_usage_course_fk',
+      columns: [t.courseId, t.orgId],
+      foreignColumns: [courses.id, courses.orgId],
+    }).onDelete('cascade'),
+    index('ai_usage_org_day_idx').on(t.orgId, t.day),
+    index('ai_usage_user_day_idx').on(t.orgId, t.userId, t.day),
   ],
 );

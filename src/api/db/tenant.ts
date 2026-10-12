@@ -19,6 +19,7 @@ import { roleExists } from './access';
 import { uuidv7 } from './ids';
 import type { Db } from './index';
 import {
+  aiUsage,
   assignments,
   codeEdits,
   courses,
@@ -1066,6 +1067,39 @@ function tenantLive(db: Db, orgId: string) {
   };
 }
 
+function tenantAi(db: Db, orgId: string) {
+  return {
+    /** The user's requests today, across the organization's courses, and the organization's neurons. */
+    async today(userId: string, day: string) {
+      const [mine] = await db
+        .select({ requests: sql<number>`coalesce(sum(${aiUsage.requests}), 0)` })
+        .from(aiUsage)
+        .where(and(eq(aiUsage.orgId, orgId), eq(aiUsage.userId, userId), eq(aiUsage.day, day)));
+      const [all] = await db
+        .select({ neurons: sql<number>`coalesce(sum(${aiUsage.neurons}), 0)` })
+        .from(aiUsage)
+        .where(and(eq(aiUsage.orgId, orgId), eq(aiUsage.day, day)));
+      return { requests: mine?.requests ?? 0, orgNeurons: all?.neurons ?? 0 };
+    },
+
+    /** Adds to the day's counts (negative to give back what a failed call reserved). */
+    async record(values: { courseId: string; userId: string; day: string; requests: number; neurons: number }) {
+      await rethrowMissingParent(
+        db
+          .insert(aiUsage)
+          .values({ ...values, orgId })
+          .onConflictDoUpdate({
+            target: [aiUsage.orgId, aiUsage.courseId, aiUsage.userId, aiUsage.day],
+            set: {
+              requests: sql`max(0, ${aiUsage.requests} + ${values.requests})`,
+              neurons: sql`max(0, ${aiUsage.neurons} + ${values.neurons})`,
+            },
+          }),
+      );
+    },
+  };
+}
+
 export function forTenant(db: Db, orgId: string) {
   const members = tenantUsers(db, orgId);
   return {
@@ -1086,6 +1120,7 @@ export function forTenant(db: Db, orgId: string) {
     grading: tenantGrading(db, orgId),
     staff: tenantStaff(db, orgId),
     live: tenantLive(db, orgId),
+    ai: tenantAi(db, orgId),
   };
 }
 
