@@ -22,6 +22,7 @@ import { isLocale, LOCALES } from '../../../../../../../shared/locale';
 import { AiQuestions } from '../../../../../../components/AiQuestions';
 import { CourseLabs } from '../../../../../../components/CourseLabs';
 import { CourseStaff } from '../../../../../../components/CourseStaff';
+import { SurveyForStaff, SurveyForStudent } from '../../../../../../components/CourseSurvey';
 import { PresentJoinCode } from '../../../../../../components/PresentJoinCode';
 import { LANGUAGE_NAMES, t as messages, useT } from '../../../../../../i18n';
 import { ApiError } from '../../../../../../lib/api';
@@ -164,6 +165,8 @@ function CoursePage() {
         </div>
       )}
 
+      {!isStaff && <SurveyForStudent org={org} courseId={courseId} />}
+
       {isStaff && (
         <Groups data={data} org={org} courseId={courseId} archived={archived} canManage={permissions.manage} />
       )}
@@ -171,6 +174,8 @@ function CoursePage() {
       <CourseLabs org={org} courseId={courseId} groups={groups} />
 
       {isStaff && course.ai && <AiQuestions org={org} courseId={courseId} />}
+
+      {isStaff && <SurveyForStaff org={org} courseId={courseId} canManage={permissions.manage} />}
 
       {permissions.manage && <CourseStaff org={org} courseId={courseId} groups={groups} />}
     </section>

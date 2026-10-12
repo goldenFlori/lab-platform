@@ -269,7 +269,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   for a chosen period (up to 200 days) and group, the students active per week and in all, labs
   opened, code runs, Live Lab participation, visualizations, exercises, submissions, and AI questions
   and requests. Counts only, and it prints on two pages (PR #109).
-- **Next:** #102, the end-of-semester survey in the app.
+- **2026-10-12:** #102 done. Pedagogs open an anonymous end-of-semester survey until a date: four
+  ratings from 1 to 5 (running code, visualizations, Live Labs, AI) and a comment. Students answer
+  once from their course page. Staff see the averages and comments from five answers, also in the
+  pilot report (PR #110).
+- **Next:** #103, the landing page with a short demo.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
@@ -309,6 +313,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-12 | AI quotas per day: 50 requests for staff who publish labs, 10 for students, 9,000 neurons per organization; counted per user, course and day, as counts only | Decided |
 | 2026-10-12 | "Explain my error" gives hints by default and everywhere outside exercises; the full fix only on exercises staff set to it, after the solutions date. Students' questions and answers are visible to the staff of their group (students are told) and deleted after 180 days | Decided |
 | 2026-10-12 | Data rights: every user downloads all their data across institutions as JSON (released grades only; drafts stay with staff). A deletion request goes to each institution's admins and deletes nothing on its own, since grades may have to stay in the institution's records | Decided |
+| 2026-10-12 | The survey is anonymous by design: ratings are stored only as counts, comments with random ids, no time and no author, in a WITHOUT ROWID table; who answered is kept apart, only to ask once. Results show from five answers | Decided |
 | 2026-10-12 | A real mobile app means an installable web app (PWA) first; a store app (Capacitor) only if a need appears | Decided |
 | 2026-10-10 | Search without FTS5: D1 cannot export databases with virtual tables, and backups must keep working. The server sends each user the text of what they may see; the browser matches it as they type | Decided |
 

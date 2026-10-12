@@ -123,6 +123,7 @@ describe('cross-tenant isolation: links to another organization', () => {
     await expect(
       a.tenant.grading.setSetup(b.notebook.id, [{ cell: 1, points: 1, hiddenTest: null }]),
     ).rejects.toBeInstanceOf(NotFoundError);
+    await expect(a.tenant.surveys.open(b.course.id, new Date())).rejects.toBeInstanceOf(NotFoundError);
     await expect(
       a.tenant.ai.ask({
         courseId: a.course.id,

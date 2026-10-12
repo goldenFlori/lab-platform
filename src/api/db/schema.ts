@@ -762,3 +762,89 @@ export const deletionRequests = sqliteTable(
     index('deletion_requests_org_idx').on(t.orgId, t.createdAt),
   ],
 );
+
+/** An end-of-semester survey of a course (#102): open until it closes. One per course. */
+export const surveys = sqliteTable(
+  'surveys',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    courseId: text('course_id').notNull(),
+    closesAt: integer('closes_at', { mode: 'timestamp' }).notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    unique('surveys_id_org_unique').on(t.id, t.orgId),
+    uniqueIndex('surveys_course_unique').on(t.orgId, t.courseId),
+    foreignKey({
+      name: 'surveys_course_fk',
+      columns: [t.courseId, t.orgId],
+      foreignColumns: [courses.id, courses.orgId],
+    }).onDelete('cascade'),
+  ],
+);
+
+/**
+ * The survey's ratings as counts only (#102): how many gave `score` to `question`. No row is a
+ * student's answer, so no answer can be traced back to one.
+ */
+export const surveyRatings = sqliteTable(
+  'survey_ratings',
+  {
+    orgId: orgId(),
+    surveyId: text('survey_id').notNull(),
+    question: text('question').notNull(),
+    score: integer('score').notNull(),
+    n: integer('n').notNull().default(0),
+  },
+  (t) => [
+    primaryKey({ name: 'survey_ratings_pk', columns: [t.orgId, t.surveyId, t.question, t.score] }),
+    foreignKey({
+      name: 'survey_ratings_survey_fk',
+      columns: [t.surveyId, t.orgId],
+      foreignColumns: [surveys.id, surveys.orgId],
+    }).onDelete('cascade'),
+  ],
+);
+
+/**
+ * The survey's comments (#102), with random ids, no time and no author. The migration makes the
+ * table WITHOUT ROWID, so even the storage order says nothing about who wrote which.
+ */
+export const surveyComments = sqliteTable(
+  'survey_comments',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    surveyId: text('survey_id').notNull(),
+    text: text('text').notNull(),
+  },
+  (t) => [
+    foreignKey({
+      name: 'survey_comments_survey_fk',
+      columns: [t.surveyId, t.orgId],
+      foreignColumns: [surveys.id, surveys.orgId],
+    }).onDelete('cascade'),
+    index('survey_comments_survey_idx').on(t.orgId, t.surveyId),
+  ],
+);
+
+/** Who answered (#102), only so each student answers once and is asked once. Not what they said. */
+export const surveyRespondents = sqliteTable(
+  'survey_respondents',
+  {
+    orgId: orgId(),
+    surveyId: text('survey_id').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+  },
+  (t) => [
+    primaryKey({ name: 'survey_respondents_pk', columns: [t.orgId, t.surveyId, t.userId] }),
+    foreignKey({
+      name: 'survey_respondents_survey_fk',
+      columns: [t.surveyId, t.orgId],
+      foreignColumns: [surveys.id, surveys.orgId],
+    }).onDelete('cascade'),
+  ],
+);
