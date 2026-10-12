@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { MAX_TEST } from './exercise-limits';
 
 // AI in a course (#84): the switch, the quotas and the copilot's request. Every call runs on
 // Workers AI's free daily allocation (10,000 neurons for the whole platform).
@@ -33,3 +34,13 @@ export const copilotInput = z.object({
 });
 
 export type CopilotInput = z.infer<typeof copilotInput>;
+
+/** An exercise to make a variant of (#85): its title, statement, code cell and visible test. */
+export const variantInput = z.object({
+  title: z.string().trim().min(1).max(160),
+  statement: z.string().max(4000),
+  code: z.string().min(1).max(8000),
+  test: z.string().max(MAX_TEST).nullable(),
+});
+
+export type VariantInput = z.infer<typeof variantInput>;

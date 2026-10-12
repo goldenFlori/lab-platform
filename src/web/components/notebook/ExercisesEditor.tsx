@@ -7,6 +7,7 @@ import { MAX_EXERCISES, MAX_TEST } from '../../../shared/exercise-limits';
 import type { Exercise } from '../../../shared/exercises';
 import { type Messages, useT } from '../../i18n';
 import { cellChoices } from './EmbedsEditor';
+import { VariantMaker, type VariantTarget } from './VariantMaker';
 
 // Staff choose a notebook's exercises (#51): the cell whose run checks each one, its title, and a
 // visible test where the cell does not check itself with kontrollo(…).
@@ -31,11 +32,14 @@ export function ExercisesEditor({
   exercises,
   isPending,
   onSave,
+  variants,
 }: {
   notebook: StoredNotebook;
   exercises: Exercise[];
   isPending: boolean;
   onSave: (exercises: Exercise[]) => Promise<unknown>;
+  /** Where the copilot's variants of the saved exercises go (#85). */
+  variants: VariantTarget;
 }) {
   const t = useT();
   // Only code that can run can check an exercise.
@@ -154,6 +158,9 @@ export function ExercisesEditor({
           </Button>
         </div>
       </form>
+      <div className="border-t border-border px-4 pb-4">
+        <VariantMaker notebook={notebook} exercises={exercises} target={variants} />
+      </div>
     </details>
   );
 }

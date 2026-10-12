@@ -89,6 +89,17 @@ account; on the free plan, going over fails (error 4006) instead of charging.
     in `ai_usage`, as counts only.
   - The browser receives plain text, so the provider's format never reaches the app.
   - The course switch needs `ai.configure`; the copilot needs `lab.publish`.
+- **Exercise variants (#85):**
+  - The copilot writes them under fixed headings (`src/shared/variant-sections.ts`), not as JSON:
+    code inside JSON strings breaks easily.
+  - The pedagog's browser runs the tests against the starter code, then the solution, in Pyodide.
+    The variant is saved only when the solution passes and the starter does not.
+  - It is saved as an `extra` notebook (the statement and the starter, with the exercise on cell 1)
+    and a `solution` notebook with the same text cells, so the presenter pairs them.
+  - The prompt asks for first-year simplicity, the same kinds of data and the same function name
+    everywhere; without that, Llama 4 Scout made convoluted variants (tested 2026-10-12).
+- **The fake model** (`AI_PROVIDER=fake`) answers a variant request with a sound variant. The
+  end-to-end preview gets it through `CLOUDFLARE_INCLUDE_PROCESS_ENV` (`playwright.config.ts`).
 - **Prompt caching:** put the stable lab context first so it is cached across students.
 - **Context building:**
   - Include: the current block's code and output, the lab section text, the exercise mode, and the

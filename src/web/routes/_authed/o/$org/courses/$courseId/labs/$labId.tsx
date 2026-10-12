@@ -30,6 +30,7 @@ import { embedAnchor, NotebookView } from '../../../../../../../components/noteb
 import { PythonBar } from '../../../../../../../components/notebook/RunControls';
 import { SubmissionBar } from '../../../../../../../components/notebook/SubmissionBar';
 import { Toc } from '../../../../../../../components/notebook/Toc';
+import type { VariantTarget } from '../../../../../../../components/notebook/VariantMaker';
 import { t as messages, useT } from '../../../../../../../i18n';
 import { reportVisualizationUsed } from '../../../../../../../lib/activity';
 import { ApiError } from '../../../../../../../lib/api';
@@ -240,6 +241,15 @@ function LabPage() {
                     exercisesPending: changes.saveExercises.isPending,
                     saveExercises: (exercises) =>
                       changes.saveExercises.mutateAsync({ notebookId: ref.notebookId, exercises }),
+                    variants: {
+                      org,
+                      courseId,
+                      base: changes.base,
+                      onSaved: async (nb) => {
+                        await changes.uploaded(nb);
+                        await navigate({ search: { notebook: nb.id } });
+                      },
+                    },
                   }
                 : null
             }
@@ -301,6 +311,7 @@ function NotebookSection({
     save: (embeds: Embed[]) => Promise<unknown>;
     exercisesPending: boolean;
     saveExercises: (exercises: Exercise[]) => Promise<unknown>;
+    variants: VariantTarget;
   } | null;
   /** Students: told the first time they use a visualization of this notebook (#18). */
   onVisualizationUsed?: () => void;
@@ -380,6 +391,7 @@ function NotebookSection({
               exercises={exercises}
               isPending={editor.exercisesPending}
               onSave={editor.saveExercises}
+              variants={editor.variants}
             />
           </div>
         )}
