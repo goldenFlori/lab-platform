@@ -4,13 +4,15 @@ import { useState } from 'react';
 import { type LiveBoard, type LiveHelpQueue, REACTIONS, type Reaction } from '../../shared/live';
 import { useT } from '../i18n';
 import { goTo, useLive } from '../lib/live-context';
+import { QuizStaff, QuizStudent } from './LiveQuiz';
 import { QrCode } from './QrCode';
 
 // A lab taught live (#65), in the lab page's header. Staff who may host start the session here;
 // the host and assistants see who is connected, show a QR code that brings students into the lab
 // and the session, and follow a running challenge's board (#67). Students see a banner, join with
 // one tap (or at once from the QR code), follow the host (#66) and see the challenge. Students ask
-// for help and react; staff see the help queue and the passing reactions (#68).
+// for help and react; staff see the help queue and the passing reactions (#68). The host asks quick
+// questions that students answer on their phones (#87).
 
 export function LiveLab({ org, courseId, labId }: { org: string; courseId: string; labId: string }) {
   const t = useT();
@@ -66,6 +68,7 @@ export function LiveLab({ org, courseId, labId }: { org: string; courseId: strin
           </div>
         )}
         <Reactions counts={socket.reactions} />
+        <QuizStaff org={org} courseId={courseId} />
         {challengeHere && <Board title={challengeHere.title} board={socket.board} onStop={live.stopChallenge} />}
         {socket.helpQueue.length > 0 && (
           <HelpQueue items={socket.helpQueue} onTake={live.takeHelp} onClose={live.closeHelp} />
@@ -120,6 +123,7 @@ export function LiveLab({ org, courseId, labId }: { org: string; courseId: strin
         )}
       </div>
       {joined && socket.state === 'open' && <AskAndReact />}
+      {joined && <QuizStudent />}
       {joined && challengeHere && (
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-surface px-3 py-2">
           <p className="flex items-center gap-2 text-sm font-semibold" data-testid="live-challenge">

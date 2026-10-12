@@ -1,4 +1,4 @@
-import { VARIANT_SECTIONS } from '../../shared/variant-sections';
+import { VARIANT_SECTIONS } from '../../shared/ai-sections';
 import { type CheckResult, cellFile } from '../python/runner';
 import { PythonSession } from '../python/session';
 

@@ -4,10 +4,10 @@ import { CircleCheck, CircleX, RefreshCw, Sparkles, Square } from 'lucide-react'
 import { useRef, useState } from 'react';
 import type { StoredNotebook } from '../../../notebook/stored';
 import type { VariantInput } from '../../../shared/ai';
+import { VARIANT_SECTIONS } from '../../../shared/ai-sections';
 import { MAX_TEST } from '../../../shared/exercise-limits';
 import type { Exercise } from '../../../shared/exercises';
 import type { NotebookDetail } from '../../../shared/notebooks';
-import { VARIANT_SECTIONS } from '../../../shared/variant-sections';
 import { useT } from '../../i18n';
 import { aiErrorText, aiPath, aiStatusQuery, streamAi } from '../../lib/ai';
 import { api } from '../../lib/api';

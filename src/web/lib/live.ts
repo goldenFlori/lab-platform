@@ -7,6 +7,9 @@ import type {
   LiveHelpState,
   LiveMessage,
   LivePresence,
+  LiveQuiz,
+  LiveQuizReveal,
+  LiveQuizTally,
   LiveState,
   LiveStep,
   Reaction,
@@ -16,6 +19,14 @@ import { api } from './api';
 // Live Lab sessions (#65): whether a lab is taught live now, starting and ending it, and the
 // session's socket. Students do not poll: the page checks when it opens and when it comes back
 // into focus, so a class of 120 stays far inside the free requests.
+
+/** The running quick question (#87): what this user chose, the staff's tally, and the reveal. */
+export type QuizState = {
+  quiz: LiveQuiz;
+  mine: number | null;
+  tally: LiveQuizTally | null;
+  reveal: LiveQuizReveal | null;
+};
 
 const livePath = (org: string, courseId: string, labId: string) =>
   `/orgs/${encodeURIComponent(org)}/courses/${encodeURIComponent(courseId)}/labs/${encodeURIComponent(labId)}/live`;
@@ -70,6 +81,7 @@ export function useLiveSocket(
   const [board, setBoard] = useState<LiveBoard | null>(null);
   const [helpQueue, setHelpQueue] = useState<LiveHelpQueue['items']>([]);
   const [help, setHelp] = useState<LiveHelpState | null>(null);
+  const [quiz, setQuiz] = useState<QuizState | null>(null);
   // Reactions of the last few seconds, as passing counts.
   const [reactions, setReactions] = useState<Partial<Record<Reaction, number>>>({});
   const socketRef = useRef<WebSocket | null>(null);
@@ -107,6 +119,21 @@ export function useLiveSocket(
         if (message.t === 'board') setBoard(message);
         if (message.t === 'help-queue') setHelpQueue(message.items);
         if (message.t === 'help-state') setHelp(message);
+        // The same kinds the host sends carry an id when they come from the session.
+        if (message.t === 'quiz' && 'id' in message) {
+          const same = (q: QuizState | null) => (q?.quiz.id === message.id ? q : null);
+          setQuiz((q) => ({
+            quiz: message,
+            mine: same(q)?.mine ?? null,
+            tally: same(q)?.tally ?? null,
+            reveal: same(q)?.reveal ?? null,
+          }));
+        }
+        if (message.t === 'quiz-mine') setQuiz((q) => (q?.quiz.id === message.id ? { ...q, mine: message.choice } : q));
+        if (message.t === 'quiz-tally') setQuiz((q) => (q?.quiz.id === message.id ? { ...q, tally: message } : q));
+        if (message.t === 'quiz-reveal' && 'id' in message)
+          setQuiz((q) => (q?.quiz.id === message.id ? { ...q, reveal: message } : q));
+        if (message.t === 'quiz-stop') setQuiz(null);
         if (message.t === 'react') {
           const { emoji } = message;
           setReactions((r) => ({ ...r, [emoji]: (r[emoji] ?? 0) + 1 }));
@@ -141,6 +168,7 @@ export function useLiveSocket(
       setBoard(null);
       setHelpQueue([]);
       setHelp(null);
+      setQuiz(null);
       setReactions({});
     };
   }, [org, courseId, labId, sessionId]);
@@ -151,5 +179,5 @@ export function useLiveSocket(
     if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message));
   }, []);
 
-  return { state, presence, step, challenge, board, helpQueue, help, reactions, send };
+  return { state, presence, step, challenge, board, helpQueue, help, quiz, reactions, send };
 }
