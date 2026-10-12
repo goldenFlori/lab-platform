@@ -116,6 +116,15 @@ account; on the free plan, going over fails (error 4006) instead of charging.
   - `POST …/ai/quiz` drafts 3 questions under `QUIZ_SECTIONS`. The prompt must say "exactly 3, the
     sections repeat": without it Llama 4 Scout wrote one (tested 2026-10-12, ~32 neurons for 3).
   - The host edits a draft and launches it; the AI never launches anything.
+- **Translating a notebook (#88):**
+  - The browser takes the original `.ipynb` and sends its text cells and its comment lines
+    (`segmentsOf`, `src/web/lib/translate.ts`) in requests of up to 7,000 characters. Each part is
+    marked `[[n]]`, not `### n`, which the notebooks' own headings would break.
+  - Parts the model leaves out keep the original text and are marked in the review.
+  - The copy keeps the code, outputs, visualizations and exercises. A solution stays a solution;
+    anything else becomes an extra notebook.
+  - Tested 2026-10-12: 30 parts of Lab 8 (7,000 characters) all came back, for ~206 neurons. A
+    whole notebook takes 3–5 requests.
 - **Workers AI streams number tokens as JSON numbers** (`"response":4`); the reader turns them back
   into text (#93).
 - **The fake model** (`AI_PROVIDER=fake`) answers a variant request with a sound variant. The

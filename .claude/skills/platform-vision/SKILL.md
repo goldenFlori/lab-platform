@@ -241,7 +241,10 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-12:** #87 done. In a Live Lab the host asks a quick multiple-choice question, written or
   taken from 3 drafts the copilot makes from the section on screen. Students answer once on their
   phones; staff see the counts live and the host reveals the answer to everyone (PR #95).
-- **Next:** #88, the copilot translates a lab notebook.
+- **2026-10-12:** #88 done. Staff translate a notebook between Albanian and English with the
+  copilot. They review each text and comment beside the original and save it as a new notebook with
+  the same code, visualizations and exercises (PR #96).
+- **Next:** #89, the installable app (PWA).
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
