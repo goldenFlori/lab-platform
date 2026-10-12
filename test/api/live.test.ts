@@ -190,4 +190,60 @@ describe('Live Lab sessions', () => {
     await new Promise((r) => setTimeout(r, 100));
     expect(host.messages.filter((m) => m.t === 'react')).toEqual([{ t: 'react', emoji: '👍' }]);
   });
+
+  it('run a quick question: each student answers once, staff see the counts, the answer only on reveal', async () => {
+    const { seed, pedagog, ana, labPath, state } = await setup();
+    await pedagog.call(`${labPath}/live`, { method: 'POST' });
+    const ws = `${labPath}/live/${(await state(pedagog)).session?.id}/ws`;
+    const host = await connect(await signIn(pedagog.user.username), ws);
+    const a = await connect(await signIn(ana.user.username), ws);
+    const besa = await account(seed, 'student', { groupId: seed.group.id });
+    const b = await connect(await signIn(besa.user.username), ws);
+    const cima = await account(seed, 'student', { groupId: seed.group.id });
+    const c = await connect(await signIn(cima.user.username), ws);
+    const tally = () => host.messages.filter((m) => m.t === 'quiz-tally').at(-1);
+    const question = {
+      t: 'quiz',
+      question: 'Cila strukturë përdor BFS?',
+      options: ['Radha', 'Stiva', 'Pema'],
+      correct: 0,
+    };
+
+    // A student cannot ask one.
+    a.ws?.send(JSON.stringify(question));
+    host.ws?.send(JSON.stringify(question));
+    await waitFor(() => b.messages.some((m) => m.t === 'quiz'));
+    const asked = b.messages.find((m) => m.t === 'quiz');
+    expect(asked).toMatchObject({ question: question.question, options: question.options, correct: null });
+    expect(host.messages.find((m) => m.t === 'quiz')).toMatchObject({ correct: 0 });
+    const id = (asked as { id: string }).id;
+    await waitFor(() => tally()?.t === 'quiz-tally');
+
+    a.ws?.send(JSON.stringify({ t: 'answer', id, choice: 0 }));
+    a.ws?.send(JSON.stringify({ t: 'answer', id, choice: 1 }));
+    b.ws?.send(JSON.stringify({ t: 'answer', id, choice: 1 }));
+    c.ws?.send(JSON.stringify({ t: 'answer', id, choice: 0 }));
+    await waitFor(() => (tally() as { waiting: number }).waiting === 0);
+    expect(tally()).toMatchObject({
+      counts: [2, 1, 0],
+      names: [[ana.user.fullName, cima.user.fullName].sort((x, y) => x.localeCompare(y)), [besa.user.fullName], []],
+    });
+    expect(a.messages.filter((m) => m.t === 'quiz-mine')).toEqual([{ t: 'quiz-mine', id, choice: 0 }]);
+    // Students never see the tally, nor the answer before the reveal.
+    expect(a.messages.some((m) => m.t === 'quiz-tally' || m.t === 'quiz-reveal')).toBe(false);
+
+    host.ws?.send(JSON.stringify({ t: 'quiz-reveal' }));
+    await waitFor(() => b.messages.some((m) => m.t === 'quiz-reveal'));
+    expect(b.messages.find((m) => m.t === 'quiz-reveal')).toEqual({
+      t: 'quiz-reveal',
+      id,
+      correct: 0,
+      counts: [2, 1, 0],
+    });
+    // A newcomer gets the question and the revealed answer.
+    const late = await account(seed, 'student', { groupId: seed.group.id });
+    const d = await connect(await signIn(late.user.username), ws);
+    await waitFor(() => d.messages.some((m) => m.t === 'quiz-reveal'));
+    expect(d.messages.find((m) => m.t === 'quiz')).toMatchObject({ id, correct: 0 });
+  });
 });

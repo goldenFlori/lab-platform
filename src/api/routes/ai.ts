@@ -1,8 +1,8 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import { type AiQuestion, type AiStatus, copilotInput, variantInput } from '../../shared/ai';
+import { type AiQuestion, type AiStatus, copilotInput, quizInput, variantInput } from '../../shared/ai';
 import { dailyLimit, streamAi, today } from '../ai/gateway';
-import { copilotSystem, variantMessages } from '../ai/purposes';
+import { copilotSystem, quizMessages, variantMessages } from '../ai/purposes';
 import type { TenantEnv } from '../auth/access';
 import { forbidden, invalidRequest, visibleCourse } from './course-context';
 
@@ -42,4 +42,12 @@ export const aiRoutes = new Hono<TenantEnv>()
     if (!c.var.access.can('lab.publish', { courseId: course.id })) return forbidden(c);
     const messages = variantMessages(c.req.valid('json'), course.locale);
     return streamAi(c, { course, staff: true, purpose: 'variant', messages });
+  })
+
+  // Three quick questions (#87) on the part of the lab being presented, for a Live Lab.
+  .post('/quiz', zValidator('json', quizInput, invalidRequest), async (c) => {
+    const { course } = await visibleCourse(c);
+    if (!c.var.access.can('lab.publish', { courseId: course.id })) return forbidden(c);
+    const messages = quizMessages(c.req.valid('json'), course.locale);
+    return streamAi(c, { course, staff: true, purpose: 'quiz', messages });
   });

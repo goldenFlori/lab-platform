@@ -45,6 +45,14 @@ export const variantInput = z.object({
 
 export type VariantInput = z.infer<typeof variantInput>;
 
+/** Quick questions (#87): the part of the lab being presented, as the copilot reads it. */
+export const quizInput = z.object({
+  title: z.string().trim().max(160),
+  context: z.string().trim().min(1).max(4000),
+});
+
+export type QuizInput = z.infer<typeof quizInput>;
+
 /** "Explain my error" (#86): the cell, the code that ran, its error, and the text just above it. */
 export const explainInput = z.object({
   cell: z.number().int().min(0).max(10_000),

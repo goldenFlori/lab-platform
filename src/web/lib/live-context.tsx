@@ -29,6 +29,31 @@ function whereNow() {
   return '';
 }
 
+/**
+ * The text of the section in view, from its heading to the next one: what the copilot drafts quick
+ * questions from (#87). Code cells come with it, so questions can ask what the code does.
+ */
+export function sectionInView() {
+  const at = cellInView();
+  if (at === null) return { title: '', text: '' };
+  const markers = [...document.querySelectorAll<HTMLElement>('[data-at]')];
+  const isHeading = (m: HTMLElement) => m.querySelector('h1, h2, h3') !== null;
+  let start = markers.findIndex((m) => Number(m.dataset.at) === at);
+  while (start > 0 && !isHeading(markers[start] as HTMLElement)) start--;
+  const part: HTMLElement[] = [];
+  for (let i = Math.max(0, start); i < markers.length; i++) {
+    const marker = markers[i] as HTMLElement;
+    if (part.length > 0 && isHeading(marker)) break;
+    part.push(marker);
+  }
+  const title = part[0]?.querySelector('h1, h2, h3')?.textContent?.trim() ?? '';
+  const text = part
+    .map((m) => m.textContent?.trim() ?? '')
+    .join('\n\n')
+    .slice(0, 4000);
+  return { title, text };
+}
+
 /** The cell nearest the top of the window, below the site header. */
 function cellInView() {
   for (const marker of document.querySelectorAll<HTMLElement>('[data-at]')) {
@@ -119,6 +144,11 @@ function useLiveValue({
     takeHelp: (id: string) => send({ t: 'help-take', id }),
     closeHelp: (id: string) => send({ t: 'help-done', id }),
     react: (emoji: Reaction) => send({ t: 'react', emoji }),
+    startQuiz: (question: string, options: string[], correct: number) =>
+      send({ t: 'quiz', question, options, correct }),
+    revealQuiz: () => send({ t: 'quiz-reveal' }),
+    stopQuiz: () => send({ t: 'quiz-stop' }),
+    answerQuiz: (id: string, choice: number) => send({ t: 'answer', id, choice }),
     /** A joined student's check of the challenge: only its result goes. */
     report: (result: Omit<LiveResult, 't'>) => {
       if (!staff && joined && challenge && challenge.notebook === notebookId && challenge.cell === result.cell)
