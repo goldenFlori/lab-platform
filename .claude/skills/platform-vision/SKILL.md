@@ -229,7 +229,10 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-12:** #84 done. Staff who may configure AI switch it on per course. Every AI call goes
   through one metered gateway on Workers AI's free allocation, with daily limits per user and per
   organization, and a staff copilot that streams its answers (PR #90).
-- **Next:** #85, copilot exercise variants with tests checked in the browser.
+- **2026-10-12:** #85 done. On a notebook's exercises, staff ask the copilot for a variant. They
+  edit it, their browser checks that the solution passes its tests and the starter does not, and
+  they save it as a new notebook in the lab with a staff-only solution notebook (PR #91).
+- **Next:** #86, "Explain my error" for students, with hints and a daily quota.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
