@@ -431,7 +431,7 @@ export const labActivity = sqliteTable(
     userId: text('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    kind: text('kind', { enum: ['view', 'download', 'visualization', 'exercise'] }).notNull(),
+    kind: text('kind', { enum: ['view', 'download', 'visualization', 'exercise', 'run', 'live'] }).notNull(),
     /** YYYY-MM-DD in the institution's time zone. */
     day: text('day').notNull(),
   },

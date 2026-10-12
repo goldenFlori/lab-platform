@@ -6,6 +6,9 @@ import {
   type ActivityKind,
   type ActivityReport,
   activityInput,
+  PILOT_MAX_DAYS,
+  type PilotCount,
+  type PilotReport,
   REPORT_WEEKS,
 } from '../../shared/activity';
 import type { TenantEnv } from '../auth/access';
@@ -113,4 +116,66 @@ export const courseActivityRoutes = new Hono<TenantEnv>().get('/', async (c) => 
     weeks,
     labs: [...perLab.values()],
   } satisfies ActivityReport);
+});
+
+const DAY = /^\d{4}-\d{2}-\d{2}$/;
+const daysBetween = (from: string, to: string) =>
+  Math.round((new Date(`${to}T00:00:00Z`).getTime() - new Date(`${from}T00:00:00Z`).getTime()) / 86_400_000);
+
+/**
+ * GET /api/orgs/:org/courses/:courseId/report[?from=…&to=…&group=…]: the pilot report (#101) for
+ * staff with analytics.view, for the groups they may see. Counts only. The period defaults to the
+ * course's start (at most PILOT_MAX_DAYS ago) until today.
+ */
+export const pilotReportRoutes = new Hono<TenantEnv>().get('/', async (c) => {
+  const { access, tenant } = c.var;
+  const { course, groups } = await visibleCourse(c);
+  const wholeCourse = access.can('analytics.view', { courseId: course.id });
+  const allowed = groups
+    .filter((g) => access.can('analytics.view', { courseId: course.id, groupId: g.id }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  if (!wholeCourse && allowed.length === 0) return forbidden(c);
+  const group = c.req.query('group') || null;
+  if (group && !allowed.some((g) => g.id === group)) return forbidden(c);
+  const groupIds = group ? [group] : wholeCourse ? null : allowed.map((g) => g.id);
+
+  const to = c.req.query('to') || today();
+  const started = today(course.createdAt);
+  const earliest = addDays(to, -(PILOT_MAX_DAYS - 1));
+  const from = c.req.query('from') || (started > earliest ? started : earliest);
+  if (!DAY.test(from) || !DAY.test(to) || from > to || daysBetween(from, to) >= PILOT_MAX_DAYS) {
+    return c.json({ error: 'invalid_request' }, 400);
+  }
+
+  const data = await tenant.activity.pilot({ courseId: course.id, groupIds, from, to });
+  const kind = (k: ActivityKind): PilotCount => {
+    const row = data.perKind.find((r) => r.kind === k);
+    return { students: row?.students ?? 0, total: Number(row?.total ?? 0) };
+  };
+  const count = (row: { students: number; total: number } | undefined): PilotCount => ({
+    students: row?.students ?? 0,
+    total: Number(row?.total ?? 0),
+  });
+  const weeks: PilotReport['weeks'] = [];
+  for (let week = mondayOf(from); week <= to; week = addDays(week, 7)) {
+    weeks.push({ week, active: data.perWeek.find((row) => row.week === week)?.students ?? 0 });
+  }
+  return c.json({
+    course: { title: course.title, academicYear: course.academicYear },
+    groups: allowed.map((g) => ({ id: g.id, name: g.name })),
+    group,
+    from,
+    to,
+    students: data.students,
+    weeks,
+    active: data.active,
+    labsOpened: kind('view'),
+    codeRuns: kind('run'),
+    liveLabs: kind('live'),
+    visualizations: kind('visualization'),
+    exercisesCompleted: count(data.solved),
+    submissions: count(data.handed),
+    aiQuestions: count(data.asked),
+    aiRequests: data.aiRequests,
+  } satisfies PilotReport);
 });

@@ -14,13 +14,25 @@ export const activityQuery = (org: string, courseId: string, group: string | und
       api<ActivityReport>(`${coursePath(org, courseId)}/activity${group ? `?group=${encodeURIComponent(group)}` : ''}`),
   });
 
-/** A student used a visualization in this lab. Fire and forget: activity never gets in the way. */
-export function reportVisualizationUsed(org: string, courseId: string, labId: string) {
+/** A student used a visualization in this lab, or ran its code. Fire and forget: activity never gets in the way. */
+function report(org: string, courseId: string, labId: string, kind: 'visualization' | 'run') {
   void fetch(`/api${coursePath(org, courseId)}/labs/${encodeURIComponent(labId)}/activity`, {
     method: 'POST',
     credentials: 'same-origin',
     keepalive: true,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ kind: 'visualization' }),
+    body: JSON.stringify({ kind }),
   }).catch(() => {});
+}
+
+export const reportVisualizationUsed = (org: string, courseId: string, labId: string) =>
+  report(org, courseId, labId, 'visualization');
+
+/** Labs whose run was reported since the page loaded: the server keeps one a day anyway (#101). */
+const ran = new Set<string>();
+
+export function reportRun(org: string, courseId: string, labId: string) {
+  if (ran.has(labId)) return;
+  ran.add(labId);
+  report(org, courseId, labId, 'run');
 }

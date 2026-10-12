@@ -34,7 +34,7 @@ import { SubmissionBar } from '../../../../../../../components/notebook/Submissi
 import { Toc } from '../../../../../../../components/notebook/Toc';
 import type { VariantTarget } from '../../../../../../../components/notebook/VariantMaker';
 import { t as messages, useT } from '../../../../../../../i18n';
-import { reportVisualizationUsed } from '../../../../../../../lib/activity';
+import { reportRun, reportVisualizationUsed } from '../../../../../../../lib/activity';
 import { ApiError } from '../../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../../lib/brand';
 import { CodeEditsProvider, useCodeEdits } from '../../../../../../../lib/code-edits';
@@ -514,6 +514,8 @@ function EditablePython({
         return exercise ? { test: exercise.test } : undefined;
       }}
       onRun={(cell, run, ms) => {
+        const ref = exercises?.notebookRef;
+        if (ref) reportRun(ref.org, ref.courseId, ref.labId);
         const outcome = run.outcome;
         if (outcome?.kind === 'ok' && outcome.check?.status === 'pass') exercises?.passed(cell);
         // In a live challenge, only the result goes to the room (#67).

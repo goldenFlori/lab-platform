@@ -2,6 +2,7 @@ import { type Context, Hono } from 'hono';
 import type { LiveRole, LiveState } from '../../shared/live';
 import type { TenantEnv } from '../auth/access';
 import { MEMBER_HEADER } from '../live/session';
+import { recordActivity } from './activity';
 import { forbidden } from './course-context';
 import { type LabContext, labContext, visibleLab } from './lab-context';
 
@@ -66,6 +67,8 @@ export const liveRoutes = new Hono<TenantEnv>()
     const user = c.var.user;
     if (!user) return forbidden(c);
     const member = { userId: user.id, name: user.fullName, role: roleIn(c, ctx, running.hostId) };
+    // Taking part counts in the course's activity (#101); staff are not counted.
+    recordActivity(c, ctx, lab.id, 'live');
     const headers = new Headers({ Upgrade: 'websocket', [MEMBER_HEADER]: JSON.stringify(member) });
     return sessionStub(c, running.id).fetch('https://live/ws', { headers });
   });

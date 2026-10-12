@@ -75,7 +75,8 @@ on startupalbania.gov.al before applying.
 
 1. **Apply after phase 2 or 3** of the roadmap, with a working product and one semester of pilot
    data.
-2. **Pilot metrics** (collect from phase 1; privacy-friendly aggregates):
+2. **Pilot metrics** (collect from phase 1; privacy-friendly aggregates). The course's "Pilot
+   report" (#101) prints all of them but the survey (#102) for any period:
    - weekly active students;
    - labs opened;
    - code runs;

@@ -264,7 +264,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   what is kept, where, for how long and who sees it. "My data" in the account menu downloads
   everything stored about the user as one JSON file, and sends their institutions a deletion
   request, which admins see and mark handled on their courses page (PR #108).
-- **Next:** #101, the pilot report for the grant.
+- **2026-10-12:** #101 done. Code runs and joining a Live Lab now count in the activity, one record
+  per student, lab and day. Staff with analytics open the "Pilot report" from the activity page:
+  for a chosen period (up to 200 days) and group, the students active per week and in all, labs
+  opened, code runs, Live Lab participation, visualizations, exercises, submissions, and AI questions
+  and requests. Counts only, and it prints on two pages (PR #109).
+- **Next:** #102, the end-of-semester survey in the app.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 

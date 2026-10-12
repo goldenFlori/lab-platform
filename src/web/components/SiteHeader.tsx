@@ -215,7 +215,7 @@ export function SiteHeader() {
   const t = useT();
   const onLoginPage = useRouterState({ select: (state) => state.location.pathname === '/login' });
   return (
-    <header className="glass sticky top-0 z-50 h-(--nav-h) border-b border-separator/80">
+    <header className="glass sticky top-0 z-50 h-(--nav-h) border-b border-separator/80 print:hidden">
       <div className="container-page flex h-full items-center gap-3">
         <Link to="/" className="group flex min-w-0 items-center gap-2.5 rounded-xl pr-2" aria-label={t.header.home}>
           <Logo className="size-9 shrink-0 transition-transform duration-300 group-hover:rotate-[-6deg]" />

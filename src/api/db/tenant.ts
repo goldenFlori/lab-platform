@@ -11,6 +11,7 @@ import {
   isNotNull,
   isNull,
   like,
+  lte,
   ne,
   or,
   type SQL,
@@ -668,6 +669,121 @@ function tenantActivity(db: Db, orgId: string) {
           .groupBy(labActivity.labId, labActivity.kind),
       ]);
       return { students: enrolled[0]?.n ?? 0, perWeekKind, perWeek, perLab };
+    },
+
+    /**
+     * The pilot report's counts (#101) from `from` to `to` (YYYY-MM-DD, both included), for the
+     * students of `groupIds` (all the course's groups when null), in one batch.
+     */
+    async pilot({
+      courseId,
+      groupIds,
+      from,
+      to,
+    }: {
+      courseId: string;
+      groupIds: string[] | null;
+      from: string;
+      to: string;
+    }) {
+      const courseLabs = db
+        .select({ id: labs.id })
+        .from(labs)
+        .where(and(eq(labs.orgId, orgId), eq(labs.courseId, courseId)));
+      const courseNotebooks = db
+        .select({ id: notebooks.id })
+        .from(notebooks)
+        .where(and(eq(notebooks.orgId, orgId), inArray(notebooks.labId, courseLabs)));
+      const { inGroups, students } = studentsOf(db, orgId, courseId, groupIds);
+      const inPeriod = and(gte(labActivity.day, from), lte(labActivity.day, to));
+      const counted = and(
+        eq(labActivity.orgId, orgId),
+        inArray(labActivity.labId, courseLabs),
+        inArray(labActivity.userId, students),
+        inPeriod,
+      );
+      const week = sql<string>`date(${labActivity.day}, '-' || ((cast(strftime('%w', ${labActivity.day}) as integer) + 6) % 7) || ' days')`;
+      // Timestamps (Unix seconds) within the period's days, UTC.
+      const start = new Date(`${from}T00:00:00Z`);
+      const end = new Date(`${to}T23:59:59Z`);
+      const [enrolled, perWeek, active, perKind, solved, handed, asked, requested] = await db.batch([
+        db
+          .select({ n: countDistinct(memberships.userId) })
+          .from(memberships)
+          .where(and(eq(memberships.orgId, orgId), eq(memberships.role, 'student'), inGroups)),
+        db
+          .select({ week, students: countDistinct(labActivity.userId) })
+          .from(labActivity)
+          .where(counted)
+          .groupBy(week),
+        db
+          .select({ n: countDistinct(labActivity.userId) })
+          .from(labActivity)
+          .where(counted),
+        db
+          .select({ kind: labActivity.kind, students: countDistinct(labActivity.userId), total: sql<number>`count(*)` })
+          .from(labActivity)
+          .where(counted)
+          .groupBy(labActivity.kind),
+        db
+          .select({ students: countDistinct(exerciseCompletions.userId), total: sql<number>`count(*)` })
+          .from(exerciseCompletions)
+          .where(
+            and(
+              eq(exerciseCompletions.orgId, orgId),
+              inArray(exerciseCompletions.notebookId, courseNotebooks),
+              inArray(exerciseCompletions.userId, students),
+              gte(exerciseCompletions.completedAt, start),
+              lte(exerciseCompletions.completedAt, end),
+            ),
+          ),
+        db
+          .select({ students: countDistinct(submissions.userId), total: sql<number>`count(*)` })
+          .from(submissions)
+          .where(
+            and(
+              eq(submissions.orgId, orgId),
+              inArray(submissions.notebookId, courseNotebooks),
+              inArray(submissions.userId, students),
+              gte(submissions.submittedAt, start),
+              lte(submissions.submittedAt, end),
+            ),
+          ),
+        db
+          .select({ students: countDistinct(aiQuestions.userId), total: sql<number>`count(*)` })
+          .from(aiQuestions)
+          .where(
+            and(
+              eq(aiQuestions.orgId, orgId),
+              eq(aiQuestions.courseId, courseId),
+              inArray(aiQuestions.userId, students),
+              gte(aiQuestions.createdAt, start),
+              lte(aiQuestions.createdAt, end),
+            ),
+          ),
+        db
+          .select({ total: sql<number>`coalesce(sum(${aiUsage.requests}), 0)` })
+          .from(aiUsage)
+          .where(
+            and(
+              eq(aiUsage.orgId, orgId),
+              eq(aiUsage.courseId, courseId),
+              inArray(aiUsage.userId, students),
+              gte(aiUsage.day, from),
+              lte(aiUsage.day, to),
+            ),
+          ),
+      ]);
+      return {
+        students: enrolled[0]?.n ?? 0,
+        perWeek,
+        active: active[0]?.n ?? 0,
+        perKind,
+        solved: solved[0],
+        handed: handed[0],
+        asked: asked[0],
+        aiRequests: Number(requested[0]?.total ?? 0),
+      };
     },
   };
 }
