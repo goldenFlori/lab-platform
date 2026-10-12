@@ -198,7 +198,8 @@ describe('brute-force protection', () => {
     for (let i = 0; i < MAX_FAILURES_PER_IP; i++) await login(`someone-${i}`, 'guess', '192.0.2.66');
     expect((await login('arben.hoxha', PASSWORD, '192.0.2.66')).status).toBe(429);
     expect((await login('arben.hoxha', PASSWORD, '192.0.2.67')).status).toBe(200);
-  });
+    // 100 sign-ins one after another: under 2 s here, near the 5 s default on a busy CI runner (#106).
+  }, 30_000);
 });
 
 describe('requests from other sites', () => {
