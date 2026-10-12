@@ -1,6 +1,6 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import { type AiStatus, copilotInput, variantInput } from '../../shared/ai';
+import { type AiQuestion, type AiStatus, copilotInput, variantInput } from '../../shared/ai';
 import { dailyLimit, streamAi, today } from '../ai/gateway';
 import { copilotSystem, variantMessages } from '../ai/purposes';
 import type { TenantEnv } from '../auth/access';
@@ -22,6 +22,18 @@ export const aiRoutes = new Hono<TenantEnv>()
     if (!c.var.access.can('lab.publish', { courseId: course.id })) return forbidden(c);
     const messages = [copilotSystem(course.title, course.locale), ...c.req.valid('json').messages];
     return streamAi(c, { course, staff: true, purpose: 'copilot', messages });
+  })
+
+  // Students' "Explain my error" questions (#86), for staff who review their groups.
+  .get('/questions', async (c) => {
+    const { course, groups } = await visibleCourse(c);
+    const { access } = c.var;
+    const courseId = course.id;
+    const whole = access.can('submission.review', { courseId });
+    const allowed = groups.filter((g) => access.can('submission.review', { courseId, groupId: g.id }));
+    if (!whole && allowed.length === 0) return forbidden(c);
+    const questions = await c.var.tenant.ai.questions(courseId, whole ? null : allowed.map((g) => g.id));
+    return c.json(questions satisfies AiQuestion[]);
   })
 
   // A variant of an exercise (#85), written under fixed headings that the browser reads.

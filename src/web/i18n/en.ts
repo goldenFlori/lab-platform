@@ -493,6 +493,12 @@ export const en: Messages = {
     saveFailed: 'The exercises were not saved. Please try again.',
     pickBoth: (n: number) => `Choose the cell and write the title in row ${n}.`,
     oneEach: 'A cell can be only one exercise.',
+    ai: 'AI for errors',
+    aiModes: {
+      off: 'Off (e.g. for an exam)',
+      hints: 'Hints only, never the solution',
+      full: 'Full explanation, once solutions are open',
+    },
   },
   ai: {
     off: 'AI is off for this course.',
@@ -500,6 +506,20 @@ export const en: Messages = {
     limitOrg: "AI has reached today's free limit for the institution. Try again tomorrow.",
     unavailable: 'AI did not answer just now. Try again shortly.',
     network: 'The connection dropped. Check the internet and try again.',
+  },
+  explain: {
+    ask: 'Explain the error',
+    title: 'Assistant',
+    thinking: 'Thinking…',
+    footer: (n) => `You have ${n} questions left today. The course's staff can read your questions.`,
+  },
+  aiQuestions: {
+    title: (n) => `Students' questions about errors (${n})`,
+    help: 'What students asked with "Explain the error", and what the AI told them. Kept for 180 days.',
+    none: 'No questions yet.',
+    code: 'Code',
+    answer: 'Answer',
+    where: (lab, notebook) => `${lab} · ${notebook}`,
   },
   variant: {
     title: 'A variant with the copilot',

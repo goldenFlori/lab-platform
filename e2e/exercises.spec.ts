@@ -62,7 +62,7 @@ test('a student solves exercises and sees them checked; the pedagog sees how man
   await expect(form.getByLabel('Titulli', { exact: true }).first()).toHaveValue('Ushtrimi 1 — Shuma');
   await form.getByRole('button', { name: 'Shto ushtrim' }).click();
   const second = form.getByRole('group', { name: 'Ushtrimi 2' });
-  const cell = second.locator('select');
+  const cell = second.locator('select').first();
   const choice = await cell.locator('option', { hasText: 'Ushtrimi 2 — Prodhimi' }).getAttribute('value');
   await cell.selectOption(choice ?? '');
   await second.getByLabel('Titulli', { exact: true }).fill('Ushtrimi 2 — Prodhimi');

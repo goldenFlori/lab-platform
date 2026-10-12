@@ -2,6 +2,7 @@ import {
   and,
   asc,
   countDistinct,
+  desc,
   eq,
   gte,
   type InferInsertModel,
@@ -15,10 +16,13 @@ import {
   sql,
 } from 'drizzle-orm';
 import type { ActivityKind } from '../../shared/activity';
+import type { AiQuestion } from '../../shared/ai';
+import type { AiMode } from '../../shared/exercise-limits';
 import { roleExists } from './access';
 import { uuidv7 } from './ids';
 import type { Db } from './index';
 import {
+  aiQuestions,
   aiUsage,
   assignments,
   codeEdits,
@@ -670,15 +674,21 @@ function tenantExercises(db: Db, orgId: string) {
   return {
     of(notebookId: string) {
       return db
-        .select({ cell: exercises.cell, title: exercises.title, test: exercises.test })
+        .select({ cell: exercises.cell, title: exercises.title, test: exercises.test, ai: exercises.aiMode })
         .from(exercises)
         .where(ofNotebook(notebookId))
         .orderBy(asc(exercises.cell));
     },
 
     /** Replaces all exercises of the notebook at once: at most 100, 11 statements. */
-    async set(notebookId: string, list: { cell: number; title: string; test: string | null }[]) {
-      const rows = list.map((exercise) => ({ ...exercise, id: uuidv7(), orgId, notebookId }));
+    async set(notebookId: string, list: { cell: number; title: string; test: string | null; ai?: AiMode }[]) {
+      const rows = list.map(({ ai, ...exercise }) => ({
+        ...exercise,
+        aiMode: ai ?? 'hints',
+        id: uuidv7(),
+        orgId,
+        notebookId,
+      }));
       await rethrowMissingParent(
         db.batch([
           db.delete(exercises).where(ofNotebook(notebookId)),
@@ -1080,6 +1090,49 @@ function tenantAi(db: Db, orgId: string) {
         .from(aiUsage)
         .where(and(eq(aiUsage.orgId, orgId), eq(aiUsage.day, day)));
       return { requests: mine?.requests ?? 0, orgNeurons: all?.neurons ?? 0 };
+    },
+
+    /** Keeps a student's "Explain my error" with its answer, for the course's staff (#86). */
+    async ask(values: {
+      courseId: string;
+      notebookId: string;
+      userId: string;
+      cell: number;
+      code: string;
+      error: string;
+      answer: string;
+    }) {
+      await rethrowMissingParent(db.insert(aiQuestions).values({ ...values, id: uuidv7(), orgId }));
+    },
+
+    /** The course's latest questions, newest first; groupIds null means all of its students. */
+    async questions(courseId: string, groupIds: string[] | null, limit = 100): Promise<AiQuestion[]> {
+      const rows = await db
+        .select({
+          id: aiQuestions.id,
+          name: users.fullName,
+          lab: labs.title,
+          notebook: notebooks.title,
+          cell: aiQuestions.cell,
+          code: aiQuestions.code,
+          error: aiQuestions.error,
+          answer: aiQuestions.answer,
+          at: aiQuestions.createdAt,
+        })
+        .from(aiQuestions)
+        .innerJoin(users, eq(users.id, aiQuestions.userId))
+        .innerJoin(notebooks, and(eq(notebooks.id, aiQuestions.notebookId), eq(notebooks.orgId, orgId)))
+        .innerJoin(labs, and(eq(labs.id, notebooks.labId), eq(labs.orgId, orgId)))
+        .where(
+          and(
+            eq(aiQuestions.orgId, orgId),
+            eq(aiQuestions.courseId, courseId),
+            inArray(aiQuestions.userId, studentsOf(db, orgId, courseId, groupIds).students),
+          ),
+        )
+        .orderBy(desc(aiQuestions.createdAt))
+        .limit(limit);
+      return rows.map(({ at, ...row }) => ({ ...row, at: at.toISOString() }));
     },
 
     /** Adds to the day's counts (negative to give back what a failed call reserved). */

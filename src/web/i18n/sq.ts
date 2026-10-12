@@ -489,6 +489,12 @@ export const sq = {
     saveFailed: 'Ushtrimet nuk u ruajtën. Provoni sërish.',
     pickBoth: (n: number) => `Zgjidhni qelizën dhe shkruani titullin te rreshti ${n}.`,
     oneEach: 'Një qelizë mund të jetë vetëm një ushtrim.',
+    ai: 'AI për gabimet',
+    aiModes: {
+      off: 'E fikur (p.sh. për provim)',
+      hints: 'Vetëm udhëzime, pa zgjidhjen',
+      full: 'Shpjegim i plotë, pasi të hapen zgjidhjet',
+    },
   },
   ai: {
     off: 'AI është e fikur për këtë kurs.',
@@ -496,6 +502,20 @@ export const sq = {
     limitOrg: 'AI ka arritur kufirin falas të sotëm për institucionin. Provoni nesër.',
     unavailable: 'AI nuk u përgjigj tani. Provoni pas pak.',
     network: 'Lidhja u ndërpre. Kontrolloni internetin dhe provoni sërish.',
+  },
+  explain: {
+    ask: 'Shpjego gabimin',
+    title: 'Asistenti',
+    thinking: 'Po mendon…',
+    footer: (n: number) => `Ju mbeten ${n} pyetje sot. Stafi i kursit mund t'i lexojë pyetjet tuaja.`,
+  },
+  aiQuestions: {
+    title: (n: number) => `Pyetjet e studentëve për gabimet (${n})`,
+    help: 'Çfarë pyetën studentët te "Shpjego gabimin" dhe çfarë u tha AI. Ruhen 180 ditë.',
+    none: 'Ende asnjë pyetje.',
+    code: 'Kodi',
+    answer: 'Përgjigjja',
+    where: (lab: string, notebook: string) => `${lab} · ${notebook}`,
   },
   variant: {
     title: 'Variant me kopilotin',

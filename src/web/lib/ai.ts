@@ -5,7 +5,7 @@ import { api } from './api';
 
 // AI in a course (#84): what the user has left today, and the answers, read as they are written.
 
-const aiPath = (org: string, courseId: string) =>
+export const aiPath = (org: string, courseId: string) =>
   `/orgs/${encodeURIComponent(org)}/courses/${encodeURIComponent(courseId)}/ai`;
 
 export const aiStatusQuery = (org: string, courseId: string) =>
@@ -21,18 +21,16 @@ export class AiError extends Error {
   }
 }
 
-/** Sends a request and calls `onText` with the whole answer so far, each time more arrives. */
+/** Sends a request to an AI route and calls `onText` with the whole answer so far, as more arrives. */
 export async function streamAi(
-  org: string,
-  courseId: string,
-  purpose: string,
+  path: string,
   body: unknown,
   onText: (text: string) => void,
   signal?: AbortSignal,
 ): Promise<string> {
   let res: Response;
   try {
-    res = await fetch(`/api${aiPath(org, courseId)}/${purpose}`, {
+    res = await fetch(`/api${path}`, {
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },

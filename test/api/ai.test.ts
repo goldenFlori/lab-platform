@@ -88,3 +88,69 @@ describe('AI in a course', () => {
     expect((await seed.tenant.ai.today(colleague.user.id, day())).requests).toBe(1);
   });
 });
+
+// #86 is done when a student gets a hint for an error, an exercise set to off refuses, and a
+// pedagog reads the question in the course; staff of other groups and students do not.
+describe('Explain my error', () => {
+  async function classroom() {
+    const seed = await seedOrganization('fshn');
+    const { tenant, course, lab, notebook } = seed;
+    const groupB = await tenant.groups.create({ courseId: course.id, name: 'Grupi B' });
+    const pedagog = await account(seed, 'pedagog', { courseId: course.id });
+    const assistant = await account(seed, 'assistant', { groupId: seed.group.id });
+    const pedagogB = await account(seed, 'pedagog', { groupId: groupB.id });
+    const ana = await account(seed, 'student', { groupId: seed.group.id });
+    const coursePath = `/orgs/${seed.org.slug}/courses/${course.id}`;
+    const labPath = `${coursePath}/labs/${lab.id}`;
+    const opened = new Date(Date.now() - 60_000).toISOString();
+    for (const groupId of [null, seed.group.id]) {
+      await pedagog.call(`${labPath}/access`, {
+        method: 'PUT',
+        body: { groupId, visibleFrom: opened, visibleUntil: null, solutionsFrom: null },
+      });
+    }
+    await pedagog.call(coursePath, { method: 'PATCH', body: { ai: true } });
+    const explain = `${labPath}/notebooks/${notebook.id}/explain`;
+    const questions = async (who: typeof ana) =>
+      (await who.call(`${coursePath}/ai/questions`)).json() as Promise<unknown[]>;
+    return { pedagog, assistant, pedagogB, ana, coursePath, labPath, notebook, explain, questions };
+  }
+
+  const question = {
+    cell: 4,
+    code: 'totali = 0\nfor x in [1, 2]:\n    total += x',
+    error: "NameError: name 'total' is not defined",
+    context: 'Ushtrimi 1 — Shuma',
+  };
+
+  it("answers a student, and keeps the question for the staff of the student's group", async () => {
+    const { pedagog, assistant, pedagogB, ana, coursePath, explain, questions } = await classroom();
+    const res = await ana.call(explain, { method: 'POST', body: question });
+    expect(res.status).toBe(200);
+    expect(await res.text()).toContain('total');
+
+    for (let i = 0; i < 100 && (await questions(pedagog)).length === 0; i++)
+      await new Promise((r) => setTimeout(r, 10));
+    expect(await questions(pedagog)).toMatchObject([
+      { name: ana.user.fullName, cell: 4, error: question.error, code: question.code },
+    ]);
+    expect(await questions(assistant)).toHaveLength(1);
+    expect(await questions(pedagogB)).toEqual([]);
+    expect((await ana.call(`${coursePath}/ai/questions`)).status).toBe(403);
+  });
+
+  it('refuses on an exercise set to off, and in a course with AI off', async () => {
+    const { pedagog, ana, coursePath, labPath, notebook, explain } = await classroom();
+    await pedagog.call(`${labPath}/notebooks/${notebook.id}/exercises`, {
+      method: 'PUT',
+      body: { exercises: [{ cell: 4, title: 'Ushtrimi 1', test: null, ai: 'off' }] },
+    });
+    const off = await ana.call(explain, { method: 'POST', body: question });
+    expect(off.status).toBe(403);
+    expect(await off.json()).toEqual({ error: 'ai_off' });
+    expect((await ana.call(explain, { method: 'POST', body: { ...question, cell: 9 } })).status).toBe(200);
+
+    await pedagog.call(coursePath, { method: 'PATCH', body: { ai: false } });
+    expect((await ana.call(explain, { method: 'POST', body: { ...question, cell: 9 } })).status).toBe(403);
+  });
+});

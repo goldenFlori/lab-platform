@@ -17,9 +17,16 @@ const refuse = (c: Context, refusal: AiRefusal, status: 403 | 429 | 503) => c.js
 
 export async function streamAi(
   c: Context<TenantEnv>,
-  request: { course: { id: string; aiEnabled: boolean }; staff: boolean; purpose: Purpose; messages: ChatMessage[] },
+  request: {
+    course: { id: string; aiEnabled: boolean };
+    staff: boolean;
+    purpose: Purpose;
+    messages: ChatMessage[];
+    /** Called with the whole answer once it has ended (not when the user leaves before). */
+    onAnswer?: (answer: string) => Promise<unknown>;
+  },
 ) {
-  const { course, staff, purpose, messages } = request;
+  const { course, staff, purpose, messages, onAnswer } = request;
   if (!course.aiEnabled) return refuse(c, { error: 'ai_off' }, 403);
   const { tenant } = c.var;
   const userId = c.var.user?.id as string;
@@ -45,13 +52,19 @@ export async function streamAi(
   }
 
   const ctx = c.executionCtx;
+  let written = '';
   const body = answer.text
     .pipeThrough(
       new TransformStream<string, string>({
+        transform(chunk, out) {
+          if (onAnswer) written += chunk;
+          out.enqueue(chunk);
+        },
         // Once the answer has ended, count what it really used instead of the reservation.
         flush() {
           const used = answer.neurons();
           if (used !== null) ctx.waitUntil(record(0, used - reserved));
+          if (onAnswer) ctx.waitUntil(onAnswer(written));
         },
       }),
     )

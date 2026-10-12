@@ -18,6 +18,7 @@ import { useExercises } from '../../lib/exercises';
 import { usePython, useSessionState } from '../../python/PythonProvider';
 import type { CheckResult } from '../../python/runner';
 import type { CellRun } from '../../python/session';
+import { ExplainError, type ExplainTarget } from './ExplainError';
 import { PlotlyFigure } from './PlotlyFigure';
 import { YourCodeViz } from './YourCodeViz';
 
@@ -107,12 +108,25 @@ export function useRunOutput(cell: CodeCell) {
   const state = useSessionState(python?.session);
   const runnable = python?.cells.get(cell);
   const run = runnable ? state.runs.get(runnable.key) : undefined;
-  const exercise = useExercises()?.of(cell);
+  const exercises = useExercises();
+  const edits = useCodeEdits();
+  const exercise = exercises?.of(cell);
   if (!python || !runnable || !run) return null;
+  // On the lab page only: the presenter has no exercises context.
+  const explain: ExplainTarget | undefined = exercises
+    ? {
+        notebookRef: exercises.notebookRef,
+        cell: cell.srcIndex,
+        code: edits?.code(cell) ?? cell.raw,
+        context: exercise?.title ?? '',
+        mode: exercise?.ai ?? 'hints',
+      }
+    : undefined;
   return (
     <LiveOutput
       number={runnable.number}
       exercise={exercise?.title}
+      explain={explain}
       onRunAbove={runnable.number > 1 ? () => void python.runAbove(cell) : undefined}
       run={run}
       starting={state.status === 'starting'}
@@ -130,6 +144,7 @@ const TIMING = /\btime\.(perf_counter|time|process_time)\s*\(|\btimeit\b/;
 function LiveOutput({
   number,
   exercise,
+  explain,
   onRunAbove,
   run,
   starting,
@@ -141,6 +156,8 @@ function LiveOutput({
   number: number;
   /** The exercise this cell checks, by its title (#51). */
   exercise?: string;
+  /** "Explain my error" for this cell (#86), where there is one. */
+  explain?: ExplainTarget;
   onRunAbove?: () => void;
   run: CellRun;
   starting: boolean;
@@ -210,6 +227,13 @@ function LiveOutput({
         {outcome?.kind === 'ok' && outcome.check && (
           <CheckCard title={exercise ?? t.exercises.check} check={outcome.check} onRunAbove={onRunAbove} />
         )}
+        {explain && outcome?.kind === 'ok' && outcome.check && ['fail', 'error'].includes(outcome.check.status) && (
+          <ExplainError
+            key={outcome.check.message}
+            target={explain}
+            error={outcome.check.message || t.exercises.fail}
+          />
+        )}
         {run.asking && <AnswerInput onAnswer={onAnswer} />}
         {waiting && !run.asking && (
           <p className="run-note mt-1 flex items-center gap-2 text-sm text-muted">
@@ -224,6 +248,9 @@ function LiveOutput({
           </p>
         )}
         {outcome?.kind === 'error' && <ErrorOutput traceback={outcome.traceback} />}
+        {explain && outcome?.kind === 'error' && (
+          <ExplainError key={outcome.traceback} target={explain} error={outcome.traceback.slice(-4000)} />
+        )}
         {outcome?.kind === 'interrupted' && <p className="run-note mt-1 text-sm text-warning">{t.python.stopped}</p>}
         {run.truncated && <p className="mt-1 text-xs text-muted">{t.python.truncated}</p>}
         {!waiting && run.output.length === 0 && outcome?.kind === 'ok' && outcome.value === null && !outcome.check && (
