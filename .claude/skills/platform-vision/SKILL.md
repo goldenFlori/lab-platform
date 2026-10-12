@@ -232,7 +232,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-12:** #85 done. On a notebook's exercises, staff ask the copilot for a variant. They
   edit it, their browser checks that the solution passes its tests and the starter does not, and
   they save it as a new notebook in the lab with a staff-only solution notebook (PR #91).
-- **Next:** #86, "Explain my error" for students, with hints and a daily quota.
+- **2026-10-12:** #86 done. Under a failed run or check, students ask "Explain the error" and get a
+  short Albanian explanation with hints, never the solution, within their daily quota. Staff set
+  each exercise's AI to off, hints or full (after the solutions date). Pedagogs and assistants read
+  their groups' questions on the course page (PR #92).
+- **Next:** #87, quick quizzes in a Live Lab, drafted by the copilot.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
@@ -270,6 +274,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-11 | Courses can be deleted by staff who manage them, with everything in them, after a confirmation popup; archiving stays the way to end a year (owner's choice, over allowing deletion only before students join) | Decided |
 | 2026-10-12 | AI runs on Workers AI's free allocation first (no key, no bill, no names sent), with Llama 4 Scout as the default after an Albanian test; paid models (Claude) only with grant or licence money | Decided |
 | 2026-10-12 | AI quotas per day: 50 requests for staff who publish labs, 10 for students, 9,000 neurons per organization; counted per user, course and day, as counts only | Decided |
+| 2026-10-12 | "Explain my error" gives hints by default and everywhere outside exercises; the full fix only on exercises staff set to it, after the solutions date. Students' questions and answers are visible to the staff of their group (students are told) and deleted after 180 days | Decided |
 | 2026-10-12 | A real mobile app means an installable web app (PWA) first; a store app (Capacitor) only if a need appears | Decided |
 | 2026-10-10 | Search without FTS5: D1 cannot export databases with virtual tables, and backups must keep working. The server sends each user the text of what they may see; the browser matches it as they type | Decided |
 
