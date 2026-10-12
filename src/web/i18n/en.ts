@@ -507,6 +507,16 @@ export const en: Messages = {
     unavailable: 'AI did not answer just now. Try again shortly.',
     network: 'The connection dropped. Check the internet and try again.',
   },
+  install: {
+    item: 'Install the app',
+    appleTitle: 'Install the app on an iPhone or iPad',
+    appleSteps: [
+      'Open this page in Safari.',
+      'Tap the Share button (the square with an arrow up).',
+      'Choose "Add to Home Screen", then "Add".',
+      'The app opens from its icon, full screen.',
+    ],
+  },
   quiz: {
     open: 'Quick question',
     title: 'A quick question for the class',

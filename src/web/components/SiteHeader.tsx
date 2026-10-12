@@ -1,12 +1,13 @@
-import { Button, Dropdown, Kbd, Label } from '@heroui/react';
+import { Button, Dropdown, Kbd, Label, Modal } from '@heroui/react';
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
-import { Check, GraduationCap, Languages, LogOut, Menu, Search, Waypoints } from 'lucide-react';
+import { Check, GraduationCap, Languages, LogOut, Menu, Search, Smartphone, Waypoints } from 'lucide-react';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import type { Me } from '../../shared/auth';
 import { LOCALES } from '../../shared/locale';
 import { LANGUAGE_NAMES, useLocale, useT } from '../i18n';
 import { useLogout, useMe } from '../lib/auth';
 import { APP_NAME } from '../lib/brand';
+import { install, useInstall } from '../lib/install';
 import { useChooseLocale } from '../lib/locale';
 import { Logo } from './Logo';
 import { ThemeToggle } from './ThemeToggle';
@@ -123,42 +124,74 @@ function AccountMenu({ me }: { me: Me }) {
   const t = useT();
   const locale = useLocale();
   const choose = useChooseLocale();
+  const installable = useInstall();
+  const [appleSteps, setAppleSteps] = useState(false);
   return (
-    <Dropdown>
-      <Button size="sm" variant="ghost" className="gap-2 px-1.5" aria-label={t.header.account(me.user.fullName)}>
-        <span className="grid size-7 place-items-center rounded-full bg-accent-soft text-xs font-semibold text-accent">
-          {initials(me.user.fullName)}
-        </span>
-        <span className="hidden max-w-40 truncate text-sm font-medium lg:inline">{me.user.fullName}</span>
-      </Button>
-      <Dropdown.Popover placement="bottom end" className="w-60">
-        <div className="px-3 pt-3 pb-1">
-          <p className="truncate text-sm font-semibold">{me.user.fullName}</p>
-          <p className="truncate text-xs text-muted">{me.user.username}</p>
-        </div>
-        <Dropdown.Menu
-          aria-label={t.header.accountMenu}
-          onAction={(key) => {
-            if (key === 'logout') logout.mutate(undefined, { onSettled: () => navigate({ to: '/' }) });
-            else if (key === 'sq' || key === 'en') choose(key);
-          }}
-        >
-          <Dropdown.Section aria-label={t.header.language}>
-            {LOCALES.map((code) => (
-              <Dropdown.Item key={code} id={code} textValue={LANGUAGE_NAMES[code]} lang={code}>
-                <Languages className="size-4" />
-                <Label>{LANGUAGE_NAMES[code]}</Label>
-                {code === locale && <Check className="ml-auto size-4 text-accent" aria-label="✓" />}
+    <>
+      <Dropdown>
+        <Button size="sm" variant="ghost" className="gap-2 px-1.5" aria-label={t.header.account(me.user.fullName)}>
+          <span className="grid size-7 place-items-center rounded-full bg-accent-soft text-xs font-semibold text-accent">
+            {initials(me.user.fullName)}
+          </span>
+          <span className="hidden max-w-40 truncate text-sm font-medium lg:inline">{me.user.fullName}</span>
+        </Button>
+        <Dropdown.Popover placement="bottom end" className="w-60">
+          <div className="px-3 pt-3 pb-1">
+            <p className="truncate text-sm font-semibold">{me.user.fullName}</p>
+            <p className="truncate text-xs text-muted">{me.user.username}</p>
+          </div>
+          <Dropdown.Menu
+            aria-label={t.header.accountMenu}
+            onAction={(key) => {
+              if (key === 'logout') logout.mutate(undefined, { onSettled: () => navigate({ to: '/' }) });
+              else if (key === 'install') installable === 'apple' ? setAppleSteps(true) : void install();
+              else if (key === 'sq' || key === 'en') choose(key);
+            }}
+          >
+            <Dropdown.Section aria-label={t.header.language}>
+              {LOCALES.map((code) => (
+                <Dropdown.Item key={code} id={code} textValue={LANGUAGE_NAMES[code]} lang={code}>
+                  <Languages className="size-4" />
+                  <Label>{LANGUAGE_NAMES[code]}</Label>
+                  {code === locale && <Check className="ml-auto size-4 text-accent" aria-label="✓" />}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Section>
+            {installable ? (
+              <Dropdown.Item id="install" textValue={t.install.item}>
+                <Smartphone className="size-4" />
+                <Label>{t.install.item}</Label>
               </Dropdown.Item>
-            ))}
-          </Dropdown.Section>
-          <Dropdown.Item id="logout" textValue={t.header.signOut}>
-            <LogOut className="size-4" />
-            <Label>{t.header.signOut}</Label>
-          </Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown.Popover>
-    </Dropdown>
+            ) : null}
+            <Dropdown.Item id="logout" textValue={t.header.signOut}>
+              <LogOut className="size-4" />
+              <Label>{t.header.signOut}</Label>
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown.Popover>
+      </Dropdown>
+      <Modal.Backdrop isOpen={appleSteps} onOpenChange={setAppleSteps}>
+        <Modal.Container size="sm">
+          <Modal.Dialog aria-label={t.install.appleTitle}>
+            <Modal.Header>
+              <Modal.Heading>{t.install.appleTitle}</Modal.Heading>
+            </Modal.Header>
+            <Modal.Body>
+              <ol className="list-decimal space-y-1 pl-5 text-sm">
+                {t.install.appleSteps.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ol>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button slot="close" variant="primary">
+                {t.common.close}
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
+    </>
   );
 }
 
