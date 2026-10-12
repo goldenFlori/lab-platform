@@ -6,9 +6,14 @@ import {
   type LiveHelpQueue,
   type LiveHelpState,
   type LivePresence,
+  type LiveQuiz,
+  type LiveQuizReveal,
+  type LiveQuizStart,
+  type LiveQuizTally,
   type LiveResult,
   type LiveRole,
   type LiveStep,
+  QUIZ_LIMITS,
   REACTIONS,
 } from '../../shared/live';
 
@@ -22,12 +27,20 @@ import {
 // - Challenges: the host starts one on an exercise; students' checks of it send their results,
 //   and the staff see the room's board (#67).
 // - Help: a student asks, staff take and close; reactions pass to the staff, throttled (#68).
+// - Quick questions: the host asks one; each student answers once; the staff see the counts, and
+//   everyone sees the right option once the host reveals it (#87).
 
 /** Who a socket belongs to, kept with it across hibernation. */
 type Member = { userId: string; name: string; role: LiveRole };
 
 /** Each student's latest result in the running challenge. */
 type Results = Record<string, { name: string; status: LiveResult['status']; error: string | null }>;
+
+/** The running question, with its right option; `revealed` once the host showed it. */
+type Quiz = LiveQuizStart & { id: string; revealed: boolean };
+
+/** Each student's answer to the running question. */
+type Answers = Record<string, { name: string; choice: number }>;
 
 /** The help queue, by student. */
 type HelpQueue = Record<string, { name: string; where: string; since: number; takenBy: string | null }>;
@@ -64,6 +77,28 @@ function parseChallenge(data: unknown): LiveChallenge | null {
   if (typeof m.title !== 'string' || !m.title.trim() || m.title.length > 160) return null;
   return { t: 'challenge', notebook: m.notebook, cell: m.cell as number, title: m.title };
 }
+
+function parseQuiz(data: unknown): LiveQuizStart | null {
+  const m = record(data);
+  if (m?.t !== 'quiz' || typeof m.question !== 'string' || !Array.isArray(m.options)) return null;
+  const question = m.question.trim();
+  const options = m.options.map((o) => (typeof o === 'string' ? o.trim() : ''));
+  const { question: maxQuestion, option: maxOption, minOptions, maxOptions } = QUIZ_LIMITS;
+  if (!question || question.length > maxQuestion) return null;
+  if (options.length < minOptions || options.length > maxOptions) return null;
+  if (options.some((o) => !o || o.length > maxOption)) return null;
+  if (!Number.isInteger(m.correct) || (m.correct as number) < 0 || (m.correct as number) >= options.length) return null;
+  return { t: 'quiz', question, options, correct: m.correct as number };
+}
+
+/** The question as one role sees it: students get the right option only once it is revealed. */
+const quizFor = (quiz: Quiz, role: LiveRole): LiveQuiz => ({
+  t: 'quiz',
+  id: quiz.id,
+  question: quiz.question,
+  options: quiz.options,
+  correct: role !== 'student' || quiz.revealed ? quiz.correct : null,
+});
 
 const STATUSES = new Set(['pass', 'fail', 'todo', 'error']);
 
@@ -108,6 +143,13 @@ export class LiveSession extends DurableObject<Env> {
     ]);
     if (step && member.role !== 'host') server.send(JSON.stringify(step));
     if (challenge) server.send(JSON.stringify(challenge));
+    const quiz = await this.ctx.storage.get<Quiz>('quiz');
+    if (quiz) {
+      server.send(JSON.stringify(quizFor(quiz, member.role)));
+      const mine = (await this.answers())[member.userId];
+      if (mine) server.send(JSON.stringify({ t: 'quiz-mine', id: quiz.id, choice: mine.choice }));
+      if (quiz.revealed) server.send(JSON.stringify(await this.revealMessage(quiz)));
+    }
     if (member.role === 'student') {
       const request = (await this.helpQueue())[member.userId];
       if (request) server.send(JSON.stringify(helpState(request)));
@@ -147,6 +189,29 @@ export class LiveSession extends DurableObject<Env> {
         this.sendAll({ t: 'challenge-stop' });
         return;
       }
+      const start = parseQuiz(data);
+      if (start) {
+        const quiz: Quiz = { ...start, id: crypto.randomUUID(), revealed: false };
+        await this.ctx.storage.put({ quiz, answers: {} satisfies Answers });
+        for (const socket of this.open()) {
+          socket.send(JSON.stringify(quizFor(quiz, (socket.deserializeAttachment() as Member).role)));
+        }
+        await this.broadcastTally();
+        return;
+      }
+      if (record(data)?.t === 'quiz-reveal') {
+        const quiz = await this.ctx.storage.get<Quiz>('quiz');
+        if (!quiz) return;
+        quiz.revealed = true;
+        await this.ctx.storage.put('quiz', quiz);
+        this.sendAll(await this.revealMessage(quiz));
+        return;
+      }
+      if (record(data)?.t === 'quiz-stop') {
+        await this.ctx.storage.delete(['quiz', 'answers']);
+        this.sendAll({ t: 'quiz-stop' });
+        return;
+      }
     }
 
     const m = record(data);
@@ -183,6 +248,19 @@ export class LiveSession extends DurableObject<Env> {
       if (now - (this.reacted.get(member.userId) ?? 0) < REACT_EVERY_MS) return;
       this.reacted.set(member.userId, now);
       this.sendStaff({ t: 'react', emoji: m.emoji });
+      return;
+    }
+
+    if (member.role === 'student' && m?.t === 'answer' && typeof m.id === 'string' && Number.isInteger(m.choice)) {
+      const quiz = await this.ctx.storage.get<Quiz>('quiz');
+      const choice = m.choice as number;
+      if (!quiz || quiz.id !== m.id || quiz.revealed || choice < 0 || choice >= quiz.options.length) return;
+      const answers = await this.answers();
+      if (answers[member.userId]) return;
+      answers[member.userId] = { name: member.name, choice };
+      await this.ctx.storage.put('answers', answers);
+      this.sendTo(member.userId, { t: 'quiz-mine', id: quiz.id, choice });
+      await this.broadcastTally();
       return;
     }
 
@@ -265,6 +343,43 @@ export class LiveSession extends DurableObject<Env> {
     };
     this.sendStaff(presence, leaving);
     await this.broadcastBoard(leaving);
+    await this.broadcastTally(leaving);
+  }
+
+  private async answers() {
+    return (await this.ctx.storage.get<Answers>('answers')) ?? {};
+  }
+
+  private async counts(quiz: Quiz) {
+    const counts = quiz.options.map(() => 0);
+    for (const answer of Object.values(await this.answers())) counts[answer.choice] = (counts[answer.choice] ?? 0) + 1;
+    return counts;
+  }
+
+  private async revealMessage(quiz: Quiz): Promise<LiveQuizReveal> {
+    return { t: 'quiz-reveal', id: quiz.id, correct: quiz.correct, counts: await this.counts(quiz) };
+  }
+
+  /** How the room answered the running question, for the staff. */
+  private async broadcastTally(leaving?: WebSocket) {
+    const quiz = await this.ctx.storage.get<Quiz>('quiz');
+    if (!quiz) return;
+    const answers = await this.answers();
+    const { students } = this.students(leaving);
+    const names = quiz.options.map((_, i) =>
+      Object.values(answers)
+        .filter((a) => a.choice === i)
+        .map((a) => a.name)
+        .sort((a, b) => a.localeCompare(b)),
+    );
+    const tally: LiveQuizTally = {
+      t: 'quiz-tally',
+      id: quiz.id,
+      counts: names.map((list) => list.length),
+      waiting: [...students.keys()].filter((id) => !answers[id]).length,
+      names,
+    };
+    this.sendStaff(tally, leaving);
   }
 
   /** How the room is doing on the running challenge, for the staff. */

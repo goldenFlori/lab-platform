@@ -64,6 +64,33 @@ export type Reaction = (typeof REACTIONS)[number];
 /** A student's reaction (#68), passed to the staff; one per student every few seconds. */
 export type LiveReact = { t: 'react'; emoji: Reaction };
 
+/**
+ * A quick question (#87). The host sends it with the right option; everyone gets it with an id,
+ * students without the answer (`correct` null) until the host reveals it.
+ */
+export type LiveQuizStart = { t: 'quiz'; question: string; options: string[]; correct: number };
+export type LiveQuiz = { t: 'quiz'; id: string; question: string; options: string[]; correct: number | null };
+
+/** A student's answer: the first one counts. */
+export type LiveAnswer = { t: 'answer'; id: string; choice: number };
+
+/** To the student who answered (also when they come back): their choice. */
+export type LiveQuizMine = { t: 'quiz-mine'; id: string; choice: number };
+
+/** To staff: how the room answered, per option, and who, by option. Names reach staff only. */
+export type LiveQuizTally = { t: 'quiz-tally'; id: string; counts: number[]; waiting: number; names: string[][] };
+
+/** To everyone, once the host reveals it: the right option and the counts. */
+export type LiveQuizReveal = { t: 'quiz-reveal'; id: string; correct: number; counts: number[] };
+
+export type LiveQuizStop = { t: 'quiz-stop' };
+
+/** From the host: show the right option to everyone. */
+export type LiveQuizRevealRequest = { t: 'quiz-reveal' };
+
+/** Limits on a question, kept within a socket message. */
+export const QUIZ_LIMITS = { question: 300, option: 120, minOptions: 2, maxOptions: 4 } as const;
+
 /** To everyone: the host ended the session. */
 export type LiveEnded = { t: 'ended' };
 
@@ -79,4 +106,12 @@ export type LiveMessage =
   | LiveHelpTake
   | LiveHelpQueue
   | LiveHelpState
-  | LiveReact;
+  | LiveReact
+  | LiveQuiz
+  | LiveQuizStart
+  | LiveAnswer
+  | LiveQuizRevealRequest
+  | LiveQuizMine
+  | LiveQuizTally
+  | LiveQuizReveal
+  | LiveQuizStop;

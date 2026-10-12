@@ -87,11 +87,42 @@ assert shuma_cift([1, 2, 3, 4]) == 6, "shuma_cift([1, 2, 3, 4]) duhet 6"
 assert shuma_cift([]) == 0, "lista bosh jep 0"
 `;
 
-/** Answers at once (a variant when asked for one, else the question's start), and reports 3 neurons. */
+/** Quick questions as the copilot writes them: the right answers are B and A. */
+const FAKE_QUIZ = `### QUESTION
+Sa krahasime bën Insertion Sort në një listë të renditur me 5 elemente?
+### A
+0
+### B
+4
+### C
+10
+### D
+25
+### ANSWER
+B
+### QUESTION
+Cila strukturë përdoret nga BFS?
+### A
+Radha
+### B
+Stiva
+### C
+Pema
+### D
+Grumbulli
+### ANSWER
+A
+`;
+
+/** Answers at once (a variant or questions when asked, else the question's start), and reports 3 neurons. */
 const fakeProvider: AiProvider = {
   async stream(_model, messages) {
-    const asksVariant = messages[0]?.content.includes('### SOLUTION');
-    const answer = asksVariant ? FAKE_VARIANT : `Përgjigje prove: ${messages.at(-1)?.content.slice(0, 60) ?? ''}`;
+    const system = messages[0]?.content ?? '';
+    const answer = system.includes('### SOLUTION')
+      ? FAKE_VARIANT
+      : system.includes('### ANSWER')
+        ? FAKE_QUIZ
+        : `Përgjigje prove: ${messages.at(-1)?.content.slice(0, 60) ?? ''}`;
     const words = answer.split(' ');
     const text = new ReadableStream<string>({
       start(controller) {
