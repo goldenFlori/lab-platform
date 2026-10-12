@@ -8,6 +8,7 @@ import {
   type InferInsertModel,
   type InferSelectModel,
   inArray,
+  isNotNull,
   isNull,
   like,
   ne,
@@ -1153,6 +1154,100 @@ function tenantAi(db: Db, orgId: string) {
   };
 }
 
+/**
+ * One user's progress in a course (#99), in one batch whatever the number of notebooks: their
+ * solved exercises (of the ones still set), the labs they opened, their groups' deadlines, their
+ * submissions and their released grades.
+ */
+function tenantProgress(db: Db, orgId: string) {
+  return {
+    async of(courseId: string, userId: string, groupIds: string[]) {
+      const ofCourse = db
+        .select({ id: notebooks.id })
+        .from(notebooks)
+        .innerJoin(labs, and(eq(labs.id, notebooks.labId), eq(labs.orgId, orgId)))
+        .where(and(eq(notebooks.orgId, orgId), eq(labs.courseId, courseId)));
+      const [set, solved, opened, due, handed, graded] = await db.batch([
+        db
+          .select({ notebookId: exercises.notebookId, n: sql<number>`count(*)` })
+          .from(exercises)
+          .where(and(eq(exercises.orgId, orgId), inArray(exercises.notebookId, ofCourse)))
+          .groupBy(exercises.notebookId),
+        db
+          .select({ notebookId: exerciseCompletions.notebookId, n: sql<number>`count(*)` })
+          .from(exerciseCompletions)
+          .innerJoin(
+            exercises,
+            and(
+              eq(exercises.orgId, orgId),
+              eq(exercises.notebookId, exerciseCompletions.notebookId),
+              eq(exercises.cell, exerciseCompletions.cell),
+            ),
+          )
+          .where(
+            and(
+              eq(exerciseCompletions.orgId, orgId),
+              eq(exerciseCompletions.userId, userId),
+              inArray(exerciseCompletions.notebookId, ofCourse),
+            ),
+          )
+          .groupBy(exerciseCompletions.notebookId),
+        db
+          .selectDistinct({ labId: labActivity.labId })
+          .from(labActivity)
+          .innerJoin(labs, and(eq(labs.id, labActivity.labId), eq(labs.orgId, orgId)))
+          .where(
+            and(
+              eq(labActivity.orgId, orgId),
+              eq(labActivity.userId, userId),
+              eq(labActivity.kind, 'view'),
+              eq(labs.courseId, courseId),
+            ),
+          ),
+        db
+          .select({ notebookId: assignments.notebookId, dueAt: sql<number>`max(${assignments.dueAt})` })
+          .from(assignments)
+          .where(
+            and(
+              eq(assignments.orgId, orgId),
+              inArray(assignments.groupId, groupIds.length ? groupIds : ['']),
+              inArray(assignments.notebookId, ofCourse),
+            ),
+          )
+          .groupBy(assignments.notebookId),
+        db
+          .select({ notebookId: submissions.notebookId, submittedAt: submissions.submittedAt })
+          .from(submissions)
+          .where(
+            and(
+              eq(submissions.orgId, orgId),
+              eq(submissions.userId, userId),
+              inArray(submissions.notebookId, ofCourse),
+            ),
+          ),
+        db
+          .select({
+            notebookId: grades.notebookId,
+            autoScore: grades.autoScore,
+            maxScore: grades.maxScore,
+            score: grades.score,
+            feedback: grades.feedback,
+          })
+          .from(grades)
+          .where(
+            and(
+              eq(grades.orgId, orgId),
+              eq(grades.userId, userId),
+              isNotNull(grades.releasedAt),
+              inArray(grades.notebookId, ofCourse),
+            ),
+          ),
+      ]);
+      return { set, solved, opened, due, handed, graded };
+    },
+  };
+}
+
 export function forTenant(db: Db, orgId: string) {
   const members = tenantUsers(db, orgId);
   return {
@@ -1174,6 +1269,7 @@ export function forTenant(db: Db, orgId: string) {
     staff: tenantStaff(db, orgId),
     live: tenantLive(db, orgId),
     ai: tenantAi(db, orgId),
+    progress: tenantProgress(db, orgId),
   };
 }
 

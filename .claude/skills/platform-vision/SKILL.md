@@ -257,7 +257,10 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-12:** #106 fixed: the two heaviest API tests (30 Live Lab sign-ins, 100 failed sign-ins)
   get a 30 s limit, after a busy CI runner passed the 5 s default on main and #104 was not deployed
   (PR #107).
-- **Next:** #99, a "My progress" page for students.
+- **2026-10-12:** #99 done. Students open "My progress" from their course. It shows the labs they
+  opened, the exercises solved per notebook, their deadlines and hand-ins, and their released grades
+  with feedback. Only their own data, gathered in one batch of queries (PR #105).
+- **Next:** #100, the privacy page and "My data".
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 

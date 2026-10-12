@@ -11,6 +11,7 @@ import {
   Plus,
   RefreshCw,
   Trash2,
+  TrendingUp,
   Unlock,
   Users,
 } from 'lucide-react';
@@ -68,6 +69,15 @@ function CoursePage() {
           <p className="mt-1 text-muted">{t.course.academicYear(course.academicYear)}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {!isStaff && (
+            <Link
+              to="/o/$org/courses/$courseId/progress"
+              params={{ org, courseId }}
+              className="button button--primary gap-2"
+            >
+              <TrendingUp className="size-4" /> {t.progress.open}
+            </Link>
+          )}
           {permissions.analytics && (
             <Link
               to="/o/$org/courses/$courseId/activity"
