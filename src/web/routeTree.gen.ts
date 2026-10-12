@@ -12,10 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as AuthedCoursesRouteImport } from './routes/_authed/courses'
 import { Route as AuthedJoinRouteImport } from './routes/_authed/join'
 import { Route as VisualizationsIndexRouteImport } from './routes/visualizations/index'
 import { Route as VisualizationsVizIdRouteImport } from './routes/visualizations/$vizId'
+import { Route as AuthedAccountDataRouteImport } from './routes/_authed/account/data'
 import { Route as AuthedOOrgCoursesCourseIdIndexRouteImport } from './routes/_authed/o/$org/courses/$courseId/index'
 import { Route as AuthedOOrgCoursesCourseIdActivityRouteImport } from './routes/_authed/o/$org/courses/$courseId/activity'
 import { Route as AuthedOOrgCoursesCourseIdProgressRouteImport } from './routes/_authed/o/$org/courses/$courseId/progress'
@@ -39,6 +41,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthedCoursesRoute = AuthedCoursesRouteImport.update({
   id: '/courses',
   path: '/courses',
@@ -58,6 +65,11 @@ const VisualizationsVizIdRoute = VisualizationsVizIdRouteImport.update({
   id: '/visualizations/$vizId',
   path: '/visualizations/$vizId',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedAccountDataRoute = AuthedAccountDataRouteImport.update({
+  id: '/account/data',
+  path: '/account/data',
+  getParentRoute: () => AuthedRoute,
 } as any)
 const AuthedOOrgCoursesCourseIdIndexRoute =
   AuthedOOrgCoursesCourseIdIndexRouteImport.update({
@@ -111,10 +123,12 @@ const AuthedOOrgCoursesCourseIdLabsLabIdSubmissionsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/courses': typeof AuthedCoursesRoute
   '/join': typeof AuthedJoinRoute
   '/visualizations/$vizId': typeof VisualizationsVizIdRoute
   '/visualizations/': typeof VisualizationsIndexRoute
+  '/account/data': typeof AuthedAccountDataRoute
   '/o/$org/courses/$courseId/activity': typeof AuthedOOrgCoursesCourseIdActivityRoute
   '/o/$org/courses/$courseId/progress': typeof AuthedOOrgCoursesCourseIdProgressRoute
   '/o/$org/courses/$courseId/': typeof AuthedOOrgCoursesCourseIdIndexRoute
@@ -127,10 +141,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/courses': typeof AuthedCoursesRoute
   '/join': typeof AuthedJoinRoute
   '/visualizations/$vizId': typeof VisualizationsVizIdRoute
   '/visualizations': typeof VisualizationsIndexRoute
+  '/account/data': typeof AuthedAccountDataRoute
   '/o/$org/courses/$courseId/activity': typeof AuthedOOrgCoursesCourseIdActivityRoute
   '/o/$org/courses/$courseId/progress': typeof AuthedOOrgCoursesCourseIdProgressRoute
   '/o/$org/courses/$courseId': typeof AuthedOOrgCoursesCourseIdIndexRoute
@@ -145,10 +161,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/_authed/courses': typeof AuthedCoursesRoute
   '/_authed/join': typeof AuthedJoinRoute
   '/visualizations/$vizId': typeof VisualizationsVizIdRoute
   '/visualizations/': typeof VisualizationsIndexRoute
+  '/_authed/account/data': typeof AuthedAccountDataRoute
   '/_authed/o/$org/courses/$courseId/activity': typeof AuthedOOrgCoursesCourseIdActivityRoute
   '/_authed/o/$org/courses/$courseId/progress': typeof AuthedOOrgCoursesCourseIdProgressRoute
   '/_authed/o/$org/courses/$courseId/': typeof AuthedOOrgCoursesCourseIdIndexRoute
@@ -163,10 +181,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/privacy'
     | '/courses'
     | '/join'
     | '/visualizations/$vizId'
     | '/visualizations/'
+    | '/account/data'
     | '/o/$org/courses/$courseId/activity'
     | '/o/$org/courses/$courseId/progress'
     | '/o/$org/courses/$courseId/'
@@ -179,10 +199,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/privacy'
     | '/courses'
     | '/join'
     | '/visualizations/$vizId'
     | '/visualizations'
+    | '/account/data'
     | '/o/$org/courses/$courseId/activity'
     | '/o/$org/courses/$courseId/progress'
     | '/o/$org/courses/$courseId'
@@ -196,10 +218,12 @@ export interface FileRouteTypes {
     | '/'
     | '/_authed'
     | '/login'
+    | '/privacy'
     | '/_authed/courses'
     | '/_authed/join'
     | '/visualizations/$vizId'
     | '/visualizations/'
+    | '/_authed/account/data'
     | '/_authed/o/$org/courses/$courseId/activity'
     | '/_authed/o/$org/courses/$courseId/progress'
     | '/_authed/o/$org/courses/$courseId/'
@@ -214,6 +238,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthedRoute: typeof AuthedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  PrivacyRoute: typeof PrivacyRoute
   VisualizationsVizIdRoute: typeof VisualizationsVizIdRoute
   VisualizationsIndexRoute: typeof VisualizationsIndexRoute
 }
@@ -239,6 +264,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authed/courses': {
@@ -268,6 +300,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/visualizations/$vizId'
       preLoaderRoute: typeof VisualizationsVizIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authed/account/data': {
+      id: '/_authed/account/data'
+      path: '/account/data'
+      fullPath: '/account/data'
+      preLoaderRoute: typeof AuthedAccountDataRouteImport
+      parentRoute: typeof AuthedRoute
     }
     '/_authed/o/$org/courses/$courseId/': {
       id: '/_authed/o/$org/courses/$courseId/'
@@ -331,6 +370,7 @@ declare module '@tanstack/react-router' {
 interface AuthedRouteChildren {
   AuthedCoursesRoute: typeof AuthedCoursesRoute
   AuthedJoinRoute: typeof AuthedJoinRoute
+  AuthedAccountDataRoute: typeof AuthedAccountDataRoute
   AuthedOOrgCoursesCourseIdActivityRoute: typeof AuthedOOrgCoursesCourseIdActivityRoute
   AuthedOOrgCoursesCourseIdProgressRoute: typeof AuthedOOrgCoursesCourseIdProgressRoute
   AuthedOOrgCoursesCourseIdIndexRoute: typeof AuthedOOrgCoursesCourseIdIndexRoute
@@ -344,6 +384,7 @@ interface AuthedRouteChildren {
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedCoursesRoute: AuthedCoursesRoute,
   AuthedJoinRoute: AuthedJoinRoute,
+  AuthedAccountDataRoute: AuthedAccountDataRoute,
   AuthedOOrgCoursesCourseIdActivityRoute:
     AuthedOOrgCoursesCourseIdActivityRoute,
   AuthedOOrgCoursesCourseIdProgressRoute:
@@ -368,6 +409,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthedRoute: AuthedRouteWithChildren,
   LoginRoute: LoginRoute,
+  PrivacyRoute: PrivacyRoute,
   VisualizationsVizIdRoute: VisualizationsVizIdRoute,
   VisualizationsIndexRoute: VisualizationsIndexRoute,
 }

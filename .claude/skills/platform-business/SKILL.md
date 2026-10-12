@@ -101,6 +101,8 @@ on startupalbania.gov.al before applying.
   Clarify this in writing early.
 - **Data protection:** the Albanian personal data protection law (aligned with GDPR). Institutions
   will need a data processing agreement, a privacy policy, minimal data, and export and delete.
+  The privacy page, the data download and deletion requests exist (#100); the data processing
+  agreement and a tool to erase an account do not yet.
 - **Repo and licence:**
   - Keep the platform code private and proprietary. In the course site, `package.json` says
     "ISC", which is only npm's default.

@@ -1,0 +1,45 @@
+import { z } from 'zod';
+
+// Privacy (#100): everything stored about a user, as one download, and their request to delete it.
+// The app imports only types from this file.
+
+type When = string;
+
+/** What one organization holds about the user. Names of courses, labs and notebooks, not ids. */
+export type OrganizationData = {
+  organization: { name: string; slug: string };
+  memberships: { role: string; course: string | null; group: string | null; since: When }[];
+  labsOpened: { lab: string; kind: string; day: string }[];
+  codeEdits: { notebook: string; cell: number; code: string; savedAt: When }[];
+  exercisesSolved: { notebook: string; cell: number; at: When }[];
+  submissions: {
+    notebook: string;
+    code: { cell: number; code: string }[];
+    solved: number[];
+    attempts: number;
+    at: When;
+  }[];
+  /** Only released grades: drafts are the staff's until they release them. */
+  grades: { notebook: string; score: number; maxScore: number; feedback: string | null; releasedAt: When }[];
+  aiQuestions: { notebook: string; cell: number; code: string; error: string; answer: string; at: When }[];
+  aiUse: { course: string; day: string; requests: number }[];
+  deletionRequests: { note: string | null; at: When; handledAt: When | null }[];
+};
+
+export type MyData = {
+  exportedAt: When;
+  account: { username: string; fullName: string; email: string | null; locale: string | null; since: When };
+  organizations: OrganizationData[];
+};
+
+export const deletionRequestInput = z.object({ note: z.string().trim().max(500).optional() });
+
+/** A deletion request, as the institution's admin sees it. */
+export type DeletionRequestView = {
+  id: string;
+  name: string;
+  username: string;
+  note: string | null;
+  createdAt: When;
+  handledAt: When | null;
+};

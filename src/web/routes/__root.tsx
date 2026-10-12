@@ -1,6 +1,6 @@
 import { RouterProvider as AriaRouterProvider } from '@heroui/react';
 import type { QueryClient } from '@tanstack/react-query';
-import { createRootRouteWithContext, HeadContent, Outlet, useRouter } from '@tanstack/react-router';
+import { createRootRouteWithContext, HeadContent, Link, Outlet, useRouter } from '@tanstack/react-router';
 import { NotFoundPage } from '../components/NotFoundPage';
 import { SiteHeader } from '../components/SiteHeader';
 import { useT } from '../i18n';
@@ -37,6 +37,12 @@ function RootLayout() {
       <main id="main">
         <Outlet />
       </main>
+      <footer className="container-page flex flex-wrap items-center justify-between gap-3 border-t border-border py-6 text-sm text-muted">
+        <span>{APP_NAME}</span>
+        <Link to="/privacy" className="hover:text-foreground">
+          {t.footer.privacy}
+        </Link>
+      </footer>
     </AriaRouterProvider>
   );
 }

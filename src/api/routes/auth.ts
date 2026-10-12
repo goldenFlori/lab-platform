@@ -1,11 +1,13 @@
 import { zValidator } from '@hono/zod-validator';
 import { type Context, Hono } from 'hono';
 import { loginInput, type Me, updateMeInput } from '../../shared/auth';
+import { deletionRequestInput, type MyData } from '../../shared/my-data';
 import { hashPassword, needsRehash, verifyPassword } from '../../shared/password';
 import { LOGIN_WINDOW_SECONDS, MAX_FAILURES_PER_IP, MAX_FAILURES_PER_USERNAME, windowCutoff } from '../auth/limits';
 import { endSession, requireUser, startSession } from '../auth/session';
 import { createDb, type Db } from '../db';
 import {
+  accountOf,
   clearFailures,
   findAccount,
   organizationsOf,
@@ -15,6 +17,7 @@ import {
   setLocale,
   setPasswordHash,
 } from '../db/auth';
+import { forTenant } from '../db/tenant';
 import type { AppEnv } from '../env';
 
 async function meOf(db: Db, user: SessionUser): Promise<Me> {
@@ -84,4 +87,37 @@ export const meRoutes = new Hono<AppEnv>()
     const db = createDb(c.env.DB);
     await setLocale(db, user.id, locale);
     return c.json(await meOf(db, { ...user, locale }));
+  })
+  // Everything stored about the user, from every organization they belong to, as one file (#100).
+  .get('/data', requireUser, async (c) => {
+    const user = c.get('user') as SessionUser;
+    const db = createDb(c.env.DB);
+    const [account, orgs] = await Promise.all([accountOf(db, user.id), organizationsOf(db, user.id)]);
+    if (!account) return c.json({ error: 'not_found' }, 404);
+    const data: MyData = {
+      exportedAt: new Date().toISOString(),
+      account: { ...account, since: account.since.toISOString() },
+      organizations: await Promise.all(
+        orgs.map(async (org) => ({
+          organization: { name: org.name, slug: org.slug },
+          ...(await forTenant(db, org.id).personal.export(user.id)),
+        })),
+      ),
+    };
+    c.header(
+      'Content-Disposition',
+      `attachment; filename="lab-platform-${account.username.replace(/[^\w.-]/g, '_')}.json"`,
+    );
+    c.header('Cache-Control', 'no-store');
+    return c.json(data);
+  })
+
+  // Asks each of the user's organizations to delete their data; their admins handle it (#100).
+  .post('/deletion-request', requireUser, zValidator('json', deletionRequestInput, invalidRequest), async (c) => {
+    const user = c.get('user') as SessionUser;
+    const db = createDb(c.env.DB);
+    const note = c.req.valid('json').note || null;
+    for (const org of await organizationsOf(db, user.id))
+      await forTenant(db, org.id).personal.requestDeletion(user.id, note);
+    return c.body(null, 204);
   });

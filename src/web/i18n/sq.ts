@@ -540,6 +540,96 @@ export const sq = {
     missed: (when: string) => `Afati mbaroi më ${when}, pa dorëzim`,
     grade: (score: number, of: number) => `Nota: ${score}/${of}`,
   },
+  privacy: {
+    title: 'Privatësia',
+    updated: 'Përditësuar më 12 tetor 2026',
+    intro:
+      'Kjo faqe tregon cilat të dhëna ruan Lab Platform, pse, ku, për sa kohë dhe kush i sheh. Institucioni juaj (p.sh. fakulteti) vendos për të dhënat e studentëve të tij; platforma i përpunon në emër të tij.',
+    sections: [
+      {
+        heading: 'Çfarë ruajmë',
+        items: [
+          'Llogarinë: emrin e plotë, emrin e përdoruesit dhe fjalëkalimin vetëm si hash (asnjëherë vetë fjalëkalimin); email-in, nëse ka.',
+          'Në cilat institucione, kurse dhe grupe jeni, dhe me çfarë roli.',
+          'Kodin që ndryshoni në fletore, që ta gjeni në çdo pajisje. Stafi nuk e sheh derisa ta dorëzoni.',
+          'Ushtrimet që zgjidhni, punën që dorëzoni dhe notat.',
+          'Aktivitetin si numra: të shumtën një shënim në ditë për çdo laborator dhe lloj (e hapët, e shkarkuat, provuat një vizualizim, zgjidhët një ushtrim).',
+          'Pyetjet "Shpjego gabimin" me përgjigjen e AI-së, dhe sa kërkesa me AI bëni në ditë.',
+          'Një cookie për hyrjen, që ju mban të identifikuar.',
+        ],
+      },
+      {
+        heading: 'Kush i sheh',
+        items: [
+          'Ju: të gjitha, te "Progresi im" dhe te "Të dhënat e mia".',
+          'Stafi i kursit ose i grupit tuaj: punën e dorëzuar, notat, pyetjet me AI dhe, gjatë një Live Lab, emrin tuaj kur jeni i lidhur ose kërkoni ndihmë. Raportet e aktivitetit tregojnë vetëm numra, kurrë emra.',
+          'Studentët e tjerë: asgjë nga e juaja.',
+          'Pronari i platformës: vetëm për mbështetje dhe kopje rezervë.',
+        ],
+      },
+      {
+        heading: 'Ku ruhen',
+        items: [
+          'Te Cloudflare. Baza e të dhënave është në juridiksionin e Bashkimit Evropian, ndaj të dhënat nuk dalin nga BE-ja.',
+          'Kopjet rezervë javore enkriptohen para se të dalin nga Cloudflare dhe mbahen 90 ditë.',
+        ],
+      },
+      {
+        heading: 'AI',
+        items: [
+          'AI-ja punon te Cloudflare (Workers AI) dhe ndizet nga pedagogu për çdo kurs.',
+          'Merr vetëm kodin, gabimin dhe tekstin e laboratorit; kurrë emrin tuaj.',
+          'Për ushtrimet jep udhëzime, jo zgjidhjen, dhe nuk vendos nota.',
+        ],
+      },
+      {
+        heading: 'Për sa kohë',
+        items: [
+          'Hyrja: 30 ditë pa përdorim.',
+          'Pyetjet me AI: 180 ditë.',
+          'Pjesa tjetër: sa kohë ekziston kursi. Kur institucioni fshin një kurs, fshihen edhe të dhënat e tij.',
+        ],
+      },
+      {
+        heading: 'Pa gjurmim',
+        items: ['Asnjë reklamë, asnjë analitikë nga palë të treta, asnjë cookie tjetër përveç asaj të hyrjes.'],
+      },
+      {
+        heading: 'Të drejtat tuaja',
+        items: [
+          'Të shkarkoni gjithçka që ruhet për ju, si një skedar, te "Të dhënat e mia".',
+          'Të kërkoni fshirjen e të dhënave: kërkesa i shkon administratorit të institucionit tuaj.',
+          'Të kërkoni korrigjim: përmes pedagogut ose administratorit të institucionit.',
+        ],
+      },
+    ],
+    myData: 'Të dhënat e mia',
+  },
+  myData: {
+    title: 'Të dhënat e mia',
+    lead: 'Gjithçka që ruhet për ju, në të gjitha institucionet ku jeni.',
+    downloadTitle: 'Shkarko të dhënat',
+    downloadText: 'Një skedar JSON me llogarinë, kurset, kodin tuaj, dorëzimet, notat e publikuara dhe pyetjet me AI.',
+    download: 'Shkarko (JSON)',
+    deleteTitle: 'Kërko fshirjen',
+    deleteText:
+      'Kërkesa i shkon administratorit të institucionit tuaj, i cili e trajton. Një notë mund të duhet të mbetet në regjistrat e institucionit.',
+    note: 'Shënim për administratorin (jo i detyrueshëm)',
+    request: 'Dërgo kërkesën',
+    sent: 'Kërkesa u dërgua. Administratori i institucionit do ta trajtojë.',
+    failed: 'Kërkesa nuk u dërgua. Provoni sërish.',
+    privacy: 'Lexoni politikën e privatësisë',
+  },
+  deletions: {
+    title: (open: number) => `Kërkesat për fshirjen e të dhënave (${open} të hapura)`,
+    help: 'Përdoruesit që kërkuan fshirjen e të dhënave të tyre në këtë institucion. Hiqini nga kurset dhe grupet; për fshirje të plotë të llogarisë kontaktoni pronarin e platformës. Pastaj shënojeni të trajtuar.',
+    asked: (when: string) => `Kërkuar më ${when}`,
+    handled: (when: string) => `Trajtuar më ${when}`,
+    markHandled: 'Shëno të trajtuar',
+  },
+  footer: {
+    privacy: 'Privatësia',
+  },
   install: {
     item: 'Instalo aplikacionin',
     appleTitle: 'Instalo aplikacionin në iPhone ose iPad',

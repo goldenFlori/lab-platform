@@ -260,7 +260,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-12:** #99 done. Students open "My progress" from their course. It shows the labs they
   opened, the exercises solved per notebook, their deadlines and hand-ins, and their released grades
   with feedback. Only their own data, gathered in one batch of queries (PR #105).
-- **Next:** #100, the privacy page and "My data".
+- **2026-10-12:** #100 done. A public privacy page (`/privacy`, linked in every page's footer) says
+  what is kept, where, for how long and who sees it. "My data" in the account menu downloads
+  everything stored about the user as one JSON file, and sends their institutions a deletion
+  request, which admins see and mark handled on their courses page (PR #108).
+- **Next:** #101, the pilot report for the grant.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 
@@ -299,6 +303,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-12 | AI runs on Workers AI's free allocation first (no key, no bill, no names sent), with Llama 4 Scout as the default after an Albanian test; paid models (Claude) only with grant or licence money | Decided |
 | 2026-10-12 | AI quotas per day: 50 requests for staff who publish labs, 10 for students, 9,000 neurons per organization; counted per user, course and day, as counts only | Decided |
 | 2026-10-12 | "Explain my error" gives hints by default and everywhere outside exercises; the full fix only on exercises staff set to it, after the solutions date. Students' questions and answers are visible to the staff of their group (students are told) and deleted after 180 days | Decided |
+| 2026-10-12 | Data rights: every user downloads all their data across institutions as JSON (released grades only; drafts stay with staff). A deletion request goes to each institution's admins and deletes nothing on its own, since grades may have to stay in the institution's records | Decided |
 | 2026-10-12 | A real mobile app means an installable web app (PWA) first; a store app (Capacitor) only if a need appears | Decided |
 | 2026-10-10 | Search without FTS5: D1 cannot export databases with virtual tables, and backups must keep working. The server sends each user the text of what they may see; the browser matches it as they type | Decided |
 
@@ -310,6 +315,9 @@ Decisions were delegated to Claude ("you decide"). Record new ones here with the
   - Product name and domain.
   - Which email domains FSHN uses for staff and for students.
   - The university's IP policy for software built for teaching (check before selling).
+- **Erasing an account:** admins mark deletion requests handled but have no tool to erase a user's
+  data in their institution yet. Build one (keeping released grades the institution must keep)
+  before selling.
 - **How long to keep learning activity:** for example two academic years, then delete. Decide
   before selling to other institutions, and write it into the data processing agreement.
 - **Course repo:**

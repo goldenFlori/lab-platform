@@ -139,6 +139,15 @@ describe('cross-tenant isolation: links to another organization', () => {
     ).rejects.toBeInstanceOf(NotFoundError);
   });
 
+  it("neither lists nor handles another organization's deletion requests", async () => {
+    const { a, b } = await seedTwo();
+    await b.tenant.personal.requestDeletion(b.user.id, null);
+    const [request] = await b.tenant.personal.deletionRequests();
+    expect(await a.tenant.personal.deletionRequests()).toEqual([]);
+    expect(await a.tenant.personal.handleDeletion(request?.id as string, a.user.id)).toBe(false);
+    expect((await b.tenant.personal.deletionRequests())[0]?.handledAt).toBeNull();
+  });
+
   it("does not give memberships to another organization's users", async () => {
     const { a, b } = await seedTwo();
     await expect(a.tenant.memberships.create({ userId: b.user.id, role: 'pedagog' })).rejects.toBeInstanceOf(
