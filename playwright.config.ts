@@ -20,7 +20,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
-  use: { baseURL: `http://localhost:${port}`, trace: 'on-first-retry' },
+  // The service worker (#89) only in the specs about it (pwa.spec.ts), so it never answers for the server.
+  use: { baseURL: `http://localhost:${port}`, trace: 'on-first-retry', serviceWorkers: 'block' },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
     // The narrowest phone we support.

@@ -244,7 +244,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-12:** #88 done. Staff translate a notebook between Albanian and English with the
   copilot. They review each text and comment beside the original and save it as a new notebook with
   the same code, visualizations and exercises (PR #96).
-- **Next:** #89, the installable app (PWA).
+- **2026-10-12:** #89 done, and with it Phase 4. The app installs from the browser on phones and
+  laptops (an "Install the app" entry, with steps for iPhone). It keeps the Python engine, so a lab's
+  code runs at once after reopening, and it shows an offline page without a connection (PR #97).
+- **Next:** before the March 2027 semester: a dry run with the FSHN course, a progress page for
+  students, a landing page with a short demo, and a privacy page. In January, a mini-pilot and the
+  Startup Albania application (see `platform-business`).
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
 

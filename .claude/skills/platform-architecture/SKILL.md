@@ -78,6 +78,17 @@ Verified 2026-10-06. Re-check before relying on them.
   - rendering.
 - **Static assets are public by design.** Never put protected content in static assets. Lab
   content comes from `/api` after a permission check.
+- **The installable app (#89)** is a PWA: `public/manifest.webmanifest`, icons drawn by
+  `scripts/make-app-icons.ts`, and a service worker (`src/web/pwa/sw.js`, built into `/sw.js`
+  with the build and Pyodide versions).
+  - The service worker never touches `/api`: protected content is never cached on a device.
+  - Pages come from the network, and the offline page when there is none.
+  - It keeps `/assets/*` per build, and the Python engine and packages per Pyodide version.
+  - Cached responses keep their COOP and COEP headers, so the app stays cross-origin isolated.
+  - Cache only final responses. Cloudflare redirects `/offline.html` to `/offline`, and a
+    redirected response may not answer a page.
+  - The other end-to-end specs block service workers (`playwright.config.ts`).
+  - A store app (Capacitor) waits until a real need appears.
 - **Files live in D1** as chunks of 2 MB or less until R2 is enabled (paid phase).
 - **One shared D1 database for all tenants,** with `org_id` on every tenant-owned table. A
   database per tenant is only an option later, for large customers.

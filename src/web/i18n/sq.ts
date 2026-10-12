@@ -503,6 +503,16 @@ export const sq = {
     unavailable: 'AI nuk u përgjigj tani. Provoni pas pak.',
     network: 'Lidhja u ndërpre. Kontrolloni internetin dhe provoni sërish.',
   },
+  install: {
+    item: 'Instalo aplikacionin',
+    appleTitle: 'Instalo aplikacionin në iPhone ose iPad',
+    appleSteps: [
+      'Hapeni këtë faqe në Safari.',
+      'Shtypni butonin Share (katrori me shigjetë lart).',
+      'Zgjidhni "Add to Home Screen" (Shto në ekranin bazë), pastaj "Add".',
+      'Aplikacioni hapet nga ikona e tij, në ekran të plotë.',
+    ],
+  },
   quiz: {
     open: 'Pyetje e shpejtë',
     title: 'Pyetje e shpejtë për klasën',

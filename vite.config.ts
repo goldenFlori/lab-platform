@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
@@ -46,6 +47,25 @@ function pyodideEngine(): Plugin {
   };
 }
 
+/**
+ * The service worker (#89), emitted as /sw.js with the build's version (from its files' names, so
+ * it changes whenever they do) and the Python engine's, which name its caches.
+ */
+function serviceWorker(): Plugin {
+  return {
+    name: 'service-worker',
+    generateBundle(_, bundle) {
+      if (this.environment.name !== 'client') return;
+      const pyodide = createRequire(import.meta.url)('pyodide/package.json') as { version: string };
+      const build = createHash('sha256').update(Object.keys(bundle).sort().join('\n')).digest('hex').slice(0, 12);
+      const source = readFileSync('src/web/pwa/sw.js', 'utf8')
+        .replace('__BUILD__', build)
+        .replace('__PYODIDE__', pyodide.version);
+      this.emitFile({ type: 'asset', fileName: 'sw.js', source });
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     // Generates src/web/routeTree.gen.ts from the files in src/web/routes; must run before React.
@@ -64,6 +84,7 @@ export default defineConfig({
       remoteBindings: !process.env.LOCAL_STATE,
     }),
     pyodideEngine(),
+    serviceWorker(),
   ],
   server: { headers: ISOLATION },
   worker: { format: 'es' },

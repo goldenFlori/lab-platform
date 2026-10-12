@@ -5,3 +5,7 @@
 # The Python engine: its path names its version, so it never changes in place.
 /pyodide/*
   Cache-Control: public, max-age=31536000, immutable
+
+# The service worker (#89): checked for a new build on every visit.
+/sw.js
+  Cache-Control: no-cache
