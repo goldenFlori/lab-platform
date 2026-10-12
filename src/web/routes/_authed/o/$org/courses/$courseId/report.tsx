@@ -3,10 +3,13 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { ArrowLeft, Printer, ShieldCheck } from 'lucide-react';
 import type { PilotCount, PilotReport } from '../../../../../../../shared/activity';
+import type { SurveyView } from '../../../../../../../shared/surveys';
+import { SurveyResultsView } from '../../../../../../components/CourseSurvey';
 import { type Messages, t as messages, useT } from '../../../../../../i18n';
 import { ApiError, api } from '../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../lib/brand';
 import { courseQuery } from '../../../../../../lib/courses';
+import { surveyQuery } from '../../../../../../lib/surveys';
 
 // The pilot report (#101): the numbers the Startup Albania application and the coordinator's
 // letter ask for, over a period, as counts only. Fits two printed pages.
@@ -54,6 +57,7 @@ function ReportPage() {
         `/orgs/${encodeURIComponent(org)}/courses/${encodeURIComponent(courseId)}/report${query.size ? `?${query}` : ''}`,
       ),
   });
+  const survey = useQuery(surveyQuery(org, courseId));
   const set = (change: Search) => void navigate({ search: (s) => ({ ...s, ...change }), replace: true });
   const data = report.data;
 
@@ -117,13 +121,13 @@ function ReportPage() {
       ) : !data ? (
         <p className="mt-8 text-sm text-muted">{t.common.loading}</p>
       ) : (
-        <Report data={data} t={t} />
+        <Report data={data} t={t} survey={survey.data} />
       )}
     </section>
   );
 }
 
-function Report({ data, t }: { data: PilotReport; t: Messages }) {
+function Report({ data, t, survey }: { data: PilotReport; t: Messages; survey: SurveyView | undefined }) {
   const share = (n: number) => (data.students ? `${Math.round((100 * n) / data.students)}%` : '—');
   const weekly = data.weeks.length ? Math.round(data.weeks.reduce((n, w) => n + w.active, 0) / data.weeks.length) : 0;
   const peak = Math.max(1, ...data.weeks.map((w) => w.active));
@@ -169,6 +173,13 @@ function Report({ data, t }: { data: PilotReport; t: Messages }) {
           ))}
         </ul>
       </section>
+
+      {survey?.results && (
+        <section className="break-inside-avoid">
+          <h2 className="font-semibold">{t.report.satisfaction}</h2>
+          <SurveyResultsView results={survey.results} />
+        </section>
+      )}
 
       <p className="inline-flex items-center gap-2 text-xs text-muted">
         <ShieldCheck className="size-4 text-success" aria-hidden="true" />{' '}
