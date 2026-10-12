@@ -88,7 +88,8 @@ describe('Live Lab sessions', () => {
     const closed = new Promise((resolve) => host.ws?.addEventListener('close', (e) => resolve(e.code)));
     await pedagog.call(`${labPath}/live/${id}/end`, { method: 'POST' });
     expect(await closed).toBe(4000);
-  });
+    // 30 sign-ins, each hashing a password: under a second here, but a busy CI runner passed 5 s (#106).
+  }, 30_000);
 
   it('let in only users who may see the lab, from our own pages', async () => {
     const { seed, pedagog, ana, labPath, state } = await setup();
