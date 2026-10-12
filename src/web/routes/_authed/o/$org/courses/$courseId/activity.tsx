@@ -1,7 +1,7 @@
 import { Alert } from '@heroui/react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
-import { ArrowLeft, BarChart3, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, BarChart3, FileBarChart, ShieldCheck } from 'lucide-react';
 import type { ActivityReport } from '../../../../../../../shared/activity';
 import { type Messages, t as messages, useT } from '../../../../../../i18n';
 import { activityQuery } from '../../../../../../lib/activity';
@@ -73,7 +73,16 @@ function ActivityPage() {
       >
         <ArrowLeft className="size-4" /> {detail.course.title}
       </Link>
-      <h1 className="mt-4 text-3xl font-bold tracking-tight">{t.activity.title}</h1>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-3xl font-bold tracking-tight">{t.activity.title}</h1>
+        <Link
+          to="/o/$org/courses/$courseId/report"
+          params={{ org, courseId }}
+          className="button button--secondary gap-2"
+        >
+          <FileBarChart className="size-4" /> {t.report.open}
+        </Link>
+      </div>
       <p className="mt-1 max-w-2xl text-muted">{t.activity.lead}</p>
       <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success">
         <ShieldCheck className="size-4" aria-hidden="true" /> {t.activity.privacy}

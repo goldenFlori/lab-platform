@@ -37,7 +37,7 @@ function RootLayout() {
       <main id="main">
         <Outlet />
       </main>
-      <footer className="container-page flex flex-wrap items-center justify-between gap-3 border-t border-border py-6 text-sm text-muted">
+      <footer className="container-page print:hidden flex flex-wrap items-center justify-between gap-3 border-t border-border py-6 text-sm text-muted">
         <span>{APP_NAME}</span>
         <Link to="/privacy" className="hover:text-foreground">
           {t.footer.privacy}
