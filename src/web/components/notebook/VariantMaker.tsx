@@ -73,8 +73,18 @@ export function VariantMaker({
   const [error, setError] = useState<string | null>(null);
   const abort = useRef<AbortController | null>(null);
 
-  if (!status.data || exercises.length === 0) return null;
-  if (!status.data.enabled) return <p className="mt-4 text-xs text-muted">{t.variant.needsAi}</p>;
+  if (!status.data) return null;
+  const missing = !status.data.enabled ? t.variant.needsAi : exercises.length === 0 ? t.variant.needsExercises : null;
+  if (missing) {
+    return (
+      <section aria-label={t.variant.title} className="mt-4 rounded-xl bg-surface-secondary p-3" data-testid="variant">
+        <h3 className="flex items-center gap-2 text-sm font-semibold">
+          <Sparkles className="size-4 text-accent" aria-hidden="true" /> {t.variant.title}
+        </h3>
+        <p className="mt-1 text-xs text-muted">{missing}</p>
+      </section>
+    );
+  }
 
   async function check(next: Variant) {
     setPhase({ at: 'review', checking: true, check: null });

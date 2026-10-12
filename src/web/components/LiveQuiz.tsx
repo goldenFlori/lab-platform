@@ -5,6 +5,7 @@ import { type FormEvent, useState } from 'react';
 import { QUIZ_LIMITS } from '../../shared/live';
 import { useT } from '../i18n';
 import { aiErrorText, aiPath, aiStatusQuery, streamAi } from '../lib/ai';
+import { revealSoon, useLabTool } from '../lib/lab-tools';
 import type { QuizState } from '../lib/live';
 import { sectionInView, useLive } from '../lib/live-context';
 import { parseQuiz, type QuizDraft } from '../lib/quiz';
@@ -20,6 +21,10 @@ export function QuizStaff({ org, courseId }: { org: string; courseId: string }) 
   const t = useT();
   const live = useLive();
   const [composing, setComposing] = useState(false);
+  useLabTool('quiz', () => {
+    setComposing(true);
+    revealSoon('[data-testid="quiz-composer"]');
+  });
   if (!live) return null;
   const running = live.socket.quiz;
   if (running) return <QuizResults state={running} host={live.isHost} />;
