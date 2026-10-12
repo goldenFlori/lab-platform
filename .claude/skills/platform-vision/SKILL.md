@@ -236,6 +236,8 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   short Albanian explanation with hints, never the solution, within their daily quota. Staff set
   each exercise's AI to off, hints or full (after the solutions date). Pedagogs and assistants read
   their groups' questions on the course page (PR #92).
+- **2026-10-12:** #93 fixed: AI answers keep their numbers. Workers AI streams number tokens as JSON
+  numbers, which the gateway had dropped (PR #94).
 - **Next:** #87, quick quizzes in a Live Lab, drafted by the copilot.
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
   phase 1 replaces it.
