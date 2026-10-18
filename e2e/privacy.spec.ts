@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 import type { DeletionRequestView } from '../src/shared/my-data';
 import { E2E_ACCOUNT, E2E_STAFF } from './account';
 import { courseWithLab } from './notebooks';
-import { apiCall, signIn } from './sign-in';
+import { apiCall, newStudent, signIn } from './sign-in';
 
 // #100: the privacy page is public; a student downloads their data and asks for its deletion, and
 // the institution's admin sees and handles the request.
@@ -57,5 +57,35 @@ test('a student downloads their data and asks for its deletion; the admin handle
   await open.getByRole('button', { name: 'Shëno të trajtuar' }).click();
   await expect(open).toHaveCount(0);
   await expect(requests).toContainText('Trajtuar më');
+  await staff.context().close();
+});
+
+test('the admin erases the data of a student who asked, and the account goes with it', async ({
+  browser,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'runs once, on desktop');
+  const staff = await signIn(browser, E2E_STAFF, isMobile);
+  const { course, group } = await courseWithLab(staff, 'Erase e2e');
+  const fullName = `Erjona Fshirja ${crypto.randomUUID().slice(0, 4)}`;
+  const account = await newStudent(staff, `/orgs/e2e/courses/${course.id}`, group.id, fullName);
+  const student = await signIn(browser, account, isMobile);
+  await apiCall(student, 'POST', '/me/deletion-request', { note: 'Largohem nga fakulteti.' });
+
+  await staff.goto('/courses');
+  const request = staff.getByTestId('deletion-requests').getByRole('listitem').filter({ hasText: fullName });
+  await request.getByRole('button', { name: 'Fshi të dhënat' }).click();
+  const dialog = staff.getByRole('alertdialog');
+  await expect(dialog).toContainText(`Të fshihen të dhënat e ${fullName}?`);
+  await expect(dialog).toContainText('Nuk ka nota të publikuara.');
+  await dialog.getByRole('button', { name: 'Fshi përfundimisht' }).click();
+  await expect(staff.getByText('Të dhënat dhe llogaria u fshinë.')).toBeVisible();
+  await expect(request).toHaveCount(0);
+  await expect(staff.getByTestId('erasures')).toContainText('edhe llogaria');
+
+  // The account is gone: its session no longer works.
+  await student.reload();
+  await expect(student).toHaveURL(/\/login/);
+  await student.context().close();
   await staff.context().close();
 });

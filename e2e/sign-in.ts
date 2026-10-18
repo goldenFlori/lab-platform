@@ -1,5 +1,7 @@
 import { type Browser, expect, type Page } from '@playwright/test';
 import type { Api } from '../scripts/course-import/apply';
+import { hashPassword } from '../src/shared/password';
+import type { GroupStudent } from '../src/shared/students';
 
 /** A fresh browser session signed in as this account, failing the test on any uncaught page error. */
 export async function signIn(browser: Browser, account: { username: string; password: string }, isMobile: boolean) {
@@ -46,4 +48,17 @@ export function pageApi(page: Page): Api {
       headers: res.headers(),
     });
   };
+}
+
+/** A new student of the group, made by staff as the import makes them, with their password. */
+export async function newStudent(staff: Page, coursePath: string, groupId: string, fullName: string) {
+  const password = `Provë-${crypto.randomUUID().slice(0, 8)}`;
+  const base = fullName.toLowerCase().replace(/[^a-z]+/g, '.');
+  const {
+    students: [student],
+  } = await apiCall<{ students: GroupStudent[] }>(staff, 'POST', `${coursePath}/groups/${groupId}/students`, {
+    students: [{ fullName, username: base, passwordHash: await hashPassword(password) }],
+  });
+  if (!student) throw new Error('No student was made');
+  return { username: student.username, password };
 }

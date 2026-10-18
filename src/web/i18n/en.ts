@@ -648,7 +648,7 @@ export const en: Messages = {
         heading: 'Your rights',
         items: [
           'Download everything kept about you as one file, in "My data".',
-          "Ask for your data to be deleted: the request goes to your institution's administrator.",
+          "Ask for your data to be deleted: the request goes to your institution's administrator, who erases it from the platform. The account goes when it belongs to no other institution.",
           "Ask for a correction: through your teacher or your institution's administrator.",
         ],
       },
@@ -663,7 +663,7 @@ export const en: Messages = {
     download: 'Download (JSON)',
     deleteTitle: 'Ask for deletion',
     deleteText:
-      "The request goes to your institution's administrator, who handles it. A grade may have to stay in the institution's records.",
+      "The request goes to your institution's administrator, who erases your data in that institution. They may first keep your released grades in the institution's records.",
     note: 'A note for the administrator (optional)',
     request: 'Send the request',
     sent: "The request was sent. Your institution's administrator will handle it.",
@@ -672,10 +672,33 @@ export const en: Messages = {
   },
   deletions: {
     title: (open) => `Requests to delete data (${open} open)`,
-    help: "Users who asked for their data in this institution to be deleted. Remove them from courses and groups; for a full deletion of the account, contact the platform's owner. Then mark it handled.",
+    help: 'Users who asked for their data in this institution to be deleted. Erase their data (first download their grades for the records, if needed), or mark the request handled if you settled it otherwise.',
     asked: (when) => `Asked on ${when}`,
     handled: (when) => `Handled on ${when}`,
     markHandled: 'Mark handled',
+    erase: 'Erase their data',
+    eraseTitle: (name) => `Erase ${name}'s data?`,
+    eraseText:
+      'Deleted for good, in this institution only: memberships of courses and groups, saved code, solved exercises, submissions, grades, activity, AI questions and counts, and Live Lab history.',
+    eraseKeep:
+      'Courses, labs and notebooks stay, also those this person made. Data in other institutions is not touched; the account is deleted only when it belongs to no other institution.',
+    gradesFirst: (n) =>
+      n === 1
+        ? 'There is 1 released grade. Download it for the institution’s records before erasing.'
+        : `There are ${n} released grades. Download them for the institution’s records before erasing.`,
+    noGrades: 'There are no released grades.',
+    downloadGrades: 'Download grades (CSV)',
+    eraseConfirm: 'Erase for good',
+    erased: (accountDeleted) =>
+      accountDeleted
+        ? 'The data and the account were erased.'
+        : 'The data was erased in this institution. The account stays for their other institutions.',
+    eraseFailed: 'The data was not erased. Please try again.',
+    erasures: 'Erasures carried out',
+    erasure: (asked, done) => `Asked on ${asked} · erased on ${done}`,
+    erasedBy: (name) => `by ${name}`,
+    accountGone: 'with the account',
+    csv: { course: 'Course', lab: 'Lab', notebook: 'Notebook', releasedAt: 'Released on' },
   },
   footer: {
     privacy: 'Privacy',
