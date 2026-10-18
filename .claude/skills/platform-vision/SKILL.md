@@ -279,6 +279,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   owner sets `DEMO_VIDEO` and `CONTACT_EMAIL` in `src/web/lib/brand.ts` (PR #111).
 - **2026-10-13:** #112 fixed: the pilot report counts submissions, exercises and AI questions from
   Tirana's midnight, not UTC's, so work done between 00:00 and 02:00 is no longer missed (PR #113).
+- **2026-10-18:** Phase 6 planned as the "Phase 6: Before selling" milestone, issues #114–#118:
+  what a second institution needs before it signs.
+- **2026-10-18:** #114 done. Staff who grade download a group's grades for a notebook, and the
+  course's released grades (a row per student, a column per notebook and the total), as CSV files
+  that Excel opens with Albanian letters intact. Next: erasing a person's data (#115).
 - **Next (the owner):** record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
   the Startup Albania application (see `platform-business`).
