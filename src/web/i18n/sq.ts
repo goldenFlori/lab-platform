@@ -1,6 +1,8 @@
 // The interface in Albanian, the source language (#19). en.ts must have the same messages.
 // Messages with values are functions; keep the wording here plain and student-facing.
 
+import { RETENTION } from '../../shared/retention';
+
 const minutes = (n: number) => `${n} ${n === 1 ? 'minute' : 'minutash'}`;
 
 export const sq = {
@@ -588,7 +590,7 @@ export const sq = {
   },
   privacy: {
     title: 'Privatësia',
-    updated: 'Përditësuar më 12 tetor 2026',
+    updated: 'Përditësuar më 18 tetor 2026',
     intro:
       'Kjo faqe tregon cilat të dhëna ruan Lab Platform, pse, ku, për sa kohë dhe kush i sheh. Institucioni juaj (p.sh. fakulteti) vendos për të dhënat e studentëve të tij; platforma i përpunon në emër të tij.',
     sections: [
@@ -631,9 +633,12 @@ export const sq = {
       {
         heading: 'Për sa kohë',
         items: [
-          'Hyrja: 30 ditë pa përdorim.',
-          'Pyetjet me AI: 180 ditë.',
-          'Pjesa tjetër: sa kohë ekziston kursi. Kur institucioni fshin një kurs, fshihen edhe të dhënat e tij.',
+          `Hyrja: mbaron pas ${RETENTION.sessionDays} ditësh pa përdorim.`,
+          `Pyetjet "Shpjego gabimin" me përgjigjet: ${RETENTION.aiQuestionDays} ditë.`,
+          `Aktiviteti ditor (laboratorët e hapur, ekzekutimet, Live Lab), numërimet e AI dhe historia e Live Lab: ${RETENTION.activityYears} vjet.`,
+          `Një kërkesë për fshirje, pasi trajtohet: ${RETENTION.handledRequestYears} vit.`,
+          'Kodi, dorëzimet, notat dhe pjesa tjetër: sa kohë ekziston kursi. Kur institucioni fshin një kurs, fshihen edhe të dhënat e tij.',
+          'Çdo natë platforma fshin vetë atë që ka kaluar afatin.',
         ],
       },
       {

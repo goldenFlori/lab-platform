@@ -1,3 +1,4 @@
+import { RETENTION } from '../../shared/retention';
 import type { Messages } from './sq';
 
 // The interface in English (#19). It must have every message of sq.ts, with the same values.
@@ -592,7 +593,7 @@ export const en: Messages = {
   },
   privacy: {
     title: 'Privacy',
-    updated: 'Updated on 12 October 2026',
+    updated: 'Updated on 18 October 2026',
     intro:
       "This page says what data Lab Platform keeps, why, where, for how long and who sees it. Your institution (a faculty, say) decides about its students' data; the platform processes it on its behalf.",
     sections: [
@@ -635,9 +636,12 @@ export const en: Messages = {
       {
         heading: 'For how long',
         items: [
-          'Sign-in: 30 days without use.',
-          'AI questions: 180 days.',
-          'The rest: as long as the course exists. When the institution deletes a course, its data goes with it.',
+          `Sign-in: ends after ${RETENTION.sessionDays} days without use.`,
+          `"Explain my error" questions with their answers: ${RETENTION.aiQuestionDays} days.`,
+          `Daily activity (labs opened, code runs, Live Labs), AI use counts and Live Lab history: ${RETENTION.activityYears} years.`,
+          `A deletion request, once handled: ${RETENTION.handledRequestYears} year.`,
+          'Code, submissions, grades and the rest: as long as the course exists. When the institution deletes a course, its data goes with it.',
+          'Every night the platform deletes on its own what has passed its period.',
         ],
       },
       {
