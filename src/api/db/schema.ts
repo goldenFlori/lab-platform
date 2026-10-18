@@ -763,6 +763,24 @@ export const deletionRequests = sqliteTable(
   ],
 );
 
+/**
+ * That the institution erased a person's data (#115), kept so it can show it acted on the request.
+ * Nothing about the person: not their name, account or note, only when it was asked and done.
+ */
+export const erasures = sqliteTable(
+  'erasures',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    requestedAt: integer('requested_at', { mode: 'timestamp' }).notNull(),
+    erasedAt: createdAt(),
+    erasedBy: text('erased_by').references(() => users.id, { onDelete: 'set null' }),
+    /** The account itself went too, as it belonged to no other institution. */
+    accountDeleted: integer('account_deleted', { mode: 'boolean' }).notNull(),
+  },
+  (t) => [index('erasures_org_idx').on(t.orgId, t.erasedAt)],
+);
+
 /** An end-of-semester survey of a course (#102): open until it closes. One per course. */
 export const surveys = sqliteTable(
   'surveys',

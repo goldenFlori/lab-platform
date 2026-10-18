@@ -21,7 +21,7 @@ import type { SQLiteColumn } from 'drizzle-orm/sqlite-core';
 import type { ActivityKind } from '../../shared/activity';
 import type { AiQuestion } from '../../shared/ai';
 import type { AiMode } from '../../shared/exercise-limits';
-import type { DeletionRequestView, OrganizationData } from '../../shared/my-data';
+import type { DeletionRequestView, ErasureView, OrganizationData, PersonGrade } from '../../shared/my-data';
 import { roleExists } from './access';
 import { uuidv7 } from './ids';
 import type { Db } from './index';
@@ -34,6 +34,7 @@ import {
   courseTemplates,
   deletionRequests,
   embeds,
+  erasures,
   exerciseCompletions,
   exerciseGrading,
   exercises,
@@ -1543,6 +1544,107 @@ function tenantPersonal(db: Db, orgId: string) {
         createdAt: iso(r.createdAt),
         handledAt: r.handledAt ? iso(r.handledAt) : null,
       }));
+    },
+
+    /** An open request and who made it; undefined once handled or when it is another's. */
+    async openRequest(id: string) {
+      const [row] = await db
+        .select({ userId: deletionRequests.userId, createdAt: deletionRequests.createdAt })
+        .from(deletionRequests)
+        .where(and(eq(deletionRequests.orgId, orgId), eq(deletionRequests.id, id), isNull(deletionRequests.handledAt)));
+      return row;
+    },
+
+    /** The user's released grades here, for the institution's records before it erases them (#115). */
+    async releasedGrades(userId: string): Promise<PersonGrade[]> {
+      const rows = await db
+        .select({
+          course: courses.title,
+          lab: labs.n,
+          notebook: notebooks.title,
+          score: sql<number>`coalesce(${grades.score}, ${grades.autoScore})`,
+          maxScore: grades.maxScore,
+          releasedAt: grades.releasedAt,
+        })
+        .from(grades)
+        .innerJoin(notebooks, and(eq(notebooks.id, grades.notebookId), eq(notebooks.orgId, orgId)))
+        .innerJoin(labs, and(eq(labs.id, notebooks.labId), eq(labs.orgId, orgId)))
+        .innerJoin(courses, and(eq(courses.id, labs.courseId), eq(courses.orgId, orgId)))
+        .where(and(eq(grades.orgId, orgId), eq(grades.userId, userId), isNotNull(grades.releasedAt)))
+        .orderBy(asc(courses.title), asc(labs.n), asc(notebooks.title));
+      return rows.map((r) => ({ ...r, score: Number(r.score), releasedAt: iso(r.releasedAt as Date) }));
+    },
+
+    /**
+     * Erases everything of the user in this organization (#115) and records that it was done, in one
+     * atomic batch. The institution's content stays, also what the user made. The account goes too
+     * when nothing ties it to another institution: no membership and no grade there.
+     */
+    async erase(userId: string, requestedAt: Date, by: string) {
+      const [elsewhere, gradedElsewhere] = await db.batch([
+        db
+          .select({ id: memberships.id })
+          .from(memberships)
+          .where(and(eq(memberships.userId, userId), ne(memberships.orgId, orgId)))
+          .limit(1),
+        db
+          .select({ id: grades.id })
+          .from(grades)
+          .where(and(eq(grades.userId, userId), ne(grades.orgId, orgId)))
+          .limit(1),
+      ]);
+      const accountDeleted = !elsewhere.length && !gradedElsewhere.length;
+      await db.batch([
+        db.delete(memberships).where(and(eq(memberships.orgId, orgId), eq(memberships.userId, userId))),
+        db.delete(labActivity).where(and(eq(labActivity.orgId, orgId), eq(labActivity.userId, userId))),
+        db.delete(codeEdits).where(and(eq(codeEdits.orgId, orgId), eq(codeEdits.userId, userId))),
+        db
+          .delete(exerciseCompletions)
+          .where(and(eq(exerciseCompletions.orgId, orgId), eq(exerciseCompletions.userId, userId))),
+        db.delete(submissions).where(and(eq(submissions.orgId, orgId), eq(submissions.userId, userId))),
+        db.delete(grades).where(and(eq(grades.orgId, orgId), eq(grades.userId, userId))),
+        db.delete(liveSessions).where(and(eq(liveSessions.orgId, orgId), eq(liveSessions.hostId, userId))),
+        db.delete(aiUsage).where(and(eq(aiUsage.orgId, orgId), eq(aiUsage.userId, userId))),
+        db.delete(aiQuestions).where(and(eq(aiQuestions.orgId, orgId), eq(aiQuestions.userId, userId))),
+        db
+          .delete(surveyRespondents)
+          .where(and(eq(surveyRespondents.orgId, orgId), eq(surveyRespondents.userId, userId))),
+        db.delete(deletionRequests).where(and(eq(deletionRequests.orgId, orgId), eq(deletionRequests.userId, userId))),
+        // What they did as staff stays, without their name.
+        db
+          .update(deletionRequests)
+          .set({ handledBy: null })
+          .where(and(eq(deletionRequests.orgId, orgId), eq(deletionRequests.handledBy, userId))),
+        db
+          .update(courseTemplates)
+          .set({ ownerUserId: null })
+          .where(and(eq(courseTemplates.orgId, orgId), eq(courseTemplates.ownerUserId, userId))),
+        db
+          .update(erasures)
+          .set({ erasedBy: null })
+          .where(and(eq(erasures.orgId, orgId), eq(erasures.erasedBy, userId))),
+        db.insert(erasures).values({ id: uuidv7(), orgId, requestedAt, erasedBy: by, accountDeleted }),
+        ...(accountDeleted ? [db.delete(users).where(eq(users.id, userId))] : []),
+      ]);
+      return { accountDeleted };
+    },
+
+    /** The organization's erasures, latest first: when asked, when done and by whom. */
+    async erasures(): Promise<ErasureView[]> {
+      const rows = await db
+        .select({
+          id: erasures.id,
+          requestedAt: erasures.requestedAt,
+          erasedAt: erasures.erasedAt,
+          by: users.fullName,
+          accountDeleted: erasures.accountDeleted,
+        })
+        .from(erasures)
+        .leftJoin(users, eq(users.id, erasures.erasedBy))
+        .where(eq(erasures.orgId, orgId))
+        .orderBy(desc(erasures.erasedAt))
+        .limit(200);
+      return rows.map((r) => ({ ...r, requestedAt: iso(r.requestedAt), erasedAt: iso(r.erasedAt) }));
     },
 
     async handleDeletion(id: string, by: string) {

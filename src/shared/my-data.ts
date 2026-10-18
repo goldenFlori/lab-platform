@@ -43,3 +43,25 @@ export type DeletionRequestView = {
   createdAt: When;
   handledAt: When | null;
 };
+
+/** A released grade of the person, for the institution's records before it erases them (#115). */
+export type PersonGrade = {
+  course: string;
+  lab: number;
+  notebook: string;
+  score: number;
+  maxScore: number;
+  releasedAt: When;
+};
+
+/** An erasure the institution carried out (#115): nothing about the person, only when and by whom. */
+export type ErasureView = {
+  id: string;
+  requestedAt: When;
+  erasedAt: When;
+  /** Null once the admin who did it is gone. */
+  by: string | null;
+  accountDeleted: boolean;
+};
+
+export type EraseResult = { accountDeleted: boolean };
