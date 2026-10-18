@@ -283,7 +283,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   what a second institution needs before it signs.
 - **2026-10-18:** #114 done. Staff who grade download a group's grades for a notebook, and the
   course's released grades (a row per student, a column per notebook and the total), as CSV files
-  that Excel opens with Albanian letters intact. Next: erasing a person's data (#115).
+  that Excel opens with Albanian letters intact (PR #119).
+- **2026-10-18:** #115 done. On an open deletion request, the institution's admin erases the
+  person's data in the institution, after a confirmation that offers their released grades as a CSV
+  for the records. Their data in other institutions stays; the account goes when nothing ties it to
+  another institution. The institution keeps a record of each erasure without the person's name.
+  Next: the retention schedule (#116).
 - **Next (the owner):** record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
   the Startup Albania application (see `platform-business`).
@@ -326,6 +331,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-12 | AI quotas per day: 50 requests for staff who publish labs, 10 for students, 9,000 neurons per organization; counted per user, course and day, as counts only | Decided |
 | 2026-10-12 | "Explain my error" gives hints by default and everywhere outside exercises; the full fix only on exercises staff set to it, after the solutions date. Students' questions and answers are visible to the staff of their group (students are told) and deleted after 180 days | Decided |
 | 2026-10-12 | Data rights: every user downloads all their data across institutions as JSON (released grades only; drafts stay with staff). A deletion request goes to each institution's admins and deletes nothing on its own, since grades may have to stay in the institution's records | Decided |
+| 2026-10-18 | Erasure is per institution and done by its admin from a deletion request: everything of the person there goes, released grades included (offered as a CSV first, since the platform is not the registry of record). The account goes only when it has no membership or grade in another institution. Each erasure leaves a record with dates and the admin, never the person | Decided |
 | 2026-10-12 | The survey is anonymous by design: ratings are stored only as counts, comments with random ids, no time and no author, in a WITHOUT ROWID table; who answered is kept apart, only to ask once. Results show from five answers | Decided |
 | 2026-10-12 | A real mobile app means an installable web app (PWA) first; a store app (Capacitor) only if a need appears | Decided |
 | 2026-10-10 | Search without FTS5: D1 cannot export databases with virtual tables, and backups must keep working. The server sends each user the text of what they may see; the browser matches it as they type | Decided |
@@ -338,9 +344,6 @@ Decisions were delegated to Claude ("you decide"). Record new ones here with the
   - Product name and domain.
   - Which email domains FSHN uses for staff and for students.
   - The university's IP policy for software built for teaching (check before selling).
-- **Erasing an account:** admins mark deletion requests handled but have no tool to erase a user's
-  data in their institution yet. Build one (keeping released grades the institution must keep)
-  before selling.
 - **How long to keep learning activity:** for example two academic years, then delete. Decide
   before selling to other institutions, and write it into the data processing agreement.
 - **Course repo:**
