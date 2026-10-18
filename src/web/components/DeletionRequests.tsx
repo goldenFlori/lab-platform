@@ -44,7 +44,7 @@ export function DeletionRequests({ org }: { org: string }) {
   const open = (data ?? []).filter((r) => !r.handledAt).length;
   return (
     <details
-      open={open > 0}
+      open={open > 0 || result !== null}
       className="mt-8 rounded-2xl border border-border bg-surface"
       data-testid="deletion-requests"
     >
