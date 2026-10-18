@@ -52,3 +52,13 @@ export type StaffGrade = {
 
 /** A released grade as its student sees it. */
 export type MyGrade = { score: number; maxScore: number; feedback: string | null };
+
+/**
+ * A course's released grades (#114) for the groups the user grades, so the pedagog can take them to
+ * the institution's records. Only notebooks with a released grade among these students.
+ */
+export type CourseGrades = {
+  notebooks: { id: string; lab: number; title: string }[];
+  students: { id: string; username: string; fullName: string; group: string }[];
+  grades: { userId: string; notebookId: string; score: number; maxScore: number }[];
+};

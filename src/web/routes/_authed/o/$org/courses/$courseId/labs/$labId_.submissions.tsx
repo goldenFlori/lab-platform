@@ -1,7 +1,7 @@
 import { Alert, Button } from '@heroui/react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
-import { ArrowLeft, ChevronDown, CircleCheck, Clock } from 'lucide-react';
+import { ArrowLeft, ChevronDown, CircleCheck, Clock, Download } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { StoredNotebook } from '../../../../../../../../notebook/stored';
 import type { Exercise } from '../../../../../../../../shared/exercises';
@@ -11,6 +11,7 @@ import { GradeChip, GradeGroupBar, GradeReview, GradingSetup } from '../../../..
 import { t as messages, useT } from '../../../../../../../i18n';
 import { ApiError } from '../../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../../lib/brand';
+import { downloadCsv, fileSlug } from '../../../../../../../lib/csv';
 import { gradesQuery, gradingSetupQuery } from '../../../../../../../lib/grading';
 import { formatMoment, labQuery } from '../../../../../../../lib/labs';
 import { type NotebookRef, notebookQuery, notebooksQuery, renderedQuery } from '../../../../../../../lib/notebooks';
@@ -117,6 +118,7 @@ function SubmissionsPage() {
           exercises={detail.data?.exercises ?? []}
           notebook={rendered.data}
           setup={setup.data?.exercises ?? null}
+          title={current?.title ?? ''}
         />
       )}
     </section>
@@ -157,6 +159,7 @@ function Group({
   exercises,
   notebook,
   setup,
+  title,
 }: {
   data: SubmissionList;
   notebookRef: NotebookRef;
@@ -164,6 +167,7 @@ function Group({
   notebook: StoredNotebook | undefined;
   /** Points and hidden tests, for staff who grade (#53); null for staff who do not. */
   setup: ExerciseGrading[] | null;
+  title: string;
 }) {
   const t = useT();
   const grades = useQuery({ ...gradesQuery(notebookRef, data.group ?? ''), enabled: setup !== null && !!data.group });
@@ -171,6 +175,26 @@ function Group({
   const { org, courseId, labId } = notebookRef;
   const shown = data.groups.find((g) => g.id === data.group);
   const handedIn = data.students.filter((s) => s.submission).length;
+
+  // The group's grades for the institution's records (#114), released or not.
+  function downloadGrades() {
+    const c = t.grading.csvColumns;
+    downloadCsv(t.grading.csvFile(fileSlug(`${title} ${shown?.name ?? ''}`)), [
+      [c.username, c.fullName, c.score, c.maxScore, c.released, c.gradedAt],
+      ...data.students.map((s) => {
+        const g = gradeOf.get(s.id);
+        return [
+          s.username,
+          s.fullName,
+          g ? (g.score ?? g.autoScore) : null,
+          g?.maxScore,
+          g ? (g.releasedAt ? c.yes : c.no) : null,
+          g ? new Date(g.gradedAt).toLocaleDateString('sv-SE') : null,
+        ];
+      }),
+    ]);
+  }
+
   return (
     <>
       {data.groups.length > 1 && (
@@ -218,6 +242,13 @@ function Group({
             setup={setup}
             graded={gradeOf.size}
           />
+        )}
+        {gradeOf.size > 0 && (
+          <div className="mt-3">
+            <Button size="sm" variant="tertiary" onPress={downloadGrades}>
+              <Download className="size-4" /> {t.grading.csv}
+            </Button>
+          </div>
         )}
         {data.students.length === 0 ? (
           <p className="mt-4 text-sm text-muted">{t.submissions.noStudents}</p>

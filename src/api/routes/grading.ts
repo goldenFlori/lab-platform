@@ -1,10 +1,17 @@
 import { zValidator } from '@hono/zod-validator';
 import { type Context, Hono } from 'hono';
-import { type GradeResult, gradeReviewInput, gradeRunInput, gradingInput, type StaffGrade } from '../../shared/grading';
+import {
+  type CourseGrades,
+  type GradeResult,
+  gradeReviewInput,
+  gradeRunInput,
+  gradingInput,
+  type StaffGrade,
+} from '../../shared/grading';
 import type { TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
 import { forbidden, invalidRequest } from './course-context';
-import { type LabContext, notebookInUrl } from './lab-context';
+import { type LabContext, labContext, notebookInUrl } from './lab-context';
 
 // Grading on the pedagog's machine (#53), under …/labs/:labId/notebooks/:notebookId.
 //
@@ -127,3 +134,35 @@ export const gradingRoutes = new Hono<TenantEnv>()
     );
     return c.body(null, 204);
   });
+
+// A course's released grades (#114), under /api/orgs/:org/courses/:courseId/grades: every notebook
+// and every student of the groups this user grades, for the CSV the pedagog takes to the records.
+export const courseGradesRoutes = new Hono<TenantEnv>().get('/', async (c) => {
+  const ctx = await labContext(c);
+  const groups = gradingGroups(c, ctx);
+  if (!groups.length) return forbidden(c);
+  const groupName = new Map(groups.map((g) => [g.id, g.name]));
+  const [{ students, released }, notebooks] = await Promise.all([
+    c.var.tenant.grading.releasedInCourse(
+      ctx.course.id,
+      groups.map((g) => g.id),
+    ),
+    c.var.tenant.notebooks.ofLabs(ctx.labs.map((l) => l.id)),
+  ]);
+  const graded = new Set(released.map((g) => g.notebookId));
+  const labN = new Map(ctx.labs.map((l) => [l.id, l.n]));
+  const seen = new Set<string>();
+  return c.json({
+    notebooks: notebooks
+      .filter((nb) => graded.has(nb.id))
+      .map((nb) => ({ id: nb.id, lab: labN.get(nb.labId) ?? 0, title: nb.title }))
+      .sort((a, b) => a.lab - b.lab),
+    // A student in two of these groups is listed once, with the first.
+    students: students.flatMap((s) => {
+      if (seen.has(s.id)) return [];
+      seen.add(s.id);
+      return [{ id: s.id, username: s.username, fullName: s.fullName, group: groupName.get(s.groupId ?? '') ?? '' }];
+    }),
+    grades: released.map((g) => ({ ...g, score: Number(g.score) })),
+  } satisfies CourseGrades);
+});

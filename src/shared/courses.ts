@@ -62,7 +62,8 @@ export type CourseDetail = {
   groups: GroupView[];
   /** analytics: may see the course's activity, for the whole course or some of its groups (#18). */
   /** configureAi: may switch the course's AI features on and off (#84). */
-  permissions: { manage: boolean; analytics: boolean; configureAi: boolean };
+  /** grades: grades some of its groups, so may download their released grades (#114). */
+  permissions: { manage: boolean; analytics: boolean; configureAi: boolean; grades: boolean };
 };
 
 export type JoinResult = {

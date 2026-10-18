@@ -1083,6 +1083,43 @@ function tenantGrading(db: Db, orgId: string) {
       const [row] = await db.select().from(grades).where(gradeOf(notebookId, userId));
       return row;
     },
+
+    /** The students of these groups and their released grades in the course (#114), in one batch. */
+    async releasedInCourse(courseId: string, groupIds: string[]) {
+      if (!groupIds.length) return { students: [], released: [] };
+      const ofGroups = and(
+        eq(memberships.orgId, orgId),
+        inArray(memberships.groupId, groupIds),
+        eq(memberships.role, 'student'),
+      );
+      const [students, released] = await db.batch([
+        db
+          .select({ id: users.id, username: users.username, fullName: users.fullName, groupId: memberships.groupId })
+          .from(memberships)
+          .innerJoin(users, eq(users.id, memberships.userId))
+          .where(ofGroups)
+          .orderBy(asc(users.fullName)),
+        db
+          .select({
+            userId: grades.userId,
+            notebookId: grades.notebookId,
+            score: sql<number>`coalesce(${grades.score}, ${grades.autoScore})`,
+            maxScore: grades.maxScore,
+          })
+          .from(grades)
+          .innerJoin(notebooks, and(eq(notebooks.id, grades.notebookId), eq(notebooks.orgId, orgId)))
+          .innerJoin(labs, and(eq(labs.id, notebooks.labId), eq(labs.orgId, orgId)))
+          .where(
+            and(
+              eq(grades.orgId, orgId),
+              eq(labs.courseId, courseId),
+              isNotNull(grades.releasedAt),
+              inArray(grades.userId, db.select({ id: memberships.userId }).from(memberships).where(ofGroups)),
+            ),
+          ),
+      ]);
+      return { students, released };
+    },
   };
 }
 

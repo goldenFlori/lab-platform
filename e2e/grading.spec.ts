@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
+import { expect, type Page, test } from '@playwright/test';
 import { renderNotebook } from '../src/notebook';
 import { toStored } from '../src/notebook/stored';
 import { E2E_ACCOUNT, E2E_STAFF } from './account';
@@ -6,7 +7,13 @@ import { courseWithLab, uploadNotebook } from './notebooks';
 import { apiCall, signIn } from './sign-in';
 
 // #53 is done when a pedagog grades a group's submissions in one batch run and the students see
-// their grades.
+// their grades. #114: the pedagog takes them to the records as CSV, for the group and the course.
+
+async function downloaded(page: Page, button: string) {
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: button }).click();
+  return readFile((await (await download).path()) ?? '', 'utf8');
+}
 
 const code = (source: string) => ({ cell_type: 'code', source, outputs: [] });
 const NOTEBOOK = JSON.stringify({
@@ -26,7 +33,7 @@ test('a pedagog grades a group in one batch, releases, and the student sees the 
 }) => {
   test.setTimeout(150_000);
   const staff = await signIn(browser, E2E_STAFF, isMobile);
-  const { group, labPath, pageUrl } = await courseWithLab(staff, 'Grading e2e', { open: true });
+  const { course, group, labPath, pageUrl } = await courseWithLab(staff, 'Grading e2e', { open: true });
   const nb = await uploadNotebook(staff, labPath, {
     kind: 'main',
     title: 'Detyra',
@@ -63,6 +70,14 @@ test('a pedagog grades a group in one batch, releases, and the student sees the 
   await staff.getByRole('button', { name: 'Publiko notat' }).click();
   await staff.getByRole('alertdialog').getByRole('button', { name: 'Publiko notat' }).click();
   await expect(grade).toContainText('Publikuar');
+
+  const groupCsv = await downloaded(staff, 'Shkarko notat (CSV)');
+  expect(groupCsv).toContain('Përdoruesi,Emri i plotë,Nota,Maksimumi,Publikuar,Vlerësuar më');
+  expect(groupCsv).toContain(`${E2E_ACCOUNT.username},${E2E_ACCOUNT.fullName},2,2,Po,`);
+  await staff.goto(`/o/e2e/courses/${course.id}`);
+  const courseCsv = await downloaded(staff, 'Notat (CSV)');
+  expect(courseCsv).toContain('Lab 1 · Detyra (/2),Gjithsej');
+  expect(courseCsv).toContain(`Grupi A,${E2E_ACCOUNT.username},${E2E_ACCOUNT.fullName},2,2`);
 
   await student.goto(pageUrl);
   await expect(student.getByTestId('my-grade')).toContainText('Nota juaj: 2/2');
