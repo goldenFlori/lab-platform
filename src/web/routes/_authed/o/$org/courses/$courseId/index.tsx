@@ -20,6 +20,7 @@ import type { CourseDetail, GroupView } from '../../../../../../../shared/course
 import { formatJoinCode } from '../../../../../../../shared/join-code';
 import { isLocale, LOCALES } from '../../../../../../../shared/locale';
 import { AiQuestions } from '../../../../../../components/AiQuestions';
+import { CourseGradesCsv } from '../../../../../../components/CourseGradesCsv';
 import { CourseLabs } from '../../../../../../components/CourseLabs';
 import { CourseStaff } from '../../../../../../components/CourseStaff';
 import { SurveyForStaff, SurveyForStudent } from '../../../../../../components/CourseSurvey';
@@ -88,6 +89,7 @@ function CoursePage() {
               <BarChart3 className="size-4" /> {t.course.activity}
             </Link>
           )}
+          {permissions.grades && <CourseGradesCsv org={org} courseId={courseId} title={course.title} />}
           {permissions.manage && (
             <Button
               variant="tertiary"
