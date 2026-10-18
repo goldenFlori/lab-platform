@@ -644,7 +644,7 @@ export const sq = {
         heading: 'Të drejtat tuaja',
         items: [
           'Të shkarkoni gjithçka që ruhet për ju, si një skedar, te "Të dhënat e mia".',
-          'Të kërkoni fshirjen e të dhënave: kërkesa i shkon administratorit të institucionit tuaj.',
+          'Të kërkoni fshirjen e të dhënave: kërkesa i shkon administratorit të institucionit tuaj, i cili i fshin nga platforma. Llogaria fshihet kur nuk i përket asnjë institucioni tjetër.',
           'Të kërkoni korrigjim: përmes pedagogut ose administratorit të institucionit.',
         ],
       },
@@ -659,7 +659,7 @@ export const sq = {
     download: 'Shkarko (JSON)',
     deleteTitle: 'Kërko fshirjen',
     deleteText:
-      'Kërkesa i shkon administratorit të institucionit tuaj, i cili e trajton. Një notë mund të duhet të mbetet në regjistrat e institucionit.',
+      'Kërkesa i shkon administratorit të institucionit tuaj, i cili fshin të dhënat tuaja në atë institucion. Notat e publikuara mund t’i ruajë më parë në regjistrat e institucionit.',
     note: 'Shënim për administratorin (jo i detyrueshëm)',
     request: 'Dërgo kërkesën',
     sent: 'Kërkesa u dërgua. Administratori i institucionit do ta trajtojë.',
@@ -668,10 +668,33 @@ export const sq = {
   },
   deletions: {
     title: (open: number) => `Kërkesat për fshirjen e të dhënave (${open} të hapura)`,
-    help: 'Përdoruesit që kërkuan fshirjen e të dhënave të tyre në këtë institucion. Hiqini nga kurset dhe grupet; për fshirje të plotë të llogarisë kontaktoni pronarin e platformës. Pastaj shënojeni të trajtuar.',
+    help: 'Përdoruesit që kërkuan fshirjen e të dhënave të tyre në këtë institucion. Fshijini të dhënat (shkarkoni më parë notat për regjistrin, nëse duhen), ose shënojeni kërkesën të trajtuar nëse e zgjidhët ndryshe.',
     asked: (when: string) => `Kërkuar më ${when}`,
     handled: (when: string) => `Trajtuar më ${when}`,
     markHandled: 'Shëno të trajtuar',
+    erase: 'Fshi të dhënat',
+    eraseTitle: (name: string) => `Të fshihen të dhënat e ${name}?`,
+    eraseText:
+      'Fshihen përfundimisht, vetëm në këtë institucion: anëtarësimet në kurse dhe grupe, kodi i ruajtur, ushtrimet e zgjidhura, dorëzimet, notat, aktiviteti, pyetjet dhe numërimet e AI dhe historia e Live Lab.',
+    eraseKeep:
+      'Kurset, laboratorët dhe fletoret mbeten, edhe ato që ka krijuar ky person. Të dhënat në institucione të tjera nuk preken; llogaria fshihet vetëm kur nuk i përket asnjë institucioni tjetër.',
+    gradesFirst: (n: number): string =>
+      n === 1
+        ? 'Ka 1 notë të publikuar. Shkarkojeni për regjistrin e institucionit para fshirjes.'
+        : `Ka ${n} nota të publikuara. Shkarkojini për regjistrin e institucionit para fshirjes.`,
+    noGrades: 'Nuk ka nota të publikuara.',
+    downloadGrades: 'Shkarko notat (CSV)',
+    eraseConfirm: 'Fshi përfundimisht',
+    erased: (accountDeleted: boolean): string =>
+      accountDeleted
+        ? 'Të dhënat dhe llogaria u fshinë.'
+        : 'Të dhënat u fshinë në këtë institucion. Llogaria mbetet për institucionet e tjera.',
+    eraseFailed: 'Të dhënat nuk u fshinë. Provoni sërish.',
+    erasures: 'Fshirjet e kryera',
+    erasure: (asked: string, done: string) => `Kërkuar më ${asked} · fshirë më ${done}`,
+    erasedBy: (name: string) => `nga ${name}`,
+    accountGone: 'edhe llogaria',
+    csv: { course: 'Kursi', lab: 'Laboratori', notebook: 'Fletorja', releasedAt: 'Publikuar më' },
   },
   footer: {
     privacy: 'Privatësia',

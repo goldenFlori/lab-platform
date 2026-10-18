@@ -147,6 +147,21 @@ describe('cross-tenant isolation: links to another organization', () => {
     expect(await a.tenant.personal.deletionRequests()).toEqual([]);
     expect(await a.tenant.personal.handleDeletion(request?.id as string, a.user.id)).toBe(false);
     expect((await b.tenant.personal.deletionRequests())[0]?.handledAt).toBeNull();
+    // Nor erases from them (#115): not their request, grades or rows, nor sees their erasures.
+    expect(await a.tenant.personal.openRequest(request?.id as string)).toBeUndefined();
+    await b.tenant.grading.record({
+      notebookId: b.notebook.id,
+      userId: b.user.id,
+      autoScore: 1,
+      maxScore: 1,
+      results: [],
+    });
+    await b.tenant.grading.release(b.notebook.id, [b.user.id]);
+    expect(await a.tenant.personal.releasedGrades(b.user.id)).toEqual([]);
+    await a.tenant.personal.erase(b.user.id, new Date(), a.user.id);
+    expect(await b.tenant.grading.of(b.notebook.id, b.user.id)).toBeDefined();
+    expect(await b.tenant.personal.deletionRequests()).toHaveLength(1);
+    expect(await b.tenant.personal.erasures()).toEqual([]);
   });
 
   it("does not give memberships to another organization's users", async () => {

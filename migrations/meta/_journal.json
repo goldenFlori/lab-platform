@@ -127,6 +127,13 @@
       "when": 1791841260221,
       "tag": "0017_surveys",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1792357693816,
+      "tag": "0018_erasures",
+      "breakpoints": true
     }
   ]
 }

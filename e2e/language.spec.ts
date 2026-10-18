@@ -2,12 +2,10 @@ import { expect, type Page, test } from '@playwright/test';
 import { renderNotebook } from '../src/notebook';
 import { toStored } from '../src/notebook/stored';
 import type { Me } from '../src/shared/auth';
-import { hashPassword } from '../src/shared/password';
-import type { GroupStudent } from '../src/shared/students';
 import { VISUALIZER_IDS } from '../src/shared/visualizers';
 import { E2E_STAFF } from './account';
 import { courseWithLab, uploadNotebook } from './notebooks';
-import { apiCall, signIn } from './sign-in';
+import { apiCall, newStudent, signIn } from './sign-in';
 
 // #19 is done when every screen exists in both languages. The shared test accounts stay in
 // Albanian for the other tests: staff see English through this device's choice, and the account
@@ -33,18 +31,6 @@ async function expectEnglish(page: Page) {
   const text = await interfaceText(page);
   // Albanian's own letters, or its most common interface words, would mean a missed message.
   expect(text, page.url()).not.toMatch(/[ëçËÇ]|\b(Kurset|Laboratori|Fletor|Grupi|Studentët|Shto|Anulo|Duke)\b/);
-}
-
-async function newStudent(staff: Page, coursePath: string, groupId: string, fullName: string) {
-  const password = `Provë-${crypto.randomUUID().slice(0, 8)}`;
-  const base = fullName.toLowerCase().replace(/[^a-z]+/g, '.');
-  const {
-    students: [student],
-  } = await apiCall<{ students: GroupStudent[] }>(staff, 'POST', `${coursePath}/groups/${groupId}/students`, {
-    students: [{ fullName, username: base, passwordHash: await hashPassword(password) }],
-  });
-  if (!student) throw new Error('No student was made');
-  return { username: student.username, password };
 }
 
 test('a visitor switches the interface to English, and it stays so on this device', async ({ page }) => {
