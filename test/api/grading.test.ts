@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { NotFoundError } from '../../src/api/db/tenant';
-import type { StaffGrade } from '../../src/shared/grading';
+import type { CourseGrades, StaffGrade } from '../../src/shared/grading';
 import type { MySubmission } from '../../src/shared/submissions';
 import { seedOrganization } from './fixtures';
 import { account } from './http';
@@ -85,6 +85,32 @@ describe('grades', () => {
   });
 });
 
+describe("a course's released grades (#114)", () => {
+  it('go to staff who grade, for their groups, and only once released', async () => {
+    const { seed, pedagog, assistant, ana, besa, nbPath } = await setup();
+    const coursePath = `/orgs/${seed.org.slug}/courses/${seed.course.id}/grades`;
+    await pedagog.call(`${nbPath}/grades/${ana.user.id}`, { method: 'PUT', body: RUN });
+    await pedagog.call(`${nbPath}/grades/release?group=${seed.group.id}`, { method: 'POST' });
+    // Graded after the release: not released yet.
+    await besa.call(`${nbPath}/submission`, { method: 'POST' });
+    await pedagog.call(`${nbPath}/grades/${besa.user.id}`, { method: 'PUT', body: RUN });
+
+    const data = (await (await pedagog.call(coursePath)).json()) as CourseGrades;
+    expect(data.notebooks).toEqual([{ id: seed.notebook.id, lab: seed.lab.n, title: seed.notebook.title }]);
+    expect(data.students.map((s) => s.id).sort()).toEqual([ana.user.id, besa.user.id].sort());
+    expect(data.grades).toEqual([{ userId: ana.user.id, notebookId: seed.notebook.id, score: 2, maxScore: 3 }]);
+
+    expect((await assistant.call(coursePath)).status).toBe(403);
+    expect((await ana.call(coursePath)).status).toBe(403);
+
+    // A pedagog of another group gets that group's students only.
+    const groupB = await seed.tenant.groups.create({ courseId: seed.course.id, name: 'Grupi B' });
+    const other = await account(seed, 'pedagog', { groupId: groupB.id });
+    const theirs = (await (await other.call(coursePath)).json()) as CourseGrades;
+    expect(theirs).toEqual({ notebooks: [], students: [], grades: [] });
+  });
+});
+
 describe('cross-tenant isolation: grading', () => {
   it("cannot set or read another organization's", async () => {
     const a = await seedOrganization('a');
@@ -106,5 +132,7 @@ describe('cross-tenant isolation: grading', () => {
       a.tenant.grading.record({ notebookId: b.notebook.id, userId: a.user.id, autoScore: 1, maxScore: 1, results: [] }),
     ).rejects.toBeInstanceOf(NotFoundError);
     expect(await a.tenant.grading.review(b.notebook.id, b.user.id, { score: 0, feedback: null })).toBe(false);
+    await b.tenant.grading.release(b.notebook.id, [b.user.id]);
+    expect(await a.tenant.grading.releasedInCourse(b.course.id, [b.group.id])).toEqual({ students: [], released: [] });
   });
 });

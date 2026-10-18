@@ -14,6 +14,7 @@ import { NotFoundError } from '../db/tenant';
 import { courseActivityRoutes, pilotReportRoutes } from './activity';
 import { aiRoutes } from './ai';
 import { forbidden, groupOf, invalidRequest, seesCourse, summary, visibleCourse } from './course-context';
+import { courseGradesRoutes } from './grading';
 import { labRoutes } from './labs';
 import { progressRoutes } from './progress';
 import { searchRoutes } from './search';
@@ -89,6 +90,11 @@ export const courseRoutes = new Hono<TenantEnv>()
           groups.map((g) => g.id),
         ),
         configureAi: access.can('ai.configure', { courseId: course.id }),
+        grades: access.canInCourse(
+          'grade.edit',
+          course.id,
+          groups.map((g) => g.id),
+        ),
       },
     } satisfies CourseDetail);
   })
@@ -202,6 +208,7 @@ export const courseRoutes = new Hono<TenantEnv>()
   .route('/:courseId/search', searchRoutes)
   .route('/:courseId/activity', courseActivityRoutes)
   .route('/:courseId/ai', aiRoutes)
+  .route('/:courseId/grades', courseGradesRoutes)
   .route('/:courseId/progress', progressRoutes)
   .route('/:courseId/report', pilotReportRoutes)
   .route('/:courseId/survey', surveyRoutes);
