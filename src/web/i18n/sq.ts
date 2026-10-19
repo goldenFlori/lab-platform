@@ -701,6 +701,14 @@ export const sq = {
     accountGone: 'edhe llogaria',
     csv: { course: 'Kursi', lab: 'Laboratori', notebook: 'Fletorja', releasedAt: 'Publikuar më' },
   },
+  orgExport: {
+    title: 'Të dhënat e institucionit',
+    help: 'Një skedar JSON me njerëzit, kurset, laboratorët, fletoret, dorëzimet, notat dhe aktivitetin. Pa fjalëkalime dhe pa kodin e padorëzuar të studentëve.',
+    download: 'Shkarko (JSON)',
+    progress: (step: number, of: number) => `Duke mbledhur të dhënat: ${step} nga ${of}…`,
+    stop: 'Ndalo',
+    failed: 'Shkarkimi nuk u krye. Provoni sërish.',
+  },
   footer: {
     privacy: 'Privatësia',
   },
