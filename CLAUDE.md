@@ -134,5 +134,7 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   CSP (`src/api/routes/notebooks.ts`). Staff upload, but students open them.
 - **Notebook HTML is shown only through `sanitize()`** (`src/web/lib/sanitize.ts`). A rendering is
   made in a browser and can be hand-crafted, so never trust the converter's escaping alone.
+- **The data processing agreement describes the code** (`docs/legal/`): a change to security,
+  sub-processors, data location or retention updates both language versions in the same PR.
 - **Student data stays in the EU or encrypted.** The production database has the EU jurisdiction;
   backups are encrypted with the owner's key. Never commit, log or upload a plaintext export.

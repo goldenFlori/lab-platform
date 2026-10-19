@@ -298,8 +298,15 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   one JSON file: people (no password hashes), course structure, notebooks with their original
   .ipynb, exercises, submissions, grades, activity, AI records, surveys, deletion requests and
   erasures. The Worker serves it in small pages and the browser assembles it. Students'
-  unsubmitted code stays out. Next: the data processing agreement template (#118).
-- **Next (the owner):** record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
+  unsubmitted code stays out (PR #122).
+- **2026-10-19:** #118 done, and with it Phase 6. A data processing agreement template in Albanian
+  and English (`docs/legal/`), written against Law No. 124/2024 and the Commissioner's adequacy
+  Decision No. 1/2025, with the platform's security measures, sub-processors and retention as
+  annexes, for a lawyer to review. Making its claims true, Live Lab rooms now run in Cloudflare's
+  EU jurisdiction and keep nothing once a class ends, and the privacy page says that AI requests
+  (never names) may be processed outside the EU and that the encrypted backups sit at GitHub.
+- **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
+  is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
   the Startup Albania application (see `platform-business`).
 - The course's static site (the course repo's `site/`, on GitHub Pages) stays in production until
@@ -342,6 +349,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-12 | "Explain my error" gives hints by default and everywhere outside exercises; the full fix only on exercises staff set to it, after the solutions date. Students' questions and answers are visible to the staff of their group (students are told) and deleted after 180 days | Decided |
 | 2026-10-12 | Data rights: every user downloads all their data across institutions as JSON (released grades only; drafts stay with staff). A deletion request goes to each institution's admins and deletes nothing on its own, since grades may have to stay in the institution's records | Decided |
 | 2026-10-18 | Erasure is per institution and done by its admin from a deletion request: everything of the person there goes, released grades included (offered as a CSV first, since the platform is not the registry of record). The account goes only when it has no membership or grade in another institution. Each erasure leaves a record with dates and the admin, never the person | Decided |
+| 2026-10-19 | The data processing agreement says only what the code does and changes with it. Stored data stays in the EU (database and Live Labs in Cloudflare's EU jurisdiction); AI requests, which carry no names, may be processed outside the EU by Cloudflare (DPF-certified, adequate under Decision No. 1/2025), and the agreement and privacy page say so rather than promise otherwise | Decided |
 | 2026-10-19 | An institution's export holds everything it owns, in one JSON file its admin downloads, except secrets (password hashes, sessions, join codes), what is derived (search, renderings) and students' unsubmitted code, which stays private to them | Decided |
 | 2026-10-18 | Retention: daily activity, AI use counts and ended Live Labs two years (two academic years of reports); handled deletion requests one year; AI questions 180 days; sign-in 30 days idle. Student work, grades and surveys live as long as their course, which the institution deletes. One list in code feeds the nightly job and the privacy page | Decided |
 | 2026-10-12 | The survey is anonymous by design: ratings are stored only as counts, comments with random ids, no time and no author, in a WITHOUT ROWID table; who answered is kept apart, only to ask once. Results show from five answers | Decided |
