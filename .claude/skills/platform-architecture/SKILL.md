@@ -585,6 +585,9 @@ at `/o/:org/courses/:id/activity`, linked from the course page.
 - **Minimal personal data:** full name, username, optional email.
 - **Learning activity** is kept per student and day only to count distinct students. Reports show
   counts, never names, and no third-party tracker is used.
+- **Retention (#116):** `src/shared/retention.ts` is the one list of periods. The daily cron
+  (`applyRetention`) deletes what passed them, at most `RETENTION_BATCH` rows per table a run to stay
+  within D1's daily writes; the privacy page prints the same numbers.
 - **Institutions own their data:** per-org export and delete.
 - **Data sent to AI:** only the question and the code or output context, never names.
 - **Before selling:** check the Albanian data-protection law (aligned with GDPR) and offer

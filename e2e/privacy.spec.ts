@@ -13,6 +13,8 @@ test('the privacy page is one click away and fits a phone', async ({ page }) => 
   await page.getByRole('contentinfo').getByRole('link', { name: 'Privatësia' }).click();
   await expect(page.getByRole('heading', { name: 'Privatësia', level: 1 })).toBeVisible();
   await expect(page.getByText('juridiksionin e Bashkimit Evropian')).toBeVisible();
+  // The periods come from the same list the nightly deletion uses (#116).
+  await expect(page.getByText(/Live Lab: 2 vjet\./)).toBeVisible();
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
   );

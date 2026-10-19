@@ -1,5 +1,6 @@
 import type { Context, MiddlewareHandler } from 'hono';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
+import { RETENTION } from '../../shared/retention';
 import { createDb } from '../db';
 import { createSession, deleteExpired, deleteSession, extendSession, findSession } from '../db/auth';
 import type { AppEnv } from '../env';
@@ -10,7 +11,7 @@ import { windowCutoff } from './limits';
 // HttpOnly, Secure and SameSite=Lax, and lasts 30 days, renewed while the user keeps coming back.
 
 const COOKIE = 'session'; // sent as __Host-session
-const LIFETIME_SECONDS = 30 * 24 * 60 * 60;
+const LIFETIME_SECONDS = RETENTION.sessionDays * 24 * 60 * 60;
 /** Renew once less than this is left, so an active session never writes on every request. */
 const RENEW_BELOW_SECONDS = 15 * 24 * 60 * 60;
 

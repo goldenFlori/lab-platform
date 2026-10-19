@@ -288,7 +288,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   person's data in the institution, after a confirmation that offers their released grades as a CSV
   for the records. Their data in other institutions stays; the account goes when nothing ties it to
   another institution. The institution keeps a record of each erasure without the person's name.
-  Next: the retention schedule (#116).
+  (PR #120).
+- **2026-10-18:** #116 done. One retention list in `src/shared/retention.ts` drives the nightly job,
+  the sign-in lifetime and the privacy page: sign-in 30 days without use, AI questions 180 days,
+  daily activity, AI counts and ended Live Labs two years, handled deletion requests one year; the
+  rest lives as long as its course. The job deletes at most 5,000 rows per table a night.
+  Next: the institution's data export (#117).
 - **Next (the owner):** record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
   the Startup Albania application (see `platform-business`).
@@ -332,6 +337,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-12 | "Explain my error" gives hints by default and everywhere outside exercises; the full fix only on exercises staff set to it, after the solutions date. Students' questions and answers are visible to the staff of their group (students are told) and deleted after 180 days | Decided |
 | 2026-10-12 | Data rights: every user downloads all their data across institutions as JSON (released grades only; drafts stay with staff). A deletion request goes to each institution's admins and deletes nothing on its own, since grades may have to stay in the institution's records | Decided |
 | 2026-10-18 | Erasure is per institution and done by its admin from a deletion request: everything of the person there goes, released grades included (offered as a CSV first, since the platform is not the registry of record). The account goes only when it has no membership or grade in another institution. Each erasure leaves a record with dates and the admin, never the person | Decided |
+| 2026-10-18 | Retention: daily activity, AI use counts and ended Live Labs two years (two academic years of reports); handled deletion requests one year; AI questions 180 days; sign-in 30 days idle. Student work, grades and surveys live as long as their course, which the institution deletes. One list in code feeds the nightly job and the privacy page | Decided |
 | 2026-10-12 | The survey is anonymous by design: ratings are stored only as counts, comments with random ids, no time and no author, in a WITHOUT ROWID table; who answered is kept apart, only to ask once. Results show from five answers | Decided |
 | 2026-10-12 | A real mobile app means an installable web app (PWA) first; a store app (Capacitor) only if a need appears | Decided |
 | 2026-10-10 | Search without FTS5: D1 cannot export databases with virtual tables, and backups must keep working. The server sends each user the text of what they may see; the browser matches it as they type | Decided |
@@ -344,8 +350,6 @@ Decisions were delegated to Claude ("you decide"). Record new ones here with the
   - Product name and domain.
   - Which email domains FSHN uses for staff and for students.
   - The university's IP policy for software built for teaching (check before selling).
-- **How long to keep learning activity:** for example two academic years, then delete. Decide
-  before selling to other institutions, and write it into the data processing agreement.
 - **Course repo:**
   - Execute `bellman-ford-animated.ipynb`, the only notebook never run (3 s, 5 graph images).
     Needs the owner's OK and a `MANIFEST.json` update.

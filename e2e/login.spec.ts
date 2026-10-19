@@ -35,7 +35,8 @@ test('signs in, opens my courses, and signs out', async ({ page }) => {
   await account.click();
   await page.getByRole('menuitem', { name: 'Dil' }).click();
   await expect(page).toHaveURL('/');
-  await expect(page.getByRole('link', { name: 'Hyr', exact: true })).toBeVisible();
+  // The header's link; the front page has another for visitors (#103).
+  await expect(page.getByRole('banner').getByRole('link', { name: 'Hyr', exact: true })).toBeVisible();
 
   await page.goto('/courses');
   await expect(page).toHaveURL('/login?redirect=%2Fcourses');
