@@ -7,6 +7,7 @@ import type { Me } from '../../../shared/auth';
 import type { CourseSummary } from '../../../shared/courses';
 import { isLocale, LOCALES } from '../../../shared/locale';
 import { DeletionRequests } from '../../components/DeletionRequests';
+import { OrganizationExport } from '../../components/OrganizationExport';
 import { LANGUAGE_NAMES, t as messages, useT } from '../../i18n';
 import { useMe } from '../../lib/auth';
 import { APP_NAME } from '../../lib/brand';
@@ -35,7 +36,7 @@ function CoursesPage() {
       canCreate: access[i]?.data?.capabilities.organization.includes('course.create') ?? false,
       admin: access[i]?.data?.capabilities.organization.includes('org.manage') ?? false,
     }))
-    .filter((section) => section.courses.length > 0 || section.failed || section.canCreate);
+    .filter((section) => section.courses.length > 0 || section.failed || section.canCreate || section.admin);
 
   return (
     <section className="container-page py-12">
@@ -54,6 +55,7 @@ function CoursesPage() {
           <div key={section.org.id}>
             <OrganizationCourses {...section} showName={sections.length > 1} />
             {admin && <DeletionRequests org={section.org.slug} />}
+            {admin && <OrganizationExport organization={section.org} />}
           </div>
         ))
       )}

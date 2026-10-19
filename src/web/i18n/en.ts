@@ -704,6 +704,14 @@ export const en: Messages = {
     accountGone: 'with the account',
     csv: { course: 'Course', lab: 'Lab', notebook: 'Notebook', releasedAt: 'Released on' },
   },
+  orgExport: {
+    title: 'The institution’s data',
+    help: 'One JSON file with the people, courses, labs, notebooks, submissions, grades and activity. No passwords and no unsubmitted student code.',
+    download: 'Download (JSON)',
+    progress: (step, of) => `Gathering the data: ${step} of ${of}…`,
+    stop: 'Stop',
+    failed: 'The download did not finish. Please try again.',
+  },
   footer: {
     privacy: 'Privacy',
   },
