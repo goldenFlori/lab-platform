@@ -1,4 +1,5 @@
-import { exports } from 'cloudflare:workers';
+import { runInDurableObject } from 'cloudflare:test';
+import { env, exports } from 'cloudflare:workers';
 import { describe, expect, it } from 'vitest';
 import type { LiveMessage, LiveState } from '../../src/shared/live';
 import { seedOrganization } from './fixtures';
@@ -157,6 +158,25 @@ describe('Live Lab sessions', () => {
 
     host.ws?.send(JSON.stringify({ t: 'challenge-stop' }));
     await waitFor(() => a.messages.some((m) => m.t === 'challenge-stop'));
+  });
+
+  it('keep nothing of the class once it ends (#118)', async () => {
+    const { seed, pedagog, ana, labPath, state } = await setup();
+    await pedagog.call(`${labPath}/live`, { method: 'POST' });
+    const id = (await state(pedagog)).session?.id ?? '';
+    const ws = `${labPath}/live/${id}/ws`;
+    const host = await connect(await signIn(pedagog.user.username), ws);
+    const a = await connect(await signIn(ana.user.username), ws);
+    host.ws?.send(JSON.stringify({ t: 'challenge', notebook: seed.notebook.id, cell: 4, title: 'Ushtrimi 1' }));
+    await waitFor(() => a.messages.some((m) => m.t === 'challenge'));
+    a.ws?.send(JSON.stringify({ t: 'result', cell: 4, status: 'pass', error: null, ms: 120 }));
+    await waitFor(() => host.messages.some((m) => m.t === 'board' && m.passed === 1));
+
+    const stored = () =>
+      runInDurableObject(env.LIVE.get(env.LIVE.idFromName(id)), async (_, ctx) => (await ctx.storage.list()).size);
+    expect(await stored()).toBeGreaterThan(0);
+    await pedagog.call(`${labPath}/live/${id}/end`, { method: 'POST' });
+    expect(await stored()).toBe(0);
   });
 
   it('queue help requests for the staff, and pass reactions on, throttled', async () => {

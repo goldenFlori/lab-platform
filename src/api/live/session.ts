@@ -129,6 +129,8 @@ export class LiveSession extends DurableObject<Env> {
         ws.send(ended);
         ws.close(ENDED, 'ended');
       }
+      // Nothing of the class outlives it: its step, challenge results, questions and answers (#118).
+      await this.ctx.storage.deleteAll();
       return new Response(null, { status: 204 });
     }
     const member = JSON.parse(request.headers.get(MEMBER_HEADER) ?? 'null') as Member | null;

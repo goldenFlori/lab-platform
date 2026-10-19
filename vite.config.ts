@@ -66,7 +66,7 @@ function serviceWorker(): Plugin {
   };
 }
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [
     // Generates src/web/routeTree.gen.ts from the files in src/web/routes; must run before React.
     tanstackRouter({
@@ -82,6 +82,8 @@ export default defineConfig({
     cloudflare({
       persistState: process.env.LOCAL_STATE ? { path: process.env.LOCAL_STATE } : true,
       remoteBindings: !process.env.LOCAL_STATE,
+      // Only Cloudflare has jurisdictions; the local runtime refuses them, so dev runs Live Labs without.
+      config: command === 'serve' ? (config) => ({ vars: { ...config.vars, LIVE_JURISDICTION: 'none' } }) : undefined,
     }),
     pyodideEngine(),
     serviceWorker(),
@@ -94,4 +96,4 @@ export default defineConfig({
     // Raise this deliberately.
     chunkSizeWarningLimit: 650,
   },
-});
+}));
