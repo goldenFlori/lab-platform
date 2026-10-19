@@ -9,9 +9,6 @@
 // instead, for tests.
 
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { uuidv7 } from '../src/api/db/ids.ts';
 import { hashPassword } from '../src/shared/password.ts';
@@ -69,17 +66,14 @@ const statements = [
   `INSERT INTO memberships (id, org_id, user_id, role) VALUES (${quote(uuidv7())}, (SELECT id FROM organizations WHERE slug = ${quote(orgSlug)}), ${quote(userId)}, ${quote(role)});`,
 ];
 
-const dir = mkdtempSync(join(tmpdir(), 'lab-account-'));
-try {
-  const file = join(dir, 'account.sql');
-  writeFileSync(file, `${statements.join('\n')}\n`, { mode: 0o600 });
-  const target = args.remote
-    ? ['--remote']
-    : ['--local', ...(args['persist-to'] ? ['--persist-to', args['persist-to']] : [])];
-  execFileSync('npx', ['wrangler', 'd1', 'execute', 'DB', '--file', file, ...target], { stdio: 'inherit' });
-} finally {
-  rmSync(dir, { recursive: true, force: true });
-}
+// Sent as one query: D1's import endpoint (what --file uses) refuses wrangler's OAuth login, and a
+// three-row insert needs none of its downtime. The statements carry only the password's hash.
+const target = args.remote
+  ? ['--remote']
+  : ['--local', ...(args['persist-to'] ? ['--persist-to', args['persist-to']] : [])];
+execFileSync('npx', ['wrangler', 'd1', 'execute', 'DB', '--command', statements.join(' '), ...target], {
+  stdio: 'inherit',
+});
 
 console.log(
   `\n✔ ${fullName} (${username}) is now ${role} of ${orgName}${args.remote ? '' : ' in the local database'}.`,
