@@ -16,7 +16,7 @@ export default defineConfig(async () => {
             cloudflareTest({
               wrangler: { configPath: './wrangler.jsonc' },
               remoteBindings: false,
-              miniflare: { bindings: { TEST_MIGRATIONS: migrations, AI_PROVIDER: 'fake' } },
+              miniflare: { bindings: { TEST_MIGRATIONS: migrations, AI_PROVIDER: 'fake', LIVE_JURISDICTION: 'none' } },
             }),
           ],
           test: { name: 'api', include: ['test/api/**/*.test.ts'], setupFiles: ['./test/apply-migrations.ts'] },

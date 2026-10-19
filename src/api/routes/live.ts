@@ -17,7 +17,15 @@ function roleIn(c: Context<TenantEnv>, ctx: LabContext, hostId: string): LiveRol
   return ctx.staff ? 'assistant' : 'student';
 }
 
-const sessionStub = (c: Context<TenantEnv>, id: string) => c.env.LIVE.get(c.env.LIVE.idFromName(id));
+/**
+ * A session's Durable Object, in the EU jurisdiction (#118): it holds who is connected, help requests
+ * and answers, so like the database it runs and stores its data only in EU data centers. Local
+ * runtimes have no jurisdictions (LIVE_JURISDICTION in wrangler.jsonc).
+ */
+function sessionStub(c: Context<TenantEnv>, id: string) {
+  const live = c.env.LIVE_JURISDICTION === 'eu' ? c.env.LIVE.jurisdiction('eu') : c.env.LIVE;
+  return live.get(live.idFromName(id));
+}
 
 export const liveRoutes = new Hono<TenantEnv>()
   .get('/', async (c) => {

@@ -25,7 +25,9 @@
   // AI features (#84) run on Workers AI's free daily allocation. Tests and end-to-end runs use a
   // fake model instead (AI_PROVIDER "fake"), since they cannot reach Cloudflare's.
   "ai": { "binding": "AI", "remote": true },
-  "vars": { "AI_PROVIDER": "workers-ai" },
+  // LIVE_JURISDICTION "eu" keeps Live Lab objects in EU data centers (#118). Local runtimes cannot
+  // (dev, tests and end-to-end runs set "none").
+  "vars": { "AI_PROVIDER": "workers-ai", "LIVE_JURISDICTION": "eu" },
   // One shared database for all tenants. In production it is created with the EU jurisdiction,
   // so the data never leaves the EU; locally it lives in .wrangler/state.
   "d1_databases": [

@@ -566,6 +566,9 @@ at `/o/:org/courses/:id/activity`, linked from the course page.
   - Later: preview versions for branches.
 - **Data location:** the production D1 database was created with the EU jurisdiction, so it is
   stored and processed only in the EU. This cannot be changed after creation.
+  Live Lab Durable Objects use the EU jurisdiction too (`LIVE_JURISDICTION` "eu"; local runtimes
+  cannot, so dev, tests and e2e set "none") and delete their storage when a class ends. Workers
+  AI has no EU restriction: its requests carry no names, and the DPA and privacy page say so.
 - **Backups:**
   - D1 Time Travel: restore to any minute of the last 7 days (30 on the paid plan).
   - Weekly (`.github/workflows/backup.yml`): `wrangler d1 export`, encrypted with the owner's
@@ -591,5 +594,6 @@ at `/o/:org/courses/:id/activity`, linked from the course page.
 - **Institutions own their data:** the admin downloads it all (#117, `src/shared/org-export.ts`:
   paged parts assembled in the browser) and erases people on request (#115).
 - **Data sent to AI:** only the question and the code or output context, never names.
-- **Before selling:** check the Albanian data-protection law (aligned with GDPR) and offer
-  institutions a data processing agreement.
+- **Data processing agreement:** `docs/legal/dpa-template.{sq,en}.md`, under Law No. 124/2024.
+  Its annexes (security measures, sub-processors, retention) describe the code, so a change to
+  any of them updates the template in the same PR.

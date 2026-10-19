@@ -69,7 +69,7 @@ export const en: Messages = {
       },
       privacy: {
         title: 'Privacy from the start',
-        text: 'Data in the EU, no ads and no tracking. Reports show counts, not names.',
+        text: 'Data stored in the EU, no ads and no tracking. Reports show counts, not names.',
       },
     },
     whoTitle: 'For universities and schools',
@@ -80,6 +80,7 @@ export const en: Messages = {
       'Student accounts without email: the teacher creates and prints them.',
       'Labs come from the .ipynb notebooks you already have.',
       'Albanian and English.',
+      'A data processing agreement under Law No. 124/2024, and all your data whenever you ask.',
     ],
     contact: 'Write to us for a pilot',
     privacy: 'Privacy',
@@ -593,7 +594,7 @@ export const en: Messages = {
   },
   privacy: {
     title: 'Privacy',
-    updated: 'Updated on 18 October 2026',
+    updated: 'Updated on 19 October 2026',
     intro:
       "This page says what data Lab Platform keeps, why, where, for how long and who sees it. Your institution (a faculty, say) decides about its students' data; the platform processes it on its behalf.",
     sections: [
@@ -606,7 +607,8 @@ export const en: Messages = {
           'The exercises you solve, the work you hand in, and your grades.',
           'Activity as counts: at most one record a day for each lab and kind (opened, downloaded, tried a visualization, solved an exercise, ran its code, took part in a Live Lab).',
           '"Explain the error" questions with the AI\'s answer, and how many AI requests you make a day.',
-          'One sign-in cookie, which keeps you signed in.',
+          'One sign-in cookie, which keeps you signed in, and the browser’s name for each sign-in.',
+          'Failed sign-ins, counted by username and network address for a few minutes, to stop password guessing.',
         ],
       },
       {
@@ -621,15 +623,15 @@ export const en: Messages = {
       {
         heading: 'Where it is kept',
         items: [
-          "At Cloudflare. The database is in the European Union's jurisdiction, so the data does not leave the EU.",
-          'Weekly backups are encrypted before they leave Cloudflare and kept for 90 days.',
+          "At Cloudflare. The database and Live Labs are in the European Union's jurisdiction: stored and processed only in EU data centers.",
+          "Weekly backups are encrypted with the owner's key before they leave Cloudflare and kept for 90 days at GitHub (US), which sees only encrypted data.",
         ],
       },
       {
         heading: 'AI',
         items: [
           'The AI runs at Cloudflare (Workers AI) and is switched on by the teacher for each course.',
-          'It gets only the code, the error and the lab text; never your name.',
+          'It gets only the code, the error and the lab text; never your name. Cloudflare may process such a request outside the EU.',
           'For exercises it gives hints, not the solution, and it never grades.',
         ],
       },
@@ -654,6 +656,13 @@ export const en: Messages = {
           'Download everything kept about you as one file, in "My data".',
           "Ask for your data to be deleted: the request goes to your institution's administrator, who erases it from the platform. The account goes when it belongs to no other institution.",
           "Ask for a correction: through your teacher or your institution's administrator.",
+        ],
+      },
+      {
+        heading: 'Who is responsible',
+        items: [
+          'Your institution is the controller of your data. The platform processes it on the institution’s behalf, under a data processing agreement and Albania’s Law No. 124/2024 on personal data protection.',
+          'You may complain to the Commissioner for the Right to Information and Personal Data Protection (idp.al).',
         ],
       },
     ],

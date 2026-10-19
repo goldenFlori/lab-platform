@@ -11,7 +11,7 @@ const server = [
   `npx wrangler d1 migrations apply DB --local --persist-to ${E2E_STATE}`,
   `ACCOUNT_PASSWORD=${E2E_ACCOUNT.password} node scripts/create-account.ts --org-slug e2e-school --org-name "E2E School" --username ${E2E_ACCOUNT.username} --full-name "${E2E_ACCOUNT.fullName}" --role student --persist-to ${E2E_STATE}`,
   `ACCOUNT_PASSWORD=${E2E_STAFF.password} node scripts/create-account.ts --org-slug e2e --org-name E2E --username ${E2E_STAFF.username} --full-name "${E2E_STAFF.fullName}" --role admin --persist-to ${E2E_STATE}`,
-  `CLOUDFLARE_INCLUDE_PROCESS_ENV=true AI_PROVIDER=fake LOCAL_STATE=${E2E_STATE} npx vite preview --port ${port} --strictPort`,
+  `CLOUDFLARE_INCLUDE_PROCESS_ENV=true AI_PROVIDER=fake LIVE_JURISDICTION=none LOCAL_STATE=${E2E_STATE} npx vite preview --port ${port} --strictPort`,
 ].join(' && ');
 
 export default defineConfig({
