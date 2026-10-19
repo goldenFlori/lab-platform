@@ -588,7 +588,8 @@ at `/o/:org/courses/:id/activity`, linked from the course page.
 - **Retention (#116):** `src/shared/retention.ts` is the one list of periods. The daily cron
   (`applyRetention`) deletes what passed them, at most `RETENTION_BATCH` rows per table a run to stay
   within D1's daily writes; the privacy page prints the same numbers.
-- **Institutions own their data:** per-org export and delete.
+- **Institutions own their data:** the admin downloads it all (#117, `src/shared/org-export.ts`:
+  paged parts assembled in the browser) and erases people on request (#115).
 - **Data sent to AI:** only the question and the code or output context, never names.
 - **Before selling:** check the Albanian data-protection law (aligned with GDPR) and offer
   institutions a data processing agreement.
