@@ -4,6 +4,8 @@ import {
   countDistinct,
   desc,
   eq,
+  getTableColumns,
+  gt,
   gte,
   type InferInsertModel,
   type InferSelectModel,
@@ -17,11 +19,12 @@ import {
   type SQL,
   sql,
 } from 'drizzle-orm';
-import type { SQLiteColumn } from 'drizzle-orm/sqlite-core';
+import type { SQLiteColumn, SQLiteTable } from 'drizzle-orm/sqlite-core';
 import type { ActivityKind } from '../../shared/activity';
 import type { AiQuestion } from '../../shared/ai';
 import type { AiMode } from '../../shared/exercise-limits';
 import type { DeletionRequestView, ErasureView, OrganizationData, PersonGrade } from '../../shared/my-data';
+import type { ExportPage, ExportPart } from '../../shared/org-export';
 import { roleExists } from './access';
 import { uuidv7 } from './ids';
 import type { Db } from './index';
@@ -335,7 +338,7 @@ function tenantLabAccess(db: Db, orgId: string) {
 /** Bytes per stored chunk: well under D1's 2 MB per value. */
 export const CHUNK_BYTES = 512 * 1024;
 
-type StoredFile = { mime: string; encoding: 'identity' | 'gzip'; size: number; data: Uint8Array };
+export type StoredFile = { mime: string; encoding: 'identity' | 'gzip'; size: number; data: Uint8Array };
 
 /** A lab's notebooks (#14), with their files in chunks and their embeds. */
 function tenantNotebooks(db: Db, orgId: string) {
@@ -1658,6 +1661,84 @@ function tenantPersonal(db: Db, orgId: string) {
   };
 }
 
+/** Rows per export page, unless the part's rows are large. */
+const EXPORT_PAGE = 500;
+
+type Exportable = { table: SQLiteTable; orgId: SQLiteColumn; id?: SQLiteColumn; omit?: string[]; limit?: number };
+
+/** Each part of an institution's export (#117) but people: its table, key and what it leaves out. */
+const EXPORTABLE: Record<Exclude<ExportPart, 'people'>, Exportable> = {
+  memberships: { table: memberships, orgId: memberships.orgId, id: memberships.id },
+  courseTemplates: { table: courseTemplates, orgId: courseTemplates.orgId, id: courseTemplates.id },
+  courses: { table: courses, orgId: courses.orgId, id: courses.id },
+  // A join code works as an invitation: not something to carry around in a file.
+  groups: { table: groups, orgId: groups.orgId, id: groups.id, omit: ['joinCode'] },
+  labs: { table: labs, orgId: labs.orgId, id: labs.id },
+  labAccess: { table: labAccess, orgId: labAccess.orgId, id: labAccess.id },
+  notebooks: { table: notebooks, orgId: notebooks.orgId, id: notebooks.id },
+  embeds: { table: embeds, orgId: embeds.orgId, id: embeds.id },
+  exercises: { table: exercises, orgId: exercises.orgId, id: exercises.id },
+  exerciseGrading: { table: exerciseGrading, orgId: exerciseGrading.orgId, id: exerciseGrading.id },
+  assignments: { table: assignments, orgId: assignments.orgId, id: assignments.id },
+  submissions: { table: submissions, orgId: submissions.orgId, id: submissions.id, limit: 100 },
+  grades: { table: grades, orgId: grades.orgId, id: grades.id },
+  exerciseCompletions: { table: exerciseCompletions, orgId: exerciseCompletions.orgId, id: exerciseCompletions.id },
+  labActivity: { table: labActivity, orgId: labActivity.orgId, id: labActivity.id },
+  aiUsage: { table: aiUsage, orgId: aiUsage.orgId },
+  aiQuestions: { table: aiQuestions, orgId: aiQuestions.orgId, id: aiQuestions.id, limit: 200 },
+  liveSessions: { table: liveSessions, orgId: liveSessions.orgId, id: liveSessions.id },
+  surveys: { table: surveys, orgId: surveys.orgId, id: surveys.id },
+  surveyRatings: { table: surveyRatings, orgId: surveyRatings.orgId },
+  surveyComments: { table: surveyComments, orgId: surveyComments.orgId, id: surveyComments.id },
+  deletionRequests: { table: deletionRequests, orgId: deletionRequests.orgId, id: deletionRequests.id },
+  erasures: { table: erasures, orgId: erasures.orgId, id: erasures.id },
+};
+
+/**
+ * An institution's data for its admin (#117), one page of one part at a time, in key order. Tables
+ * without an id page by rowid. People are those with a membership here, without password hashes.
+ */
+function tenantExport(db: Db, orgId: string) {
+  return {
+    async page(part: ExportPart, after: string | null, limit = EXPORT_PAGE): Promise<ExportPage> {
+      if (part === 'people') {
+        const rows = await db
+          .select(publicUser)
+          .from(users)
+          .where(
+            and(
+              inArray(
+                users.id,
+                db.select({ id: memberships.userId }).from(memberships).where(eq(memberships.orgId, orgId)),
+              ),
+              after ? gt(users.id, after) : undefined,
+            ),
+          )
+          .orderBy(asc(users.id))
+          .limit(limit);
+        return { rows, next: rows.length === limit ? (rows.at(-1)?.id ?? null) : null };
+      }
+      const spec = EXPORTABLE[part];
+      const size = Math.min(limit, spec.limit ?? EXPORT_PAGE);
+      const { orgId: _org, ...columns } = getTableColumns(spec.table) as Record<string, SQLiteColumn>;
+      for (const name of spec.omit ?? []) delete columns[name];
+      const key = spec.id ?? sql<number>`rowid`;
+      const past = !after ? undefined : spec.id ? gt(spec.id, after) : gt(sql`rowid`, Number(after));
+      const rows = (await db
+        .select({ ...columns, _key: key })
+        .from(spec.table)
+        .where(and(eq(spec.orgId, orgId), past))
+        .orderBy(asc(key))
+        .limit(size)) as (Record<string, unknown> & { _key: unknown })[];
+      const last = rows.at(-1)?._key;
+      return {
+        rows: rows.map(({ _key, ...row }) => row),
+        next: rows.length === size && last !== undefined ? String(last) : null,
+      };
+    },
+  };
+}
+
 /** A course's end-of-semester survey (#102): answered anonymously, read only as totals. */
 function tenantSurveys(db: Db, orgId: string) {
   return {
@@ -1777,6 +1858,7 @@ export function forTenant(db: Db, orgId: string) {
     progress: tenantProgress(db, orgId),
     personal: tenantPersonal(db, orgId),
     surveys: tenantSurveys(db, orgId),
+    export: tenantExport(db, orgId),
   };
 }
 

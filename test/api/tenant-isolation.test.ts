@@ -3,6 +3,7 @@ import { Hono } from 'hono';
 import { describe, expect, it } from 'vitest';
 import { NotFoundError, type TenantDb } from '../../src/api/db/tenant';
 import { handleError, notFound } from '../../src/api/errors';
+import { EXPORT_PARTS } from '../../src/shared/org-export';
 import { type Seeded, seedOrganization } from './fixtures';
 
 // Every tenant-owned resource, as seen from another organization: it must look like it does not exist.
@@ -162,6 +163,16 @@ describe('cross-tenant isolation: links to another organization', () => {
     expect(await b.tenant.grading.of(b.notebook.id, b.user.id)).toBeDefined();
     expect(await b.tenant.personal.deletionRequests()).toHaveLength(1);
     expect(await b.tenant.personal.erasures()).toEqual([]);
+  });
+
+  it("exports none of another organization's rows (#117)", async () => {
+    const { a, b } = await seedTwo();
+    const ids = [b.org.id, b.user.id, b.course.id, b.group.id, b.lab.id, b.notebook.id, b.membership.id];
+    for (const part of EXPORT_PARTS) {
+      const text = JSON.stringify(await a.tenant.export.page(part, null));
+      for (const id of ids) expect(text, part).not.toContain(id);
+    }
+    expect(await a.tenant.notebooks.getFile(b.notebook.id, 'notebook.ipynb')).toBeUndefined();
   });
 
   it("does not give memberships to another organization's users", async () => {

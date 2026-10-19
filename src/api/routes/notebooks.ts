@@ -18,7 +18,7 @@ import { searchSectionsInput } from '../../shared/search';
 import { streamAi } from '../ai/gateway';
 import { explainMessages } from '../ai/purposes';
 import type { TenantEnv } from '../auth/access';
-import { NotFoundError } from '../db/tenant';
+import { NotFoundError, type StoredFile } from '../db/tenant';
 import { recordActivity } from './activity';
 import { forbidden, invalidRequest } from './course-context';
 import { gradingRoutes } from './grading';
@@ -164,12 +164,7 @@ export const notebookRoutes = new Hono<TenantEnv>()
     };
     if (c.req.param('name') === ORIGINAL_FILE) headers['Content-Disposition'] = attachment(nb.originalName);
 
-    if (file.encoding !== 'gzip') return new Response(file.data, { headers });
-    // Stored gzipped: sent as it is to browsers that accept gzip, so the Worker never re-encodes.
-    if (/\bgzip\b/.test(c.req.header('Accept-Encoding') ?? '')) {
-      return new Response(file.data, { headers: { ...headers, 'Content-Encoding': 'gzip' }, encodeBody: 'manual' });
-    }
-    return new Response(new Blob([file.data]).stream().pipeThrough(new DecompressionStream('gzip')), { headers });
+    return storedFileResponse(c, file, headers);
   })
 
   .put('/:notebookId/embeds', zValidator('json', embedsInput, invalidRequest), async (c) => {
@@ -315,3 +310,12 @@ export const notebookRoutes = new Hono<TenantEnv>()
     await c.var.tenant.notebooks.remove(nb.id);
     return c.body(null, 204);
   });
+
+/** A stored file as it is: gzipped ones go out gzipped to browsers that accept it, never re-encoded. */
+export function storedFileResponse(c: Context, file: StoredFile, headers: Record<string, string>) {
+  if (file.encoding !== 'gzip') return new Response(file.data, { headers });
+  if (/\bgzip\b/.test(c.req.header('Accept-Encoding') ?? '')) {
+    return new Response(file.data, { headers: { ...headers, 'Content-Encoding': 'gzip' }, encodeBody: 'manual' });
+  }
+  return new Response(new Blob([file.data]).stream().pipeThrough(new DecompressionStream('gzip')), { headers });
+}
