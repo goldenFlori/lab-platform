@@ -69,7 +69,7 @@ export const sq = {
       },
       privacy: {
         title: 'Privatësi që në fillim',
-        text: 'Të dhënat në BE, pa reklama dhe pa gjurmim. Raportet tregojnë numra, jo emra.',
+        text: 'Të dhënat ruhen në BE, pa reklama dhe pa gjurmim. Raportet tregojnë numra, jo emra.',
       },
     },
     whoTitle: 'Për universitete dhe shkolla',
@@ -80,6 +80,7 @@ export const sq = {
       'Llogari për studentët pa email: pedagogu i krijon dhe i printon.',
       'Laboratorët vijnë nga fletoret .ipynb që keni tashmë.',
       'Shqip dhe anglisht.',
+      'Marrëveshje për përpunimin e të dhënave sipas ligjit nr. 124/2024, dhe të gjitha të dhënat tuaja kur t’i kërkoni.',
     ],
     contact: 'Na shkruani për një pilot',
     privacy: 'Privatësia',
@@ -590,7 +591,7 @@ export const sq = {
   },
   privacy: {
     title: 'Privatësia',
-    updated: 'Përditësuar më 18 tetor 2026',
+    updated: 'Përditësuar më 19 tetor 2026',
     intro:
       'Kjo faqe tregon cilat të dhëna ruan Lab Platform, pse, ku, për sa kohë dhe kush i sheh. Institucioni juaj (p.sh. fakulteti) vendos për të dhënat e studentëve të tij; platforma i përpunon në emër të tij.',
     sections: [
@@ -603,7 +604,8 @@ export const sq = {
           'Ushtrimet që zgjidhni, punën që dorëzoni dhe notat.',
           'Aktivitetin si numra: të shumtën një shënim në ditë për çdo laborator dhe lloj (e hapët, e shkarkuat, provuat një vizualizim, zgjidhët një ushtrim, ekzekutuat kodin, morët pjesë në një Live Lab).',
           'Pyetjet "Shpjego gabimin" me përgjigjen e AI-së, dhe sa kërkesa me AI bëni në ditë.',
-          'Një cookie për hyrjen, që ju mban të identifikuar.',
+          'Një cookie për hyrjen, që ju mban të identifikuar, dhe emrin e shfletuesit për çdo hyrje.',
+          'Hyrjet e dështuara, të numëruara sipas emrit të përdoruesit dhe adresës së rrjetit për pak minuta, për të ndalur hamendësimin e fjalëkalimeve.',
         ],
       },
       {
@@ -618,15 +620,15 @@ export const sq = {
       {
         heading: 'Ku ruhen',
         items: [
-          'Te Cloudflare. Baza e të dhënave është në juridiksionin e Bashkimit Evropian, ndaj të dhënat nuk dalin nga BE-ja.',
-          'Kopjet rezervë javore enkriptohen para se të dalin nga Cloudflare dhe mbahen 90 ditë.',
+          'Te Cloudflare. Baza e të dhënave dhe Live Lab-et janë në juridiksionin e Bashkimit Evropian: ruhen dhe përpunohen vetëm në qendra të dhënash në BE.',
+          'Kopjet rezervë javore enkriptohen me çelësin e pronarit para se të dalin nga Cloudflare dhe mbahen 90 ditë te GitHub (SHBA), që sheh vetëm të dhëna të enkriptuara.',
         ],
       },
       {
         heading: 'AI',
         items: [
           'AI-ja punon te Cloudflare (Workers AI) dhe ndizet nga pedagogu për çdo kurs.',
-          'Merr vetëm kodin, gabimin dhe tekstin e laboratorit; kurrë emrin tuaj.',
+          'Merr vetëm kodin, gabimin dhe tekstin e laboratorit; kurrë emrin tuaj. Cloudflare mund ta përpunojë këtë kërkesë edhe jashtë BE-së.',
           'Për ushtrimet jep udhëzime, jo zgjidhjen, dhe nuk vendos nota.',
         ],
       },
@@ -651,6 +653,13 @@ export const sq = {
           'Të shkarkoni gjithçka që ruhet për ju, si një skedar, te "Të dhënat e mia".',
           'Të kërkoni fshirjen e të dhënave: kërkesa i shkon administratorit të institucionit tuaj, i cili i fshin nga platforma. Llogaria fshihet kur nuk i përket asnjë institucioni tjetër.',
           'Të kërkoni korrigjim: përmes pedagogut ose administratorit të institucionit.',
+        ],
+      },
+      {
+        heading: 'Kush përgjigjet',
+        items: [
+          'Institucioni juaj është kontrolluesi i të dhënave tuaja. Platforma i përpunon në emër të tij, sipas një marrëveshjeje për përpunimin e të dhënave dhe ligjit nr. 124/2024 "Për mbrojtjen e të dhënave personale".',
+          'Mund të ankoheni te Komisioneri për të Drejtën e Informimit dhe Mbrojtjen e të Dhënave Personale (idp.al).',
         ],
       },
     ],
