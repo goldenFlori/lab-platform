@@ -10,6 +10,7 @@ import {
   MonitorUp,
   Plus,
   RefreshCw,
+  Repeat,
   Trash2,
   TrendingUp,
   Unlock,
@@ -79,6 +80,15 @@ function CoursePage() {
               className="button button--primary gap-2"
             >
               <TrendingUp className="size-4" /> {t.progress.open}
+            </Link>
+          )}
+          {!isStaff && (
+            <Link
+              to="/o/$org/courses/$courseId/review"
+              params={{ org, courseId }}
+              className="button button--secondary gap-2"
+            >
+              <Repeat className="size-4" /> {t.review.open}
             </Link>
           )}
           {permissions.analytics && (

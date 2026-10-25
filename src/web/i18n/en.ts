@@ -647,6 +647,13 @@ export const en: Messages = {
       review: (topic) => `To review: **${topic}**, where you have the fewest right at the first try.`,
     },
   },
+  review: {
+    open: 'Review',
+    title: 'Review',
+    lead: 'A few short questions on the algorithms of the labs you have opened, with new inputs every time. The topics you get wrong more often come back more often. Practice, not a grade.',
+    empty: 'Nothing to review yet. Open a lab with algorithm visualizations and come back here.',
+    toLab: (n) => `To Lab ${n}`,
+  },
   topics: {
     insertion: 'Insertion Sort',
     selection: 'Selection Sort',

@@ -1,6 +1,6 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
-import { ArrowLeft, BrainCircuit, CircleCheck, Clock, Lightbulb, Send, Star } from 'lucide-react';
+import { ArrowLeft, BrainCircuit, CircleCheck, Clock, Lightbulb, Repeat, Send, Star } from 'lucide-react';
 import type { TopicResult } from '../../../../../../../shared/predictions';
 import type { LabProgress, NotebookProgress } from '../../../../../../../shared/progress';
 import { RichText } from '../../../../../../../viz/kit/RichText';
@@ -78,7 +78,7 @@ function ProgressPage() {
         </p>
       )}
 
-      <Understanding topics={data.topics} />
+      <Understanding org={org} courseId={courseId} topics={data.topics} />
 
       {data.labs.length === 0 ? (
         <p className="mt-8 text-sm text-muted">{t.progress.noLabs}</p>
@@ -96,7 +96,7 @@ function ProgressPage() {
 }
 
 /** First-try results per topic (#151), and the one to review: the lowest, once it has three answers. */
-function Understanding({ topics }: { topics: TopicResult[] }) {
+function Understanding({ org, courseId, topics }: { org: string; courseId: string; topics: TopicResult[] }) {
   const t = useT();
   const weakest = topics
     .filter((r) => r.asked >= 3 && r.right < r.asked)
@@ -137,6 +137,13 @@ function Understanding({ topics }: { topics: TopicResult[] }) {
               <RichText text={t.progress.understanding.review(t.topics[weakest.topic])} />
             </p>
           )}
+          <Link
+            to="/o/$org/courses/$courseId/review"
+            params={{ org, courseId }}
+            className="button button--secondary mt-4 gap-2"
+          >
+            <Repeat className="size-4" /> {t.review.open}
+          </Link>
         </>
       )}
     </section>
