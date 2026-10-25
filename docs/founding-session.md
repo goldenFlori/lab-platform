@@ -46,7 +46,7 @@ This happened in the course repo `goldenFlori/discrete-structures-algorithms-cou
    - The first deploy failed because the lockfile written by npm 11.6 was rejected by CI's newer
      npm. PR #5 repaired it and added a CI check on every PR.
 4. **Audit of the 151 code blocks:** blank outputs are by design (exercise stubs and homework).
-   The one exception, `bellman-ford-animated.ipynb`, is an open item in `platform-vision`.
+   The one exception, `bellman-ford-animated.ipynb`, was executed later (course PR #26).
 
 ## Why the platform looks the way it does
 
