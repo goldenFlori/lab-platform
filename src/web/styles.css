@@ -238,6 +238,14 @@ select:not([multiple]):not([size]) {
   background-size: 44px 44px;
 }
 
+/* The front page's light (#129): the state colours, blurred far behind the hero. */
+@utility hero-glow {
+  background:
+    radial-gradient(40rem 22rem at 78% 30%, color-mix(in oklab, var(--state-current) 16%, transparent), transparent 70%),
+    radial-gradient(28rem 18rem at 92% 80%, color-mix(in oklab, var(--state-path) 12%, transparent), transparent 70%),
+    radial-gradient(26rem 16rem at 60% 85%, color-mix(in oklab, var(--state-visited) 12%, transparent), transparent 70%);
+}
+
 @utility glass {
   background: color-mix(in oklab, var(--background) 72%, transparent);
   backdrop-filter: saturate(1.6) blur(16px);
