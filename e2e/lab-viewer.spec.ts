@@ -100,7 +100,8 @@ test('a student reads a course notebook with its outputs, figures and visualizat
   const student = await signIn(browser, E2E_ACCOUNT, isMobile);
   await apiCall(student, 'POST', '/join', { code: group.joinCode });
   await student.goto(`/o/e2e/courses/${course.id}`);
-  await student.getByRole('link', { name: 'Algoritmet e renditjes' }).click();
+  // The lab's card, not its node on the learning path (#126), which links to the same lab.
+  await student.getByRole('link', { name: 'Algoritmet e renditjes', exact: true }).click();
   await expect(student).toHaveURL(`/o/e2e/courses/${course.id}/labs/${lab.id}`);
   await expect(student).toHaveTitle('Algoritmet e renditjes · Lab Platform');
   await expect(student.getByRole('heading', { level: 1, name: 'Algoritmet e renditjes' })).toBeVisible();
