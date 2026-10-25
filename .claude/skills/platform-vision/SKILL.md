@@ -371,6 +371,13 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   of each augmenting path (not in the adversary's run), and the topological-order game hides the
   vertices that may come next (Kahn's queue) and its hint button, so each pick is a prediction
   with a score. Next: #150, the hand-tracing class problems as checked tables.
+- **2026-10-25:** #150 done. A 16th visualization, the trace table: the class problems traced by
+  hand (Lab 5 Kruskal and Prim, Lab 6 Kahn, Lab 7 Dijkstra and Bellman-Ford, Lab 8 Floyd-Warshall)
+  as tables students fill row by row beside the graph. Each row is checked when finished; a wrong
+  one marks its first wrong cell with the rule it breaks, never the value, and can be shown after
+  three tries. Students write as on paper (∞, "A-C", "po", ∅ for an empty queue), numbers carry over
+  from the row above, and finished rows replay on the graph. Staff embed one with
+  `{"preset": "lab05-prim"}` and the like. Next: #151, counting first-try results.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
