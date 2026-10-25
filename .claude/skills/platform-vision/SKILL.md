@@ -414,6 +414,4 @@ Decisions were delegated to Claude ("you decide"). Record new ones here with the
   - Which email domains FSHN uses for staff and for students.
   - The university's IP policy for software built for teaching (check before selling).
 - **Course repo:**
-  - Execute `bellman-ford-animated.ipynb`, the only notebook never run (3 s, 5 graph images).
-    Needs the owner's OK and a `MANIFEST.json` update.
   - Two early commits there show another author. Leave them: rewriting them needs a force-push.
