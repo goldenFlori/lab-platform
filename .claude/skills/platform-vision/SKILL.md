@@ -305,6 +305,13 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   annexes, for a lawyer to review. Making its claims true, Live Lab rooms now run in Cloudflare's
   EU jurisdiction and keep nothing once a class ends, and the privacy page says that AI requests
   (never names) may be processed outside the EU and that the encrypted backups sit at GitHub.
+- **2026-10-25:** Phase 7 planned as the "Phase 7: Design that teaches" milestone, issues #125–#133:
+  a visual identity from algorithm states, a live front page, gallery previews, a content-first lab
+  page, a learning path, predict mode, editor polish, and visualizations for Labs 3 and 5.
+- **2026-10-25:** #128 done. The foundation every screen uses: ink-and-paper surfaces, one set of
+  algorithm-state colours (frontier, current, visited, path, done, rejected) shared by the interface
+  and the visualizations, Bricolage Grotesque for headings, a motion system (Motion for React) that
+  respects reduced motion, and a logo drawn from a moment of BFS. Next: the live front page (#129).
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and

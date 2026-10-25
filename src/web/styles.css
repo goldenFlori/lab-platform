@@ -1,22 +1,36 @@
 /* =====================================================================
- *  Design system: Tailwind CSS v4 + HeroUI v3, with the tokens of the
- *  course site (Struktura Diskrete & Algoritme), so the platform looks
- *  like the site it replaces.
+ *  Design system (#128): Tailwind CSS v4 + HeroUI v3.
+ *  The identity comes from the algorithms themselves: ink and paper for
+ *  the surfaces, and one set of algorithm-state colours (frontier,
+ *  current, visited, path, done, rejected) that mean the same thing in
+ *  every visualization and every screen.
  * ===================================================================== */
 @import "tailwindcss";
 @import "@heroui/styles";
 @import "@fontsource-variable/inter";
 @import "@fontsource-variable/jetbrains-mono";
+@import "@fontsource-variable/bricolage-grotesque";
 
 @custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
 
 @theme {
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Headings: a grotesque with character, that renders ë and ç well. */
+  --font-display: "Bricolage Grotesque Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
 
   --color-brand: var(--brand);
   --color-brand-2: var(--brand-2);
   --color-brand-3: var(--brand-3);
+
+  /* Algorithm states, as Tailwind colours: bg-state-frontier, text-state-path… */
+  --color-state-unvisited: var(--state-unvisited);
+  --color-state-frontier: var(--state-frontier);
+  --color-state-current: var(--state-current);
+  --color-state-visited: var(--state-visited);
+  --color-state-path: var(--state-path);
+  --color-state-done: var(--state-done);
+  --color-state-reject: var(--state-reject);
 }
 
 /* ---------------------------------------------------------------------
@@ -25,86 +39,107 @@
  * ------------------------------------------------------------------- */
 :root {
   --radius: 0.75rem;
-  --brand: oklch(0.56 0.23 280);
-  --brand-2: oklch(0.7 0.15 220);
-  --brand-3: oklch(0.68 0.2 330);
+  /* Electric blue, teal and magenta: the current node, the visited set and the path. */
+  --brand: oklch(0.55 0.2 258);
+  --brand-2: oklch(0.7 0.13 195);
+  --brand-3: oklch(0.62 0.22 325);
   --nav-h: 64px;
 }
 
 .light,
 [data-theme="light"] {
-  --background: oklch(0.985 0.004 275);
-  --foreground: oklch(0.21 0.025 278);
+  /* Paper and ink */
+  --background: oklch(0.984 0.004 250);
+  --foreground: oklch(0.2 0.03 262);
   --surface: oklch(1 0 0);
-  --surface-secondary: oklch(0.972 0.006 275);
-  --surface-tertiary: oklch(0.952 0.008 275);
+  --surface-secondary: oklch(0.97 0.006 250);
+  --surface-tertiary: oklch(0.948 0.008 250);
   --overlay: oklch(1 0 0);
-  --muted: oklch(0.5 0.025 278);
-  --accent: oklch(0.55 0.22 280);
+  --muted: oklch(0.49 0.025 260);
+  --accent: oklch(0.53 0.2 258);
   --accent-foreground: oklch(0.99 0 0);
-  --default: oklch(0.948 0.008 275);
-  --default-foreground: oklch(0.25 0.02 278);
-  --border: oklch(0.905 0.012 278);
-  --separator: oklch(0.925 0.01 278);
+  --default: oklch(0.946 0.008 250);
+  --default-foreground: oklch(0.24 0.025 262);
+  --border: oklch(0.905 0.011 255);
+  --separator: oklch(0.925 0.009 255);
   --focus: var(--accent);
   --link: var(--accent);
-  --surface-shadow: 0 1px 2px 0 rgb(24 24 40 / 0.04), 0 4px 18px -6px rgb(24 24 60 / 0.08);
+  --surface-shadow:
+    0 1px 0 0 oklch(1 0 0 / 0.7) inset, 0 1px 2px 0 rgb(16 24 48 / 0.05), 0 8px 24px -10px rgb(16 24 64 / 0.12);
 
-  --glow-1: oklch(0.75 0.15 285 / 0.35);
-  --glow-2: oklch(0.82 0.11 215 / 0.35);
-  --grid-line: oklch(0.5 0.03 278 / 0.07);
+  --glow-1: oklch(0.72 0.16 258 / 0.3);
+  --glow-2: oklch(0.82 0.11 195 / 0.3);
+  --grid-line: oklch(0.45 0.03 258 / 0.07);
 
-  --code-bg: oklch(0.975 0.006 275);
-  --code-border: oklch(0.92 0.01 278);
+  --code-bg: oklch(0.974 0.006 250);
+  --code-border: oklch(0.915 0.01 255);
 
-  /* Visualizer palette: every state also has a shape or label */
-  --viz-canvas: oklch(0.985 0.004 275);
-  --viz-idle: oklch(0.93 0.01 278);
-  --viz-idle-ink: oklch(0.42 0.03 278);
-  --viz-line: oklch(0.78 0.015 278);
-  --viz-active: oklch(0.55 0.22 280);
-  --viz-compare: oklch(0.75 0.16 70);
-  --viz-done: oklch(0.66 0.16 155);
-  --viz-path: oklch(0.62 0.17 230);
-  --viz-reject: oklch(0.63 0.21 25);
-  --viz-soft: oklch(0.55 0.22 280 / 0.12);
+  /* Algorithm states: the same meaning everywhere. Every state also has a shape or a label. */
+  --state-unvisited: oklch(0.925 0.01 255);
+  --state-frontier: oklch(0.76 0.16 70);
+  --state-current: oklch(0.55 0.2 258);
+  --state-visited: oklch(0.7 0.12 195);
+  --state-path: oklch(0.6 0.22 325);
+  --state-done: oklch(0.65 0.16 155);
+  --state-reject: oklch(0.62 0.21 25);
+
+  /* The visualization kit's names for them */
+  --viz-canvas: oklch(0.984 0.004 250);
+  --viz-idle: var(--state-unvisited);
+  --viz-idle-ink: oklch(0.42 0.03 260);
+  --viz-line: oklch(0.78 0.015 255);
+  --viz-active: var(--state-current);
+  --viz-compare: var(--state-frontier);
+  --viz-done: var(--state-done);
+  --viz-path: var(--state-path);
+  --viz-reject: var(--state-reject);
+  --viz-soft: oklch(0.55 0.2 258 / 0.12);
 }
 
 :root.dark,
 :root[data-theme="dark"],
 .dark {
-  --background: oklch(0.155 0.014 278);
-  --foreground: oklch(0.965 0.004 278);
-  --surface: oklch(0.2 0.016 278);
-  --surface-secondary: oklch(0.232 0.016 278);
-  --surface-tertiary: oklch(0.262 0.016 278);
-  --overlay: oklch(0.215 0.016 278);
-  --muted: oklch(0.72 0.02 278);
-  --accent: oklch(0.73 0.16 282);
-  --accent-foreground: oklch(0.16 0.02 278);
-  --default: oklch(0.275 0.016 278);
-  --default-foreground: oklch(0.94 0.005 278);
-  --border: oklch(0.3 0.018 278);
-  --separator: oklch(0.27 0.016 278);
-  --surface-shadow: 0 0 0 1px oklch(1 0 0 / 0.02);
+  /* Deep ink, not lavender */
+  --background: oklch(0.155 0.022 262);
+  --foreground: oklch(0.965 0.005 255);
+  --surface: oklch(0.195 0.024 262);
+  --surface-secondary: oklch(0.225 0.024 262);
+  --surface-tertiary: oklch(0.255 0.024 262);
+  --overlay: oklch(0.21 0.024 262);
+  --muted: oklch(0.72 0.022 258);
+  --accent: oklch(0.72 0.15 252);
+  --accent-foreground: oklch(0.16 0.03 262);
+  --default: oklch(0.27 0.024 262);
+  --default-foreground: oklch(0.94 0.006 255);
+  --border: oklch(0.3 0.026 262);
+  --separator: oklch(0.265 0.024 262);
+  --surface-shadow: 0 1px 0 0 oklch(1 0 0 / 0.04) inset, 0 0 0 1px oklch(1 0 0 / 0.02);
 
-  --glow-1: oklch(0.55 0.2 285 / 0.35);
-  --glow-2: oklch(0.6 0.13 215 / 0.28);
-  --grid-line: oklch(0.9 0.02 278 / 0.05);
+  --glow-1: oklch(0.55 0.18 258 / 0.35);
+  --glow-2: oklch(0.6 0.12 195 / 0.25);
+  --grid-line: oklch(0.9 0.02 255 / 0.05);
 
-  --code-bg: oklch(0.185 0.016 278);
-  --code-border: oklch(0.29 0.018 278);
+  --code-bg: oklch(0.18 0.022 262);
+  --code-border: oklch(0.29 0.026 262);
 
-  --viz-canvas: oklch(0.175 0.015 278);
-  --viz-idle: oklch(0.3 0.018 278);
-  --viz-idle-ink: oklch(0.85 0.01 278);
-  --viz-line: oklch(0.45 0.02 278);
-  --viz-active: oklch(0.73 0.16 282);
-  --viz-compare: oklch(0.8 0.15 75);
-  --viz-done: oklch(0.74 0.15 155);
-  --viz-path: oklch(0.74 0.13 225);
-  --viz-reject: oklch(0.7 0.18 25);
-  --viz-soft: oklch(0.73 0.16 282 / 0.16);
+  --state-unvisited: oklch(0.3 0.024 262);
+  --state-frontier: oklch(0.82 0.15 75);
+  --state-current: oklch(0.72 0.15 252);
+  --state-visited: oklch(0.76 0.11 195);
+  --state-path: oklch(0.72 0.19 325);
+  --state-done: oklch(0.74 0.15 155);
+  --state-reject: oklch(0.7 0.18 25);
+
+  --viz-canvas: oklch(0.17 0.022 262);
+  --viz-idle: var(--state-unvisited);
+  --viz-idle-ink: oklch(0.85 0.012 255);
+  --viz-line: oklch(0.45 0.026 260);
+  --viz-active: var(--state-current);
+  --viz-compare: var(--state-frontier);
+  --viz-done: var(--state-done);
+  --viz-path: var(--state-path);
+  --viz-reject: var(--state-reject);
+  --viz-soft: oklch(0.72 0.15 252 / 0.16);
 }
 
 /* ---------------------------------------------------------------------
@@ -132,6 +167,32 @@
   pre,
   samp {
     font-family: var(--font-mono);
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  h1 {
+    letter-spacing: -0.035em;
+  }
+  /* Motion only for those who want it: CSS transitions and animations go too (#128). */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      /* biome-ignore lint/complexity/noImportantStyles: reduced motion wins over every animation */
+      animation-duration: 0.01ms !important;
+      /* biome-ignore lint/complexity/noImportantStyles: reduced motion wins over every animation */
+      animation-iteration-count: 1 !important;
+      /* biome-ignore lint/complexity/noImportantStyles: reduced motion wins over every animation */
+      transition-duration: 0.01ms !important;
+      /* biome-ignore lint/complexity/noImportantStyles: reduced motion wins over every animation */
+      scroll-behavior: auto !important;
+    }
   }
 }
 

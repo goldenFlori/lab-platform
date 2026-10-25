@@ -539,6 +539,21 @@ at `/o/:org/courses/:id/activity`, linked from the course page.
   - code runs;
   - deleting old activity (see open items in `platform-vision`).
 
+## Design system (#128)
+
+- **Tokens** live in `src/web/styles.css`. The algorithm states (`--state-frontier`, `-current`,
+  `-visited`, `-path`, `-done`, `-reject`, `-unvisited`) mean the same everywhere; the visualization
+  kit's `--viz-*` names point at them, and Tailwind exposes them as `bg-state-*` / `text-state-*`.
+  Every state also has a shape or a label, never colour alone.
+- **Type:** Bricolage Grotesque (headings, `--font-display`), Inter (text), JetBrains Mono (code),
+  all self-hosted through Fontsource because the app is cross-origin isolated.
+- **Motion:** Motion for React through `src/web/lib/motion.tsx` only: `MotionProvider` (LazyMotion,
+  strict, so components use `m.*`; the features chunk loads after the page) and the named springs
+  in `SPRING`. `MotionConfig reducedMotion="user"` and a CSS rule stop all movement for users who
+  ask for reduced motion.
+- **Budget:** the app shell (the `index` chunk) stays near 120 kB gzipped; measure it in any PR
+  that adds a dependency to it.
+
 ## Quality, deploy, backups
 
 - **Tests:**
