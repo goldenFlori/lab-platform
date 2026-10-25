@@ -13,6 +13,7 @@ import {
   Waypoints,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { LiveGraph } from '../components/home/LiveGraph';
 import { VizEmbed } from '../components/VizEmbed';
 import { useT } from '../i18n';
 import { useMe } from '../lib/auth';
@@ -26,13 +27,14 @@ export const Route = createFileRoute('/')({
   component: HomePage,
 });
 
+// Each feature wears one of the algorithm-state colours (#128).
 const FEATURES = [
-  { key: 'python', Icon: Smartphone },
-  { key: 'yourCode', Icon: Code2 },
-  { key: 'live', Icon: Radio },
-  { key: 'ai', Icon: Lightbulb },
-  { key: 'control', Icon: SlidersHorizontal },
-  { key: 'privacy', Icon: ShieldCheck },
+  { key: 'python', Icon: Smartphone, color: 'var(--state-current)' },
+  { key: 'yourCode', Icon: Code2, color: 'var(--state-path)' },
+  { key: 'live', Icon: Radio, color: 'var(--state-frontier)' },
+  { key: 'ai', Icon: Lightbulb, color: 'var(--state-visited)' },
+  { key: 'control', Icon: SlidersHorizontal, color: 'var(--state-done)' },
+  { key: 'privacy', Icon: ShieldCheck, color: 'var(--state-reject)' },
 ] as const;
 
 function HomePage() {
@@ -45,26 +47,43 @@ function HomePage() {
           className="bg-grid absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_75%)]"
           aria-hidden="true"
         />
-        <div className="container-page relative py-20 sm:py-28">
-          <p className="text-sm font-semibold text-accent">{t.home.eyebrow}</p>
-          <h1 className="mt-3 max-w-3xl text-4xl font-extrabold tracking-tight text-balance sm:text-6xl">
-            {t.home.titleStart} <span className="text-gradient">{t.home.titleEnd}</span>
-          </h1>
-          <p className="mt-5 max-w-2xl text-lg text-muted">{t.home.lead}</p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            {me ? (
-              <Link to="/courses" className="button button--primary gap-2">
-                {t.home.myCourses} <ArrowRight className="size-4" />
-              </Link>
-            ) : (
-              <Link to="/login" className="button button--primary gap-2">
-                <LogIn className="size-4" /> {t.home.signIn}
-              </Link>
-            )}
-            <a href="#demo" className="button button--secondary gap-2">
-              {t.home.seeIt}
-            </a>
+        <div className="hero-glow absolute inset-0" aria-hidden="true" />
+        <div className="container-page relative grid items-center gap-10 py-14 sm:py-20 lg:grid-cols-[1fr_1.05fr] lg:gap-14">
+          <div>
+            <p className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/70 px-3 py-1 text-xs font-semibold text-accent">
+              <span className="size-1.5 rounded-full bg-state-frontier" aria-hidden="true" /> {t.home.eyebrow}
+            </p>
+            <h1 className="mt-4 text-4xl font-extrabold text-balance sm:text-6xl">
+              {t.home.titleStart} <span className="text-gradient">{t.home.titleEnd}</span>
+            </h1>
+            <p className="mt-5 max-w-xl text-lg text-muted">{t.home.lead}</p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              {me ? (
+                <Link to="/courses" className="button button--primary gap-2">
+                  {t.home.myCourses} <ArrowRight className="size-4" />
+                </Link>
+              ) : (
+                <Link to="/login" className="button button--primary gap-2">
+                  <LogIn className="size-4" /> {t.home.signIn}
+                </Link>
+              )}
+              <a href="#demo" className="button button--secondary gap-2">
+                {t.home.seeIt}
+              </a>
+            </div>
+            <dl className="mt-10 grid max-w-md grid-cols-3 gap-4">
+              {t.home.stats.map(([value, label]) => (
+                <div key={label}>
+                  <dt className="sr-only">{label}</dt>
+                  <dd>
+                    <span className="block font-[family-name:var(--font-display)] text-2xl font-bold">{value}</span>
+                    <span className="text-xs text-muted">{label}</span>
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </div>
+          <LiveGraph />
         </div>
       </section>
 
@@ -91,9 +110,9 @@ function HomePage() {
           {t.home.featuresTitle}
         </h2>
         <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map(({ key, Icon }) => (
+          {FEATURES.map(({ key, Icon, color }) => (
             <li key={key}>
-              <Card icon={<Icon className="size-5" />} title={t.home.features[key].title}>
+              <Card icon={<Icon className="size-5" />} color={color} title={t.home.features[key].title}>
                 {t.home.features[key].text}
               </Card>
             </li>
@@ -131,10 +150,24 @@ function HomePage() {
   );
 }
 
-function Card({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
+function Card({
+  icon,
+  color,
+  title,
+  children,
+}: {
+  icon: ReactNode;
+  color: string;
+  title: string;
+  children: ReactNode;
+}) {
   return (
-    <div className="h-full rounded-2xl border border-border bg-surface p-5">
-      <span className="grid size-10 place-items-center rounded-xl bg-accent-soft text-accent" aria-hidden="true">
+    <div className="group h-full rounded-2xl border border-border bg-surface p-5 shadow-surface transition-transform duration-300 hover:-translate-y-0.5">
+      <span
+        className="grid size-10 place-items-center rounded-xl"
+        style={{ color, background: `color-mix(in oklab, ${color} 14%, transparent)` }}
+        aria-hidden="true"
+      >
         {icon}
       </span>
       <h3 className="mt-4 font-semibold">{title}</h3>

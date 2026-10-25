@@ -39,6 +39,21 @@ export const sq = {
     visualizations: 'Vizualizimet',
     signIn: 'Hyr',
     seeIt: 'Shikojeni në punë',
+    stats: [
+      ['13', 'vizualizime'],
+      ['10', 'laboratorë'],
+      ['0', 'instalime'],
+    ] as [string, string][],
+    hero: {
+      modeGroup: 'Algoritmi',
+      modes: { bfs: 'BFS', dfs: 'DFS', dijkstra: 'Dijkstra' },
+      hint: 'Prekni një kulm për të nisur prej tij.',
+      graph: 'Graf i gjallë: algoritmi zgjedhur përshkon grafin hap pas hapi',
+      node: (label: string) => `Nis nga kulmi ${label}`,
+      structure: { bfs: 'Radha (FIFO)', dfs: 'Stiva (LIFO)', dijkstra: 'Radha me prioritet' },
+      empty: 'bosh',
+      legend: { current: 'Aktual', frontier: 'Në pritje', done: 'I përfunduar', tree: 'Pema e kërkimit' },
+    },
     demoTitle: 'Provojeni këtu',
     demoLead:
       'Një nga 13 vizualizimet e kursit, siç e shohin studentët: luajeni hap pas hapi, ndryshoni labirintin dhe krahasoni BFS me DFS.',

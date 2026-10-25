@@ -22,3 +22,20 @@ test('the front page explains the platform, in both languages, and fits a phone'
   await expect(page.getByRole('heading', { level: 1 })).toContainText('See the algorithm');
   await expect(page.getByRole('heading', { name: 'What it does' })).toBeVisible();
 });
+
+// #129: the hero runs the course's own algorithms; a visitor switches them and starts from any vertex.
+test('the live graph runs BFS, DFS and Dijkstra from the vertex a visitor taps', async ({ page }) => {
+  await page.goto('/');
+  const graph = page.getByTestId('live-graph');
+  await expect(graph.getByText('Radha (FIFO)')).toBeVisible();
+  await graph.getByRole('button', { name: 'Dijkstra' }).click();
+  await expect(graph.getByRole('button', { name: 'Dijkstra' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(graph.getByText('Radha me prioritet')).toBeVisible();
+  const j = graph.getByRole('button', { name: 'Nis nga kulmi J' });
+  await j.click();
+  // Started from J: its distance stays 0 for the whole run.
+  await expect(j).toContainText('0');
+  await expect(graph.locator('p[aria-live="polite"]')).not.toBeEmpty();
+  await graph.getByRole('button', { name: 'DFS' }).click();
+  await expect(graph.getByText('Stiva (LIFO)')).toBeVisible();
+});

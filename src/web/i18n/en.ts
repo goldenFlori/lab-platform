@@ -39,6 +39,21 @@ export const en: Messages = {
     visualizations: 'Visualizations',
     signIn: 'Sign in',
     seeIt: 'See it at work',
+    stats: [
+      ['13', 'visualizations'],
+      ['10', 'labs'],
+      ['0', 'installs'],
+    ],
+    hero: {
+      modeGroup: 'Algorithm',
+      modes: { bfs: 'BFS', dfs: 'DFS', dijkstra: 'Dijkstra' },
+      hint: 'Tap a vertex to start from it.',
+      graph: 'A live graph: the chosen algorithm explores it step by step',
+      node: (label) => `Start from vertex ${label}`,
+      structure: { bfs: 'Queue (FIFO)', dfs: 'Stack (LIFO)', dijkstra: 'Priority queue' },
+      empty: 'empty',
+      legend: { current: 'Current', frontier: 'Waiting', done: 'Finished', tree: 'Search tree' },
+    },
     demoTitle: 'Try it here',
     demoLead:
       "One of the course's 13 visualizations, as students see it: play it step by step, change the maze, and compare BFS with DFS.",
