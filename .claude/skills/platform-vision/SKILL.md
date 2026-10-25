@@ -327,7 +327,13 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-25:** #126 done. Students see their way through the course on the course page: the
   labs open to them as a path, each coloured not started / in progress / handed in / graded, with
   a ring for exercises solved, a summary, and "Continue with Lab N" to the next unfinished lab.
-  Only their own progress, from the "My progress" data. Next: predict mode (#127).
+  Only their own progress, from the "My progress" data (PRs #139, #140).
+- **2026-10-25:** #127 done. Predict mode in the visualizations: they stop at each decision and ask
+  the student first: which vertex leaves the queue (BFS) or the stack (DFS), which vertex Dijkstra
+  settles (ties accepted), which element Selection Sort puts in each position. Options come from
+  the algorithm's state, never in an order that gives the answer away; a wrong guess shows the right
+  answer and why, and a score is kept. Built into the kit (`usePredict`), so any visualization
+  can add it. Next: code editor polish (#131).
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and

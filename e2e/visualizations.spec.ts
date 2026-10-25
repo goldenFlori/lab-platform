@@ -87,3 +87,18 @@ test('an unknown visualization shows the 404 page', async ({ page }) => {
   await page.goto('/visualizations/nuk-ekziston');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Kjo rrugë nuk ekziston në graf');
 });
+
+// #127: in predict mode the visualization stops at a decision and asks before showing it.
+test('predict mode asks for the next step and scores the answer', async ({ page }) => {
+  await page.goto('/visualizations/renditja');
+  await page.getByRole('radio', { name: 'Selection' }).click();
+  const predict = page.getByTestId('predict');
+  await predict.getByText('Parashiko', { exact: true }).click();
+  await expect(predict.getByRole('switch', { name: 'Parashiko' })).toBeChecked();
+  await page.getByRole('button', { name: 'Hapi tjetër (→)' }).click();
+  const question = predict.getByRole('group', { name: /Cili element do të përfundojë në pozicionin 0/ });
+  await expect(question).toBeVisible();
+  await question.getByRole('button').first().click();
+  await expect(page.getByTestId('predict-feedback')).toBeVisible();
+  await expect(predict).toContainText('/1 parashikime të sakta');
+});
