@@ -348,6 +348,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   colour, the sorted edges accepted or rejected), beside Prim on the same graph; both reach the same
   weight. Next: refresh the course notebook fixtures once the course repo's PRs merge, then the
   remaining lab fixes (Labs 1, 4, 5, 6, 8, 9).
+- **2026-10-25:** #145 done. The course's 2026/27 lab review is complete in the course repo (PRs
+  #15–#25: corrected texts and class problems, the cut property, Kosaraju and Kahn, negative cycles,
+  stability, Lab 7 single-source with Floyd-Warshall moved to Lab 8, and the Lab 9 homework on the
+  students' own functions with checks). The converter's fixtures, snapshots and embeds follow it,
+  with 3 new exercise checks found. Next: re-import the course (`npm run course:import`) so the
+  production labs get the new texts and exercises.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
