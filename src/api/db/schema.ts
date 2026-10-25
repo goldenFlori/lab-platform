@@ -531,6 +531,41 @@ export const exerciseCompletions = sqliteTable(
 );
 
 /**
+ * A student's first answer to one decision of an embedded visualization (#151): a predict question
+ * or a trace table's row, right or not and what they picked. Kept once; later tries change nothing.
+ * Practice, not grading: staff read it only as counts. Gone with the notebook or the user.
+ */
+export const predictionResults = sqliteTable(
+  'prediction_results',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    notebookId: text('notebook_id').notNull(),
+    /** The embed's cell in the notebook. */
+    cell: integer('cell').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    topic: text('topic').notNull(),
+    decision: text('decision').notNull(),
+    correct: integer('correct', { mode: 'boolean' }).notNull(),
+    pick: text('pick').notNull(),
+    answer: text('answer').notNull(),
+    prompt: text('prompt').notNull(),
+    /** YYYY-MM-DD in the institution's time zone. */
+    day: text('day').notNull(),
+  },
+  (t) => [
+    foreignKey({
+      name: 'prediction_results_notebook_fk',
+      columns: [t.notebookId, t.orgId],
+      foreignColumns: [notebooks.id, notebooks.orgId],
+    }).onDelete('cascade'),
+    uniqueIndex('prediction_results_unique').on(t.orgId, t.notebookId, t.cell, t.userId, t.decision),
+  ],
+);
+
+/**
  * A notebook opened for submission to one group (#52), until its deadline. Closing it removes the
  * row; the work already handed in stays.
  */

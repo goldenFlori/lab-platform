@@ -6,6 +6,8 @@ import type { MarkdownCell, SectionKind } from '../../../notebook/types';
 import type { Embed } from '../../../shared/notebooks';
 import { isVisualizerId } from '../../../shared/visualizers';
 import { type Messages, useT } from '../../i18n';
+import { useExercises } from '../../lib/exercises';
+import { ResultsProvider } from '../../lib/results';
 import { sanitize } from '../../lib/sanitize';
 import { VizEmbed } from '../VizEmbed';
 import { CodeCell } from './CodeCell';
@@ -44,6 +46,8 @@ export function NotebookView({
   fileUrl: (name: string) => string;
 }) {
   const t = useT();
+  // On the lab page, an embedded visualization reports the student's first answers (#151).
+  const notebookRef = useExercises()?.notebookRef;
   const embedAt = new Map(embeds.map((embed) => [embed.cell, embed]));
   const lastOfSource = new Map<number, number>();
   notebook.cells.forEach((cell, i) => {
@@ -53,7 +57,13 @@ export function NotebookView({
   const viz = (embed: Embed, label: string) =>
     isVisualizerId(embed.viz) ? (
       <div id={embedAnchor(id, embed.cell)} className="my-2 scroll-mt-24">
-        <VizEmbed viz={embed.viz} props={embed.props} label={`${label} · ${embed.title ?? ''}`} />
+        {notebookRef ? (
+          <ResultsProvider notebookRef={notebookRef} cell={embed.cell}>
+            <VizEmbed viz={embed.viz} props={embed.props} label={`${label} · ${embed.title ?? ''}`} />
+          </ResultsProvider>
+        ) : (
+          <VizEmbed viz={embed.viz} props={embed.props} label={`${label} · ${embed.title ?? ''}`} />
+        )}
       </div>
     ) : null;
 

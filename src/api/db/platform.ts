@@ -3,7 +3,15 @@ import type { SQLiteTable } from 'drizzle-orm/sqlite-core';
 import { daysOf, RETENTION } from '../../shared/retention';
 import { uuidv7 } from './ids';
 import type { Db } from './index';
-import { aiQuestions, aiUsage, deletionRequests, labActivity, liveSessions, organizations } from './schema';
+import {
+  aiQuestions,
+  aiUsage,
+  deletionRequests,
+  labActivity,
+  liveSessions,
+  organizations,
+  predictionResults,
+} from './schema';
 
 // Platform-level operations, outside any tenant: for the platform owner's tools, seeding and
 // tests. Route handlers that serve a tenant use forTenant() instead.
@@ -40,6 +48,7 @@ export async function applyRetention(db: Db, now = new Date(), batch = RETENTION
   await db.batch([
     deleteSome(db, aiQuestions, lt(aiQuestions.createdAt, before(RETENTION.aiQuestionDays)), batch),
     deleteSome(db, labActivity, lt(labActivity.day, dayBefore(activity)), batch),
+    deleteSome(db, predictionResults, lt(predictionResults.day, dayBefore(activity)), batch),
     deleteSome(db, aiUsage, lt(aiUsage.day, dayBefore(activity)), batch),
     deleteSome(
       db,

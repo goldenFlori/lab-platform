@@ -203,6 +203,7 @@ Tiranës [ose siç parashikon marrëveshja e shërbimit].
 | Rolet | Institucionet, kurset dhe grupet ku bën pjesë një person, dhe roli i tij. |
 | Puna mësimore | Kodi që studenti ndryshon në fletore (e sheh vetëm ai derisa ta dorëzojë), ushtrimet e zgjidhura, puna e dorëzuar, notat dhe komentet. |
 | Aktiviteti | Të shumtën një shënim për student, laborator, lloj dhe ditë: e hapi, e shkarkoi, provoi një vizualizim, zgjidhi një ushtrim, ekzekutoi kod, mori pjesë në një Live Lab. |
+| Përgjigjet e para | Përgjigjja e parë e studentit te çdo vendim i një vizualizimi të përfshirë ose rresht i një tabele gjurmimi: nëse ishte e saktë, çfarë u përgjigj, pyetja dhe dita. Ushtrim, kurrë notë; stafi i sheh vetëm si numra, nga pesë studentë e lart. |
 | AI | Pyetjet "Shpjego gabimin" (kodi, gabimi, përgjigjja); numri i kërkesave AI për person dhe ditë. |
 | Live Lab | Gjatë mësimit: kush është i lidhur, kërkesat për ndihmë, reagimet, përgjigjet e pyetjeve dhe rezultatet e sfidave. |
 | Anketat | Përgjigjet e fundit të semestrit, anonime: vlerësimet vetëm si numra, komentet pa autor dhe pa kohë. |
@@ -229,7 +230,7 @@ Administratori shkarkon në çdo kohë të dhënat e Institucionit si një skeda
 - strukturën e kurseve;
 - fletoret me skedarët origjinalë;
 - ushtrimet, dorëzimet dhe notat;
-- aktivitetin, të dhënat e AI-së, historinë e Live Lab, anketat, kërkesat për fshirje dhe
+- aktivitetin, përgjigjet e para, të dhënat e AI-së, historinë e Live Lab, anketat, kërkesat për fshirje dhe
   fshirjet.
 
 Kodi i padorëzuar i studentëve mbetet privat për ta dhe nuk përfshihet.
@@ -287,7 +288,7 @@ privatësisë:
 |---|---|
 | Hyrja (seanca) | 30 ditë pa përdorim |
 | Pyetjet "Shpjego gabimin" me përgjigjet | 180 ditë |
-| Aktiviteti ditor, numërimet e AI-së, shënimet e Live Lab | 2 vjet |
+| Aktiviteti ditor, përgjigjet e para, numërimet e AI-së, shënimet e Live Lab | 2 vjet |
 | Një kërkesë për fshirje e trajtuar | 1 vit pasi u trajtua |
 | Numëruesit e hyrjeve të dështuara | pak minuta |
 | Kodi i studentëve, dorëzimet, notat, anketat, pjesa tjetër | sa kohë ekziston kursi; Institucioni fshin kurset |

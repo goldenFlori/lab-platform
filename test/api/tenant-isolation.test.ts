@@ -115,6 +115,20 @@ describe('cross-tenant isolation: links to another organization', () => {
     await expect(
       a.tenant.exercises.complete({ notebookId: b.notebook.id, cell: 1, userId: a.user.id }),
     ).rejects.toBeInstanceOf(NotFoundError);
+    await expect(
+      a.tenant.predictions.record({
+        notebookId: b.notebook.id,
+        cell: 1,
+        userId: a.user.id,
+        day: '2026-10-25',
+        topic: 'prim',
+        decision: '1:x',
+        right: true,
+        pick: 'A',
+        answer: 'A',
+        prompt: 'P',
+      }),
+    ).rejects.toBeInstanceOf(NotFoundError);
     await expect(a.tenant.submissions.open(a.notebook.id, b.group.id, new Date())).rejects.toBeInstanceOf(
       NotFoundError,
     );

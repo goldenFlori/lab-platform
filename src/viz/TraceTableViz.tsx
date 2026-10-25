@@ -1,6 +1,7 @@
 import { Button } from '@heroui/react';
 import { Eye, Pause, Play, RotateCcw, Table2 } from 'lucide-react';
 import { type KeyboardEvent, useEffect, useMemo, useState } from 'react';
+import type { PredictionTopic } from '../shared/predictions';
 import { natural } from './algorithms/graphs';
 import { layeredLayout } from './algorithms/scc';
 import {
@@ -18,6 +19,7 @@ import {
 import { TRACE_TEXT, type TraceText } from './algorithms/trace.text';
 import { Choice, Field } from './kit/controls';
 import { type EdgeLook, type GEdge, type GNode, GraphCanvas, type NodeLook } from './kit/GraphCanvas';
+import { result, useResults } from './kit/results';
 import { Panel, StepNote, VizShell } from './kit/shell';
 import { useText } from './kit/text';
 
@@ -29,6 +31,8 @@ type PresetId = 'lab07-dijkstra' | 'lab07-bellman' | 'lab05-kruskal' | 'lab05-pr
 
 interface Preset {
   id: PresetId;
+  /** What the table practises, for the student's results (#151). */
+  topic: PredictionTopic;
   nodes: GNode[];
   edges: GEdge[];
   directed: boolean;
@@ -76,6 +80,7 @@ const COURSE_EDGES = E([
 export const TRACE_PRESETS: Preset[] = [
   {
     id: 'lab07-dijkstra',
+    topic: 'trace-dijkstra',
     directed: true,
     nodes: N([
       ['A', 90, 90],
@@ -99,6 +104,7 @@ export const TRACE_PRESETS: Preset[] = [
   },
   {
     id: 'lab07-bellman',
+    topic: 'trace-bellman',
     directed: true,
     nodes: N([
       ['A', 100, 90],
@@ -117,18 +123,21 @@ export const TRACE_PRESETS: Preset[] = [
   },
   {
     id: 'lab05-kruskal',
+    topic: 'trace-kruskal',
     directed: false,
     ...LAB5,
     trace: (ids, edges, directed, T) => kruskalTrace({ ids, edges, directed }, T.words),
   },
   {
     id: 'lab05-prim',
+    topic: 'trace-prim',
     directed: false,
     ...LAB5,
     trace: (ids, edges, directed, T) => primTrace({ ids, edges, directed }, 'A', T.words),
   },
   {
     id: 'lab06-kahn',
+    topic: 'trace-kahn',
     directed: true,
     pill: true,
     nodes: layeredLayout(COURSES, COURSE_EDGES, 720, 380).map(({ id, x, y }) => ({ id, x, y })),
@@ -137,6 +146,7 @@ export const TRACE_PRESETS: Preset[] = [
   },
   {
     id: 'lab08-floyd',
+    topic: 'trace-floyd',
     directed: true,
     nodes: N([
       ['0', 120, 80],
@@ -236,11 +246,26 @@ function TraceTable({ preset, X }: { preset: Preset; X: TraceText }) {
     return next;
   };
 
+  const report = useResults();
   const check = () => {
     if (!row) return;
     const keys = Object.keys(answers);
     if (keys.some((k) => !answers[k]?.trim())) return setStatus({ text: X.status.empty, tone: 'warning' });
     const wrong = firstWrong(trace, row, answers, ids);
+    const cellName = (key: string, label: string) => (trace.matrix ? `D[${key.replace(',', '][')}]` : label);
+    // In a lab, the first check of each row counts in the student's results (#151): right or not,
+    // and which cell was wrong first.
+    if (tries === 0)
+      report?.(
+        result({
+          topic: preset.topic,
+          decision: `${preset.id}:${at}`,
+          right: !wrong,
+          pick: wrong ? X.cell(cellName(wrong.key, wrong.column.label)) : '',
+          answer: '',
+          prompt: `${X.presets[preset.id]?.name ?? preset.id} · ${row.label}`,
+        }),
+      );
     if (!wrong) {
       const next = advance(tries === 0 ? 'right' : 'later');
       if (next.length === trace.rows.length) {
@@ -250,8 +275,7 @@ function TraceTable({ preset, X }: { preset: Preset; X: TraceText }) {
     }
     setTries((t) => t + 1);
     setWrongKey(wrong.key);
-    const cell = trace.matrix ? `D[${wrong.key.replace(',', '][')}]` : wrong.column.label;
-    setStatus({ text: X.status.wrong(cell, wrong.column.rule), tone: 'danger' });
+    setStatus({ text: X.status.wrong(cellName(wrong.key, wrong.column.label), wrong.column.rule), tone: 'danger' });
   };
 
   const reveal = () => {

@@ -201,6 +201,7 @@ fulfilled.
 | Roles | The institutions, courses and groups a person belongs to, and their role. |
 | Learning work | Code a student changes in notebooks (seen only by them until handed in), exercises solved, work handed in, grades and feedback. |
 | Activity | At most one record per student, lab, kind and day: opened, downloaded, tried a visualisation, solved an exercise, ran code, took part in a Live Lab. |
+| First-try results | A student's first answer to each decision of an embedded visualisation or row of a trace table: whether it was right, what they answered, the question and the day. Practice, never a grade; staff see it only as counts from five students up. |
 | AI | "Explain my error" questions (code, error, answer); the number of AI requests per person and day. |
 | Live Labs | While a class runs: who is connected, help requests, reactions, quiz answers and challenge results. |
 | Surveys | End-of-semester answers, kept anonymous: ratings only as counts, comments with no author or time. |
@@ -227,7 +228,7 @@ The administrator downloads the Institution's data at any time as one JSON file.
 - course structure;
 - notebooks with their original files;
 - exercises, submissions and grades;
-- activity, AI records, Live Lab history, surveys, deletion requests and erasures.
+- activity, first-try results, AI records, Live Lab history, surveys, deletion requests and erasures.
 
 Students' unsubmitted code stays private to them and is not in it.
 
@@ -282,7 +283,7 @@ The same periods as `src/shared/retention.ts`, which the nightly job and the pri
 |---|---|
 | Sign-in (session) | 30 days without use |
 | "Explain my error" questions and answers | 180 days |
-| Daily activity, AI use counts, Live Lab records | 2 years |
+| Daily activity, first-try results, AI use counts, Live Lab records | 2 years |
 | A handled deletion request | 1 year after it was handled |
 | Failed sign-in counters | a few minutes |
 | Students' code, submissions, grades, surveys, the rest | as long as the course exists; the Institution deletes courses |

@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { PREDICTION_TOPICS, type PredictionTopic } from '../../shared/predictions';
 import type { MyProgress } from '../../shared/progress';
 import type { TenantEnv } from '../auth/access';
 import { labContext, mayReadNotebook, openToViewer } from './lab-context';
@@ -15,9 +16,10 @@ export const progressRoutes = new Hono<TenantEnv>().get('/', async (c) => {
     .filter((g) => c.var.access.can('submission.create', { courseId, groupId: g.id }))
     .map((g) => g.id);
   const labs = ctx.labs.filter((lab) => ctx.staff || openToViewer(ctx, lab)).sort((a, b) => a.n - b.n);
-  const [notebooks, rows] = await Promise.all([
+  const [notebooks, rows, topics] = await Promise.all([
     c.var.tenant.notebooks.ofLabs(labs.map((l) => l.id)),
     c.var.tenant.progress.of(courseId, userId, ownGroups),
+    c.var.tenant.predictions.ofStudent(courseId, userId),
   ]);
   const count = (list: { notebookId: string; n: number }[]) => new Map(list.map((r) => [r.notebookId, Number(r.n)]));
   const set = count(rows.set);
@@ -52,5 +54,10 @@ export const progressRoutes = new Hono<TenantEnv>().get('/', async (c) => {
           };
         }),
     })),
+    // In the course's order of topics, the ones the student has met.
+    topics: PREDICTION_TOPICS.flatMap((topic) => {
+      const row = topics.find((t) => t.topic === topic);
+      return row ? [{ topic: topic as PredictionTopic, asked: Number(row.asked), right: Number(row.right) }] : [];
+    }),
   } satisfies MyProgress);
 });

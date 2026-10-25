@@ -1,5 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 import type { ActivityReport } from '../../shared/activity';
+import type { UnderstandingReport } from '../../shared/predictions';
 import { api } from './api';
 
 // Learning activity (#18): the course's report for staff, and the one thing the app reports itself.
@@ -12,6 +13,16 @@ export const activityQuery = (org: string, courseId: string, group: string | und
     queryKey: ['orgs', org, 'courses', courseId, 'activity', group ?? null],
     queryFn: () =>
       api<ActivityReport>(`${coursePath(org, courseId)}/activity${group ? `?group=${encodeURIComponent(group)}` : ''}`),
+  });
+
+/** First-try results of predictions and trace tables (#151), for the same staff. */
+export const understandingQuery = (org: string, courseId: string, group: string | undefined) =>
+  queryOptions({
+    queryKey: ['orgs', org, 'courses', courseId, 'understanding', group ?? null],
+    queryFn: () =>
+      api<UnderstandingReport>(
+        `${coursePath(org, courseId)}/understanding${group ? `?group=${encodeURIComponent(group)}` : ''}`,
+      ),
   });
 
 /** A student used a visualization in this lab, or ran its code. Fire and forget: activity never gets in the way. */

@@ -11,6 +11,14 @@ import {
   type PilotReport,
   REPORT_WEEKS,
 } from '../../shared/activity';
+import {
+  type EmbedUnderstanding,
+  type HardDecision,
+  MIN_STUDENTS,
+  PREDICTION_TOPICS,
+  type PredictionTopic,
+  type UnderstandingReport,
+} from '../../shared/predictions';
 import type { TenantEnv } from '../auth/access';
 import { forbidden, invalidRequest, visibleCourse } from './course-context';
 import { type LabContext, labContext, visibleLab } from './lab-context';
@@ -216,4 +224,80 @@ export const pilotReportRoutes = new Hono<TenantEnv>().get('/', async (c) => {
     aiQuestions: count(data.asked),
     aiRequests: data.aiRequests,
   } satisfies PilotReport);
+});
+
+/**
+ * GET /api/orgs/:org/courses/:courseId/understanding[?group=…]: first-try results of predictions and
+ * trace tables (#151), per embedded visualization, for staff with analytics.view and the groups they
+ * may see. Counts only, and only what five students or more stand behind: an embed's totals, and its
+ * three hardest decisions with the wrong answer most of them gave.
+ */
+export const understandingRoutes = new Hono<TenantEnv>().get('/', async (c) => {
+  const { access, tenant } = c.var;
+  const { course, groups } = await visibleCourse(c);
+  const wholeCourse = access.can('analytics.view', { courseId: course.id });
+  const allowed = groups.filter((g) => access.can('analytics.view', { courseId: course.id, groupId: g.id }));
+  if (!wholeCourse && allowed.length === 0) return forbidden(c);
+  const group = c.req.query('group') || null;
+  if (group && !allowed.some((g) => g.id === group)) return forbidden(c);
+  const groupIds = group ? [group] : wholeCourse ? null : allowed.map((g) => g.id);
+
+  const [data, labs] = await Promise.all([
+    tenant.predictions.report({ courseId: course.id, groupIds }),
+    tenant.labs.ofCourse(course.id),
+  ]);
+  const key = (row: { notebookId: string; cell: number }) => `${row.notebookId}#${row.cell}`;
+  const topics = new Map<string, PredictionTopic[]>();
+  for (const row of data.perTopic) {
+    if (!(PREDICTION_TOPICS as readonly string[]).includes(row.topic)) continue;
+    topics.set(key(row), [...(topics.get(key(row)) ?? []), row.topic as PredictionTopic]);
+  }
+  const picks = new Map<string, { pick: string; students: number }>();
+  for (const row of data.wrong) {
+    const k = `${key(row)}#${row.decision}`;
+    const best = picks.get(k);
+    const students = Number(row.students);
+    if (!best || students > best.students || (students === best.students && row.pick < best.pick))
+      picks.set(k, { pick: row.pick, students });
+  }
+  const hardest = new Map<string, HardDecision[]>();
+  for (const row of data.perDecision) {
+    const students = Number(row.students);
+    if (students < MIN_STUDENTS) continue;
+    const wrong = picks.get(`${key(row)}#${row.decision}`);
+    const decision: HardDecision = {
+      prompt: row.prompt,
+      answer: row.answer,
+      students,
+      right: Number(row.right),
+      // The wrong answer most of them gave: a count among five students or more, so it names nobody.
+      wrong: wrong ?? null,
+    };
+    hardest.set(key(row), [...(hardest.get(key(row)) ?? []), decision]);
+  }
+  const byLab = new Map(labs.map((lab) => [lab.id, lab]));
+  const embeds: EmbedUnderstanding[] = data.perEmbed
+    .filter((row) => row.students >= MIN_STUDENTS && byLab.has(row.labId))
+    .map((row) => {
+      const lab = byLab.get(row.labId);
+      return {
+        labId: row.labId,
+        lab: lab?.n ?? 0,
+        labTitle: lab?.title ?? '',
+        notebook: row.notebook,
+        cell: row.cell,
+        viz: row.viz ?? '',
+        title: row.title,
+        topics: topics.get(key(row)) ?? [],
+        students: row.students,
+        answers: Number(row.answers),
+        right: Number(row.right),
+        hardest: (hardest.get(key(row)) ?? [])
+          .filter((d) => d.right < d.students)
+          .sort((a, b) => a.right / a.students - b.right / b.students || b.students - a.students)
+          .slice(0, 3),
+      };
+    })
+    .sort((a, b) => a.lab - b.lab || a.notebook.localeCompare(b.notebook) || a.cell - b.cell);
+  return c.json({ group, embeds } satisfies UnderstandingReport);
 });

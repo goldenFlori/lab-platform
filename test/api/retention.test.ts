@@ -28,6 +28,18 @@ async function seedOld(slug: string) {
   ] as const) {
     await tenant.activity.record({ labId: lab.id, userId: user.id, kind, day: dayAgo(n) });
     await tenant.ai.record({ courseId: course.id, userId: user.id, day: dayAgo(n), requests: 1, neurons: 1 });
+    await tenant.predictions.record({
+      notebookId: notebook.id,
+      cell: 1,
+      userId: user.id,
+      day: dayAgo(n),
+      topic: 'bfs',
+      decision: `${n}:x`,
+      right: true,
+      pick: 'A',
+      answer: 'A',
+      prompt: 'P',
+    });
   }
   for (const n of [RETENTION.aiQuestionDays + 1, RETENTION.aiQuestionDays - 1]) {
     const question = { courseId: course.id, notebookId: notebook.id, userId: user.id, cell: n };
@@ -68,6 +80,7 @@ describe('the retention schedule (#116)', () => {
     await applyRetention(createDb(env.DB), NOW);
     expect(await count('lab_activity')).toBe(2);
     expect(await count('ai_usage')).toBe(2);
+    expect(await count('prediction_results')).toBe(2);
     expect(await count('ai_questions')).toBe(2);
     // The recent ended one and the running one stay.
     expect(await count('live_sessions')).toBe(4);

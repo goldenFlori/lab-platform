@@ -21,6 +21,7 @@ export const EXPORT_PARTS = [
   'submissions',
   'grades',
   'exerciseCompletions',
+  'predictionResults',
   'labActivity',
   'aiUsage',
   'aiQuestions',

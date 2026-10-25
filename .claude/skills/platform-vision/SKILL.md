@@ -378,6 +378,13 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   three tries. Students write as on paper (∞, "A-C", "po", ∅ for an empty queue), numbers carry over
   from the row above, and finished rows replay on the graph. Staff embed one with
   `{"preset": "lab05-prim"}` and the like. Next: #151, counting first-try results.
+- **2026-10-25:** #151 done. A student's first answer to each decision of an embedded visualization
+  (predict mode, the ordering game) and to each row of a trace table is kept, right or not and what
+  they answered; later tries change nothing. Students see their accuracy per topic on "My progress",
+  with the topic to review. Staff with analytics see on the activity page, per visualization from
+  five students up, the first-try accuracy and its three hardest decisions with the wrong answer most
+  gave; never names. Kept two years like activity, erased with the person, in "My data", the
+  institution export, the privacy page and the agreement. Next: #152, the mixed review session.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
@@ -428,6 +435,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-12 | The survey is anonymous by design: ratings are stored only as counts, comments with random ids, no time and no author, in a WITHOUT ROWID table; who answered is kept apart, only to ask once. Results show from five answers | Decided |
 | 2026-10-12 | A real mobile app means an installable web app (PWA) first; a store app (Capacitor) only if a need appears | Decided |
 | 2026-10-25 | Phase 8 is "Understanding, measured" before SaaS: students predict and trace every algorithm by hand, checked at once, and first-try results are counted (never graded). Teaching quality comes first, and the January pilot must show learning, not only use, before a second institution signs | Decided |
+| 2026-10-25 | First-try results are practice data: kept once per student and decision (later tries change nothing), shown to the student per topic and to staff with analytics only as counts from five students up, with the hardest decisions and the most common wrong answer, never names; two years like activity. A decision is identified by its step and its options as ids, so both languages count as one | Decided |
 | 2026-10-25 | Predict mode asks only decisions that can go either way, and caps long runs by order, never by outcome (4 per Bellman-Ford pass, 3 per Floyd-Warshall k), so practice stays short and the cap gives nothing away | Decided |
 | 2026-10-10 | Search without FTS5: D1 cannot export databases with virtual tables, and backups must keep working. The server sends each user the text of what they may see; the browser matches it as they type | Decided |
 

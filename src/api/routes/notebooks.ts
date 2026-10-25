@@ -14,12 +14,13 @@ import {
   ORIGINAL_FILE,
   RENDERED_FILE,
 } from '../../shared/notebooks';
+import { predictionInput } from '../../shared/predictions';
 import { searchSectionsInput } from '../../shared/search';
 import { streamAi } from '../ai/gateway';
 import { explainMessages } from '../ai/purposes';
 import type { TenantEnv } from '../auth/access';
 import { NotFoundError, type StoredFile } from '../db/tenant';
-import { recordActivity } from './activity';
+import { recordActivity, today } from './activity';
 import { forbidden, invalidRequest } from './course-context';
 import { gradingRoutes } from './grading';
 import {
@@ -268,6 +269,27 @@ export const notebookRoutes = new Hono<TenantEnv>()
     if (!ctx.staff) {
       await c.var.tenant.exercises.complete({ notebookId: nb.id, cell, userId: c.var.user?.id as string });
       recordActivity(c, ctx, lab.id, 'exercise');
+    }
+    return c.body(null, 204);
+  })
+
+  // A student's first answer to a decision of an embedded visualization (#151): kept once, never
+  // changed by a later try. Practice like the exercises, so the browser is trusted with it; staff
+  // are not counted.
+  .post('/:notebookId/embeds/:cell/results', zValidator('json', predictionInput, invalidRequest), async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    const cell = cellParam(c.req.param('cell'));
+    if (cell === null) return c.json({ error: 'invalid_request' }, 400);
+    const embeds = await c.var.tenant.notebooks.embedsOf(nb.id);
+    if (!embeds.some((e) => e.cell === cell)) throw new NotFoundError();
+    if (!ctx.staff) {
+      await c.var.tenant.predictions.record({
+        ...c.req.valid('json'),
+        notebookId: nb.id,
+        cell,
+        userId: c.var.user?.id as string,
+        day: today(),
+      });
     }
     return c.body(null, 204);
   })

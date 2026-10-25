@@ -11,7 +11,7 @@ import { generateJoinCode } from '../../shared/join-code';
 import { type GroupStudent, importStudentsInput, resetPasswordInput } from '../../shared/students';
 import type { TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
-import { courseActivityRoutes, pilotReportRoutes } from './activity';
+import { courseActivityRoutes, pilotReportRoutes, understandingRoutes } from './activity';
 import { aiRoutes } from './ai';
 import { forbidden, groupOf, invalidRequest, seesCourse, summary, visibleCourse } from './course-context';
 import { courseGradesRoutes } from './grading';
@@ -207,6 +207,7 @@ export const courseRoutes = new Hono<TenantEnv>()
   .route('/:courseId/labs', labRoutes)
   .route('/:courseId/search', searchRoutes)
   .route('/:courseId/activity', courseActivityRoutes)
+  .route('/:courseId/understanding', understandingRoutes)
   .route('/:courseId/ai', aiRoutes)
   .route('/:courseId/grades', courseGradesRoutes)
   .route('/:courseId/progress', progressRoutes)

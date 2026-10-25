@@ -5,6 +5,7 @@ import type { Question } from '../algorithms/predict';
 import { PREDICT_TEXT } from '../algorithms/predict.text';
 import { Toggle } from './controls';
 import { RichText } from './RichText';
+import { decisionKey, result, useResults } from './results';
 import { useText } from './text';
 import type { Player } from './usePlayer';
 
@@ -93,18 +94,34 @@ export function usePredict<S>(
     return () => window.clearTimeout(timer);
   }, [enabled, auto, pending, atEnd, next, baseDelay, player.speed]);
 
+  const report = useResults();
   const answer = useCallback(
     (id: string) => {
       if (pending === null) return;
       const q = questionAt(pending);
       if (!q) return;
       const ok = q.answers.includes(id);
+      // In a lab, the first answer counts in the student's results (#151).
+      report?.(
+        result({
+          topic: q.topic,
+          decision: decisionKey(
+            pending,
+            q.options.map((o) => o.id),
+            q.answers,
+          ),
+          right: ok,
+          pick: q.options.find((o) => o.id === id)?.label ?? id,
+          answer: q.answerLabel,
+          prompt: q.prompt,
+        }),
+      );
       setAnswered((a) => ({ ...a, [pending]: ok }));
       setFeedback({ ok, question: q });
       player.go(pending);
       setPending(null);
     },
-    [pending, questionAt, player],
+    [pending, questionAt, player, report],
   );
 
   const setEnabled = useCallback(

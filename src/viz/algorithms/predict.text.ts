@@ -67,6 +67,7 @@ const sq = {
       `Ngushtica është kapaciteti mbetës më i vogël përgjatë rrugës (${caps}): **${x}**. Aq rrjedhë mund të shtohet.`,
   },
   topo: {
+    prompt: (placed: string) => `Renditja deri tani: ${placed || '—'}. Cili kulm mund të vijë tani?`,
     help: 'Kulmet që mund të vijnë tani nuk ndriçohen më: zgjidhni vetë.',
     right: (v: string) => `Saktë: të gjitha parakushtet e ${v} janë vendosur (fuqia hyrëse e mbetur 0).`,
   },
@@ -155,6 +156,7 @@ export const PREDICT_TEXT = bilingual<PredictText>(sq, {
       `The bottleneck is the smallest residual capacity along the path (${caps}): **${x}**. That much flow can be added.`,
   },
   topo: {
+    prompt: (placed) => `The order so far: ${placed || '—'}. Which vertex may come now?`,
     help: 'The vertices that may come next are no longer highlighted: choose yourself.',
     right: (v) => `Right: every prerequisite of ${v} is placed (its remaining in-degree is 0).`,
   },
