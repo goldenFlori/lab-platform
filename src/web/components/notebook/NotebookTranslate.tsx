@@ -26,12 +26,15 @@ export function NotebookTranslate({
   base,
   notebook,
   onSaved,
+  withButton = true,
 }: {
   org: string;
   courseId: string;
   base: string;
   notebook: NotebookSummary;
   onSaved: (nb: NotebookDetail) => unknown;
+  /** Without its own button it opens from the lab's menus (#130). */
+  withButton?: boolean;
 }) {
   const t = useT();
   const queryClient = useQueryClient();
@@ -51,11 +54,11 @@ export function NotebookTranslate({
   });
 
   if (!open) {
-    return (
+    return withButton ? (
       <Button variant="secondary" onPress={() => setOpen(true)}>
         <Languages className="size-4" /> {t.translate.open}
       </Button>
-    );
+    ) : null;
   }
 
   const close = () => {

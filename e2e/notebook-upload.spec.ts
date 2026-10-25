@@ -11,7 +11,9 @@ test('a pedagog uploads a notebook, places a visualization in it and deletes it'
   await expect(staff.getByText('Ky laborator nuk ka ende fletore.')).toBeVisible();
 
   // Upload: converted in this browser, then sent in steps.
-  await staff.getByRole('button', { name: 'Ngarko fletore' }).click();
+  // From the lab header's "More" menu (#130).
+  await staff.getByRole('button', { name: 'Më shumë veprime me fletoret' }).click();
+  await staff.getByRole('menuitem', { name: 'Ngarko fletore' }).click();
   const form = staff.getByRole('form', { name: 'Ngarko fletore' });
   await form.getByLabel('Fletorja (.ipynb)').setInputFiles('test/notebook/fixtures/notebooks/laborator-03.ipynb');
   await expect(form.getByLabel('Lloji')).toHaveValue('main');
@@ -43,7 +45,8 @@ test('a pedagog uploads a notebook, places a visualization in it and deletes it'
   await expect(staff.locator('article [data-viz-id="gara-e-krahasimeve"]')).toHaveCount(1);
 
   // Delete: the lab is empty again.
-  await staff.getByRole('button', { name: 'Fshi fletoren' }).click();
+  await staff.getByRole('button', { name: 'Më shumë veprime me fletoret' }).click();
+  await staff.getByRole('menuitem', { name: 'Fshi fletoren' }).click();
   await staff.getByRole('alertdialog').getByRole('button', { name: 'Fshi fletoren' }).click();
   await expect(staff.getByText('Ky laborator nuk ka ende fletore.')).toBeVisible();
 

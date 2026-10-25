@@ -20,6 +20,7 @@ import type { LabView } from '../../../../../../../../shared/labs';
 import { ORIGINAL_FILE } from '../../../../../../../../shared/notebook-files';
 import type { Embed, NotebookKind, NotebookSummary } from '../../../../../../../../shared/notebooks';
 import { AiTools } from '../../../../../../../components/AiTools';
+import { LabMoreMenu } from '../../../../../../../components/LabMoreMenu';
 import { LiveLab } from '../../../../../../../components/LiveLab';
 import { AssignmentsEditor } from '../../../../../../../components/notebook/AssignmentsEditor';
 import { DeleteNotebook } from '../../../../../../../components/notebook/DeleteNotebook';
@@ -152,37 +153,42 @@ function LabPage() {
           </h1>
           {lab.summary && <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted">{lab.summary}</p>}
 
-          {ref && current?.ready && (
-            <div className="mt-7 flex flex-wrap gap-2.5">
-              <a href={notebookFileUrl(ref, ORIGINAL_FILE)} download className="button button--primary gap-2">
-                <Download className="size-4" aria-hidden="true" /> {t.lab.download}
-              </a>
-              <Link
-                to="/o/$org/courses/$courseId/labs/$labId/present"
-                params={{ org, courseId, labId }}
-                search={{ notebook: ref.notebookId }}
-                // Fullscreen needs the click itself, so it starts here rather than on the next page.
-                onClick={() => void document.documentElement.requestFullscreen?.().catch(() => undefined)}
-                className="button button--secondary gap-2"
-              >
-                <Presentation className="size-4" aria-hidden="true" /> {t.lab.present}
-              </Link>
-              {firstEmbed && (
-                <a href={`#${embedAnchor(ref.notebookId, firstEmbed.cell)}`} className="button button--tertiary gap-2">
-                  <Sparkles className="size-4" aria-hidden="true" /> {t.lab.firstVisualization}
+          {/* One toolbar (#130): what everyone uses, then the staff's tools, then the rest in "More". */}
+          <div className="mt-7 flex flex-wrap items-center gap-2.5" data-testid="lab-toolbar">
+            {ref && current?.ready && (
+              <>
+                <a href={notebookFileUrl(ref, ORIGINAL_FILE)} download className="button button--primary gap-2">
+                  <Download className="size-4" aria-hidden="true" /> {t.lab.download}
                 </a>
-              )}
-            </div>
-          )}
-
-          <div className="mt-5 flex flex-wrap gap-2.5">
+                <Link
+                  to="/o/$org/courses/$courseId/labs/$labId/present"
+                  params={{ org, courseId, labId }}
+                  search={{ notebook: ref.notebookId }}
+                  // Fullscreen needs the click itself, so it starts here rather than on the next page.
+                  onClick={() => void document.documentElement.requestFullscreen?.().catch(() => undefined)}
+                  className="button button--secondary gap-2"
+                >
+                  <Presentation className="size-4" aria-hidden="true" /> {t.lab.present}
+                </Link>
+                {firstEmbed && (
+                  <a
+                    href={`#${embedAnchor(ref.notebookId, firstEmbed.cell)}`}
+                    className="button button--tertiary gap-2 max-sm:hidden"
+                  >
+                    <Sparkles className="size-4" aria-hidden="true" /> {t.lab.firstVisualization}
+                  </a>
+                )}
+              </>
+            )}
             {canManage && <AiTools org={org} courseId={courseId} />}
+            {canManage && <LabMoreMenu canDelete={!!current} />}
             <LiveLab org={org} courseId={courseId} labId={labId} />
           </div>
 
           {canManage && (
-            <div className="mt-7 flex flex-wrap items-start gap-2.5">
+            <div className="flex flex-wrap items-start gap-2.5 empty:hidden [&:has(>*)]:mt-5">
               <NotebookUpload
+                withButton={false}
                 base={changes.base}
                 hasMain={notebooks.some((nb) => nb.kind === 'main')}
                 onUploaded={async (nb) => {
@@ -193,6 +199,7 @@ function LabPage() {
               {current?.ready && (
                 <NotebookTranslate
                   key={current.id}
+                  withButton={false}
                   org={org}
                   courseId={courseId}
                   base={changes.base}
@@ -205,6 +212,7 @@ function LabPage() {
               )}
               {current && (
                 <DeleteNotebook
+                  withButton={false}
                   title={current.title}
                   isPending={changes.deleteNotebook.isPending}
                   onDelete={() =>

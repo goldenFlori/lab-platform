@@ -104,7 +104,7 @@ test('a student reads a course notebook with its outputs, figures and visualizat
   await expect(student).toHaveURL(`/o/e2e/courses/${course.id}/labs/${lab.id}`);
   await expect(student).toHaveTitle('Algoritmet e renditjes · Lab Platform');
   await expect(student.getByRole('heading', { level: 1, name: 'Algoritmet e renditjes' })).toBeVisible();
-  await expect(student.getByRole('button', { name: 'Ngarko fletore' })).toHaveCount(0);
+  await expect(student.getByRole('button', { name: 'Më shumë veprime me fletoret' })).toHaveCount(0);
   await expect(student.getByText(/Vizualizimet në këtë fletore/)).toHaveCount(0);
   await expect(student.getByRole('link', { name: 'Shkarko fletoren' })).toHaveAttribute(
     'href',

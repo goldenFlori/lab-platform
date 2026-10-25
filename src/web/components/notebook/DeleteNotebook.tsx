@@ -1,23 +1,32 @@
 import { AlertDialog, Button } from '@heroui/react';
 import { Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import { useT } from '../../i18n';
+import { useLabTool } from '../../lib/lab-tools';
 
 export function DeleteNotebook({
   title,
   isPending,
   onDelete,
+  withButton = true,
 }: {
   title: string;
   isPending: boolean;
   onDelete: () => void;
+  /** Without its own button it opens from the lab's "More" menu (#130). */
+  withButton?: boolean;
 }) {
   const t = useT();
+  const [isOpen, setOpen] = useState(false);
+  useLabTool('delete', () => setOpen(true));
   return (
-    <AlertDialog>
-      <Button variant="ghost" isPending={isPending}>
-        <Trash2 className="size-4" /> {t.notebook.deleteButton}
-      </Button>
-      <AlertDialog.Backdrop>
+    <>
+      {withButton && (
+        <Button variant="ghost" isPending={isPending} onPress={() => setOpen(true)}>
+          <Trash2 className="size-4" /> {t.notebook.deleteButton}
+        </Button>
+      )}
+      <AlertDialog.Backdrop isOpen={isOpen} onOpenChange={setOpen}>
         <AlertDialog.Container>
           <AlertDialog.Dialog>
             <AlertDialog.Header>
@@ -36,6 +45,6 @@ export function DeleteNotebook({
           </AlertDialog.Dialog>
         </AlertDialog.Container>
       </AlertDialog.Backdrop>
-    </AlertDialog>
+    </>
   );
 }

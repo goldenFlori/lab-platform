@@ -748,6 +748,7 @@ export const en: Messages = {
     stop: 'Stop',
     failed: 'The download did not finish. Please try again.',
   },
+  labMenu: { label: 'More notebook actions' },
   footer: {
     privacy: 'Privacy',
   },
