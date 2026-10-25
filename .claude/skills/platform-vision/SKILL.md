@@ -311,7 +311,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-25:** #128 done. The foundation every screen uses: ink-and-paper surfaces, one set of
   algorithm-state colours (frontier, current, visited, path, done, rejected) shared by the interface
   and the visualizations, Bricolage Grotesque for headings, a motion system (Motion for React) that
-  respects reduced motion, and a logo drawn from a moment of BFS. Next: the live front page (#129).
+  respects reduced motion, and a logo drawn from a moment of BFS (PR #134).
+- **2026-10-25:** #129 done. The front page opens on a live graph running the course's own BFS, DFS
+  and Dijkstra with their narration: visitors switch the algorithm or tap a vertex to start from
+  it, and watch the queue, stack or priority queue do the work. It cycles on its own until touched
+  and pauses off screen. Next: gallery previews (#125).
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
