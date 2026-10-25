@@ -629,6 +629,32 @@ const Matching = () => (
   </Frame>
 );
 
+// Merge Sort's recursion tree: split down four levels, then merged back up from the leaves.
+const RecursionTree = () => (
+  <Frame count={9} ms={420}>
+    {(f) =>
+      [1, 2, 4, 8].flatMap((count, depth) => {
+        if (f < depth) return [];
+        const merged = f >= 8 - depth;
+        const width = 176 / count;
+        return Array.from({ length: count }, (_, i) => (
+          <rect
+            // biome-ignore lint/suspicious/noArrayIndexKey: a fixed drawing, keyed by level and position
+            key={`${depth}-${i}`}
+            x={12 + i * width + 2}
+            y={10 + depth * 24}
+            width={width - 4}
+            height={16}
+            rx={4}
+            fill={merged ? C.done : depth === f ? C.current : C.idle}
+            className="transition-[fill] duration-300"
+          />
+        ));
+      })
+    }
+  </Frame>
+);
+
 const PREVIEWS: Record<VisualizerId, () => ReactNode> = {
   renditja: Sorting,
   'gara-e-krahasimeve': Race,
@@ -643,6 +669,7 @@ const PREVIEWS: Record<VisualizerId, () => ReactNode> = {
   'gara-e-rrugeve': PathRace,
   'rrjedha-max': Flow,
   ciftezimi: Matching,
+  'pema-rekursive': RecursionTree,
 };
 
 export function VizPreview({ id }: { id: VisualizerId }) {

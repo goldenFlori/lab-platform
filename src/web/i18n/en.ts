@@ -40,7 +40,7 @@ export const en: Messages = {
     signIn: 'Sign in',
     seeIt: 'See it at work',
     stats: [
-      ['13', 'visualizations'],
+      ['14', 'visualizations'],
       ['10', 'labs'],
       ['0', 'installs'],
     ],
@@ -56,7 +56,7 @@ export const en: Messages = {
     },
     demoTitle: 'Try it here',
     demoLead:
-      "One of the course's 13 visualizations, as students see it: play it step by step, change the maze, and compare BFS with DFS.",
+      "One of the course's 14 visualizations, as students see it: play it step by step, change the maze, and compare BFS with DFS.",
     demoVideoLead: 'Two minutes: a lab class, from code to visualization and Live Lab.',
     demoLabel: 'The maze — BFS versus DFS',
     allVisualizations: 'All visualizations',
@@ -451,6 +451,7 @@ export const en: Messages = {
       'gara-e-rrugeve': 'Game: The path race',
       'rrjedha-max': 'Max flow & min cut',
       ciftezimi: 'Matching & assignment',
+      'pema-rekursive': 'Recursion tree',
     },
     summaries: {
       renditja: 'The sorting algorithms step by step, with the pseudocode and the complexity of each.',
@@ -471,6 +472,8 @@ export const en: Messages = {
       'rrjedha-max':
         'Ford-Fulkerson grows the flow while there are augmenting paths; the reachable vertices give the minimum cut.',
       ciftezimi: 'Maximum matching and the assignment problem, solved with maximum flow.',
+      'pema-rekursive':
+        'Merge Sort’s calls as a tree, with the work per level, and Fibonacci’s repeated calls that memoization removes.',
     },
   },
   search: {
