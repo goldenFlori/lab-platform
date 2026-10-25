@@ -2,7 +2,7 @@ import { Button } from '@heroui/react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { ArrowLeft, Printer, ShieldCheck } from 'lucide-react';
-import type { PilotCount, PilotReport } from '../../../../../../../shared/activity';
+import type { FirstTries, PilotCount, PilotReport } from '../../../../../../../shared/activity';
 import type { SurveyView } from '../../../../../../../shared/surveys';
 import { SurveyResultsView } from '../../../../../../components/CourseSurvey';
 import { type Messages, t as messages, useT } from '../../../../../../i18n';
@@ -174,6 +174,8 @@ function Report({ data, t, survey }: { data: PilotReport; t: Messages; survey: S
         </ul>
       </section>
 
+      <Learning data={data} t={t} />
+
       {survey?.results && (
         <section className="break-inside-avoid">
           <h2 className="font-semibold">{t.report.satisfaction}</h2>
@@ -186,6 +188,92 @@ function Report({ data, t, survey }: { data: PilotReport; t: Messages; survey: S
         {t.report.privacy(new Date().toISOString().slice(0, 10))}
       </p>
     </div>
+  );
+}
+
+const rate = ({ answers, right }: FirstTries) => (answers ? `${Math.round((100 * right) / answers)}%` : '—');
+
+/** Learning (#153): first-try accuracy overall, per topic and week, and after the first day. */
+function Learning({ data, t }: { data: PilotReport; t: Messages }) {
+  const L = t.report.learning;
+  const u = data.understanding;
+  return (
+    <section className="break-inside-avoid" data-testid="pilot-learning">
+      <h2 className="font-semibold">{L.title}</h2>
+      <p className="mt-1 text-sm text-muted">{L.lead}</p>
+      {u.answers === 0 ? (
+        <p className="mt-3 text-sm text-muted">{L.none}</p>
+      ) : (
+        <>
+          <dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 print:grid-cols-3">
+            <Stat label={L.rate} value={rate(u)} note={L.rateNote(u.right, u.answers, u.students)} />
+            <Stat
+              label={L.growth}
+              value={u.growth ? `${rate(u.growth.firstDay)} → ${rate(u.growth.later)}` : '—'}
+              note={u.growth ? L.growthNote(u.growth.students) : L.growthNone}
+            />
+            <Stat
+              label={L.traceRows}
+              value={String(u.traceRows.total)}
+              note={t.report.byStudents(
+                u.traceRows.students,
+                data.students ? `${Math.round((100 * u.traceRows.students) / data.students)}%` : '—',
+              )}
+            />
+          </dl>
+          {u.topics.length > 0 && (
+            <div className="mt-4 overflow-x-auto">
+              <h3 className="text-sm font-semibold">{L.topics}</h3>
+              <table className="mt-2 w-full min-w-md text-left text-sm">
+                <thead className="text-xs text-muted">
+                  <tr className="border-b border-separator">
+                    <th scope="col" className="py-1.5 pr-4 font-medium">
+                      {L.topic}
+                    </th>
+                    <th scope="col" className="py-1.5 pr-4 font-medium">
+                      {L.students}
+                    </th>
+                    <th scope="col" className="py-1.5 pr-4 font-medium">
+                      {L.answers}
+                    </th>
+                    <th scope="col" className="py-1.5 font-medium">
+                      {L.right}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {u.topics.map((row) => (
+                    <tr key={row.topic} className="border-b border-separator/60 last:border-0">
+                      <th scope="row" className="py-1.5 pr-4 font-medium">
+                        {t.topics[row.topic]}
+                      </th>
+                      <td className="py-1.5 pr-4 tabular-nums">{row.students}</td>
+                      <td className="py-1.5 pr-4 tabular-nums">{row.answers}</td>
+                      <td className="py-1.5 tabular-nums">{rate(row)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <h3 className="mt-4 text-sm font-semibold">{L.weeks}</h3>
+          <ul className="mt-2 grid gap-1.5">
+            {u.weeks.map((w) => (
+              <li key={w.week} className="grid grid-cols-[6.5rem_minmax(0,1fr)_3rem] items-center gap-3 text-sm">
+                <span className="text-muted tabular-nums">{w.week}</span>
+                <div className="h-2.5 overflow-hidden rounded-full bg-surface-secondary print:border print:border-border">
+                  <div
+                    className="h-full rounded-full bg-success"
+                    style={{ width: w.answers ? `${(100 * w.right) / w.answers}%` : '0%' }}
+                  />
+                </div>
+                <span className="text-right tabular-nums">{rate(w)}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </section>
   );
 }
 

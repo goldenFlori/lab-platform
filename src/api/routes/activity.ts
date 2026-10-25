@@ -9,6 +9,7 @@ import {
   PILOT_MAX_DAYS,
   type PilotCount,
   type PilotReport,
+  type PilotUnderstanding,
   REPORT_WEEKS,
 } from '../../shared/activity';
 import {
@@ -157,6 +158,34 @@ export const courseActivityRoutes = new Hono<TenantEnv>().get('/', async (c) => 
   } satisfies ActivityReport);
 });
 
+type Learning = Awaited<ReturnType<TenantEnv['Variables']['tenant']['predictions']['pilot']>>;
+
+/** The pilot report's learning section (#153), with the five-student rule applied. */
+function understandingOf(learning: Learning, from: string, to: string): PilotUnderstanding {
+  const tries = (row: { answers: number; right: number } | undefined) => ({
+    answers: Number(row?.answers ?? 0),
+    right: Number(row?.right ?? 0),
+  });
+  const weeks: PilotUnderstanding['weeks'] = [];
+  for (let week = mondayOf(from); week <= to; week = addDays(week, 7)) {
+    weeks.push({ week, ...tries(learning.perWeek.find((row) => row.week === week)) });
+  }
+  const first = learning.growth.find((row) => Number(row.first) === 1);
+  const later = learning.growth.find((row) => Number(row.first) === 0);
+  const growing = Number(first?.students ?? 0);
+  return {
+    students: Number(learning.totals?.students ?? 0),
+    ...tries(learning.totals),
+    topics: PREDICTION_TOPICS.flatMap((topic) => {
+      const row = learning.perTopic.find((r) => r.topic === topic);
+      return row && row.students >= MIN_STUDENTS ? [{ topic, students: row.students, ...tries(row) }] : [];
+    }),
+    weeks,
+    growth: growing >= MIN_STUDENTS ? { students: growing, firstDay: tries(first), later: tries(later) } : null,
+    traceRows: { students: Number(learning.trace?.students ?? 0), total: Number(learning.trace?.total ?? 0) },
+  };
+}
+
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const daysBetween = (from: string, to: string) =>
   Math.round((new Date(`${to}T00:00:00Z`).getTime() - new Date(`${from}T00:00:00Z`).getTime()) / 86_400_000);
@@ -186,14 +215,17 @@ export const pilotReportRoutes = new Hono<TenantEnv>().get('/', async (c) => {
     return c.json({ error: 'invalid_request' }, 400);
   }
 
-  const data = await tenant.activity.pilot({
-    courseId: course.id,
-    groupIds,
-    from,
-    to,
-    start: startOfDay(from),
-    end: new Date(startOfDay(addDays(to, 1)).getTime() - 1),
-  });
+  const [data, learning] = await Promise.all([
+    tenant.activity.pilot({
+      courseId: course.id,
+      groupIds,
+      from,
+      to,
+      start: startOfDay(from),
+      end: new Date(startOfDay(addDays(to, 1)).getTime() - 1),
+    }),
+    tenant.predictions.pilot({ courseId: course.id, groupIds, from, to }),
+  ]);
   const kind = (k: ActivityKind): PilotCount => {
     const row = data.perKind.find((r) => r.kind === k);
     return { students: row?.students ?? 0, total: Number(row?.total ?? 0) };
@@ -223,6 +255,7 @@ export const pilotReportRoutes = new Hono<TenantEnv>().get('/', async (c) => {
     submissions: count(data.handed),
     aiQuestions: count(data.asked),
     aiRequests: data.aiRequests,
+    understanding: understandingOf(learning, from, to),
   } satisfies PilotReport);
 });
 

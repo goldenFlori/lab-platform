@@ -391,6 +391,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   a matrix). Topics interleave, at most three each, and those with more wrong first tries come back
   more often (their results, plus this device's past sessions). The end lists what to revisit with a
   link to its lab. Runs in the browser, no AI, no cost. Next: #153, learning in the pilot report.
+- **2026-10-26:** #153 done, and with it Phase 8. The pilot report shows learning beside use: the
+  share of first answers right, per topic (from five students up) and week by week, how it changes
+  from a student's first day to the days after (from five such students up), and the trace-table
+  rows checked. It prints with the rest, and is the evidence of learning for the Startup Albania
+  application. Next: the owner re-imports the course, places the trace tables on the class problems,
+  and runs the dry run with the FSHN course.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and

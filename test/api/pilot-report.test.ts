@@ -75,6 +75,63 @@ describe('the pilot report', () => {
   });
 });
 
+// #153: the report shows learning, not only use: first-try accuracy per topic and week, and whether
+// it rises after a student's first day, from five students up.
+describe("the pilot report's learning", () => {
+  it('counts first tries per topic and week, and the first day against the later ones', async () => {
+    const seed = await seedOrganization('fshn');
+    const { tenant, course, notebook, group } = seed;
+    const pedagog = await account(seed, 'pedagog', { courseId: course.id });
+    const now = today();
+    const before = new Date(`${now}T12:00:00Z`);
+    before.setUTCDate(before.getUTCDate() - 1);
+    const yesterday = before.toISOString().slice(0, 10);
+    const answer = (
+      userId: string,
+      day: string,
+      topic: 'bfs' | 'prim' | 'trace-prim',
+      decision: string,
+      right: boolean,
+    ) =>
+      tenant.predictions.record({
+        notebookId: notebook.id,
+        cell: 1,
+        userId,
+        day,
+        topic,
+        decision,
+        right,
+        pick: 'X',
+        answer: 'Y',
+        prompt: 'P',
+      });
+    // Five students: BFS wrong on their first day, right the next.
+    for (let i = 0; i < 5; i++) {
+      const student = await account(seed, 'student', { groupId: group.id });
+      await answer(student.user.id, yesterday, 'bfs', 'a', false);
+      await answer(student.user.id, now, 'bfs', 'b', true);
+      // One of them also tries Prim and a trace table: too few to show per topic.
+      if (i === 0) {
+        await answer(student.user.id, now, 'prim', 'c', true);
+        await answer(student.user.id, now, 'trace-prim', 'lab05-prim:0', false);
+      }
+    }
+    const res = await pedagog.call(`/orgs/${seed.org.slug}/courses/${course.id}/report?from=${yesterday}&to=${now}`);
+    const { understanding } = (await res.json()) as PilotReport;
+    expect(understanding).toMatchObject({
+      students: 5,
+      answers: 12,
+      right: 6,
+      topics: [{ topic: 'bfs', students: 5, answers: 10, right: 5 }],
+      growth: { students: 5, firstDay: { answers: 5, right: 0 }, later: { answers: 7, right: 6 } },
+      traceRows: { students: 1, total: 1 },
+    });
+    const weeks = understanding.weeks;
+    expect(weeks.reduce((n, w) => n + w.answers, 0)).toBe(12);
+    expect(weeks.reduce((n, w) => n + w.right, 0)).toBe(6);
+  });
+});
+
 // #112: the period runs from Tirana's midnight, not UTC's, so late-evening work is counted.
 describe("the institution's days", () => {
   it('begin at midnight in Tirana, in summer and in winter time', () => {
