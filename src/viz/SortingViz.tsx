@@ -1,7 +1,7 @@
 import { Button, Chip, Input } from '@heroui/react';
 import { ArrowDownWideNarrow, ArrowUpNarrowWide, BarChart3, Shuffle } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
-import { selectionQuestion } from './algorithms/predict';
+import { insertionQuestion, mergeQuestion, selectionQuestion } from './algorithms/predict';
 import { PREDICT_TEXT } from './algorithms/predict.text';
 import { makeInput, parseNumbers, SORT_META, SORT_RUN, type SortAlgo, type SortStep } from './algorithms/sorting';
 import { SORTING_TEXT } from './algorithms/sorting.text';
@@ -82,10 +82,16 @@ export default function SortingViz({
   const S = useText(SORTING_TEXT);
   const steps = useMemo(() => SORT_RUN[algo](values, S), [algo, values, S]);
   const basePlayer = usePlayer<SortStep>(steps, 700);
-  // Predict mode (#127), for Selection Sort: which element ends up in each position.
+  // Predict mode (#127, #148): where Insertion Sort puts each key, which element Selection Sort puts
+  // in each position, and which head a merge writes next.
   const P = useText(PREDICT_TEXT);
   const question = useCallback(
-    (k: number) => (algo === 'selection' ? selectionQuestion(steps, k, P) : null),
+    (k: number) =>
+      algo === 'selection'
+        ? selectionQuestion(steps, k, P)
+        : algo === 'insertion'
+          ? insertionQuestion(steps, k, P)
+          : mergeQuestion(steps, k, P),
     [algo, steps, P],
   );
   const predict = usePredict(basePlayer, question, steps, 700);
@@ -151,7 +157,7 @@ export default function SortingViz({
           {error && <p className="text-sm text-warning">{error}</p>}
           <StepNote text={s.note} />
           <PlayerBar player={player} />
-          {algo === 'selection' && <PredictPanel predict={predict} />}
+          <PredictPanel predict={predict} />
         </>
       }
     >

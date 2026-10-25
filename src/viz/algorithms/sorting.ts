@@ -18,6 +18,8 @@ export interface SortStep {
   sortedSet?: number[];
   /** active range (merge sort) */
   range?: [number, number];
+  /** the heads of the left and right halves being compared (merge sort) */
+  heads?: [number, number];
   comparisons: number;
   writes: number;
   line?: number;
@@ -234,6 +236,7 @@ export function mergeSteps(src: number[], text: SortingText): SortStep[] {
         note: T.compare(left[i], takeLeft, right[j]),
         arr: a.slice(),
         compare: [k],
+        heads: [left[i], right[j]],
         range: [l, r],
         sortedSet: range(l, k - 1),
         comparisons: c,

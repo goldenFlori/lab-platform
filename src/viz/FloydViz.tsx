@@ -1,11 +1,14 @@
 import { Button, Chip } from '@heroui/react';
 import { FastForward, Grid2x2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { floydQuestion } from './algorithms/predict';
+import { PREDICT_TEXT } from './algorithms/predict.text';
 import { type FwStep, floydSteps, fwPath, INF, inf, weightMatrix } from './algorithms/shortest';
 import { SHORTEST_TEXT } from './algorithms/shortest.text';
 import { Choice, Field, PlayerBar, Segmented } from './kit/controls';
 import { fitLayout, type GEdge, type GNode, GraphCanvas } from './kit/GraphCanvas';
 import { must } from './kit/must';
+import { PredictPanel, usePredict } from './kit/predict';
 import { Panel, Stat, StepNote, VizShell } from './kit/shell';
 import { bilingual, useText } from './kit/text';
 import { playerKeys, usePlayer } from './kit/usePlayer';
@@ -270,7 +273,12 @@ export default function FloydViz({ preset: initial = 'klasa3' }: { preset?: stri
     () => floydSteps(weightMatrix(L, preset.edges, preset.directed), L, S),
     [preset, L, S],
   );
-  const player = usePlayer(steps, 650);
+  const basePlayer = usePlayer(steps, 650);
+  // Predict mode (#148): before each comparison through k that can go either way, what D[i][j] becomes.
+  const P = useText(PREDICT_TEXT);
+  const question = useCallback((k: number) => floydQuestion(steps, k, L, P), [steps, L, P]);
+  const predict = usePredict(basePlayer, question, steps, 650);
+  const player = predict.player;
   const s = player.step;
 
   const load = (id: string) => {
@@ -348,6 +356,7 @@ export default function FloydViz({ preset: initial = 'klasa3' }: { preset?: stri
         <>
           <StepNote text={s.note} tone={s.phase === 'done' ? 'success' : s.improved ? 'success' : 'accent'} />
           <PlayerBar player={player} />
+          <PredictPanel predict={predict} />
         </>
       }
     >

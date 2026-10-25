@@ -1,8 +1,8 @@
 import { Button, Chip, Input } from '@heroui/react';
 import { Eraser, MapPinned, Trash2, Waypoints } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { natural } from './algorithms/graphs';
-import { dijkstraQuestion } from './algorithms/predict';
+import { bellmanQuestion, dijkstraQuestion } from './algorithms/predict';
 import { PREDICT_TEXT } from './algorithms/predict.text';
 import { bellmanFordSteps, dijkstraSteps, inf, type PathStep, pathTo, toArcs } from './algorithms/shortest';
 import { SHORTEST_TEXT } from './algorithms/shortest.text';
@@ -487,10 +487,23 @@ export default function PathsViz({
     [runs],
   );
   const basePlayer = usePlayer(ticks, 800);
-  // Predict mode (#127) asks about Dijkstra's choices; Bellman-Ford relaxes every edge, so it has none.
+  // Predict mode (#127, #148): Dijkstra's choices, or with Bellman-Ford alone on screen, what each
+  // relaxation does to the distance.
   const P = useText(PREDICT_TEXT);
-  const dQuestion = useCallback((k: number) => (runs ? dijkstraQuestion(runs.d, k, P) : null), [runs, P]);
-  const predict = usePredict(basePlayer, dQuestion, ticks, 800);
+  const question = useCallback(
+    (k: number) => (!runs ? null : view === 'bellman' ? bellmanQuestion(runs.b, k, P) : dijkstraQuestion(runs.d, k, P)),
+    [runs, view, P],
+  );
+  const predict = usePredict(basePlayer, question, ticks, 800);
+  // Switching between the algorithms asks the other one's questions from the start.
+  const restartPredict = useRef(predict.setEnabled);
+  restartPredict.current = predict.setEnabled;
+  const predicting = useRef(predict.enabled);
+  predicting.current = predict.enabled;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs only when the view changes
+  useEffect(() => {
+    if (predicting.current) restartPredict.current(true);
+  }, [view]);
   const player = predict.player;
   const t = player.index;
 
@@ -593,7 +606,7 @@ export default function PathsViz({
       footer={
         <>
           <PlayerBar player={player} />
-          {view !== 'bellman' && <PredictPanel predict={predict} />}
+          <PredictPanel predict={predict} />
         </>
       }
     >
