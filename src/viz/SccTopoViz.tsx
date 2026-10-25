@@ -2,9 +2,10 @@ import { Button, Chip } from '@heroui/react';
 import { Eye, EyeOff, GitBranch, ListOrdered, Shuffle, Trash2, Undo2, Wand2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { natural } from './algorithms/graphs';
+import { PREDICT_TEXT } from './algorithms/predict.text';
 import { allOrders, available, hasCycle, layeredLayout, reach, type SccStep, sccSteps } from './algorithms/scc';
 import { SCC_TEXT } from './algorithms/scc.text';
-import { Choice, Field, PlayerBar, Segmented } from './kit/controls';
+import { Choice, Field, PlayerBar, Segmented, Toggle } from './kit/controls';
 import { fitLayout, type GEdge, type GNode, GraphCanvas, type NodeLook } from './kit/GraphCanvas';
 import { must } from './kit/must';
 import { Legend, Panel, Pseudocode, StepNote, TokenRow, VizShell } from './kit/shell';
@@ -305,6 +306,7 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
   const [mode, setMode] = useState<'scc' | 'topo'>(initialMode);
   const X = useText(TEXT);
   const S = useText(SCC_TEXT);
+  const P = useText(PREDICT_TEXT);
   /** A vertex's name in the interface language. */
   const name = (id: string) => X.steps[id] ?? id;
 
@@ -343,6 +345,10 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
   const [found, setFound] = useState<string[]>([]);
   const [flash, setFlash] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
+  // Predict mode (#149): the vertices that may come next (Kahn's queue) are no longer shown; each
+  // pick is a prediction, right when all its prerequisites are placed.
+  const [predicting, setPredicting] = useState(false);
+  const [good, setGood] = useState<string | null>(null);
   const avail = available(tNodes, topo.edges, placed);
   const orders = useMemo(() => allOrders(topo.nodes, topo.edges, 24), [topo]);
   const complete = placed.length === tNodes.length && tNodes.length > 0;
@@ -358,9 +364,18 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
     setMistakes(0);
     setFound([]);
     setFlash(null);
+    setGood(null);
+  };
+  const predictTopo = (on: boolean) => {
+    setPredicting(on);
+    setPlaced([]);
+    setMistakes(0);
+    setFlash(null);
+    setGood(null);
   };
   const place = (id: string) => {
     if (complete) return;
+    setGood(null);
     if (placed.includes(id)) return setFlash(X.already(name(id)));
     if (!avail.includes(id)) {
       const missing = topo.edges.filter((e) => e.v === id && !placed.includes(e.u)).map((e) => e.u);
@@ -370,6 +385,7 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
     const next = [...placed, id];
     setPlaced(next);
     setFlash(null);
+    if (predicting) setGood(P.topo.right(name(id)));
     if (next.length === tNodes.length) {
       const key = next.join(' → ');
       setFound((f) => (f.includes(key) ? f : [...f, key]));
@@ -446,7 +462,8 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
         badge: String(pos + 1),
         badgeColor: 'var(--viz-done)',
       };
-    if (avail.includes(n.id)) return { stroke: 'var(--viz-active)', strokeWidth: 3, ring: 'var(--viz-active)' };
+    if (!predicting && avail.includes(n.id))
+      return { stroke: 'var(--viz-active)', strokeWidth: 3, ring: 'var(--viz-active)' };
     return { dim: false, stroke: 'var(--viz-line)' };
   };
   const topoEdge = (e: GEdge) => (placed.includes(e.u) ? { stroke: 'var(--viz-done)', width: 2.5 } : {});
@@ -502,17 +519,32 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
             <PlayerBar player={player} />
           </>
         ) : (
-          <StepNote
-            tone={flash ? 'danger' : complete ? 'success' : 'accent'}
-            text={
-              flash ??
-              (complete
-                ? X.valid(placed.map(name).join(' → '), mistakes, orders.count)
-                : placed.length === 0
-                  ? X.start(X.topoPresets[topo.id]?.desc ?? '')
-                  : X.available(avail.map(name).join(', '), placed.length, tNodes.length))
-            }
-          />
+          <>
+            <StepNote
+              tone={flash ? 'danger' : complete || good ? 'success' : 'accent'}
+              text={
+                flash ??
+                (complete
+                  ? X.valid(placed.map(name).join(' → '), mistakes, orders.count)
+                  : (good ??
+                    (placed.length === 0
+                      ? X.start(X.topoPresets[topo.id]?.desc ?? '')
+                      : predicting
+                        ? P.topo.help
+                        : X.available(avail.map(name).join(', '), placed.length, tNodes.length))))
+              }
+            />
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1" data-testid="predict">
+              <Toggle label={P.mode} value={predicting} onChange={predictTopo} />
+              <span className="text-xs text-muted">
+                {predicting && placed.length + mistakes > 0
+                  ? P.score(placed.length, placed.length + mistakes)
+                  : predicting
+                    ? P.topo.help
+                    : P.help}
+              </span>
+            </div>
+          </>
         )
       }
     >
@@ -563,7 +595,7 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
                 <Button
                   size="sm"
                   variant="secondary"
-                  isDisabled={complete || !avail.length}
+                  isDisabled={complete || !avail.length || predicting}
                   onPress={() => place(avail[0])}
                 >
                   <Wand2 /> {X.auto}

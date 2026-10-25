@@ -1,17 +1,24 @@
 import { describe, expect, it } from 'vitest';
+import { kruskalSteps, primSteps } from '../../src/viz/algorithms/graphs';
+import { maxflowSteps } from '../../src/viz/algorithms/maxflow';
 import {
   BELLMAN_PER_PASS,
   bellmanQuestion,
+  bottleneckQuestion,
   FLOYD_PER_K,
   floydQuestion,
   insertionQuestion,
+  kruskalQuestion,
   mergeQuestion,
+  primQuestion,
   type Question,
 } from '../../src/viz/algorithms/predict';
 import { PREDICT_TEXT } from '../../src/viz/algorithms/predict.text';
 import { bellmanFordSteps, floydSteps, toArcs, weightMatrix } from '../../src/viz/algorithms/shortest';
 import { insertionSteps, mergeSteps } from '../../src/viz/algorithms/sorting';
 import { SORTING_TEXT } from '../../src/viz/algorithms/sorting.text';
+import { kruskalUnionFind } from '../../src/viz/algorithms/unionfind';
+import { UNION_FIND_TEXT } from '../../src/viz/algorithms/unionfind.text';
 import type { GEdge } from '../../src/viz/kit/GraphCanvas';
 
 // Predict mode's questions (#148) must have the algorithm's own answer: each is checked against
@@ -114,5 +121,68 @@ describe('predict mode questions', () => {
       const after = s ? s.D[s.i]?.[s.j] : undefined;
       expect(q.answerLabel, q.prompt).toBe(q.answers[0] === 'update' ? T.update(String(after)) : T.keep(String(after)));
     }
+  });
+
+  // The Kruskal & Prim visualization's graph (#132), whose minimum spanning tree weighs 39.
+  const mst = edges([
+    ['A', 'B', 7],
+    ['A', 'D', 5],
+    ['B', 'C', 8],
+    ['B', 'D', 9],
+    ['B', 'E', 7],
+    ['C', 'E', 5],
+    ['D', 'E', 15],
+    ['D', 'F', 6],
+    ['E', 'F', 8],
+    ['E', 'G', 9],
+    ['F', 'G', 11],
+  ]);
+
+  it('Kruskal: accept or reject as the run decides, with and without union-find', () => {
+    const runs: { considering: number | null; tree: number[]; rejected: number[]; weight: number }[][] = [
+      kruskalSteps(nodes('ABCDEFG'), mst),
+      kruskalUnionFind(nodes('ABCDEFG'), mst, UNION_FIND_TEXT.sq),
+    ];
+    for (const steps of runs) {
+      const last = steps.at(-1);
+      expect(last?.weight).toBe(39);
+      const asked = questions(steps, (k) => kruskalQuestion(steps, k, mst, T));
+      // Every edge considered once the tree has two edges, until the tree is complete.
+      const considered = [...(last?.tree ?? []), ...(last?.rejected ?? [])].length;
+      expect(asked).toHaveLength(considered - 2);
+      for (const { k, q } of asked) {
+        const i = steps[k]?.considering ?? -1;
+        expect(q.answers, q.prompt).toEqual([last?.rejected.includes(i) ? 'reject' : 'accept']);
+      }
+      expect(asked.filter(({ q }) => q.answers[0] === 'reject')).toHaveLength(last?.rejected.length ?? -1);
+    }
+  });
+
+  it('Prim: the lightest edge across the cut, options in alphabetical order', () => {
+    const steps = primSteps(nodes('ABCDEFG'), mst, 'A');
+    expect(steps.at(-1)?.weight).toBe(39);
+    const asked = questions(steps, (k) => primQuestion(steps, k, mst, T));
+    // From A: A–B (7) or A–D (5); Prim takes A–D.
+    expect(asked[0]?.q.options.map((o) => o.label)).toEqual(['A–B (7)', 'A–D (5)']);
+    expect(asked[0]?.q.answers).toEqual(['1']);
+    for (const { k, q } of asked) expect(q.answers, q.prompt).toContain(String(steps[k]?.considering));
+  });
+
+  it('Edmonds-Karp: the bottleneck is the smallest residual capacity, on the Lab 9 ISP network', () => {
+    const isp = edges([
+      ['S', 'RA', 20],
+      ['S', 'RB', 15],
+      ['RA', 'SW1', 12],
+      ['RA', 'SW2', 8],
+      ['RB', 'SW1', 7],
+      ['RB', 'SW2', 10],
+      ['SW1', 'T', 14],
+      ['SW2', 'T', 11],
+    ]);
+    const steps = maxflowSteps([], isp, 'S', 'T', 'ek');
+    expect(steps.at(-1)?.value).toBe(25);
+    const asked = questions(steps, (k) => bottleneckQuestion(steps, k, 'S', T));
+    expect(asked.length).toBeGreaterThan(0);
+    for (const { k, q } of asked) expect(q.answers, q.prompt).toEqual([String(steps[k]?.x)]);
   });
 });

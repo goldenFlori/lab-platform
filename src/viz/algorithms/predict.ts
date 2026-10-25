@@ -4,7 +4,9 @@
  *  come from the algorithm's own state at step k − 1.
  * ===================================================================== */
 
-import { natural, type TraversalStep } from './graphs';
+import type { GEdge } from '../kit/GraphCanvas';
+import { type MstStep, natural, type TraversalStep } from './graphs';
+import type { FlowStep } from './maxflow';
 import type { PredictText } from './predict.text';
 import { type FwStep, INF, inf, type PathStep } from './shortest';
 import type { SortStep } from './sorting';
@@ -211,5 +213,80 @@ export function floydQuestion(steps: FwStep[], k: number, L: string[], T: Predic
     answers: q.answers,
     answerLabel: q.answerLabel,
     explain: T.floyd.explain(a, b, c, inf(ik), inf(kj), inf(ik + kj), inf(old), q.better),
+  };
+}
+
+const edgeLabel = (e: GEdge) => `${e.u}–${e.v} (${e.w ?? 0})`;
+
+/** The part of a Kruskal step the question needs: plain Kruskal and Kruskal with union-find both have it. */
+interface KruskalLike {
+  considering: number | null;
+  tree: number[];
+  rejected: number[];
+}
+
+/**
+ * Kruskal: accept or reject the next edge in weight order, asked as it comes up. Not asked while
+ * the tree has fewer than two edges: the first two always join (a cycle needs three).
+ */
+export function kruskalQuestion(steps: KruskalLike[], k: number, edges: GEdge[], T: PredictText): Question | null {
+  const step = steps[k];
+  const before = steps[k - 1];
+  if (!step || !before || step.considering === null || step.considering === before.considering) return null;
+  const e = edges[step.considering];
+  if (!e || before.tree.length < 2) return null;
+  const rejected = steps.at(-1)?.rejected.includes(step.considering) ?? false;
+  return {
+    prompt: T.kruskal.prompt(edgeLabel(e)),
+    options: [
+      { id: 'accept', label: T.kruskal.accept },
+      { id: 'reject', label: T.kruskal.reject },
+    ],
+    answers: [rejected ? 'reject' : 'accept'],
+    answerLabel: rejected ? T.kruskal.reject : T.kruskal.accept,
+    explain: rejected ? T.kruskal.explainReject(e.u, e.v) : T.kruskal.explainAccept(e.u, e.v),
+  };
+}
+
+/** Prim: which edge joins the tree next, among those crossing the cut (ties accepted). */
+export function primQuestion(steps: MstStep[], k: number, edges: GEdge[], T: PredictText): Question | null {
+  const step = steps[k];
+  if (step?.line !== 1 || step.considering === null) return null;
+  const inTree = new Set(step.inTree);
+  const crossing = edges
+    .map((e, i) => ({ e, i }))
+    .filter(({ e }) => e.u !== e.v && inTree.has(e.u) !== inTree.has(e.v))
+    .sort((a, b) => natural(a.e.u, b.e.u) || natural(a.e.v, b.e.v));
+  if (crossing.length < 2) return null;
+  const best = Math.min(...crossing.map(({ e }) => e.w ?? 0));
+  const answers = crossing.filter(({ e }) => (e.w ?? 0) === best).map(({ i }) => String(i));
+  const chosen = edges[step.considering];
+  if (!chosen) return null;
+  return {
+    prompt: T.prim.prompt(step.inTree.join(', ')),
+    options: crossing.map(({ e, i }) => ({ id: String(i), label: edgeLabel(e) })),
+    answers,
+    answerLabel: edgeLabel(chosen),
+    explain: T.prim.explain(edgeLabel(chosen), answers.length > 1),
+  };
+}
+
+/**
+ * Max flow: the bottleneck of the augmenting path just found. Options are the residual capacities
+ * in the order the path meets them; not asked when they are all equal.
+ */
+export function bottleneckQuestion(steps: FlowStep[], k: number, s: string, T: PredictText): Question | null {
+  const step = steps[k];
+  if (step?.phase !== 'path' || !step.path.length) return null;
+  const caps = step.path.map((a) => a.cap);
+  const options = unique(caps);
+  if (options.length < 2) return null;
+  const x = Math.min(...caps);
+  return {
+    prompt: T.flow.prompt([s, ...step.path.map((a) => a.v)].join(' → ')),
+    options: options.map((c) => ({ id: String(c), label: String(c) })),
+    answers: [String(x)],
+    answerLabel: String(x),
+    explain: T.flow.explain(caps.join(', '), x),
   };
 }

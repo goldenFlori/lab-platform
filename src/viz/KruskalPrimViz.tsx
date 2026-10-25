@@ -1,11 +1,14 @@
 import { Waypoints } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { primSteps } from './algorithms/graphs';
 import { GRAPHS_TEXT } from './algorithms/graphs.text';
+import { kruskalQuestion, primQuestion } from './algorithms/predict';
+import { PREDICT_TEXT } from './algorithms/predict.text';
 import { kruskalUnionFind, type UnionFindStep } from './algorithms/unionfind';
 import { UNION_FIND_TEXT } from './algorithms/unionfind.text';
 import { Field, PlayerBar, Segmented } from './kit/controls';
 import { type EdgeLook, type GEdge, type GNode, GraphCanvas, type NodeLook } from './kit/GraphCanvas';
+import { PredictPanel, usePredict } from './kit/predict';
 import { Legend, Panel, Stat, StepNote, VizShell } from './kit/shell';
 import { bilingual, useText } from './kit/text';
 import { playerKeys, usePlayer } from './kit/usePlayer';
@@ -104,7 +107,24 @@ export default function KruskalPrimViz({ view: initialView = 'both' }: { view?: 
     () => Array.from({ length: Math.max(kruskal.length, prim.length) }, (_, i) => i),
     [kruskal, prim],
   );
-  const player = usePlayer(ticks, 900);
+  const basePlayer = usePlayer(ticks, 900);
+  // Predict mode (#149): Prim's next edge when Prim is shown alone, otherwise Kruskal's accept or reject.
+  const P = useText(PREDICT_TEXT);
+  const question = useCallback(
+    (t: number) => (view === 'prim' ? primQuestion(prim, t, EDGES, P) : kruskalQuestion(kruskal, t, EDGES, P)),
+    [view, prim, kruskal, P],
+  );
+  const predict = usePredict(basePlayer, question, ticks, 900);
+  // Switching the view asks the other algorithm's questions from the start.
+  const restartPredict = useRef(predict.setEnabled);
+  restartPredict.current = predict.setEnabled;
+  const predicting = useRef(predict.enabled);
+  predicting.current = predict.enabled;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs only when the view changes
+  useEffect(() => {
+    if (predicting.current) restartPredict.current(true);
+  }, [view]);
+  const player = predict.player;
   const k = kruskal[Math.min(player.index, kruskal.length - 1)] ?? kruskal[0];
   const p = prim[Math.min(player.index, prim.length - 1)] ?? prim[0];
   if (!k || !p) return null;
@@ -164,6 +184,7 @@ export default function KruskalPrimViz({ view: initialView = 'both' }: { view?: 
           {showK && <StepNote text={`**Kruskal:** ${k.note}`} />}
           {showP && <StepNote text={`**Prim:** ${p.note}`} tone="success" />}
           <PlayerBar player={player} />
+          <PredictPanel predict={predict} />
         </>
       }
     >

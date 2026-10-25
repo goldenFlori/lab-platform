@@ -27,7 +27,7 @@ import {
   type TraversalStep,
 } from './algorithms/graphs';
 import { GRAPHS_TEXT } from './algorithms/graphs.text';
-import { traversalQuestion } from './algorithms/predict';
+import { kruskalQuestion, primQuestion, traversalQuestion } from './algorithms/predict';
 import { PREDICT_TEXT } from './algorithms/predict.text';
 import { Choice, Field, PlayerBar, Segmented, Toggle } from './kit/controls';
 import { type EdgeLook, fitLayout, type GEdge, type GNode, GraphCanvas, type NodeLook } from './kit/GraphCanvas';
@@ -617,12 +617,20 @@ export default function GraphLab({
     [idsKey, edgesKey, mstAlgo, startOk, X, G],
   );
   const travPlayer = usePlayer(travSteps, 950);
-  const mp = usePlayer(mstSteps, 950);
+  const mstPlayer = usePlayer(mstSteps, 950);
   // Predict mode (#127): which vertex leaves the queue (BFS) or the stack (DFS).
   const P = useText(PREDICT_TEXT);
   const travQuestion = useCallback((k: number) => traversalQuestion(travSteps, k, trav, P), [travSteps, trav, P]);
   const predict = usePredict(travPlayer, travQuestion, travSteps, 950);
   const tp = predict.player;
+  // And (#149) Kruskal's accept or reject, or the edge Prim adds next.
+  const mstQuestion = useCallback(
+    (k: number) =>
+      mstAlgo === 'kruskal' ? kruskalQuestion(mstSteps, k, edges, P) : primQuestion(mstSteps, k, edges, P),
+    [mstAlgo, mstSteps, edges, P],
+  );
+  const mstPredict = usePredict(mstPlayer, mstQuestion, mstSteps, 950);
+  const mp = mstPredict.player;
   const props = useMemo(() => properties(nodes, edges, directed), [nodes, edges, directed]);
   const bip = useMemo(() => (showBip ? bipartite(nodes, edges) : null), [showBip, nodes, edges]);
 
@@ -850,6 +858,7 @@ export default function GraphLab({
           {mode === 'traverse' && <PlayerBar player={tp} />}
           {mode === 'traverse' && <PredictPanel predict={predict} />}
           {mode === 'mst' && weighted && !directed && <PlayerBar player={mp} />}
+          {mode === 'mst' && weighted && !directed && <PredictPanel predict={mstPredict} />}
         </>
       }
     >

@@ -115,3 +115,15 @@ test('predict mode in Floyd-Warshall checks the rule D[i][j] = min(D[i][j], D[i]
   await expect(page.getByTestId('predict-feedback')).toContainText('Saktë!');
   await expect(predict).toContainText('1/1 parashikime të sakta');
 });
+
+// #149: Kruskal asks whether each edge joins the tree, once two edges are in it.
+test('predict mode in Kruskal asks to accept or reject the next edge', async ({ page }) => {
+  await page.goto('/visualizations/kruskal-prim');
+  const predict = page.getByTestId('predict');
+  await predict.getByText('Parashiko', { exact: true }).click();
+  await page.getByRole('button', { name: 'Shko te fundi (End)' }).click();
+  // A–D (5) and C–E (5) are in; D–F (6) joins two different parts of the forest.
+  const question = predict.getByRole('group', { name: /brinja tjetër sipas peshës është D–F \(6\)/ });
+  await question.getByRole('button', { name: 'pranohet' }).click();
+  await expect(page.getByTestId('predict-feedback')).toContainText('Saktë!');
+});
