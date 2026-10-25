@@ -1,4 +1,4 @@
-// The 13 interactive visualizations (#14), by the ids the course site uses in its embeds.
+// The interactive visualizations (#14, #133), by the ids the course site uses in its embeds.
 // No imports: the API validates embeds against this list, and the app shows the titles.
 
 export const VISUALIZERS = {
@@ -15,6 +15,7 @@ export const VISUALIZERS = {
   'gara-e-rrugeve': 'Lojë: Gara e rrugëve',
   'rrjedha-max': 'Rrjedha max & prerja min',
   ciftezimi: 'Çiftëzimi & caktimet',
+  'pema-rekursive': 'Pema rekursive',
 } as const;
 
 export type VisualizerId = keyof typeof VISUALIZERS;
