@@ -4,6 +4,7 @@ import { type FormEvent, useState } from 'react';
 import type { NotebookDetail, NotebookKind } from '../../../shared/notebooks';
 import { type Messages, useT } from '../../i18n';
 import { ApiError } from '../../lib/api';
+import { revealSoon, useLabTool } from '../../lib/lab-tools';
 import { UploadError, type UploadProgress, uploadNotebook } from '../../lib/upload-notebook';
 
 const KINDS: NotebookKind[] = ['main', 'extra', 'solution'];
@@ -29,22 +30,29 @@ export function NotebookUpload({
   base,
   hasMain,
   onUploaded,
+  withButton = true,
 }: {
   base: string;
   hasMain: boolean;
   onUploaded: (notebook: NotebookDetail) => void;
+  /** Without its own button it opens from the lab's "More" menu (#130). */
+  withButton?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [progress, setProgress] = useState<UploadProgress | null>(null);
   const [error, setError] = useState<string | null>(null);
   const t = useT();
+  useLabTool('upload', () => {
+    setOpen(true);
+    revealSoon('[data-testid="notebook-upload"]');
+  });
 
   if (!open) {
-    return (
+    return withButton ? (
       <Button variant="secondary" onPress={() => setOpen(true)}>
         <FileUp className="size-4" /> {t.upload.open}
       </Button>
-    );
+    ) : null;
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -75,6 +83,7 @@ export function NotebookUpload({
     <form
       onSubmit={submit}
       aria-label={t.upload.open}
+      data-testid="notebook-upload"
       className="grid w-full gap-3 rounded-2xl border border-border bg-surface p-4 sm:grid-cols-2"
     >
       <label className="grid gap-1 text-sm sm:col-span-2">
