@@ -354,6 +354,17 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   students' own functions with checks). The converter's fixtures, snapshots and embeds follow it,
   with 3 new exercise checks found. Next: re-import the course (`npm run course:import`) so the
   production labs get the new texts and exercises.
+- **2026-10-25:** Phase 8 planned as the "Phase 8: Understanding, measured" milestone, issues
+  #148–#153: predict mode for every algorithm of the course, the hand-tracing class problems as
+  checked tables, first-try results counted for students and pedagogs, a mixed review session, and
+  learning in the pilot report.
+- **2026-10-25:** #148 done. Predict mode now covers sorting and shortest paths too: where Insertion
+  Sort puts each key, which head a merge writes next, and what a Bellman-Ford relaxation or a
+  Floyd-Warshall comparison through k does to the distance. Trivial decisions are not asked (∞ on
+  either side, two single elements), and the long runs are capped by order, never by outcome:
+  4 questions per Bellman-Ford pass, 3 per Floyd-Warshall k. The visualizations' algorithms have
+  their own unit tests, type-checked with the app. Next: #149, predict mode for spanning trees,
+  topological order and flows.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
@@ -403,6 +414,8 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-18 | Retention: daily activity, AI use counts and ended Live Labs two years (two academic years of reports); handled deletion requests one year; AI questions 180 days; sign-in 30 days idle. Student work, grades and surveys live as long as their course, which the institution deletes. One list in code feeds the nightly job and the privacy page | Decided |
 | 2026-10-12 | The survey is anonymous by design: ratings are stored only as counts, comments with random ids, no time and no author, in a WITHOUT ROWID table; who answered is kept apart, only to ask once. Results show from five answers | Decided |
 | 2026-10-12 | A real mobile app means an installable web app (PWA) first; a store app (Capacitor) only if a need appears | Decided |
+| 2026-10-25 | Phase 8 is "Understanding, measured" before SaaS: students predict and trace every algorithm by hand, checked at once, and first-try results are counted (never graded). Teaching quality comes first, and the January pilot must show learning, not only use, before a second institution signs | Decided |
+| 2026-10-25 | Predict mode asks only decisions that can go either way, and caps long runs by order, never by outcome (4 per Bellman-Ford pass, 3 per Floyd-Warshall k), so practice stays short and the cap gives nothing away | Decided |
 | 2026-10-10 | Search without FTS5: D1 cannot export databases with virtual tables, and backups must keep working. The server sends each user the text of what they may see; the browser matches it as they type | Decided |
 
 Decisions were delegated to Claude ("you decide"). Record new ones here with the date.

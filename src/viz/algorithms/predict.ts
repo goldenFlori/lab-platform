@@ -6,7 +6,7 @@
 
 import { natural, type TraversalStep } from './graphs';
 import type { PredictText } from './predict.text';
-import { INF, inf, type PathStep } from './shortest';
+import { type FwStep, INF, inf, type PathStep } from './shortest';
 import type { SortStep } from './sorting';
 
 export interface Question {
@@ -81,5 +81,135 @@ export function selectionQuestion(steps: SortStep[], k: number, T: PredictText):
     answers: [String(min)],
     answerLabel: String(min),
     explain: T.selection.explain(min),
+  };
+}
+
+/** Insertion Sort: the index where the key a[i] lands in the sorted prefix. Asked as it is taken. */
+export function insertionQuestion(steps: SortStep[], k: number, T: PredictText): Question | null {
+  const step = steps[k];
+  if (step?.line !== 1 || !step.compare) return null;
+  const i = step.compare[0] ?? 0;
+  const key = step.arr[i];
+  if (key === undefined || i < 1) return null;
+  // Equal values stay before the key (the loop shifts only larger ones), so the sort is stable.
+  const at = step.arr.slice(0, i).filter((x) => x <= key).length;
+  return {
+    prompt: T.insertion.prompt(key, i),
+    options: Array.from({ length: i + 1 }, (_, p) => ({ id: String(p), label: String(p) })),
+    answers: [String(at)],
+    answerLabel: String(at),
+    explain: T.insertion.explain(key, at, i - at),
+  };
+}
+
+/**
+ * Merge Sort: which head is written next while merging two halves. Not asked for equal heads, nor
+ * in merges of two single elements, where it is only "which of two is smaller".
+ */
+export function mergeQuestion(steps: SortStep[], k: number, T: PredictText): Question | null {
+  const step = steps[k];
+  if (!step?.heads || !step.compare || !step.range) return null;
+  const [a, b] = step.heads;
+  if (a === b || step.range[1] - step.range[0] < 2) return null;
+  const v = Math.min(a, b);
+  return {
+    prompt: T.merge.prompt(step.compare[0] ?? 0),
+    options: [
+      { id: 'left', label: T.merge.left(a) },
+      { id: 'right', label: T.merge.right(b) },
+    ],
+    answers: [a <= b ? 'left' : 'right'],
+    answerLabel: String(v),
+    explain: T.merge.explain(a, b, v),
+  };
+}
+
+/** Keep or change a distance: the two options, always in this order. */
+function keepOrUpdate(old: number, next: number, T: PredictText) {
+  const better = next < old;
+  const options = [
+    { id: 'keep', label: T.keep(inf(old)) },
+    { id: 'update', label: T.update(inf(next)) },
+  ];
+  return {
+    better,
+    options,
+    answers: [better ? 'update' : 'keep'],
+    answerLabel: better ? T.update(inf(next)) : T.keep(inf(old)),
+  };
+}
+
+/** A relaxation that can go either way: dist[u] and dist[v] finite, and dist[u] + w ≠ dist[v]. */
+function openRelaxation(steps: PathStep[], k: number) {
+  const step = steps[k];
+  const before = steps[k - 1];
+  if (!step?.arc || !before) return null;
+  const { u, v, w } = step.arc;
+  const du = before.dist[u] ?? INF;
+  const old = before.dist[v] ?? INF;
+  if (du === INF || old === INF || du + w === old) return null;
+  return { u, v, w, du, old, iteration: step.iteration };
+}
+
+/** Questions per Bellman-Ford pass at most. */
+export const BELLMAN_PER_PASS = 4;
+
+/**
+ * Bellman-Ford: what a relaxation does to dist[v]. Not asked when dist[u] or dist[v] is still ∞
+ * (nothing to decide: ∞ never improves anything, and anything improves ∞), nor when they are
+ * equal; and only the first BELLMAN_PER_PASS of each pass, by their order.
+ */
+export function bellmanQuestion(steps: PathStep[], k: number, T: PredictText): Question | null {
+  const r = openRelaxation(steps, k);
+  if (!r) return null;
+  let earlier = 0;
+  for (let x = k - 1; x >= 0 && steps[x]?.iteration === r.iteration; x--) if (openRelaxation(steps, x)) earlier++;
+  if (earlier >= BELLMAN_PER_PASS) return null;
+  const { u, v, w, du, old } = r;
+  const q = keepOrUpdate(old, du + w, T);
+  return {
+    prompt: T.bellman.prompt(u, v, w),
+    options: q.options,
+    answers: q.answers,
+    answerLabel: q.answerLabel,
+    explain: T.bellman.explain(u, v, inf(du), w, inf(du + w), inf(old), q.better),
+  };
+}
+
+/** A Floyd-Warshall comparison that can go either way: both sides finite and different. */
+function openComparison(steps: FwStep[], k: number) {
+  const step = steps[k];
+  const before = steps[k - 1];
+  if (step?.phase !== 'cmp' || !before) return null;
+  const { i, j, k: m } = step;
+  const old = before.D[i]?.[j] ?? INF;
+  const ik = before.D[i]?.[m] ?? INF;
+  const kj = before.D[m]?.[j] ?? INF;
+  if (ik === INF || kj === INF || old === INF || ik + kj === old) return null;
+  return { i, j, m, old, ik, kj };
+}
+
+/** Questions per k at most: enough to practise the rule, without hundreds on a larger graph. */
+export const FLOYD_PER_K = 3;
+
+/**
+ * Floyd-Warshall: what one comparison through k does to D[i][j]. Only the first FLOYD_PER_K open
+ * comparisons of each k are asked, chosen by their order, never by their outcome.
+ */
+export function floydQuestion(steps: FwStep[], k: number, L: string[], T: PredictText): Question | null {
+  const cmp = openComparison(steps, k);
+  if (!cmp) return null;
+  let earlier = 0;
+  for (let x = k - 1; x >= 0 && steps[x]?.phase === 'cmp'; x--) if (openComparison(steps, x)) earlier++;
+  if (earlier >= FLOYD_PER_K) return null;
+  const { i, j, m, old, ik, kj } = cmp;
+  const q = keepOrUpdate(old, ik + kj, T);
+  const [a, b, c] = [L[i] ?? '', L[j] ?? '', L[m] ?? ''];
+  return {
+    prompt: T.floyd.prompt(a, b, c),
+    options: q.options,
+    answers: q.answers,
+    answerLabel: q.answerLabel,
+    explain: T.floyd.explain(a, b, c, inf(ik), inf(kj), inf(ik + kj), inf(old), q.better),
   };
 }

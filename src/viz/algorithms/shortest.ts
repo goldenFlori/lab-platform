@@ -34,6 +34,8 @@ export interface PathStep {
   /** index of the drawn edge being relaxed */
   relaxing: number | null;
   updated: string[];
+  /** the arc Bellman-Ford relaxes at this step */
+  arc?: { u: string; v: string; w: number };
   iteration?: number;
   relaxations: number;
   negativeCycle?: boolean;
@@ -183,6 +185,7 @@ export function bellmanFordSteps(
         settled: [],
         relaxing: a.ei,
         updated: better ? [a.v] : [],
+        arc: { u: a.u, v: a.v, w: a.w },
         iteration: it,
         relaxations: relax,
       });

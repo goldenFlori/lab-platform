@@ -102,3 +102,16 @@ test('predict mode asks for the next step and scores the answer', async ({ page 
   await expect(page.getByTestId('predict-feedback')).toBeVisible();
   await expect(predict).toContainText('/1 parashikime të sakta');
 });
+
+// #148: Floyd-Warshall asks what a comparison through k does, starting with the Lab 8 class problem.
+test('predict mode in Floyd-Warshall checks the rule D[i][j] = min(D[i][j], D[i][k] + D[k][j])', async ({ page }) => {
+  await page.goto('/visualizations/floyd-warshall');
+  const predict = page.getByTestId('predict');
+  await predict.getByText('Parashiko', { exact: true }).click();
+  // Skipping ahead stops at the first open comparison: through 0, 5 + 7 = 12 does not beat 1.
+  await page.getByRole('button', { name: 'Shko te fundi (End)' }).click();
+  const question = predict.getByRole('group', { name: 'k = 0: çfarë bëhet D[2][3]?' });
+  await question.getByRole('button', { name: 'mbetet 1' }).click();
+  await expect(page.getByTestId('predict-feedback')).toContainText('Saktë!');
+  await expect(predict).toContainText('1/1 parashikime të sakta');
+});
