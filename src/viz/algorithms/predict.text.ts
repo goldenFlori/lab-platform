@@ -47,6 +47,29 @@ const sq = {
         ? `dist[${u}] + ${w} = ${du} + (${w}) = ${cand} < ${old}: rruga përmes ${u} është më e shkurtër, prandaj dist[${v}] **bëhet ${cand}**.`
         : `dist[${u}] + ${w} = ${du} + (${w}) = ${cand} ≥ ${old}: nuk e përmirëson, prandaj dist[${v}] **mbetet ${old}**.`,
   },
+  kruskal: {
+    prompt: (e: string) => `Kruskal: brinja tjetër sipas peshës është ${e}. Çfarë bëhet me të?`,
+    accept: 'pranohet',
+    reject: 'refuzohet',
+    explainAccept: (u: string, v: string) =>
+      `${u} dhe ${v} janë në pjesë të ndryshme të pyllit, prandaj brinja nuk mbyll cikël: **pranohet**.`,
+    explainReject: (u: string, v: string) =>
+      `${u} dhe ${v} janë tashmë të lidhur nga brinjët e zgjedhura, prandaj brinja do të mbyllte një cikël: **refuzohet**.`,
+  },
+  prim: {
+    prompt: (tree: string) => `Prim: pema ka {${tree}}. Cila brinjë hyn tani në pemë?`,
+    explain: (e: string, tie: boolean) =>
+      `Prim merr brinjën më të lehtë që kalon prerjen (një skaj në pemë, tjetri jashtë): **${e}**.${tie ? ' Ka barazim: çdo brinjë me këtë peshë është e saktë.' : ''}`,
+  },
+  flow: {
+    prompt: (path: string) => `Rruga rritëse: ${path}. Sa është ngushtica?`,
+    explain: (caps: string, x: number) =>
+      `Ngushtica është kapaciteti mbetës më i vogël përgjatë rrugës (${caps}): **${x}**. Aq rrjedhë mund të shtohet.`,
+  },
+  topo: {
+    help: 'Kulmet që mund të vijnë tani nuk ndriçohen më: zgjidhni vetë.',
+    right: (v: string) => `Saktë: të gjitha parakushtet e ${v} janë vendosur (fuqia hyrëse e mbetur 0).`,
+  },
   floyd: {
     prompt: (i: string, j: string, k: string) => `k = ${k}: çfarë bëhet D[${i}][${j}]?`,
     explain: (
@@ -111,6 +134,29 @@ export const PREDICT_TEXT = bilingual<PredictText>(sq, {
       better
         ? `dist[${u}] + ${w} = ${du} + (${w}) = ${cand} < ${old}: the path through ${u} is shorter, so dist[${v}] **becomes ${cand}**.`
         : `dist[${u}] + ${w} = ${du} + (${w}) = ${cand} ≥ ${old}: no improvement, so dist[${v}] **stays ${old}**.`,
+  },
+  kruskal: {
+    prompt: (e) => `Kruskal: the next edge by weight is ${e}. What happens to it?`,
+    accept: 'accepted',
+    reject: 'rejected',
+    explainAccept: (u, v) =>
+      `${u} and ${v} are in different parts of the forest, so the edge closes no cycle: **accepted**.`,
+    explainReject: (u, v) =>
+      `${u} and ${v} are already joined by the chosen edges, so the edge would close a cycle: **rejected**.`,
+  },
+  prim: {
+    prompt: (tree) => `Prim: the tree has {${tree}}. Which edge joins the tree now?`,
+    explain: (e, tie) =>
+      `Prim takes the lightest edge crossing the cut (one end in the tree, the other outside): **${e}**.${tie ? ' There is a tie: any edge of this weight is right.' : ''}`,
+  },
+  flow: {
+    prompt: (path) => `Augmenting path: ${path}. What is its bottleneck?`,
+    explain: (caps, x) =>
+      `The bottleneck is the smallest residual capacity along the path (${caps}): **${x}**. That much flow can be added.`,
+  },
+  topo: {
+    help: 'The vertices that may come next are no longer highlighted: choose yourself.',
+    right: (v) => `Right: every prerequisite of ${v} is placed (its remaining in-degree is 0).`,
   },
   floyd: {
     prompt: (i, j, k) => `k = ${k}: what does D[${i}][${j}] become?`,

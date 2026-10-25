@@ -1,12 +1,15 @@
 import { Button, Chip } from '@heroui/react';
 import { Droplets, Eye, Scissors, Trash2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { type FlowStep, maxflowSteps, residual, type Strategy, separated } from './algorithms/maxflow';
 import { MAXFLOW_TEXT } from './algorithms/maxflow.text';
+import { bottleneckQuestion } from './algorithms/predict';
+import { PREDICT_TEXT } from './algorithms/predict.text';
 import { layeredLayout } from './algorithms/scc';
 import { Choice, Field, PlayerBar, Segmented } from './kit/controls';
 import { type EdgeLook, fitLayout, type GEdge, type GNode, GraphCanvas, type NodeLook } from './kit/GraphCanvas';
 import { must } from './kit/must';
+import { PredictPanel, usePredict } from './kit/predict';
 import { Legend, Panel, Pseudocode, Stat, StepNote, VizShell } from './kit/shell';
 import { bilingual, useText } from './kit/text';
 import { playerKeys, usePlayer } from './kit/usePlayer';
@@ -460,7 +463,16 @@ export default function MaxFlowViz({
     const st = maxflowSteps(net.nodes, net.edges, net.s, net.t, 'ek');
     return st[st.length - 1];
   }, [net]);
-  const player = usePlayer(steps, strategy === 'adversary' ? 450 : 1100);
+  const basePlayer = usePlayer(steps, strategy === 'adversary' ? 450 : 1100);
+  // Predict mode (#149): the bottleneck of each augmenting path. Not in the adversary's run, whose
+  // point is how many paths it takes, each with bottleneck 1.
+  const P = useText(PREDICT_TEXT);
+  const question = useCallback(
+    (k: number) => (strategy === 'adversary' ? null : bottleneckQuestion(steps, k, net.s, P)),
+    [strategy, steps, net.s, P],
+  );
+  const predict = usePredict(basePlayer, question, steps, 1100);
+  const player = predict.player;
   const s = player.step;
   const done = s.phase === 'done';
   const cutS = new Set(done ? s.cutS : []);
@@ -624,6 +636,7 @@ export default function MaxFlowViz({
           <>
             <StepNote text={s.note} tone={done ? 'success' : s.phase === 'stuck' ? 'danger' : 'accent'} />
             <PlayerBar player={player} />
+            {strategy !== 'adversary' && <PredictPanel predict={predict} />}
           </>
         ) : (
           <StepNote

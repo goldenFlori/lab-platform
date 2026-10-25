@@ -365,6 +365,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   4 questions per Bellman-Ford pass, 3 per Floyd-Warshall k. The visualizations' algorithms have
   their own unit tests, type-checked with the app. Next: #149, predict mode for spanning trees,
   topological order and flows.
+- **2026-10-25:** #149 done, and with it predict mode for every algorithm of the course. Kruskal asks
+  to accept or reject each edge once the tree has two (in the union-find visualization and the
+  graph lab), Prim which edge crossing the cut joins next (ties accepted), max flow the bottleneck
+  of each augmenting path (not in the adversary's run), and the topological-order game hides the
+  vertices that may come next (Kahn's queue) and its hint button, so each pick is a prediction
+  with a score. Next: #150, the hand-tracing class problems as checked tables.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
