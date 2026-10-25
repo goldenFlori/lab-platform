@@ -130,15 +130,26 @@ test('a student reads a course notebook with its outputs, figures and visualizat
   expect((await insertion.boundingBox())?.y ?? 0).toBeLessThan((await folded.boundingBox())?.y ?? 0);
   await expect(student.getByText('Versioni interaktiv · Selection Sort hap pas hapi')).toBeAttached();
 
-  // A saved image output, served from the API with the student's session.
-  const image = student.getByAltText('Figura e prodhuar nga kodi i mësipërm').first();
-  await image.scrollIntoViewIfNeeded();
-  await expect.poll(() => image.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
-
   // A Plotly figure, drawn again so it stays interactive.
   const figure = student.locator('.plotly-figure').first();
   await figure.scrollIntoViewIfNeeded();
   await expect(figure.locator('.main-svg').first()).toBeVisible({ timeout: 20_000 });
+
+  // A saved image output, served from the API with the student's session. Lab 1 draws only with
+  // Plotly, so the image comes from Lab 4's NetworkX figures, as a second notebook of the lab.
+  const lab4 = await readFile('test/notebook/fixtures/notebooks/laborator-04.ipynb', 'utf8');
+  const lab4Assets = new Map<string, Uint8Array>();
+  const extra = await uploadNotebook(staff, labPath, {
+    kind: 'extra',
+    title: 'Laboratori 4',
+    raw: lab4,
+    stored: toStored(await renderNotebook(lab4, { assets: lab4Assets })),
+    assets: lab4Assets,
+  });
+  await student.goto(`/o/e2e/courses/${course.id}/labs/${lab.id}?notebook=${extra.id}`);
+  const image = student.getByAltText('Figura e prodhuar nga kodi i mësipërm').first();
+  await image.scrollIntoViewIfNeeded();
+  await expect.poll(() => image.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
 
   const overflow = await student.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,

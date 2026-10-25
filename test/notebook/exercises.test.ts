@@ -22,18 +22,20 @@ describe('exercises a notebook checks itself', () => {
       'Ushtrimi 3 — Kundërshembulli',
       'Ushtrimi 4 — Inputi më i keq',
       'Ushtrimi 5 — HI e Selection Sort',
+      'Ushtrimi 6 — Qëndrueshmëria',
     ]);
     expect(found.every((e) => e.test === null)).toBe(true);
-    expect(found.map((e) => e.cell)).toEqual([8, 14, 18, 23]);
+    expect(found.map((e) => e.cell)).toEqual([8, 14, 18, 23, 26]);
   });
 
   // One test per notebook: together they take longer than a test may on a slow machine.
   const CHECKS: Record<string, number> = {
-    'laborator-01-ushtrime-shtese.ipynb': 4,
+    'laborator-01-ushtrime-shtese.ipynb': 5,
     'laborator-02-ushtrime-shtese.ipynb': 4,
     'laborator-03-ushtrime-shtese.ipynb': 3,
     'laborator-04-ushtrime-shtese.ipynb': 8,
-    'laborator-09-ushtrime-shtese.ipynb': 7,
+    'laborator-07.ipynb': 2,
+    'laborator-09-ushtrime-shtese.ipynb': 10,
     'laborator-10.ipynb': 3,
   };
   it.each([...byName.keys()])('finds every check of %s, and none where there is none', async (name) => {
