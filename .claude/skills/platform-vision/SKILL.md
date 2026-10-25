@@ -319,7 +319,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-25:** #125 done. The gallery is grouped by topic (sorting and complexity, graphs and
   traversal, shortest paths, flows and matching), each card with a looping preview of its own
   idea in the state colours: small SVGs that play only on screen and hold still under reduced
-  motion. Next: the content-first lab page (#130).
+  motion (PR #137).
+- **2026-10-25:** #130 done. The lab page puts content first: one toolbar (download, present, AI,
+  Live Lab, and a "More" menu for uploading or deleting notebooks), so a phone's first screen shows
+  the lab instead of a wall of buttons. Upload, translation and deletion open from the menus through
+  the lab-tools channel. Next: the students' learning path (#126).
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
