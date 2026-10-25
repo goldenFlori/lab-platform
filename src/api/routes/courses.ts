@@ -16,7 +16,7 @@ import { aiRoutes } from './ai';
 import { forbidden, groupOf, invalidRequest, seesCourse, summary, visibleCourse } from './course-context';
 import { courseGradesRoutes } from './grading';
 import { labRoutes } from './labs';
-import { progressRoutes } from './progress';
+import { progressRoutes, reviewRoutes } from './progress';
 import { searchRoutes } from './search';
 import { staffRoutes } from './staff';
 import { surveyRoutes } from './surveys';
@@ -211,5 +211,6 @@ export const courseRoutes = new Hono<TenantEnv>()
   .route('/:courseId/ai', aiRoutes)
   .route('/:courseId/grades', courseGradesRoutes)
   .route('/:courseId/progress', progressRoutes)
+  .route('/:courseId/review', reviewRoutes)
   .route('/:courseId/report', pilotReportRoutes)
   .route('/:courseId/survey', surveyRoutes);

@@ -385,6 +385,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   five students up, the first-try accuracy and its three hardest decisions with the wrong answer most
   gave; never names. Kept two years like activity, erased with the person, in "My data", the
   institution export, the privacy page and the agreement. Next: #152, the mixed review session.
+- **2026-10-25:** #152 done. Students open "Review" from their course (or "My understanding"): a
+  session of up to eight predict questions on fresh small random inputs, drawn from the algorithms of
+  the labs they opened, each shown with its state (an array, a merge, a graph with the queue or stack,
+  a matrix). Topics interleave, at most three each, and those with more wrong first tries come back
+  more often (their results, plus this device's past sessions). The end lists what to revisit with a
+  link to its lab. Runs in the browser, no AI, no cost. Next: #153, learning in the pilot report.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and

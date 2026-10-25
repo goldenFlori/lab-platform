@@ -648,6 +648,13 @@ export const sq = {
       review: (topic: string) => `Për ta përsëritur: **${topic}**, ku keni më pak përgjigje të sakta në provën e parë.`,
     },
   },
+  review: {
+    open: 'Përsërit',
+    title: 'Përsëritje',
+    lead: 'Disa pyetje të shkurtra mbi algoritmet e laboratorëve që keni hapur, me të dhëna të reja çdo herë. Temat ku gaboni më shpesh kthehen më shpesh. Është ushtrim, jo notë.',
+    empty: 'Ende asgjë për të përsëritur. Hapni një laborator me vizualizime algoritmesh dhe kthehuni këtu.',
+    toLab: (n: number) => `Te Laboratori ${n}`,
+  },
   topics: {
     insertion: 'Insertion Sort',
     selection: 'Selection Sort',

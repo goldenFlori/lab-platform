@@ -420,6 +420,15 @@ function tenantNotebooks(db: Db, orgId: string) {
       return embedRows.list(eq(embeds.notebookId, notebookId));
     },
 
+    /** The embeds of several notebooks at once. */
+    async embedsOfNotebooks(notebookIds: string[]) {
+      return (
+        await Promise.all(
+          inChunks(notebookIds, IDS_PER_QUERY).map((ids) => embedRows.list(inArray(embeds.notebookId, ids))),
+        )
+      ).flat();
+    },
+
     /** Replaces all embeds of the notebook at once. */
     async setEmbeds(
       notebookId: string,
