@@ -342,7 +342,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   split down and merge back up beside a work-per-level table (n per level × log₂n levels), and
   recursive Fibonacci with its repeated calls counted and a memo switch that prunes them (2n − 1
   calls). In the gallery and the embeds editor; the course site does not have it, so Lab 3 embeds it
-  from the platform. Next: Kruskal with union-find (#132).
+  from the platform (PR #143).
+- **2026-10-25:** #132 done, and with it Phase 7's issues. A 15th visualization for Lab 5: Kruskal
+  with the union-find forest drawn at every step (union by rank, path compression, sets merging in
+  colour, the sorted edges accepted or rejected), beside Prim on the same graph; both reach the same
+  weight. Next: refresh the course notebook fixtures once the course repo's PRs merge, then the
+  remaining lab fixes (Labs 1, 4, 5, 6, 8, 9).
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
