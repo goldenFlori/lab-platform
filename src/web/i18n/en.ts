@@ -749,6 +749,15 @@ export const en: Messages = {
     failed: 'The download did not finish. Please try again.',
   },
   labMenu: { label: 'More notebook actions' },
+  path: {
+    title: 'Your path',
+    summary: (started, total, solved, exercises) =>
+      `${started} of ${total} labs started${exercises ? ` · ${solved}/${exercises} exercises` : ''}`,
+    states: { new: 'Not started', progress: 'In progress', handed: 'Handed in', graded: 'Graded' },
+    node: (n, title, state, solved, exercises) =>
+      `Lab ${n}: ${title} — ${state}${exercises ? `, ${solved} of ${exercises} exercises` : ''}`,
+    next: (n) => `Continue with Lab ${n}`,
+  },
   footer: {
     privacy: 'Privacy',
   },

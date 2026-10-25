@@ -24,6 +24,7 @@ import { CourseGradesCsv } from '../../../../../../components/CourseGradesCsv';
 import { CourseLabs } from '../../../../../../components/CourseLabs';
 import { CourseStaff } from '../../../../../../components/CourseStaff';
 import { SurveyForStaff, SurveyForStudent } from '../../../../../../components/CourseSurvey';
+import { LearningPath } from '../../../../../../components/LearningPath';
 import { PresentJoinCode } from '../../../../../../components/PresentJoinCode';
 import { LANGUAGE_NAMES, t as messages, useT } from '../../../../../../i18n';
 import { ApiError } from '../../../../../../lib/api';
@@ -166,6 +167,8 @@ function CoursePage() {
           </span>
         </div>
       )}
+
+      {!isStaff && <LearningPath org={org} courseId={courseId} />}
 
       {!isStaff && <SurveyForStudent org={org} courseId={courseId} />}
 
