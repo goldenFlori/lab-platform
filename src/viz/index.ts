@@ -1,7 +1,7 @@
 import { type ComponentType, lazy } from 'react';
 import type { VisualizerId } from '../shared/visualizers';
 
-// The 13 visualizations, each in its own chunk that loads the first time one is shown. A notebook's
+// The visualizations, each in its own chunk that loads the first time one is shown. A notebook's
 // embed passes props that override a visualization's defaults (a preset, a mode, the values).
 
 export type VizProps = Record<string, unknown>;
@@ -48,5 +48,8 @@ export const VIZ: Record<VisualizerId, { Component: ReturnType<typeof load> }> =
   },
   ciftezimi: {
     Component: load(() => import('./MatchingViz')),
+  },
+  'pema-rekursive': {
+    Component: load(() => import('./RecursionTreeViz')),
   },
 };

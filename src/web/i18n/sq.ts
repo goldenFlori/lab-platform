@@ -40,7 +40,7 @@ export const sq = {
     signIn: 'Hyr',
     seeIt: 'Shikojeni në punë',
     stats: [
-      ['13', 'vizualizime'],
+      ['14', 'vizualizime'],
       ['10', 'laboratorë'],
       ['0', 'instalime'],
     ] as [string, string][],
@@ -56,7 +56,7 @@ export const sq = {
     },
     demoTitle: 'Provojeni këtu',
     demoLead:
-      'Një nga 13 vizualizimet e kursit, siç e shohin studentët: luajeni hap pas hapi, ndryshoni labirintin dhe krahasoni BFS me DFS.',
+      'Një nga 14 vizualizimet e kursit, siç e shohin studentët: luajeni hap pas hapi, ndryshoni labirintin dhe krahasoni BFS me DFS.',
     demoVideoLead: 'Dy minuta: një orë laboratori, nga kodi te vizualizimi dhe Live Lab.',
     demoLabel: 'Labirinti — BFS kundrejt DFS',
     allVisualizations: 'Të gjitha vizualizimet',
@@ -455,6 +455,7 @@ export const sq = {
       'gara-e-rrugeve': 'Lojë: Gara e rrugëve',
       'rrjedha-max': 'Rrjedha max & prerja min',
       ciftezimi: 'Çiftëzimi & caktimet',
+      'pema-rekursive': 'Pema rekursive',
     },
     summaries: {
       renditja: 'Algoritmet e renditjes hap pas hapi, me pseudokodin dhe kompleksitetin e secilit.',
@@ -471,6 +472,8 @@ export const sq = {
       'rrjedha-max':
         'Ford-Fulkerson rrit rrjedhën sa kohë ka rrugë rritëse; kulmet e arritshme japin prerjen minimale.',
       ciftezimi: 'Çiftëzimi maksimum dhe problemi i caktimit, të zgjidhur me rrjedhë maksimale.',
+      'pema-rekursive':
+        'Thirrjet e Merge Sort si pemë, me punën për nivel, dhe Fibonacci me thirrjet e përsëritura që i heq memoizimi.',
     },
   },
   search: {
