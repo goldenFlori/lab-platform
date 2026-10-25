@@ -8,6 +8,7 @@ import { SCC_TEXT } from './algorithms/scc.text';
 import { Choice, Field, PlayerBar, Segmented, Toggle } from './kit/controls';
 import { fitLayout, type GEdge, type GNode, GraphCanvas, type NodeLook } from './kit/GraphCanvas';
 import { must } from './kit/must';
+import { decisionKey, result, useResults } from './kit/results';
 import { Legend, Panel, Pseudocode, StepNote, TokenRow, VizShell } from './kit/shell';
 import { bilingual, useText } from './kit/text';
 import { playerKeys, usePlayer } from './kit/usePlayer';
@@ -349,6 +350,9 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
   // pick is a prediction, right when all its prerequisites are placed.
   const [predicting, setPredicting] = useState(false);
   const [good, setGood] = useState<string | null>(null);
+  // In a lab, the first pick at each point of the order counts in the student's results (#151).
+  const report = useResults();
+  const [reported, setReported] = useState<number[]>([]);
   const avail = available(tNodes, topo.edges, placed);
   const orders = useMemo(() => allOrders(topo.nodes, topo.edges, 24), [topo]);
   const complete = placed.length === tNodes.length && tNodes.length > 0;
@@ -365,8 +369,10 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
     setFound([]);
     setFlash(null);
     setGood(null);
+    setReported([]);
   };
   const predictTopo = (on: boolean) => {
+    setReported([]);
     setPredicting(on);
     setPlaced([]);
     setMistakes(0);
@@ -377,6 +383,20 @@ export default function SccTopoViz({ mode: initialMode = 'scc', preset }: { mode
     if (complete) return;
     setGood(null);
     if (placed.includes(id)) return setFlash(X.already(name(id)));
+    if (predicting && !reported.includes(placed.length)) {
+      setReported((r) => [...r, placed.length]);
+      const open = tNodes.map((n) => n.id).filter((v) => !placed.includes(v));
+      report?.(
+        result({
+          topic: 'topo',
+          decision: decisionKey(`${topo.id}:${placed.length}`, open, avail),
+          right: avail.includes(id),
+          pick: name(id),
+          answer: avail.map(name).join(', '),
+          prompt: P.topo.prompt(placed.map(name).join(' → ')),
+        }),
+      );
+    }
     if (!avail.includes(id)) {
       const missing = topo.edges.filter((e) => e.v === id && !placed.includes(e.u)).map((e) => e.u);
       setMistakes((m) => m + 1);

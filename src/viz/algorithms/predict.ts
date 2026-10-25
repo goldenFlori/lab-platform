@@ -4,6 +4,7 @@
  *  come from the algorithm's own state at step k − 1.
  * ===================================================================== */
 
+import type { PredictionTopic } from '../../shared/predictions';
 import type { GEdge } from '../kit/GraphCanvas';
 import { type MstStep, natural, type TraversalStep } from './graphs';
 import type { FlowStep } from './maxflow';
@@ -12,6 +13,8 @@ import { type FwStep, INF, inf, type PathStep } from './shortest';
 import type { SortStep } from './sorting';
 
 export interface Question {
+  /** The algorithm it practises, for the student's results per topic (#151). */
+  topic: PredictionTopic;
   prompt: string;
   options: { id: string; label: string }[];
   /** Every option that counts as right (several when there is a tie). */
@@ -39,6 +42,7 @@ export function traversalQuestion(
   const options = unique(before.frontier).sort(natural);
   if (options.length < 2 || !options.includes(step.current)) return null;
   return {
+    topic: kind,
     prompt: T[kind].prompt,
     options: options.map((v) => ({ id: v, label: v })),
     answers: [step.current],
@@ -60,6 +64,7 @@ export function dijkstraQuestion(steps: PathStep[], k: number, T: PredictText): 
   const best = Math.min(...candidates.map((v) => before.dist[v] ?? INF));
   const answers = candidates.filter((v) => before.dist[v] === best);
   return {
+    topic: 'dijkstra',
     prompt: T.dijkstra.prompt,
     options: candidates.map((v) => ({ id: v, label: `${v} · ${inf(before.dist[v] ?? INF)}` })),
     answers,
@@ -78,6 +83,7 @@ export function selectionQuestion(steps: SortStep[], k: number, T: PredictText):
   if (options.length < 2) return null;
   const min = Math.min(...rest);
   return {
+    topic: 'selection',
     prompt: T.selection.prompt(i),
     options: options.map((v) => ({ id: String(v), label: String(v) })),
     answers: [String(min)],
@@ -96,6 +102,7 @@ export function insertionQuestion(steps: SortStep[], k: number, T: PredictText):
   // Equal values stay before the key (the loop shifts only larger ones), so the sort is stable.
   const at = step.arr.slice(0, i).filter((x) => x <= key).length;
   return {
+    topic: 'insertion',
     prompt: T.insertion.prompt(key, i),
     options: Array.from({ length: i + 1 }, (_, p) => ({ id: String(p), label: String(p) })),
     answers: [String(at)],
@@ -115,6 +122,7 @@ export function mergeQuestion(steps: SortStep[], k: number, T: PredictText): Que
   if (a === b || step.range[1] - step.range[0] < 2) return null;
   const v = Math.min(a, b);
   return {
+    topic: 'merge',
     prompt: T.merge.prompt(step.compare[0] ?? 0),
     options: [
       { id: 'left', label: T.merge.left(a) },
@@ -170,6 +178,7 @@ export function bellmanQuestion(steps: PathStep[], k: number, T: PredictText): Q
   const { u, v, w, du, old } = r;
   const q = keepOrUpdate(old, du + w, T);
   return {
+    topic: 'bellman',
     prompt: T.bellman.prompt(u, v, w),
     options: q.options,
     answers: q.answers,
@@ -208,6 +217,7 @@ export function floydQuestion(steps: FwStep[], k: number, L: string[], T: Predic
   const q = keepOrUpdate(old, ik + kj, T);
   const [a, b, c] = [L[i] ?? '', L[j] ?? '', L[m] ?? ''];
   return {
+    topic: 'floyd',
     prompt: T.floyd.prompt(a, b, c),
     options: q.options,
     answers: q.answers,
@@ -237,6 +247,7 @@ export function kruskalQuestion(steps: KruskalLike[], k: number, edges: GEdge[],
   if (!e || before.tree.length < 2) return null;
   const rejected = steps.at(-1)?.rejected.includes(step.considering) ?? false;
   return {
+    topic: 'kruskal',
     prompt: T.kruskal.prompt(edgeLabel(e)),
     options: [
       { id: 'accept', label: T.kruskal.accept },
@@ -263,6 +274,7 @@ export function primQuestion(steps: MstStep[], k: number, edges: GEdge[], T: Pre
   const chosen = edges[step.considering];
   if (!chosen) return null;
   return {
+    topic: 'prim',
     prompt: T.prim.prompt(step.inTree.join(', ')),
     options: crossing.map(({ e, i }) => ({ id: String(i), label: edgeLabel(e) })),
     answers,
@@ -283,6 +295,7 @@ export function bottleneckQuestion(steps: FlowStep[], k: number, s: string, T: P
   if (options.length < 2) return null;
   const x = Math.min(...caps);
   return {
+    topic: 'flow',
     prompt: T.flow.prompt([s, ...step.path.map((a) => a.v)].join(' → ')),
     options: options.map((c) => ({ id: String(c), label: String(c) })),
     answers: [String(x)],
