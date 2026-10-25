@@ -425,6 +425,18 @@ export const en: Messages = {
     open: 'Open it',
     all: 'All visualizations',
     fallbackTitle: 'Visualization',
+    groups: {
+      sorting: { title: 'Sorting and complexity', text: 'How the algorithms sort, and how fast their work grows.' },
+      graphs: {
+        title: 'Graphs and traversal',
+        text: 'Graph properties, BFS and DFS, strongly connected components and topological orders.',
+      },
+      paths: {
+        title: 'Shortest paths',
+        text: 'Dijkstra, Bellman-Ford and Floyd-Warshall: from one source and between all pairs.',
+      },
+      flows: { title: 'Flows and matching', text: 'Maximum flow, minimum cut and assignment problems.' },
+    },
     names: {
       renditja: 'Sorting visualizer',
       'gara-e-krahasimeve': 'The comparison race',
