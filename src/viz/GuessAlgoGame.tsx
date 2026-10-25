@@ -39,14 +39,15 @@ const TEXT = bilingual(
   {
     selection: (sel: number) =>
       `Selection Sort bën **gjithmonë saktësisht n(n−1)/2 = ${sel}** krahasime, pavarësisht nga rendi i listës.`,
-    merge: (nlog: number) => `Merge Sort bën afërsisht **n·log₂n ≈ ${nlog}** krahasime (pak më pak), për çdo listë.`,
+    merge: (nlog: number) =>
+      `Mbi një listë rastësore, Merge Sort bën pak më pak se **n·log₂n ≈ ${nlog}** krahasime. (Mbi një listë të renditur do të bënte rreth gjysmën.)`,
     insertion: (quarter: number, sel: number, nlog: number) =>
       `Insertion Sort mbi një listë të rastit bën rreth **n²/4 ≈ ${quarter}** krahasime — shumë më pak se ${sel}, por shumë më tepër se ${nlog}.`,
     title: 'Lojë: Gjej Algoritmin!',
     subtitle: 'Programi renditi listën me një algoritëm të fshehur. Ju shihni vetëm numrin e krahasimeve.',
     points: (n: number) => `${n} pikë`,
     over: (score: number) =>
-      `Loja mbaroi! Morët **${score} pikë**. Strategjia: n(n−1)/2 → Selection · ≈ n·log₂n → Merge · midis tyre → Insertion.`,
+      `Loja mbaroi! Morët **${score} pikë**. Strategjia: n(n−1)/2 → Selection · pak më pak se n·log₂n → Merge · midis tyre → Insertion.`,
     again: 'Luaj sërish',
     right: '**Saktë!**',
     wrong: (name: string) => `**Jo** — ishte ${name}.`,
@@ -60,14 +61,15 @@ const TEXT = bilingual(
   {
     selection: (sel) =>
       `Selection Sort **always makes exactly n(n−1)/2 = ${sel}** comparisons, whatever the order of the list.`,
-    merge: (nlog) => `Merge Sort makes about **n·log₂n ≈ ${nlog}** comparisons (a little fewer), for any list.`,
+    merge: (nlog) =>
+      `On a random list, Merge Sort makes a little fewer than **n·log₂n ≈ ${nlog}** comparisons. (On a sorted list it would make about half.)`,
     insertion: (quarter, sel, nlog) =>
       `Insertion Sort on a random list makes about **n²/4 ≈ ${quarter}** comparisons — far fewer than ${sel}, but far more than ${nlog}.`,
     title: 'Game: Guess the algorithm!',
     subtitle: 'The program sorted the list with a hidden algorithm. You only see the number of comparisons.',
     points: (n) => `${n} points`,
     over: (score) =>
-      `Game over! You scored **${score} points**. The strategy: n(n−1)/2 → Selection · ≈ n·log₂n → Merge · in between → Insertion.`,
+      `Game over! You scored **${score} points**. The strategy: n(n−1)/2 → Selection · a little under n·log₂n → Merge · in between → Insertion.`,
     again: 'Play again',
     right: '**Right!**',
     wrong: (name) => `**No** — it was ${name}.`,
