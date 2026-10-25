@@ -11,7 +11,7 @@ import {
   Trash2,
   Waypoints,
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   bfsSteps,
   bipartite,
@@ -27,9 +27,12 @@ import {
   type TraversalStep,
 } from './algorithms/graphs';
 import { GRAPHS_TEXT } from './algorithms/graphs.text';
+import { traversalQuestion } from './algorithms/predict';
+import { PREDICT_TEXT } from './algorithms/predict.text';
 import { Choice, Field, PlayerBar, Segmented, Toggle } from './kit/controls';
 import { type EdgeLook, fitLayout, type GEdge, type GNode, GraphCanvas, type NodeLook } from './kit/GraphCanvas';
 import { must } from './kit/must';
+import { PredictPanel, usePredict } from './kit/predict';
 import { Legend, Panel, Pseudocode, Stat, StepNote, TokenRow, VizShell } from './kit/shell';
 import { bilingual, useText } from './kit/text';
 import { playerKeys, usePlayer } from './kit/usePlayer';
@@ -613,8 +616,13 @@ export default function GraphLab({
           : primSteps(nodes, edges, startOk, G),
     [idsKey, edgesKey, mstAlgo, startOk, X, G],
   );
-  const tp = usePlayer(travSteps, 950);
+  const travPlayer = usePlayer(travSteps, 950);
   const mp = usePlayer(mstSteps, 950);
+  // Predict mode (#127): which vertex leaves the queue (BFS) or the stack (DFS).
+  const P = useText(PREDICT_TEXT);
+  const travQuestion = useCallback((k: number) => traversalQuestion(travSteps, k, trav, P), [travSteps, trav, P]);
+  const predict = usePredict(travPlayer, travQuestion, travSteps, 950);
+  const tp = predict.player;
   const props = useMemo(() => properties(nodes, edges, directed), [nodes, edges, directed]);
   const bip = useMemo(() => (showBip ? bipartite(nodes, edges) : null), [showBip, nodes, edges]);
 
@@ -840,6 +848,7 @@ export default function GraphLab({
         <>
           <StepNote text={note} tone={mode === 'analyze' && bip ? (bip.ok ? 'success' : 'danger') : 'accent'} />
           {mode === 'traverse' && <PlayerBar player={tp} />}
+          {mode === 'traverse' && <PredictPanel predict={predict} />}
           {mode === 'mst' && weighted && !directed && <PlayerBar player={mp} />}
         </>
       }

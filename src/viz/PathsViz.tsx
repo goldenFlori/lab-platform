@@ -1,12 +1,15 @@
 import { Button, Chip, Input } from '@heroui/react';
 import { Eraser, MapPinned, Trash2, Waypoints } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { natural } from './algorithms/graphs';
+import { dijkstraQuestion } from './algorithms/predict';
+import { PREDICT_TEXT } from './algorithms/predict.text';
 import { bellmanFordSteps, dijkstraSteps, inf, type PathStep, pathTo, toArcs } from './algorithms/shortest';
 import { SHORTEST_TEXT } from './algorithms/shortest.text';
 import { Choice, Field, PlayerBar, Segmented, Toggle } from './kit/controls';
 import { type EdgeLook, fitLayout, type GEdge, type GNode, GraphCanvas, type NodeLook } from './kit/GraphCanvas';
 import { must } from './kit/must';
+import { PredictPanel, usePredict } from './kit/predict';
 import { StepNote, VizShell } from './kit/shell';
 import { bilingual, useText } from './kit/text';
 import { playerKeys, usePlayer } from './kit/usePlayer';
@@ -483,7 +486,12 @@ export default function PathsViz({
     () => Array.from({ length: runs ? Math.max(runs.d.length, runs.b.length) : 1 }, (_, i) => i),
     [runs],
   );
-  const player = usePlayer(ticks, 800);
+  const basePlayer = usePlayer(ticks, 800);
+  // Predict mode (#127) asks about Dijkstra's choices; Bellman-Ford relaxes every edge, so it has none.
+  const P = useText(PREDICT_TEXT);
+  const dQuestion = useCallback((k: number) => (runs ? dijkstraQuestion(runs.d, k, P) : null), [runs, P]);
+  const predict = usePredict(basePlayer, dQuestion, ticks, 800);
+  const player = predict.player;
   const t = player.index;
 
   /* ---- editing ---- */
@@ -582,7 +590,12 @@ export default function PathsViz({
           </div>
         </>
       }
-      footer={<PlayerBar player={player} />}
+      footer={
+        <>
+          <PlayerBar player={player} />
+          {view !== 'bellman' && <PredictPanel predict={predict} />}
+        </>
+      }
     >
       <div className="flex flex-col gap-3 p-4 sm:p-5">
         {edit && (
