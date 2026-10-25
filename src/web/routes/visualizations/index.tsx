@@ -14,7 +14,7 @@ export const Route = createFileRoute('/visualizations/')({
 // institution, a lab number does not.
 const GROUPS: { key: 'sorting' | 'graphs' | 'paths' | 'flows'; ids: VisualizerId[] }[] = [
   { key: 'sorting', ids: ['renditja', 'gara-e-krahasimeve', 'kompleksiteti', 'pema-rekursive', 'gjej-algoritmin'] },
-  { key: 'graphs', ids: ['grafet', 'labirinti', 'scc-topologjike'] },
+  { key: 'graphs', ids: ['grafet', 'labirinti', 'kruskal-prim', 'scc-topologjike'] },
   { key: 'paths', ids: ['rruget', 'kuizi-bellman-ford', 'floyd-warshall', 'gara-e-rrugeve'] },
   { key: 'flows', ids: ['rrjedha-max', 'ciftezimi'] },
 ];
