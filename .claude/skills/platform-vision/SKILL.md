@@ -337,7 +337,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-25:** #131 done. A failed run marks the line where it stopped, in the code students read
   and in the editor (from the cell's traceback), until the code changes. The editor gains line
   numbers and the palette's accent for the active line and selection. Syntax colours stay GitHub's,
-  matching the code highlighted at upload. Next: the recursion-tree visualization (#133).
+  matching the code highlighted at upload (PR #142).
+- **2026-10-25:** #133 done. A 14th visualization, the recursion tree, for Lab 3: Merge Sort's calls
+  split down and merge back up beside a work-per-level table (n per level × log₂n levels), and
+  recursive Fibonacci with its repeated calls counted and a memo switch that prunes them (2n − 1
+  calls). In the gallery and the embeds editor; the course site does not have it, so Lab 3 embeds it
+  from the platform. Next: Kruskal with union-find (#132).
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
