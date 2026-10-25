@@ -669,6 +669,50 @@ const KruskalPreview = () => (
   </Frame>
 );
 
+// Trace table: a hand trace filled row by row, each row turning green with a tick once checked.
+const TRACE_ROWS = 4;
+const TRACE_COLS = 4;
+const TracePreview = () => (
+  <Frame count={TRACE_ROWS * 2 + 1} ms={520}>
+    {(f) => (
+      <>
+        {Array.from({ length: TRACE_ROWS }, (_, r) => {
+          // Each row takes two frames: written, then checked.
+          const state = f > 2 * r + 1 ? 'checked' : f === 2 * r + 1 ? 'writing' : 'empty';
+          return (
+            // biome-ignore lint/suspicious/noArrayIndexKey: a row of a fixed table
+            <g key={r}>
+              {Array.from({ length: TRACE_COLS }, (_, c) => (
+                <rect
+                  // biome-ignore lint/suspicious/noArrayIndexKey: a cell of a fixed table
+                  key={c}
+                  x={30 + c * 32}
+                  y={10 + r * 23}
+                  width={28}
+                  height={18}
+                  rx={4}
+                  fill={state === 'checked' ? C.done : state === 'writing' ? C.frontier : C.idle}
+                  className="transition-[fill] duration-300"
+                />
+              ))}
+              {state === 'checked' && (
+                <path
+                  d={`M ${164} ${19 + r * 23} l 5 5 l 9 -10`}
+                  fill="none"
+                  stroke={C.done}
+                  strokeWidth={3}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              )}
+            </g>
+          );
+        })}
+      </>
+    )}
+  </Frame>
+);
+
 const PREVIEWS: Record<VisualizerId, () => ReactNode> = {
   renditja: Sorting,
   'gara-e-krahasimeve': Race,
@@ -685,6 +729,7 @@ const PREVIEWS: Record<VisualizerId, () => ReactNode> = {
   ciftezimi: Matching,
   'pema-rekursive': RecursionTree,
   'kruskal-prim': KruskalPreview,
+  'tabela-gjurmimit': TracePreview,
 };
 
 export function VizPreview({ id }: { id: VisualizerId }) {

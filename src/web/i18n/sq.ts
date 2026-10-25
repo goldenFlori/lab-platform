@@ -40,7 +40,7 @@ export const sq = {
     signIn: 'Hyr',
     seeIt: 'Shikojeni në punë',
     stats: [
-      ['15', 'vizualizime'],
+      ['16', 'vizualizime'],
       ['10', 'laboratorë'],
       ['0', 'instalime'],
     ] as [string, string][],
@@ -56,7 +56,7 @@ export const sq = {
     },
     demoTitle: 'Provojeni këtu',
     demoLead:
-      'Një nga 15 vizualizimet e kursit, siç e shohin studentët: luajeni hap pas hapi, ndryshoni labirintin dhe krahasoni BFS me DFS.',
+      'Një nga 16 vizualizimet e kursit, siç e shohin studentët: luajeni hap pas hapi, ndryshoni labirintin dhe krahasoni BFS me DFS.',
     demoVideoLead: 'Dy minuta: një orë laboratori, nga kodi te vizualizimi dhe Live Lab.',
     demoLabel: 'Labirinti — BFS kundrejt DFS',
     allVisualizations: 'Të gjitha vizualizimet',
@@ -457,6 +457,7 @@ export const sq = {
       ciftezimi: 'Çiftëzimi & caktimet',
       'pema-rekursive': 'Pema rekursive',
       'kruskal-prim': 'Kruskal me union-find & Prim',
+      'tabela-gjurmimit': 'Tabela e gjurmimit',
     },
     summaries: {
       renditja: 'Algoritmet e renditjes hap pas hapi, me pseudokodin dhe kompleksitetin e secilit.',
@@ -477,6 +478,8 @@ export const sq = {
         'Thirrjet e Merge Sort si pemë, me punën për nivel, dhe Fibonacci me thirrjet e përsëritura që i heq memoizimi.',
       'kruskal-prim':
         'Kruskal me pyllin union-find të dukshëm (bashkimi sipas rangut, kompresimi i rrugës), krahas Prim mbi të njëjtin graf.',
+      'tabela-gjurmimit':
+        'Problemet e Punës në Klasë si tabela: plotësoni Dijkstra, Bellman-Ford, Prim, Kruskal, Kahn ose Floyd-Warshall rresht pas rreshti, dhe çdo rresht kontrollohet.',
     },
   },
   search: {

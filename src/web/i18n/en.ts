@@ -40,7 +40,7 @@ export const en: Messages = {
     signIn: 'Sign in',
     seeIt: 'See it at work',
     stats: [
-      ['15', 'visualizations'],
+      ['16', 'visualizations'],
       ['10', 'labs'],
       ['0', 'installs'],
     ],
@@ -56,7 +56,7 @@ export const en: Messages = {
     },
     demoTitle: 'Try it here',
     demoLead:
-      "One of the course's 15 visualizations, as students see it: play it step by step, change the maze, and compare BFS with DFS.",
+      "One of the course's 16 visualizations, as students see it: play it step by step, change the maze, and compare BFS with DFS.",
     demoVideoLead: 'Two minutes: a lab class, from code to visualization and Live Lab.',
     demoLabel: 'The maze — BFS versus DFS',
     allVisualizations: 'All visualizations',
@@ -453,6 +453,7 @@ export const en: Messages = {
       ciftezimi: 'Matching & assignment',
       'pema-rekursive': 'Recursion tree',
       'kruskal-prim': 'Kruskal with union-find & Prim',
+      'tabela-gjurmimit': 'Trace table',
     },
     summaries: {
       renditja: 'The sorting algorithms step by step, with the pseudocode and the complexity of each.',
@@ -477,6 +478,8 @@ export const en: Messages = {
         'Merge Sort’s calls as a tree, with the work per level, and Fibonacci’s repeated calls that memoization removes.',
       'kruskal-prim':
         'Kruskal with the union-find forest in view (union by rank, path compression), beside Prim on the same graph.',
+      'tabela-gjurmimit':
+        'The class problems as tables: fill in Dijkstra, Bellman-Ford, Prim, Kruskal, Kahn or Floyd-Warshall row by row, each row checked.',
     },
   },
   search: {

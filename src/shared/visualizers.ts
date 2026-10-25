@@ -17,6 +17,7 @@ export const VISUALIZERS = {
   ciftezimi: 'Çiftëzimi & caktimet',
   'pema-rekursive': 'Pema rekursive',
   'kruskal-prim': 'Kruskal me union-find & Prim',
+  'tabela-gjurmimit': 'Tabela e gjurmimit',
 } as const;
 
 export type VisualizerId = keyof typeof VISUALIZERS;

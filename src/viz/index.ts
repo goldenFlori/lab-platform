@@ -55,4 +55,7 @@ export const VIZ: Record<VisualizerId, { Component: ReturnType<typeof load> }> =
   'kruskal-prim': {
     Component: load(() => import('./KruskalPrimViz')),
   },
+  'tabela-gjurmimit': {
+    Component: load(() => import('./TraceTableViz')),
+  },
 };

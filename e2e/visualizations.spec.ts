@@ -127,3 +127,21 @@ test('predict mode in Kruskal asks to accept or reject the next edge', async ({ 
   await question.getByRole('button', { name: 'pranohet' }).click();
   await expect(page.getByTestId('predict-feedback')).toContainText('Saktë!');
 });
+
+// #150: a class problem as a trace table, each row checked; a wrong cell names the rule, not the value.
+test('a trace table checks each row of the Lab 5 Prim problem', async ({ page }) => {
+  await page.goto('/visualizations/tabela-gjurmimit');
+  await page.getByRole('button', { name: /Lab 7 · Dijkstra nga A/ }).click();
+  await page.getByRole('option', { name: 'Lab 5 · Prim nga A' }).click();
+  const trace = page.getByTestId('trace');
+  await trace.getByLabel('Hapi 1 · Brinja').fill('a-c');
+  await trace.getByLabel('Hapi 1 · Pesha deri tani').fill('1');
+  await trace.getByRole('button', { name: 'Kontrollo rreshtin' }).click();
+  await expect(trace).toContainText('Saktë: Hapi 1.');
+  // Step 2: B–C (5) is not the lightest edge across the cut; C–E (2) is.
+  await trace.getByLabel('Hapi 2 · Brinja').fill('B-C');
+  await trace.getByLabel('Hapi 2 · Pesha deri tani').fill('6');
+  await trace.getByRole('button', { name: 'Kontrollo rreshtin' }).click();
+  await expect(trace).toContainText('Prim zgjedh brinjën më të lehtë');
+  await expect(trace).not.toContainText('C–E');
+});
