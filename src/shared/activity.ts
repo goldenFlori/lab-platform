@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { PredictionTopic } from './predictions';
 
 // Learning activity (#18): what students do in a course, kept as at most one row per student, lab,
 // kind and day, and shown to staff only as totals. The app imports only types from this file.
@@ -63,4 +64,24 @@ export type PilotReport = {
   submissions: PilotCount;
   aiQuestions: PilotCount;
   aiRequests: number;
+  /** Learning (#153): first-try results of predictions and trace tables in the period. */
+  understanding: PilotUnderstanding;
+};
+
+/** Answers counted at the first try, and how many of them were right. */
+export type FirstTries = { answers: number; right: number };
+
+export type PilotUnderstanding = FirstTries & {
+  students: number;
+  /** Per topic, each from five students up. */
+  topics: (FirstTries & { topic: PredictionTopic; students: number })[];
+  /** Per week (Monday) of the period. */
+  weeks: (FirstTries & { week: string })[];
+  /**
+   * Students who answered on two days or more: their first day against their later days. Null below
+   * five such students.
+   */
+  growth: { students: number; firstDay: FirstTries; later: FirstTries } | null;
+  /** Trace-table rows checked, and by how many students. */
+  traceRows: PilotCount;
 };

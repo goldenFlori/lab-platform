@@ -714,6 +714,65 @@ function tenantPredictions(db: Db, orgId: string) {
       ]);
       return { perEmbed, perTopic, perDecision, wrong };
     },
+
+    /**
+     * The pilot report's learning numbers (#153) from `from` to `to` (YYYY-MM-DD, both included), for
+     * the students of `groupIds` (all the course's groups when null): totals, per topic and per week,
+     * the first day against the later days of students who answered on two days or more, and the
+     * trace-table rows checked. Counts only.
+     */
+    async pilot({
+      courseId,
+      groupIds,
+      from,
+      to,
+    }: {
+      courseId: string;
+      groupIds: string[] | null;
+      from: string;
+      to: string;
+    }) {
+      const { students } = studentsOf(db, orgId, courseId, groupIds);
+      const counted = and(
+        eq(pr.orgId, orgId),
+        inArray(pr.notebookId, courseNotebooks(courseId)),
+        inArray(pr.userId, students),
+        gte(pr.day, from),
+        lte(pr.day, to),
+      );
+      const week = sql<string>`date(${pr.day}, '-' || ((cast(strftime('%w', ${pr.day}) as integer) + 6) % 7) || ' days')`;
+      const firsts = db
+        .select({ userId: pr.userId, first: sql<string>`min(${pr.day})`.as('first') })
+        .from(pr)
+        .where(counted)
+        .groupBy(pr.userId)
+        .having(sql`count(distinct ${pr.day}) >= 2`)
+        .as('firsts');
+      const firstDay = sql<number>`${pr.day} = ${firsts.first}`;
+      const [totals, perTopic, perWeek, growth, trace] = await db.batch([
+        db
+          .select({ students: countDistinct(pr.userId), answers: total, right })
+          .from(pr)
+          .where(counted),
+        db
+          .select({ topic: pr.topic, students: countDistinct(pr.userId), answers: total, right })
+          .from(pr)
+          .where(counted)
+          .groupBy(pr.topic),
+        db.select({ week, answers: total, right }).from(pr).where(counted).groupBy(week),
+        db
+          .select({ first: firstDay, students: countDistinct(pr.userId), answers: total, right })
+          .from(pr)
+          .innerJoin(firsts, eq(firsts.userId, pr.userId))
+          .where(counted)
+          .groupBy(firstDay),
+        db
+          .select({ students: countDistinct(pr.userId), total })
+          .from(pr)
+          .where(and(counted, like(pr.topic, 'trace-%'))),
+      ]);
+      return { totals: totals[0], perTopic, perWeek, growth, trace: trace[0] };
+    },
   };
 }
 
