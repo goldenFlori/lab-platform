@@ -655,6 +655,20 @@ const RecursionTree = () => (
   </Frame>
 );
 
+// Kruskal: edges join the tree in order of weight, the sets merging into one colour.
+// Five edges for six vertices: a spanning tree, no cycle.
+const KRUSKAL_ORDER = [5, 0, 3, 6, 1];
+const KruskalPreview = () => (
+  <Frame count={KRUSKAL_ORDER.length + 1} ms={520}>
+    {(f) => (
+      <Graph
+        node={(i) => (KRUSKAL_ORDER.slice(0, f).some((k) => G_EDGES[k]?.includes(i)) ? C.done : C.idle)}
+        edge={(k) => (KRUSKAL_ORDER.slice(0, f).includes(k) ? C.path : KRUSKAL_ORDER[f] === k ? C.current : undefined)}
+      />
+    )}
+  </Frame>
+);
+
 const PREVIEWS: Record<VisualizerId, () => ReactNode> = {
   renditja: Sorting,
   'gara-e-krahasimeve': Race,
@@ -670,6 +684,7 @@ const PREVIEWS: Record<VisualizerId, () => ReactNode> = {
   'rrjedha-max': Flow,
   ciftezimi: Matching,
   'pema-rekursive': RecursionTree,
+  'kruskal-prim': KruskalPreview,
 };
 
 export function VizPreview({ id }: { id: VisualizerId }) {
