@@ -1,4 +1,5 @@
 import type { MyGrade } from './grading';
+import type { TopicResult } from './predictions';
 
 // A student's own progress in a course (#99): per lab, whether they opened it, and per notebook the
 // exercises solved, the submission and the released grade. Only ever the user's own.
@@ -16,4 +17,5 @@ export type NotebookProgress = {
 
 export type LabProgress = { id: string; n: number; title: string; opened: boolean; notebooks: NotebookProgress[] };
 
-export type MyProgress = { labs: LabProgress[] };
+/** With the first-try results of predictions and trace tables per topic (#151). */
+export type MyProgress = { labs: LabProgress[]; topics: TopicResult[] };

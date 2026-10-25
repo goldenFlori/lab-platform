@@ -7,7 +7,10 @@ export const RETENTION = {
   sessionDays: 30,
   /** Students' "Explain my error" questions with the answers (#86): a semester and its exams. */
   aiQuestionDays: 180,
-  /** Daily learning activity, AI use counts and ended Live Labs: two academic years of reports. */
+  /**
+   * Daily learning activity, first-try results of predictions (#151), AI use counts and ended Live
+   * Labs: two academic years of reports.
+   */
   activityYears: 2,
   /** A deletion request once handled, so the institution can show it answered. */
   handledRequestYears: 1,

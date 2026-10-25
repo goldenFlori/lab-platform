@@ -25,6 +25,7 @@ import type { AiQuestion } from '../../shared/ai';
 import type { AiMode } from '../../shared/exercise-limits';
 import type { DeletionRequestView, ErasureView, OrganizationData, PersonGrade } from '../../shared/my-data';
 import type { ExportPage, ExportPart } from '../../shared/org-export';
+import type { PredictionInput } from '../../shared/predictions';
 import { roleExists } from './access';
 import { uuidv7 } from './ids';
 import type { Db } from './index';
@@ -51,6 +52,7 @@ import {
   liveSessions,
   memberships,
   notebooks,
+  predictionResults,
   searchSections,
   sessions,
   submissions,
@@ -620,6 +622,99 @@ function studentsOf(db: Db, orgId: string, courseId: string, groupIds: string[] 
     .from(memberships)
     .where(and(eq(memberships.orgId, orgId), eq(memberships.role, 'student'), inGroups));
   return { inGroups, students };
+}
+
+/**
+ * First-try results of predictions and trace tables (#151): a student's first answer to each decision
+ * of an embedded visualization. Students read their own per topic; staff only as counts.
+ */
+function tenantPredictions(db: Db, orgId: string) {
+  const pr = predictionResults;
+  const courseNotebooks = (courseId: string) =>
+    db
+      .select({ id: notebooks.id })
+      .from(notebooks)
+      .innerJoin(labs, and(eq(labs.id, notebooks.labId), eq(labs.orgId, orgId)))
+      .where(and(eq(notebooks.orgId, orgId), eq(labs.courseId, courseId)));
+  const right = sql<number>`coalesce(sum(${pr.correct}), 0)`;
+  const total = sql<number>`count(*)`;
+  return {
+    /** Keeps the student's first answer to the decision; any later answer changes nothing. */
+    async record(row: PredictionInput & { notebookId: string; cell: number; userId: string; day: string }) {
+      const { right: correct, ...rest } = row;
+      await rethrowMissingParent(
+        db
+          .insert(pr)
+          .values({ ...rest, correct, id: uuidv7(), orgId })
+          .onConflictDoNothing(),
+      );
+    },
+
+    /** The student's own first-try results in a course, per topic. */
+    async ofStudent(courseId: string, userId: string) {
+      return db
+        .select({ topic: pr.topic, asked: total, right })
+        .from(pr)
+        .where(and(eq(pr.orgId, orgId), eq(pr.userId, userId), inArray(pr.notebookId, courseNotebooks(courseId))))
+        .groupBy(pr.topic);
+    },
+
+    /**
+     * A course's results for the students of `groupIds` (all its groups when null): per embed, its
+     * topics, students and answers; per decision, its answers and right ones; and the wrong picks.
+     * Counts only: the route keeps what five students or more stand behind.
+     */
+    async report({ courseId, groupIds }: { courseId: string; groupIds: string[] | null }) {
+      const { students } = studentsOf(db, orgId, courseId, groupIds);
+      const counted = and(
+        eq(pr.orgId, orgId),
+        inArray(pr.notebookId, courseNotebooks(courseId)),
+        inArray(pr.userId, students),
+      );
+      const [perEmbed, perTopic, perDecision, wrong] = await Promise.all([
+        db
+          .select({
+            notebookId: pr.notebookId,
+            cell: pr.cell,
+            notebook: notebooks.title,
+            labId: notebooks.labId,
+            viz: embeds.viz,
+            title: embeds.title,
+            students: countDistinct(pr.userId),
+            answers: total,
+            right,
+          })
+          .from(pr)
+          .innerJoin(notebooks, and(eq(notebooks.id, pr.notebookId), eq(notebooks.orgId, orgId)))
+          .leftJoin(
+            embeds,
+            and(eq(embeds.orgId, orgId), eq(embeds.notebookId, pr.notebookId), eq(embeds.cell, pr.cell)),
+          )
+          .where(counted)
+          .groupBy(pr.notebookId, pr.cell),
+        db.selectDistinct({ notebookId: pr.notebookId, cell: pr.cell, topic: pr.topic }).from(pr).where(counted),
+        db
+          .select({
+            notebookId: pr.notebookId,
+            cell: pr.cell,
+            decision: pr.decision,
+            prompt: sql<string>`max(${pr.prompt})`,
+            answer: sql<string>`max(${pr.answer})`,
+            students: total,
+            right,
+          })
+          .from(pr)
+          .where(counted)
+          .groupBy(pr.notebookId, pr.cell, pr.decision),
+        db
+          .select({ notebookId: pr.notebookId, cell: pr.cell, decision: pr.decision, pick: pr.pick, students: total })
+          .from(pr)
+          .where(and(counted, eq(pr.correct, false)))
+          .groupBy(pr.notebookId, pr.cell, pr.decision, pr.pick),
+      ]);
+      return { perEmbed, perTopic, perDecision, wrong };
+    },
+  };
 }
 
 /** Learning activity (#18): recorded once per student, lab, kind and day; read only as counts. */
@@ -1423,7 +1518,7 @@ function tenantPersonal(db: Db, orgId: string) {
   return {
     async export(userId: string): Promise<Omit<OrganizationData, 'organization'>> {
       const nb = (column: SQLiteColumn) => and(eq(notebooks.id, column), eq(notebooks.orgId, orgId));
-      const [member, opened, edits, solved, handed, graded, asked, used, requests] = await db.batch([
+      const [member, opened, edits, solved, predicted, handed, graded, asked, used, requests] = await db.batch([
         db
           .select({ role: memberships.role, course: courses.title, group: groups.name, since: memberships.createdAt })
           .from(memberships)
@@ -1451,6 +1546,20 @@ function tenantPersonal(db: Db, orgId: string) {
           .from(exerciseCompletions)
           .innerJoin(notebooks, nb(exerciseCompletions.notebookId))
           .where(and(eq(exerciseCompletions.orgId, orgId), eq(exerciseCompletions.userId, userId))),
+        db
+          .select({
+            notebook: notebooks.title,
+            cell: predictionResults.cell,
+            topic: predictionResults.topic,
+            prompt: predictionResults.prompt,
+            pick: predictionResults.pick,
+            correct: predictionResults.correct,
+            day: predictionResults.day,
+          })
+          .from(predictionResults)
+          .innerJoin(notebooks, nb(predictionResults.notebookId))
+          .where(and(eq(predictionResults.orgId, orgId), eq(predictionResults.userId, userId)))
+          .orderBy(asc(predictionResults.day)),
         db
           .select({
             notebook: notebooks.title,
@@ -1505,6 +1614,7 @@ function tenantPersonal(db: Db, orgId: string) {
         labsOpened: opened,
         codeEdits: edits.map((e) => ({ ...e, savedAt: iso(e.savedAt) })),
         exercisesSolved: solved.map((s) => ({ ...s, at: iso(s.at) })),
+        firstTries: predicted,
         submissions: handed.map((s) => ({ ...s, at: iso(s.at) })),
         grades: graded.map(({ autoScore, score, releasedAt, ...g }) => ({
           ...g,
@@ -1604,6 +1714,9 @@ function tenantPersonal(db: Db, orgId: string) {
         db
           .delete(exerciseCompletions)
           .where(and(eq(exerciseCompletions.orgId, orgId), eq(exerciseCompletions.userId, userId))),
+        db
+          .delete(predictionResults)
+          .where(and(eq(predictionResults.orgId, orgId), eq(predictionResults.userId, userId))),
         db.delete(submissions).where(and(eq(submissions.orgId, orgId), eq(submissions.userId, userId))),
         db.delete(grades).where(and(eq(grades.orgId, orgId), eq(grades.userId, userId))),
         db.delete(liveSessions).where(and(eq(liveSessions.orgId, orgId), eq(liveSessions.hostId, userId))),
@@ -1683,6 +1796,7 @@ const EXPORTABLE: Record<Exclude<ExportPart, 'people'>, Exportable> = {
   submissions: { table: submissions, orgId: submissions.orgId, id: submissions.id, limit: 100 },
   grades: { table: grades, orgId: grades.orgId, id: grades.id },
   exerciseCompletions: { table: exerciseCompletions, orgId: exerciseCompletions.orgId, id: exerciseCompletions.id },
+  predictionResults: { table: predictionResults, orgId: predictionResults.orgId, id: predictionResults.id },
   labActivity: { table: labActivity, orgId: labActivity.orgId, id: labActivity.id },
   aiUsage: { table: aiUsage, orgId: aiUsage.orgId },
   aiQuestions: { table: aiQuestions, orgId: aiQuestions.orgId, id: aiQuestions.id, limit: 200 },
@@ -1850,6 +1964,7 @@ export function forTenant(db: Db, orgId: string) {
     activity: tenantActivity(db, orgId),
     codeEdits: tenantCodeEdits(db, orgId),
     exercises: tenantExercises(db, orgId),
+    predictions: tenantPredictions(db, orgId),
     submissions: tenantSubmissions(db, orgId),
     grading: tenantGrading(db, orgId),
     staff: tenantStaff(db, orgId),

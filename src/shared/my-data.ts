@@ -12,6 +12,16 @@ export type OrganizationData = {
   labsOpened: { lab: string; kind: string; day: string }[];
   codeEdits: { notebook: string; cell: number; code: string; savedAt: When }[];
   exercisesSolved: { notebook: string; cell: number; at: When }[];
+  /** First answers to the decisions of visualizations and trace tables (#151). */
+  firstTries: {
+    notebook: string;
+    cell: number;
+    topic: string;
+    prompt: string;
+    pick: string;
+    correct: boolean;
+    day: string;
+  }[];
   submissions: {
     notebook: string;
     code: { cell: number; code: string }[];
