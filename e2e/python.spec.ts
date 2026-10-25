@@ -59,6 +59,9 @@ test('a student runs the cells, sees errors plainly, stops a loop and answers in
   await expect(error).toContainText('ZeroDivisionError');
   await expect(error).toContainText('<cell 3>');
   await expect(error).not.toContainText('_pyodide');
+  // #131: the line that failed is marked in the code itself.
+  await expect(student.locator('.nb-error-line')).toHaveCount(1);
+  await expect(student.locator('.nb-error-line')).toHaveText('1 / 0');
 
   // A loop that never ends: Stop interrupts it, and the variables survive.
   await run(student, 4);
