@@ -426,6 +426,21 @@ export const sq = {
     open: 'Hape',
     all: 'Të gjitha vizualizimet',
     fallbackTitle: 'Vizualizimi',
+    groups: {
+      sorting: {
+        title: 'Renditja dhe kompleksiteti',
+        text: 'Si rendisin algoritmet dhe sa shpejt rritet puna e tyre.',
+      },
+      graphs: {
+        title: 'Grafet dhe përshkimi',
+        text: 'Vetitë e grafeve, BFS dhe DFS, komponentet e lidhura fort dhe renditjet topologjike.',
+      },
+      paths: {
+        title: 'Rrugët më të shkurtra',
+        text: 'Dijkstra, Bellman-Ford dhe Floyd-Warshall: nga një burim dhe ndërmjet të gjitha çifteve.',
+      },
+      flows: { title: 'Rrjedhat dhe çiftëzimi', text: 'Rrjedha maksimale, prerja minimale dhe problemet e caktimit.' },
+    },
     names: {
       renditja: 'Vizualizuesi i renditjes',
       'gara-e-krahasimeve': 'Gara e krahasimeve',

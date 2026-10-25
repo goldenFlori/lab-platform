@@ -35,6 +35,16 @@ test('the gallery lists every visualization and is reachable from the header', a
   for (const id of VISUALIZER_IDS) {
     await expect(page.getByRole('link', { name: VISUALIZERS[id] })).toBeVisible();
   }
+  // #125: grouped by topic, each card with its moving preview.
+  for (const group of [
+    'Renditja dhe kompleksiteti',
+    'Grafet dhe përshkimi',
+    'Rrugët më të shkurtra',
+    'Rrjedhat dhe çiftëzimi',
+  ]) {
+    await expect(page.getByRole('heading', { level: 2, name: group })).toBeVisible();
+  }
+  await expect(page.getByTestId('viz-card').locator('svg[viewBox="0 0 200 110"]')).toHaveCount(VISUALIZER_IDS.length);
   expect(await overflow(page)).toBeLessThanOrEqual(0);
 
   await page.getByRole('link', { name: VISUALIZERS.labirinti }).click();
