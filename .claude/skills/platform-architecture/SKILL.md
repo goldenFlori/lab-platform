@@ -262,6 +262,7 @@ lab_activity(id, org_id, lab_id, user_id, kind: view|download|visualization|exer
 code_edits(id, org_id, notebook_id, user_id, cell, code, updated_at)  -- built (#49)
 exercises(id, org_id, notebook_id, cell, title, test?)  -- built (#51)
 exercise_completions(id, org_id, notebook_id, cell, user_id, created_at)  -- built (#51)
+prediction_results(id, org_id, notebook_id, cell, user_id, topic, decision, correct, pick, answer, prompt, day)  -- built (#151): first try only
 assignments(id, org_id, notebook_id, group_id, due_at)  -- built (#52)
 submissions(id, org_id, notebook_id, user_id, code, solved, attempts, submitted_at)  -- built (#52)
 exercise_grading(id, org_id, notebook_id, cell, points, hidden_test?)  -- built (#53)
