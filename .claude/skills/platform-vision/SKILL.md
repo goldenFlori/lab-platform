@@ -323,7 +323,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-10-25:** #130 done. The lab page puts content first: one toolbar (download, present, AI,
   Live Lab, and a "More" menu for uploading or deleting notebooks), so a phone's first screen shows
   the lab instead of a wall of buttons. Upload, translation and deletion open from the menus through
-  the lab-tools channel. Next: the students' learning path (#126).
+  the lab-tools channel (PR #138).
+- **2026-10-25:** #126 done. Students see their way through the course on the course page: the
+  labs open to them as a path, each coloured not started / in progress / handed in / graded, with
+  a ring for exercises solved, a summary, and "Continue with Lab N" to the next unfinished lab.
+  Only their own progress, from the "My progress" data. Next: predict mode (#127).
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
