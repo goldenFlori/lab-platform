@@ -46,6 +46,14 @@ test('a student sees their solved exercise, submission and grade on My progress'
   await apiCall(staff, 'POST', `${nbPath}/grades/release?group=${group.id}`);
 
   await student.goto(`/o/e2e/courses/${course.id}`);
+  // #126: the course page shows the student's path; this lab is graded, so nothing is left to do.
+  const path = student.getByTestId('learning-path');
+  await expect(path).toContainText('1 nga 1 laboratorë të filluar · 1/1 ushtrime');
+  await expect(path.getByRole('link', { name: /Laboratori 1: .* — Me notë, 1 nga 1 ushtrime/ })).toHaveAttribute(
+    'data-state',
+    'graded',
+  );
+  await expect(student.getByTestId('learning-path-next')).toHaveCount(0);
   await student.getByRole('link', { name: 'Progresi im' }).click();
   await expect(student.getByRole('heading', { name: 'Progresi im', level: 1 })).toBeVisible();
   const totals = student.getByTestId('progress-totals');
@@ -55,5 +63,9 @@ test('a student sees their solved exercise, submission and grade on My progress'
   await expect(student.getByTestId('progress-lab')).toContainText('Dorëzuar më');
   await expect(student.getByTestId('progress-grade')).toHaveText('Nota: 1/1');
   await student.context().close();
+  // Staff see the course's management, not a path of their own.
+  await staff.goto(`/o/e2e/courses/${course.id}`);
+  await expect(staff.getByRole('heading', { name: 'Grupet' })).toBeVisible();
+  await expect(staff.getByTestId('learning-path')).toHaveCount(0);
   await staff.context().close();
 });
