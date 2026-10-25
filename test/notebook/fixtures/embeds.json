@@ -147,12 +147,12 @@
   ],
   "laborator-05.ipynb": [
     {
-      "cell": 3,
+      "cell": 2,
       "viz": "labirinti",
       "title": "Labirinti me BFS dhe DFS"
     },
     {
-      "cell": 6,
+      "cell": 4,
       "viz": "grafet",
       "title": "BFS dhe DFS në grafin tuaj",
       "props": {
@@ -161,7 +161,7 @@
       }
     },
     {
-      "cell": 9,
+      "cell": 6,
       "viz": "grafet",
       "title": "Kruskal dhe Prim",
       "props": {
@@ -170,7 +170,7 @@
       }
     },
     {
-      "cell": 12,
+      "cell": 8,
       "viz": "scc-topologjike",
       "title": "Komponentet e lidhura fort",
       "props": {
@@ -179,7 +179,7 @@
       }
     },
     {
-      "cell": 15,
+      "cell": 10,
       "viz": "scc-topologjike",
       "title": "Renditja topologjike e lëndëve",
       "props": {
@@ -188,7 +188,7 @@
       }
     },
     {
-      "cell": 18,
+      "cell": 12,
       "viz": "scc-topologjike",
       "title": "Lojë: renditja topologjike",
       "props": {
@@ -229,9 +229,11 @@
       "cell": 8,
       "viz": "kuizi-bellman-ford",
       "title": "Kuiz: Bellman-Ford"
-    },
+    }
+  ],
+  "laborator-08.ipynb": [
     {
-      "cell": 10,
+      "cell": 3,
       "viz": "floyd-warshall",
       "title": "Floyd-Warshall: matrica e distancave",
       "props": {
@@ -239,14 +241,7 @@
       }
     },
     {
-      "cell": 12,
-      "viz": "gara-e-rrugeve",
-      "title": "Lojë: gara e rrugëve"
-    }
-  ],
-  "laborator-08.ipynb": [
-    {
-      "cell": 4,
+      "cell": 6,
       "viz": "floyd-warshall",
       "title": "Floyd-Warshall: UrbanPost",
       "props": {
@@ -254,7 +249,7 @@
       }
     },
     {
-      "cell": 7,
+      "cell": 9,
       "viz": "floyd-warshall",
       "title": "Floyd-Warshall: rrjeti mjekësor",
       "props": {
@@ -263,6 +258,11 @@
     },
     {
       "cell": 11,
+      "viz": "gara-e-rrugeve",
+      "title": "Lojë: gara e rrugëve"
+    },
+    {
+      "cell": 16,
       "viz": "rrjedha-max",
       "title": "Edmonds-Karp: ujësjellësi",
       "props": {

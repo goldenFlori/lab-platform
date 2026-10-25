@@ -1,23 +1,11 @@
 {
-  "title": "Laboratori 4 — Hyrje ne Teorine e Grafeve",
+  "title": "Laboratori 4 — Hyrje në Teorinë e Grafeve",
   "toc": [
     {
       "id": "teoria-bazat-e-teorise-se-grafeve",
-      "title": "Teoria — Bazat e Teorise se Grafeve",
+      "title": "Teoria — Bazat e Teorisë së Grafeve",
       "level": 2,
       "kind": "theory"
-    },
-    {
-      "id": "terminologjia-baze",
-      "title": "Terminologjia baze",
-      "level": 3,
-      "kind": "normal"
-    },
-    {
-      "id": "llojet-kryesore-te-grafeve",
-      "title": "Llojet kryesore te grafeve",
-      "level": 3,
-      "kind": "normal"
     },
     {
       "id": "ushtrimi-1-vizualizim-interaktiv-ndertoni-grafin-tuaj",
@@ -26,52 +14,10 @@
       "kind": "exercise"
     },
     {
-      "id": "qellimi",
-      "title": "Qëllimi",
-      "level": 3,
-      "kind": "normal"
-    },
-    {
-      "id": "kontrollat",
-      "title": "Kontrollat",
-      "level": 3,
-      "kind": "normal"
-    },
-    {
-      "id": "cfare-te-vezhgoni",
-      "title": "Çfarë të vëzhgoni",
-      "level": 3,
-      "kind": "normal"
-    },
-    {
-      "id": "ushtrimi-2-bashkesia-e-pavarur-klika-grafi-dyanesor",
-      "title": "Ushtrimi 2: Bashkesia e Pavarur, Klika & Grafi Dyanesor",
+      "id": "ushtrimi-2-bashkesia-e-pavarur-klika-dhe-grafi-dyanesor",
+      "title": "Ushtrimi 2 — Bashkësia e Pavarur, Klika dhe Grafi Dyanësor",
       "level": 2,
       "kind": "exercise"
-    },
-    {
-      "id": "menyra-nderto-blu-tab-per-te-kaluar",
-      "title": "Menyra Nderto (blu) — TAB per te kaluar",
-      "level": 3,
-      "kind": "normal"
-    },
-    {
-      "id": "menyra-analizo-portokalli-tab-per-te-kaluar",
-      "title": "Menyra Analizo (portokalli) — TAB per te kaluar",
-      "level": 3,
-      "kind": "normal"
-    },
-    {
-      "id": "provoni",
-      "title": "Provoni:",
-      "level": 3,
-      "kind": "normal"
-    },
-    {
-      "id": "ngjyrat-e-brinjeve-dyanesor",
-      "title": "Ngjyrat e brinjeve (dyanesor):",
-      "level": 3,
-      "kind": "normal"
     },
     {
       "id": "ushtrimi-3-llojet-e-grafeve-me-networkx",
@@ -80,64 +26,34 @@
       "kind": "exercise"
     },
     {
-      "id": "qellimi-2",
-      "title": "Qellimi",
-      "level": 3,
-      "kind": "normal"
-    },
-    {
-      "id": "llojet-qe-do-te-shohim",
-      "title": "Llojet qe do te shohim",
-      "level": 3,
-      "kind": "normal"
-    },
-    {
-      "id": "pyetje-per-diskutim",
-      "title": "Pyetje per diskutim",
-      "level": 3,
-      "kind": "reflect"
-    },
-    {
-      "id": "ushtrimi-4-paraqitja-e-grafeve-liste-dhe-matrice-fqinjesie",
-      "title": "Ushtrimi 4 — Paraqitja e Grafeve: Liste dhe Matrice Fqinjesie",
+      "id": "ushtrimi-4-paraqitja-e-grafeve-lista-dhe-matrica-e-fqinjesise",
+      "title": "Ushtrimi 4 — Paraqitja e Grafeve: Lista dhe Matrica e Fqinjësisë",
       "level": 2,
       "kind": "exercise"
-    },
-    {
-      "id": "dy-menyrat-kryesore-te-paraqitjes",
-      "title": "Dy menyrat kryesore te paraqitjes",
-      "level": 3,
-      "kind": "normal"
-    },
-    {
-      "id": "verejtje-per-digrafet",
-      "title": "Verejtje per digrafet",
-      "level": 3,
-      "kind": "normal"
-    },
-    {
-      "id": "pyetje",
-      "title": "Pyetje",
-      "level": 3,
-      "kind": "normal"
     }
   ],
   "tocFull": [
     {
       "id": "teoria-bazat-e-teorise-se-grafeve",
-      "title": "Teoria — Bazat e Teorise se Grafeve",
+      "title": "Teoria — Bazat e Teorisë së Grafeve",
       "level": 2,
       "kind": "theory"
     },
     {
       "id": "terminologjia-baze",
-      "title": "Terminologjia baze",
+      "title": "Terminologjia bazë",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "fuqia-dhe-lema-e-shtrengimit-te-duarve",
+      "title": "Fuqia dhe lema e shtrëngimit të duarve",
       "level": 3,
       "kind": "normal"
     },
     {
       "id": "llojet-kryesore-te-grafeve",
-      "title": "Llojet kryesore te grafeve",
+      "title": "Llojet kryesore të grafeve",
       "level": 3,
       "kind": "normal"
     },
@@ -154,8 +70,8 @@
       "kind": "normal"
     },
     {
-      "id": "kontrollat",
-      "title": "Kontrollat",
+      "id": "kontrollet",
+      "title": "Kontrollet",
       "level": 3,
       "kind": "normal"
     },
@@ -166,32 +82,32 @@
       "kind": "normal"
     },
     {
-      "id": "ushtrimi-2-bashkesia-e-pavarur-klika-grafi-dyanesor",
-      "title": "Ushtrimi 2: Bashkesia e Pavarur, Klika & Grafi Dyanesor",
+      "id": "ushtrimi-2-bashkesia-e-pavarur-klika-dhe-grafi-dyanesor",
+      "title": "Ushtrimi 2 — Bashkësia e Pavarur, Klika dhe Grafi Dyanësor",
       "level": 2,
       "kind": "exercise"
     },
     {
       "id": "menyra-nderto-blu-tab-per-te-kaluar",
-      "title": "Menyra Nderto (blu) — TAB per te kaluar",
+      "title": "Mënyra Ndërto (blu) — TAB për të kaluar",
       "level": 3,
       "kind": "normal"
     },
     {
       "id": "menyra-analizo-portokalli-tab-per-te-kaluar",
-      "title": "Menyra Analizo (portokalli) — TAB per te kaluar",
+      "title": "Mënyra Analizo (portokalli) — TAB për të kaluar",
       "level": 3,
       "kind": "normal"
     },
     {
       "id": "provoni",
-      "title": "Provoni:",
+      "title": "Provoni",
       "level": 3,
       "kind": "normal"
     },
     {
       "id": "ngjyrat-e-brinjeve-dyanesor",
-      "title": "Ngjyrat e brinjeve (dyanesor):",
+      "title": "Ngjyrat e brinjëve (dyanësor)",
       "level": 3,
       "kind": "normal"
     },
@@ -203,49 +119,55 @@
     },
     {
       "id": "qellimi-2",
-      "title": "Qellimi",
+      "title": "Qëllimi",
       "level": 3,
       "kind": "normal"
     },
     {
       "id": "llojet-qe-do-te-shohim",
-      "title": "Llojet qe do te shohim",
+      "title": "Llojet që do të shohim",
       "level": 3,
       "kind": "normal"
     },
     {
       "id": "pyetje-per-diskutim",
-      "title": "Pyetje per diskutim",
+      "title": "Pyetje për diskutim",
       "level": 3,
       "kind": "reflect"
     },
     {
-      "id": "ushtrimi-4-paraqitja-e-grafeve-liste-dhe-matrice-fqinjesie",
-      "title": "Ushtrimi 4 — Paraqitja e Grafeve: Liste dhe Matrice Fqinjesie",
+      "id": "ushtrimi-4-paraqitja-e-grafeve-lista-dhe-matrica-e-fqinjesise",
+      "title": "Ushtrimi 4 — Paraqitja e Grafeve: Lista dhe Matrica e Fqinjësisë",
       "level": 2,
       "kind": "exercise"
     },
     {
       "id": "dy-menyrat-kryesore-te-paraqitjes",
-      "title": "Dy menyrat kryesore te paraqitjes",
+      "title": "Dy mënyrat kryesore të paraqitjes",
       "level": 3,
       "kind": "normal"
     },
     {
       "id": "1-lista-e-fqinjesise-adjacency-list",
-      "title": "1. Lista e Fqinjesise *(Adjacency List)*",
+      "title": "1. Lista e fqinjësisë *(Adjacency List)*",
       "level": 4,
       "kind": "normal"
     },
     {
       "id": "2-matrica-e-fqinjesise-adjacency-matrix",
-      "title": "2. Matrica e Fqinjesise *(Adjacency Matrix)*",
+      "title": "2. Matrica e fqinjësisë *(Adjacency Matrix)*",
       "level": 4,
       "kind": "normal"
     },
     {
-      "id": "verejtje-per-digrafet",
-      "title": "Verejtje per digrafet",
+      "id": "krahasimi-ne-kohe-jo-vetem-ne-hapesire",
+      "title": "Krahasimi në kohë, jo vetëm në hapësirë",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "verejtje-per-digrafet-dhe-laket",
+      "title": "Vërejtje për digrafet dhe lakët",
       "level": 3,
       "kind": "normal"
     },
@@ -259,17 +181,22 @@
   "sections": [
     {
       "id": "teoria-bazat-e-teorise-se-grafeve",
-      "title": "Teoria — Bazat e Teorise se Grafeve",
+      "title": "Teoria — Bazat e Teorisë së Grafeve",
       "kind": "theory"
     },
     {
       "id": "terminologjia-baze",
-      "title": "Terminologjia baze",
+      "title": "Terminologjia bazë",
+      "kind": "normal"
+    },
+    {
+      "id": "fuqia-dhe-lema-e-shtrengimit-te-duarve",
+      "title": "Fuqia dhe lema e shtrëngimit të duarve",
       "kind": "normal"
     },
     {
       "id": "llojet-kryesore-te-grafeve",
-      "title": "Llojet kryesore te grafeve",
+      "title": "Llojet kryesore të grafeve",
       "kind": "normal"
     },
     {
@@ -283,8 +210,8 @@
       "kind": "normal"
     },
     {
-      "id": "kontrollat",
-      "title": "Kontrollat",
+      "id": "kontrollet",
+      "title": "Kontrollet",
       "kind": "normal"
     },
     {
@@ -293,28 +220,28 @@
       "kind": "normal"
     },
     {
-      "id": "ushtrimi-2-bashkesia-e-pavarur-klika-grafi-dyanesor",
-      "title": "Ushtrimi 2: Bashkesia e Pavarur, Klika & Grafi Dyanesor",
+      "id": "ushtrimi-2-bashkesia-e-pavarur-klika-dhe-grafi-dyanesor",
+      "title": "Ushtrimi 2 — Bashkësia e Pavarur, Klika dhe Grafi Dyanësor",
       "kind": "exercise"
     },
     {
       "id": "menyra-nderto-blu-tab-per-te-kaluar",
-      "title": "Menyra Nderto (blu) — TAB per te kaluar",
+      "title": "Mënyra Ndërto (blu) — TAB për të kaluar",
       "kind": "normal"
     },
     {
       "id": "menyra-analizo-portokalli-tab-per-te-kaluar",
-      "title": "Menyra Analizo (portokalli) — TAB per te kaluar",
+      "title": "Mënyra Analizo (portokalli) — TAB për të kaluar",
       "kind": "normal"
     },
     {
       "id": "provoni",
-      "title": "Provoni:",
+      "title": "Provoni",
       "kind": "normal"
     },
     {
       "id": "ngjyrat-e-brinjeve-dyanesor",
-      "title": "Ngjyrat e brinjeve (dyanesor):",
+      "title": "Ngjyrat e brinjëve (dyanësor)",
       "kind": "normal"
     },
     {
@@ -324,42 +251,47 @@
     },
     {
       "id": "qellimi-2",
-      "title": "Qellimi",
+      "title": "Qëllimi",
       "kind": "normal"
     },
     {
       "id": "llojet-qe-do-te-shohim",
-      "title": "Llojet qe do te shohim",
+      "title": "Llojet që do të shohim",
       "kind": "normal"
     },
     {
       "id": "pyetje-per-diskutim",
-      "title": "Pyetje per diskutim",
+      "title": "Pyetje për diskutim",
       "kind": "reflect"
     },
     {
-      "id": "ushtrimi-4-paraqitja-e-grafeve-liste-dhe-matrice-fqinjesie",
-      "title": "Ushtrimi 4 — Paraqitja e Grafeve: Liste dhe Matrice Fqinjesie",
+      "id": "ushtrimi-4-paraqitja-e-grafeve-lista-dhe-matrica-e-fqinjesise",
+      "title": "Ushtrimi 4 — Paraqitja e Grafeve: Lista dhe Matrica e Fqinjësisë",
       "kind": "exercise"
     },
     {
       "id": "dy-menyrat-kryesore-te-paraqitjes",
-      "title": "Dy menyrat kryesore te paraqitjes",
+      "title": "Dy mënyrat kryesore të paraqitjes",
       "kind": "normal"
     },
     {
       "id": "1-lista-e-fqinjesise-adjacency-list",
-      "title": "1. Lista e Fqinjesise *(Adjacency List)*",
+      "title": "1. Lista e fqinjësisë *(Adjacency List)*",
       "kind": "normal"
     },
     {
       "id": "2-matrica-e-fqinjesise-adjacency-matrix",
-      "title": "2. Matrica e Fqinjesise *(Adjacency Matrix)*",
+      "title": "2. Matrica e fqinjësisë *(Adjacency Matrix)*",
       "kind": "normal"
     },
     {
-      "id": "verejtje-per-digrafet",
-      "title": "Verejtje per digrafet",
+      "id": "krahasimi-ne-kohe-jo-vetem-ne-hapesire",
+      "title": "Krahasimi në kohë, jo vetëm në hapësirë",
+      "kind": "normal"
+    },
+    {
+      "id": "verejtje-per-digrafet-dhe-laket",
+      "title": "Vërejtje për digrafet dhe lakët",
       "kind": "normal"
     },
     {
@@ -372,7 +304,7 @@
     {
       "type": "markdown",
       "kind": "normal",
-      "html": "sha256:dc0f8f9389d3402b",
+      "html": "sha256:1a283930cce8518d",
       "srcIndex": 0,
       "intro": true
     },
@@ -381,10 +313,10 @@
       "kind": "theory",
       "label": "Teori",
       "id": "teoria-bazat-e-teorise-se-grafeve",
-      "heading": "Teoria — Bazat e Teorise se Grafeve",
+      "heading": "Teoria — Bazat e Teorisë së Grafeve",
       "level": 2,
       "redundant": false,
-      "html": "sha256:5c2e06876f5d30b3",
+      "html": "sha256:e4b79db66ac767df",
       "srcIndex": 0
     },
     {
@@ -392,10 +324,21 @@
       "kind": "normal",
       "label": null,
       "id": "terminologjia-baze",
-      "heading": "Terminologjia baze",
+      "heading": "Terminologjia bazë",
       "level": 3,
       "redundant": false,
-      "html": "sha256:0d248da374992d1b",
+      "html": "sha256:8f8d5738a3582399",
+      "srcIndex": 0
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "fuqia-dhe-lema-e-shtrengimit-te-duarve",
+      "heading": "Fuqia dhe lema e shtrëngimit të duarve",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:849fe5c4d8c85e11",
       "srcIndex": 0
     },
     {
@@ -403,10 +346,10 @@
       "kind": "normal",
       "label": null,
       "id": "llojet-kryesore-te-grafeve",
-      "heading": "Llojet kryesore te grafeve",
+      "heading": "Llojet kryesore të grafeve",
       "level": 3,
       "redundant": false,
-      "html": "sha256:f37a918cbdfa3637",
+      "html": "sha256:c0465ea0855d23eb",
       "srcIndex": 0
     },
     {
@@ -428,18 +371,18 @@
       "heading": "Qëllimi",
       "level": 3,
       "redundant": false,
-      "html": "sha256:4b86576f67efa7c3",
+      "html": "sha256:02d57aa1401625bb",
       "srcIndex": 1
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
-      "id": "kontrollat",
-      "heading": "Kontrollat",
+      "id": "kontrollet",
+      "heading": "Kontrollet",
       "level": 3,
       "redundant": false,
-      "html": "sha256:64e7e6507cd96d96",
+      "html": "sha256:afd04f524387d60f",
       "srcIndex": 1
     },
     {
@@ -450,7 +393,7 @@
       "heading": "Çfarë të vëzhgoni",
       "level": 3,
       "redundant": false,
-      "html": "sha256:43ac13d468b9e2c1",
+      "html": "sha256:31f3c2f4a256fc35",
       "srcIndex": 1
     },
     {
@@ -500,11 +443,11 @@
       "type": "markdown",
       "kind": "exercise",
       "label": "Ushtrim",
-      "id": "ushtrimi-2-bashkesia-e-pavarur-klika-grafi-dyanesor",
-      "heading": "Ushtrimi 2: Bashkesia e Pavarur, Klika & Grafi Dyanesor",
+      "id": "ushtrimi-2-bashkesia-e-pavarur-klika-dhe-grafi-dyanesor",
+      "heading": "Ushtrimi 2 — Bashkësia e Pavarur, Klika dhe Grafi Dyanësor",
       "level": 2,
       "redundant": false,
-      "html": "sha256:e025b98ad5071752",
+      "html": "sha256:0e16a83e7f13fe55",
       "srcIndex": 3
     },
     {
@@ -512,10 +455,10 @@
       "kind": "normal",
       "label": null,
       "id": "menyra-nderto-blu-tab-per-te-kaluar",
-      "heading": "Menyra Nderto (blu) — TAB per te kaluar",
+      "heading": "Mënyra Ndërto (blu) — TAB për të kaluar",
       "level": 3,
       "redundant": false,
-      "html": "sha256:fa49842cb17a4796",
+      "html": "sha256:bda535ccd1952117",
       "srcIndex": 3
     },
     {
@@ -523,10 +466,10 @@
       "kind": "normal",
       "label": null,
       "id": "menyra-analizo-portokalli-tab-per-te-kaluar",
-      "heading": "Menyra Analizo (portokalli) — TAB per te kaluar",
+      "heading": "Mënyra Analizo (portokalli) — TAB për të kaluar",
       "level": 3,
       "redundant": false,
-      "html": "sha256:3f97c07d67ffd59b",
+      "html": "sha256:6443f59f251d4c6c",
       "srcIndex": 3
     },
     {
@@ -534,10 +477,10 @@
       "kind": "normal",
       "label": null,
       "id": "provoni",
-      "heading": "Provoni:",
+      "heading": "Provoni",
       "level": 3,
       "redundant": false,
-      "html": "sha256:f16994fbe0598470",
+      "html": "sha256:44da62e5e3bc638b",
       "srcIndex": 3
     },
     {
@@ -545,10 +488,10 @@
       "kind": "normal",
       "label": null,
       "id": "ngjyrat-e-brinjeve-dyanesor",
-      "heading": "Ngjyrat e brinjeve (dyanesor):",
+      "heading": "Ngjyrat e brinjëve (dyanësor)",
       "level": 3,
       "redundant": false,
-      "html": "sha256:53e363017c402d19",
+      "html": "sha256:696893d000177dd9",
       "srcIndex": 3
     },
     {
@@ -624,10 +567,10 @@
       "kind": "normal",
       "label": null,
       "id": "qellimi-2",
-      "heading": "Qellimi",
+      "heading": "Qëllimi",
       "level": 3,
       "redundant": false,
-      "html": "sha256:2495bb514a9590b8",
+      "html": "sha256:abaf4e2353600453",
       "srcIndex": 5
     },
     {
@@ -635,10 +578,10 @@
       "kind": "normal",
       "label": null,
       "id": "llojet-qe-do-te-shohim",
-      "heading": "Llojet qe do te shohim",
+      "heading": "Llojet që do të shohim",
       "level": 3,
       "redundant": false,
-      "html": "sha256:290658ef96e8de89",
+      "html": "sha256:7ae9b59436f6be3d",
       "srcIndex": 5
     },
     {
@@ -646,10 +589,10 @@
       "kind": "reflect",
       "label": "Pyetje Reflektuese",
       "id": "pyetje-per-diskutim",
-      "heading": "Pyetje per diskutim",
+      "heading": "Pyetje për diskutim",
       "level": 3,
       "redundant": false,
-      "html": "sha256:2538960d4e7a26ee",
+      "html": "sha256:98a9c7a35cc46c6c",
       "srcIndex": 5
     },
     {
@@ -696,8 +639,8 @@
       "type": "markdown",
       "kind": "exercise",
       "label": "Ushtrim",
-      "id": "ushtrimi-4-paraqitja-e-grafeve-liste-dhe-matrice-fqinjesie",
-      "heading": "Ushtrimi 4 — Paraqitja e Grafeve: Liste dhe Matrice Fqinjesie",
+      "id": "ushtrimi-4-paraqitja-e-grafeve-lista-dhe-matrica-e-fqinjesise",
+      "heading": "Ushtrimi 4 — Paraqitja e Grafeve: Lista dhe Matrica e Fqinjësisë",
       "level": 2,
       "redundant": false,
       "html": "sha256:e3b0c44298fc1c14",
@@ -708,10 +651,10 @@
       "kind": "normal",
       "label": null,
       "id": "dy-menyrat-kryesore-te-paraqitjes",
-      "heading": "Dy menyrat kryesore te paraqitjes",
+      "heading": "Dy mënyrat kryesore të paraqitjes",
       "level": 3,
       "redundant": false,
-      "html": "sha256:10f77af30c00dfe9",
+      "html": "sha256:2012a63b2b81c2d5",
       "srcIndex": 7
     },
     {
@@ -719,10 +662,10 @@
       "kind": "normal",
       "label": null,
       "id": "1-lista-e-fqinjesise-adjacency-list",
-      "heading": "1. Lista e Fqinjesise *(Adjacency List)*",
+      "heading": "1. Lista e fqinjësisë *(Adjacency List)*",
       "level": 4,
       "redundant": false,
-      "html": "sha256:9222cbf6fd3b2722",
+      "html": "sha256:c9e5748591d6edc2",
       "srcIndex": 7
     },
     {
@@ -730,21 +673,32 @@
       "kind": "normal",
       "label": null,
       "id": "2-matrica-e-fqinjesise-adjacency-matrix",
-      "heading": "2. Matrica e Fqinjesise *(Adjacency Matrix)*",
+      "heading": "2. Matrica e fqinjësisë *(Adjacency Matrix)*",
       "level": 4,
       "redundant": false,
-      "html": "sha256:798d3ed0cc20cf07",
+      "html": "sha256:6c3863c7cdc78364",
       "srcIndex": 7
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
-      "id": "verejtje-per-digrafet",
-      "heading": "Verejtje per digrafet",
+      "id": "krahasimi-ne-kohe-jo-vetem-ne-hapesire",
+      "heading": "Krahasimi në kohë, jo vetëm në hapësirë",
       "level": 3,
       "redundant": false,
-      "html": "sha256:4edfb033ed8adfb4",
+      "html": "sha256:90daba285089ae91",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "verejtje-per-digrafet-dhe-laket",
+      "heading": "Vërejtje për digrafet dhe lakët",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:9213da18e2db3dc2",
       "srcIndex": 7
     },
     {
@@ -755,7 +709,7 @@
       "heading": "Pyetje",
       "level": 3,
       "redundant": false,
-      "html": "sha256:9ed0a7e5b8cad4f0",
+      "html": "sha256:68cf879f7ae958e6",
       "srcIndex": 7
     },
     {
@@ -806,9 +760,9 @@
   },
   "missingScripts": [],
   "stats": {
-    "cells": 10,
+    "cells": 9,
     "markdown": 5,
-    "code": 5,
+    "code": 4,
     "codeLines": 1100
   },
   "hasEmbeddedHomework": false,

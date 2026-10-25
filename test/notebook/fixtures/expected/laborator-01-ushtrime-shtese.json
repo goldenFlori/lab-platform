@@ -62,6 +62,12 @@
       "kind": "exercise"
     },
     {
+      "id": "ushtrimi-6-qendrueshmeria-kush-del-i-pari-kur-notat-jane-te-barabarta",
+      "title": "Ushtrimi 6 — Qëndrueshmëria: kush del i pari kur notat janë të barabarta?",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
       "id": "pune-ne-klase",
       "title": "Punë në Klasë",
       "level": 2,
@@ -136,6 +142,12 @@
       "kind": "exercise"
     },
     {
+      "id": "ushtrimi-6-qendrueshmeria-kush-del-i-pari-kur-notat-jane-te-barabarta",
+      "title": "Ushtrimi 6 — Qëndrueshmëria: kush del i pari kur notat janë të barabarta?",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
       "id": "pune-ne-klase",
       "title": "Punë në Klasë",
       "level": 2,
@@ -197,6 +209,11 @@
     {
       "id": "ushtrimi-5-selection-sort-nen-te-njejten-lupe",
       "title": "Ushtrimi 5 — Selection Sort nën të njëjtën lupë",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-6-qendrueshmeria-kush-del-i-pari-kur-notat-jane-te-barabarta",
+      "title": "Ushtrimi 6 — Qëndrueshmëria: kush del i pari kur notat janë të barabarta?",
       "kind": "exercise"
     },
     {
@@ -623,6 +640,67 @@
     },
     {
       "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-6-qendrueshmeria-kush-del-i-pari-kur-notat-jane-te-barabarta",
+      "heading": "Ushtrimi 6 — Qëndrueshmëria: kush del i pari kur notat janë të barabarta?",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:f2ca96b0fd92e129",
+      "srcIndex": 24
+    },
+    {
+      "type": "code",
+      "srcIndex": 25,
+      "interactive": false,
+      "html": "sha256:e2880869a0ef3fed",
+      "raw": "sha256:c2d8812bf7494b9d",
+      "lines": 27,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 26,
+      "interactive": false,
+      "html": "sha256:001884ab845aa96e",
+      "raw": "sha256:284887ec069a6f55",
+      "lines": 15,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:9da72ed48b2ee56a",
+      "srcIndex": 27
+    },
+    {
+      "type": "markdown",
       "kind": "classwork",
       "label": "Punë në Klasë",
       "id": "pune-ne-klase",
@@ -630,7 +708,7 @@
       "level": 2,
       "redundant": false,
       "html": "sha256:3f0d576b584d7cbe",
-      "srcIndex": 24
+      "srcIndex": 28
     },
     {
       "type": "markdown",
@@ -641,7 +719,7 @@
       "level": 2,
       "redundant": false,
       "html": "sha256:edf402f01d5a7933",
-      "srcIndex": 25
+      "srcIndex": 29
     }
   ],
   "imports": ["inspect", "itertools", "plotly", "random"],
@@ -657,10 +735,10 @@
   },
   "missingScripts": [],
   "stats": {
-    "cells": 26,
-    "markdown": 15,
-    "code": 11,
-    "codeLines": 192
+    "cells": 30,
+    "markdown": 17,
+    "code": 13,
+    "codeLines": 234
   },
   "hasEmbeddedHomework": false,
   "hasClasswork": true,

@@ -21,12 +21,6 @@
     },
     {
       "id": "ushtrimi-3-pema-perfshirese-minimum-kruskal-dhe-prim",
-      "title": "Ushtrimi 3 — Pema Perfshirese Minimum: Kruskal dhe Prim",
-      "level": 2,
-      "kind": "exercise"
-    },
-    {
-      "id": "ushtrimi-3-pema-perfshirese-minimum-kruskal-dhe-prim-2",
       "title": "Ushtrimi 3 — Pema Përfshirëse Minimum: Kruskal dhe Prim",
       "level": 2,
       "kind": "exercise"
@@ -45,7 +39,7 @@
     },
     {
       "id": "ushtrimi-6-renditjet-topologjike-loje-interaktive",
-      "title": "Ushtrimi 6 — Renditjet Topologjike: Loje Interaktive",
+      "title": "Ushtrimi 6 — Renditjet Topologjike: Lojë Interaktive",
       "level": 2,
       "kind": "exercise"
     },
@@ -64,6 +58,12 @@
     {
       "id": "pune-ne-klase-problemi-2-pema-perfshirese-minimum-me-algoritmin-e-krus",
       "title": "Punë në Klasë — Problemi 2: Pema Përfshirëse Minimum me Algoritmin e Kruskalit",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pune-ne-klase-problemi-3-pema-perfshirese-minimum-me-algoritmin-e-prim",
+      "title": "Punë në Klasë — Problemi 3: Pema Përfshirëse Minimum me Algoritmin e Prim-it",
       "level": 2,
       "kind": "classwork"
     },
@@ -149,13 +149,13 @@
     },
     {
       "id": "ushtrimi-3-pema-perfshirese-minimum-kruskal-dhe-prim",
-      "title": "Ushtrimi 3 — Pema Perfshirese Minimum: Kruskal dhe Prim",
+      "title": "Ushtrimi 3 — Pema Përfshirëse Minimum: Kruskal dhe Prim",
       "level": 2,
       "kind": "exercise"
     },
     {
       "id": "cfare-eshte-nje-peme-perfshirese",
-      "title": "Çfarë është një Pemë Perfshirese?",
+      "title": "Çfarë është një pemë përfshirëse?",
       "level": 3,
       "kind": "normal"
     },
@@ -178,6 +178,12 @@
       "kind": "normal"
     },
     {
+      "id": "pse-funksionojne-vetia-e-prerjes",
+      "title": "Pse funksionojnë: vetia e prerjes",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
       "id": "zbatimet-ne-boten-reale-te-mst",
       "title": "Zbatimet në Botën Reale të MST",
       "level": 3,
@@ -190,12 +196,6 @@
       "kind": "normal"
     },
     {
-      "id": "ushtrimi-3-pema-perfshirese-minimum-kruskal-dhe-prim-2",
-      "title": "Ushtrimi 3 — Pema Përfshirëse Minimum: Kruskal dhe Prim",
-      "level": 2,
-      "kind": "exercise"
-    },
-    {
       "id": "ushtrimi-4-komponentet-e-lidhura-fort",
       "title": "Ushtrimi 4 — Komponentet e Lidhura Fort",
       "level": 2,
@@ -203,7 +203,7 @@
     },
     {
       "id": "cfare-jane-komponentet-e-lidhura-fort",
-      "title": "Cfare jane Komponentet e Lidhura Fort?",
+      "title": "Çfarë janë komponentet e lidhura fort?",
       "level": 3,
       "kind": "normal"
     },
@@ -214,20 +214,26 @@
       "kind": "normal"
     },
     {
-      "id": "pronat-kryesore",
-      "title": "Pronat kryesore",
+      "id": "vetite-kryesore",
+      "title": "Vetitë kryesore",
       "level": 3,
       "kind": "normal"
     },
     {
-      "id": "zbatimet-ne-boten-reale",
-      "title": "Zbatimet ne boten reale",
+      "id": "zbatime-ne-boten-reale",
+      "title": "Zbatime në botën reale",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "si-i-gjejme-te-gjitha-klf-te",
+      "title": "Si i gjejmë të gjitha KLF-të?",
       "level": 3,
       "kind": "normal"
     },
     {
       "id": "cfare-ben-ky-ushtrim-2",
-      "title": "Cfare ben ky ushtrim",
+      "title": "Çfarë bën ky ushtrim",
       "level": 3,
       "kind": "normal"
     },
@@ -239,61 +245,67 @@
     },
     {
       "id": "cfare-eshte-renditja-topologjike",
-      "title": "Cfare eshte Renditja Topologjike?",
+      "title": "Çfarë është renditja topologjike?",
       "level": 3,
       "kind": "normal"
     },
     {
-      "id": "kushti-i-domosdoshem-grafu-nuk-duhet-te-kete-cikle",
-      "title": "Kushti i domosdoshem: grafu nuk duhet te kete cikle",
+      "id": "kushti-i-domosdoshem-grafi-nuk-duhet-te-kete-cikle",
+      "title": "Kushti i domosdoshëm: grafi nuk duhet të ketë cikle",
       "level": 3,
       "kind": "normal"
     },
     {
       "id": "shembull-intuitiv-varesite-e-lendeve",
-      "title": "Shembull intuitiv: varesitë e lendeve",
+      "title": "Shembull intuitiv: varësitë e lëndëve",
       "level": 3,
       "kind": "normal"
     },
     {
-      "id": "pronat-kryesore-2",
-      "title": "Pronat kryesore",
+      "id": "vetite-kryesore-2",
+      "title": "Vetitë kryesore",
       "level": 3,
       "kind": "normal"
     },
     {
-      "id": "zbatimet-ne-boten-reale-2",
-      "title": "Zbatimet ne boten reale",
+      "id": "zbatime-ne-boten-reale-2",
+      "title": "Zbatime në botën reale",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "si-e-gjen-nje-program-renditjen-algoritmi-i-kahn-it-o-v-e",
+      "title": "Si e gjen një program renditjen? Algoritmi i Kahn-it — $O(V+E)$",
       "level": 3,
       "kind": "normal"
     },
     {
       "id": "cfare-ben-ky-ushtrim-3",
-      "title": "Cfare ben ky ushtrim",
+      "title": "Çfarë bën ky ushtrim",
       "level": 3,
       "kind": "normal"
     },
     {
       "id": "ushtrimi-6-renditjet-topologjike-loje-interaktive",
-      "title": "Ushtrimi 6 — Renditjet Topologjike: Loje Interaktive",
+      "title": "Ushtrimi 6 — Renditjet Topologjike: Lojë Interaktive",
       "level": 2,
       "kind": "exercise"
     },
     {
       "id": "cfare-ben-ky-ushtrim-4",
-      "title": "Cfare ben ky ushtrim",
+      "title": "Çfarë bën ky ushtrim",
       "level": 3,
       "kind": "normal"
     },
     {
       "id": "faza-1-nderto-grafin",
-      "title": "Faza 1 — Nderto Grafin",
+      "title": "Faza 1 — Ndërto grafin",
       "level": 3,
       "kind": "normal"
     },
     {
       "id": "faza-2-luaj-lojen",
-      "title": "Faza 2 — Luaj Lojën",
+      "title": "Faza 2 — Luaj lojën",
       "level": 3,
       "kind": "normal"
     },
@@ -304,8 +316,8 @@
       "kind": "normal"
     },
     {
-      "id": "cfare-te-veshgosh",
-      "title": "Cfare te veshgosh",
+      "id": "cfare-te-vezhgoni",
+      "title": "Çfarë të vëzhgoni",
       "level": 3,
       "kind": "normal"
     },
@@ -324,6 +336,12 @@
     {
       "id": "pune-ne-klase-problemi-2-pema-perfshirese-minimum-me-algoritmin-e-krus",
       "title": "Punë në Klasë — Problemi 2: Pema Përfshirëse Minimum me Algoritmin e Kruskalit",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pune-ne-klase-problemi-3-pema-perfshirese-minimum-me-algoritmin-e-prim",
+      "title": "Punë në Klasë — Problemi 3: Pema Përfshirëse Minimum me Algoritmin e Prim-it",
       "level": 2,
       "kind": "classwork"
     },
@@ -400,12 +418,12 @@
     },
     {
       "id": "ushtrimi-3-pema-perfshirese-minimum-kruskal-dhe-prim",
-      "title": "Ushtrimi 3 — Pema Perfshirese Minimum: Kruskal dhe Prim",
+      "title": "Ushtrimi 3 — Pema Përfshirëse Minimum: Kruskal dhe Prim",
       "kind": "exercise"
     },
     {
       "id": "cfare-eshte-nje-peme-perfshirese",
-      "title": "Çfarë është një Pemë Perfshirese?",
+      "title": "Çfarë është një pemë përfshirëse?",
       "kind": "normal"
     },
     {
@@ -424,6 +442,11 @@
       "kind": "normal"
     },
     {
+      "id": "pse-funksionojne-vetia-e-prerjes",
+      "title": "Pse funksionojnë: vetia e prerjes",
+      "kind": "normal"
+    },
+    {
       "id": "zbatimet-ne-boten-reale-te-mst",
       "title": "Zbatimet në Botën Reale të MST",
       "kind": "normal"
@@ -434,18 +457,13 @@
       "kind": "normal"
     },
     {
-      "id": "ushtrimi-3-pema-perfshirese-minimum-kruskal-dhe-prim-2",
-      "title": "Ushtrimi 3 — Pema Përfshirëse Minimum: Kruskal dhe Prim",
-      "kind": "exercise"
-    },
-    {
       "id": "ushtrimi-4-komponentet-e-lidhura-fort",
       "title": "Ushtrimi 4 — Komponentet e Lidhura Fort",
       "kind": "exercise"
     },
     {
       "id": "cfare-jane-komponentet-e-lidhura-fort",
-      "title": "Cfare jane Komponentet e Lidhura Fort?",
+      "title": "Çfarë janë komponentet e lidhura fort?",
       "kind": "normal"
     },
     {
@@ -454,18 +472,23 @@
       "kind": "normal"
     },
     {
-      "id": "pronat-kryesore",
-      "title": "Pronat kryesore",
+      "id": "vetite-kryesore",
+      "title": "Vetitë kryesore",
       "kind": "normal"
     },
     {
-      "id": "zbatimet-ne-boten-reale",
-      "title": "Zbatimet ne boten reale",
+      "id": "zbatime-ne-boten-reale",
+      "title": "Zbatime në botën reale",
+      "kind": "normal"
+    },
+    {
+      "id": "si-i-gjejme-te-gjitha-klf-te",
+      "title": "Si i gjejmë të gjitha KLF-të?",
       "kind": "normal"
     },
     {
       "id": "cfare-ben-ky-ushtrim-2",
-      "title": "Cfare ben ky ushtrim",
+      "title": "Çfarë bën ky ushtrim",
       "kind": "normal"
     },
     {
@@ -475,52 +498,57 @@
     },
     {
       "id": "cfare-eshte-renditja-topologjike",
-      "title": "Cfare eshte Renditja Topologjike?",
+      "title": "Çfarë është renditja topologjike?",
       "kind": "normal"
     },
     {
-      "id": "kushti-i-domosdoshem-grafu-nuk-duhet-te-kete-cikle",
-      "title": "Kushti i domosdoshem: grafu nuk duhet te kete cikle",
+      "id": "kushti-i-domosdoshem-grafi-nuk-duhet-te-kete-cikle",
+      "title": "Kushti i domosdoshëm: grafi nuk duhet të ketë cikle",
       "kind": "normal"
     },
     {
       "id": "shembull-intuitiv-varesite-e-lendeve",
-      "title": "Shembull intuitiv: varesitë e lendeve",
+      "title": "Shembull intuitiv: varësitë e lëndëve",
       "kind": "normal"
     },
     {
-      "id": "pronat-kryesore-2",
-      "title": "Pronat kryesore",
+      "id": "vetite-kryesore-2",
+      "title": "Vetitë kryesore",
       "kind": "normal"
     },
     {
-      "id": "zbatimet-ne-boten-reale-2",
-      "title": "Zbatimet ne boten reale",
+      "id": "zbatime-ne-boten-reale-2",
+      "title": "Zbatime në botën reale",
+      "kind": "normal"
+    },
+    {
+      "id": "si-e-gjen-nje-program-renditjen-algoritmi-i-kahn-it-o-v-e",
+      "title": "Si e gjen një program renditjen? Algoritmi i Kahn-it — $O(V+E)$",
       "kind": "normal"
     },
     {
       "id": "cfare-ben-ky-ushtrim-3",
-      "title": "Cfare ben ky ushtrim",
+      "title": "Çfarë bën ky ushtrim",
       "kind": "normal"
     },
     {
       "id": "ushtrimi-6-renditjet-topologjike-loje-interaktive",
-      "title": "Ushtrimi 6 — Renditjet Topologjike: Loje Interaktive",
+      "title": "Ushtrimi 6 — Renditjet Topologjike: Lojë Interaktive",
       "kind": "exercise"
     },
     {
       "id": "cfare-ben-ky-ushtrim-4",
-      "title": "Cfare ben ky ushtrim",
+      "title": "Çfarë bën ky ushtrim",
       "kind": "normal"
     },
     {
       "id": "faza-1-nderto-grafin",
-      "title": "Faza 1 — Nderto Grafin",
+      "title": "Faza 1 — Ndërto grafin",
       "kind": "normal"
     },
     {
       "id": "faza-2-luaj-lojen",
-      "title": "Faza 2 — Luaj Lojën",
+      "title": "Faza 2 — Luaj lojën",
       "kind": "normal"
     },
     {
@@ -529,8 +557,8 @@
       "kind": "normal"
     },
     {
-      "id": "cfare-te-veshgosh",
-      "title": "Cfare te veshgosh",
+      "id": "cfare-te-vezhgoni",
+      "title": "Çfarë të vëzhgoni",
       "kind": "normal"
     },
     {
@@ -546,6 +574,11 @@
     {
       "id": "pune-ne-klase-problemi-2-pema-perfshirese-minimum-me-algoritmin-e-krus",
       "title": "Punë në Klasë — Problemi 2: Pema Përfshirëse Minimum me Algoritmin e Kruskalit",
+      "kind": "classwork"
+    },
+    {
+      "id": "pune-ne-klase-problemi-3-pema-perfshirese-minimum-me-algoritmin-e-prim",
+      "title": "Punë në Klasë — Problemi 3: Pema Përfshirëse Minimum me Algoritmin e Prim-it",
       "kind": "classwork"
     },
     {
@@ -661,19 +694,8 @@
       "srcIndex": 1
     },
     {
-      "type": "markdown",
-      "kind": "exercise",
-      "label": "Ushtrim",
-      "id": "ushtrimi-1-zgjidhja-e-labirintit-me-bfs-dhe-dfs-2",
-      "heading": null,
-      "level": 2,
-      "redundant": true,
-      "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 2
-    },
-    {
       "type": "code",
-      "srcIndex": 3,
+      "srcIndex": 2,
       "interactive": true,
       "html": "sha256:2229183defe9d020",
       "raw": "sha256:ff6d43e57c435934",
@@ -754,7 +776,7 @@
       "type": "markdown",
       "kind": "normal",
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 4
+      "srcIndex": 3
     },
     {
       "type": "markdown",
@@ -765,7 +787,7 @@
       "level": 2,
       "redundant": false,
       "html": "sha256:425226574aac0e4e",
-      "srcIndex": 4
+      "srcIndex": 3
     },
     {
       "type": "markdown",
@@ -776,22 +798,11 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:96be3e7f85bb21d3",
-      "srcIndex": 4
-    },
-    {
-      "type": "markdown",
-      "kind": "exercise",
-      "label": "Ushtrim",
-      "id": "ushtrimi-2-ndertimi-interaktiv-i-grafit-me-bfs-dhe-dfs-2",
-      "heading": null,
-      "level": 2,
-      "redundant": true,
-      "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 5
+      "srcIndex": 3
     },
     {
       "type": "code",
-      "srcIndex": 6,
+      "srcIndex": 4,
       "interactive": true,
       "html": "sha256:9eac1a7ad3c34952",
       "raw": "sha256:777dc4c0db9a768f",
@@ -872,29 +883,29 @@
       "type": "markdown",
       "kind": "normal",
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 7
+      "srcIndex": 5
     },
     {
       "type": "markdown",
       "kind": "exercise",
       "label": "Ushtrim",
       "id": "ushtrimi-3-pema-perfshirese-minimum-kruskal-dhe-prim",
-      "heading": "Ushtrimi 3 — Pema Perfshirese Minimum: Kruskal dhe Prim",
+      "heading": "Ushtrimi 3 — Pema Përfshirëse Minimum: Kruskal dhe Prim",
       "level": 2,
       "redundant": false,
       "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 7
+      "srcIndex": 5
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
       "id": "cfare-eshte-nje-peme-perfshirese",
-      "heading": "Çfarë është një Pemë Perfshirese?",
+      "heading": "Çfarë është një pemë përfshirëse?",
       "level": 3,
       "redundant": false,
-      "html": "sha256:aa93afa37f074e46",
-      "srcIndex": 7
+      "html": "sha256:f70a4fbffb467f1e",
+      "srcIndex": 5
     },
     {
       "type": "markdown",
@@ -905,7 +916,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:e9b472cf0b94aee8",
-      "srcIndex": 7
+      "srcIndex": 5
     },
     {
       "type": "markdown",
@@ -916,7 +927,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:22c73411a70eaf93",
-      "srcIndex": 7
+      "srcIndex": 5
     },
     {
       "type": "markdown",
@@ -927,7 +938,18 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:7b62c2fa4cdc7a52",
-      "srcIndex": 7
+      "srcIndex": 5
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "pse-funksionojne-vetia-e-prerjes",
+      "heading": "Pse funksionojnë: vetia e prerjes",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:bdf962cfea206b54",
+      "srcIndex": 5
     },
     {
       "type": "markdown",
@@ -938,7 +960,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:c38dba65c85ab753",
-      "srcIndex": 7
+      "srcIndex": 5
     },
     {
       "type": "markdown",
@@ -949,22 +971,11 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:4fee2c2b5ccebe32",
-      "srcIndex": 7
-    },
-    {
-      "type": "markdown",
-      "kind": "exercise",
-      "label": "Ushtrim",
-      "id": "ushtrimi-3-pema-perfshirese-minimum-kruskal-dhe-prim-2",
-      "heading": "Ushtrimi 3 — Pema Përfshirëse Minimum: Kruskal dhe Prim",
-      "level": 2,
-      "redundant": false,
-      "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 8
+      "srcIndex": 5
     },
     {
       "type": "code",
-      "srcIndex": 9,
+      "srcIndex": 6,
       "interactive": true,
       "html": "sha256:ffc81eb44d1bee72",
       "raw": "sha256:9698173a33df11ea",
@@ -1045,7 +1056,7 @@
       "type": "markdown",
       "kind": "normal",
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 10
+      "srcIndex": 7
     },
     {
       "type": "markdown",
@@ -1056,18 +1067,18 @@
       "level": 2,
       "redundant": false,
       "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 10
+      "srcIndex": 7
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
       "id": "cfare-jane-komponentet-e-lidhura-fort",
-      "heading": "Cfare jane Komponentet e Lidhura Fort?",
+      "heading": "Çfarë janë komponentet e lidhura fort?",
       "level": 3,
       "redundant": false,
-      "html": "sha256:358ba97ebd9b66d6",
-      "srcIndex": 10
+      "html": "sha256:afe28d0fd8c9ea46",
+      "srcIndex": 7
     },
     {
       "type": "markdown",
@@ -1077,56 +1088,56 @@
       "heading": "Shembull intuitiv",
       "level": 3,
       "redundant": false,
-      "html": "sha256:fb5df9b6b7647e85",
-      "srcIndex": 10
+      "html": "sha256:57e251d6f6c8a4ef",
+      "srcIndex": 7
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
-      "id": "pronat-kryesore",
-      "heading": "Pronat kryesore",
+      "id": "vetite-kryesore",
+      "heading": "Vetitë kryesore",
       "level": 3,
       "redundant": false,
-      "html": "sha256:c88adea0b9e6961a",
-      "srcIndex": 10
+      "html": "sha256:e77997be50772b05",
+      "srcIndex": 7
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
-      "id": "zbatimet-ne-boten-reale",
-      "heading": "Zbatimet ne boten reale",
+      "id": "zbatime-ne-boten-reale",
+      "heading": "Zbatime në botën reale",
       "level": 3,
       "redundant": false,
-      "html": "sha256:becfd6b2a9cb8dd8",
-      "srcIndex": 10
+      "html": "sha256:a62a427b016fc8a8",
+      "srcIndex": 7
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "si-i-gjejme-te-gjitha-klf-te",
+      "heading": "Si i gjejmë të gjitha KLF-të?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:8b96c00658750511",
+      "srcIndex": 7
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
       "id": "cfare-ben-ky-ushtrim-2",
-      "heading": "Cfare ben ky ushtrim",
+      "heading": "Çfarë bën ky ushtrim",
       "level": 3,
       "redundant": false,
-      "html": "sha256:4f5df0e421a75af8",
-      "srcIndex": 10
-    },
-    {
-      "type": "markdown",
-      "kind": "exercise",
-      "label": "Ushtrim",
-      "id": "ushtrimi-4-komponentet-e-lidhura-fort-2",
-      "heading": null,
-      "level": 2,
-      "redundant": true,
-      "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 11
+      "html": "sha256:37d8006e95675cd3",
+      "srcIndex": 7
     },
     {
       "type": "code",
-      "srcIndex": 12,
+      "srcIndex": 8,
       "interactive": true,
       "html": "sha256:46be00f9044e9c1f",
       "raw": "sha256:1003118597b7fbd8",
@@ -1207,7 +1218,7 @@
       "type": "markdown",
       "kind": "normal",
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 13
+      "srcIndex": 9
     },
     {
       "type": "markdown",
@@ -1218,88 +1229,88 @@
       "level": 2,
       "redundant": false,
       "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 13
+      "srcIndex": 9
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
       "id": "cfare-eshte-renditja-topologjike",
-      "heading": "Cfare eshte Renditja Topologjike?",
+      "heading": "Çfarë është renditja topologjike?",
       "level": 3,
       "redundant": false,
-      "html": "sha256:9e756f5e59d512ff",
-      "srcIndex": 13
+      "html": "sha256:38976a45486766fe",
+      "srcIndex": 9
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
-      "id": "kushti-i-domosdoshem-grafu-nuk-duhet-te-kete-cikle",
-      "heading": "Kushti i domosdoshem: grafu nuk duhet te kete cikle",
+      "id": "kushti-i-domosdoshem-grafi-nuk-duhet-te-kete-cikle",
+      "heading": "Kushti i domosdoshëm: grafi nuk duhet të ketë cikle",
       "level": 3,
       "redundant": false,
-      "html": "sha256:760822f1e0e4e1fa",
-      "srcIndex": 13
+      "html": "sha256:be58865fd1985d99",
+      "srcIndex": 9
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
       "id": "shembull-intuitiv-varesite-e-lendeve",
-      "heading": "Shembull intuitiv: varesitë e lendeve",
+      "heading": "Shembull intuitiv: varësitë e lëndëve",
       "level": 3,
       "redundant": false,
-      "html": "sha256:2a9f79fca8abb02a",
-      "srcIndex": 13
+      "html": "sha256:92cfbe9f1536e62f",
+      "srcIndex": 9
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
-      "id": "pronat-kryesore-2",
-      "heading": "Pronat kryesore",
+      "id": "vetite-kryesore-2",
+      "heading": "Vetitë kryesore",
       "level": 3,
       "redundant": false,
-      "html": "sha256:1c60cd9c5395057f",
-      "srcIndex": 13
+      "html": "sha256:1a7069ae92f1b6b6",
+      "srcIndex": 9
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
-      "id": "zbatimet-ne-boten-reale-2",
-      "heading": "Zbatimet ne boten reale",
+      "id": "zbatime-ne-boten-reale-2",
+      "heading": "Zbatime në botën reale",
       "level": 3,
       "redundant": false,
-      "html": "sha256:8c0fd8f46449c560",
-      "srcIndex": 13
+      "html": "sha256:69757c52e53cf732",
+      "srcIndex": 9
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "si-e-gjen-nje-program-renditjen-algoritmi-i-kahn-it-o-v-e",
+      "heading": "Si e gjen një program renditjen? Algoritmi i Kahn-it — $O(V+E)$",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:abc713a68f11ad93",
+      "srcIndex": 9
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
       "id": "cfare-ben-ky-ushtrim-3",
-      "heading": "Cfare ben ky ushtrim",
+      "heading": "Çfarë bën ky ushtrim",
       "level": 3,
       "redundant": false,
-      "html": "sha256:e2604d6987f31403",
-      "srcIndex": 13
-    },
-    {
-      "type": "markdown",
-      "kind": "exercise",
-      "label": "Ushtrim",
-      "id": "ushtrimi-5-renditjet-topologjike-2",
-      "heading": null,
-      "level": 2,
-      "redundant": true,
-      "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 14
+      "html": "sha256:9fd79a8c1c353cb7",
+      "srcIndex": 9
     },
     {
       "type": "code",
-      "srcIndex": 15,
+      "srcIndex": 10,
       "interactive": true,
       "html": "sha256:fca9db3809c2a142",
       "raw": "sha256:09a086aeb3268cb7",
@@ -1356,51 +1367,51 @@
       "type": "markdown",
       "kind": "normal",
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 16
+      "srcIndex": 11
     },
     {
       "type": "markdown",
       "kind": "exercise",
       "label": "Ushtrim",
       "id": "ushtrimi-6-renditjet-topologjike-loje-interaktive",
-      "heading": "Ushtrimi 6 — Renditjet Topologjike: Loje Interaktive",
+      "heading": "Ushtrimi 6 — Renditjet Topologjike: Lojë Interaktive",
       "level": 2,
       "redundant": false,
       "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 16
+      "srcIndex": 11
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
       "id": "cfare-ben-ky-ushtrim-4",
-      "heading": "Cfare ben ky ushtrim",
+      "heading": "Çfarë bën ky ushtrim",
       "level": 3,
       "redundant": false,
-      "html": "sha256:469042d36927611b",
-      "srcIndex": 16
+      "html": "sha256:b674a884a284bd1b",
+      "srcIndex": 11
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
       "id": "faza-1-nderto-grafin",
-      "heading": "Faza 1 — Nderto Grafin",
+      "heading": "Faza 1 — Ndërto grafin",
       "level": 3,
       "redundant": false,
-      "html": "sha256:f78dd5e9eb1e3895",
-      "srcIndex": 16
+      "html": "sha256:f756705f409a9827",
+      "srcIndex": 11
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
       "id": "faza-2-luaj-lojen",
-      "heading": "Faza 2 — Luaj Lojën",
+      "heading": "Faza 2 — Luaj lojën",
       "level": 3,
       "redundant": false,
-      "html": "sha256:73e4f5f44ac3e44e",
-      "srcIndex": 16
+      "html": "sha256:d00ce3674a145890",
+      "srcIndex": 11
     },
     {
       "type": "markdown",
@@ -1410,34 +1421,23 @@
       "heading": "Pikëzimi",
       "level": 3,
       "redundant": false,
-      "html": "sha256:65b528d85cdf78ef",
-      "srcIndex": 16
+      "html": "sha256:1a39600a6085c75a",
+      "srcIndex": 11
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
-      "id": "cfare-te-veshgosh",
-      "heading": "Cfare te veshgosh",
+      "id": "cfare-te-vezhgoni",
+      "heading": "Çfarë të vëzhgoni",
       "level": 3,
       "redundant": false,
-      "html": "sha256:f6b596f74015f403",
-      "srcIndex": 16
-    },
-    {
-      "type": "markdown",
-      "kind": "exercise",
-      "label": "Ushtrim",
-      "id": "ushtrimi-6-renditjet-topologjike-loje-interaktive-2",
-      "heading": null,
-      "level": 2,
-      "redundant": true,
-      "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 17
+      "html": "sha256:ef7586e5314971a9",
+      "srcIndex": 11
     },
     {
       "type": "code",
-      "srcIndex": 18,
+      "srcIndex": 12,
       "interactive": true,
       "html": "sha256:937349a46829cf97",
       "raw": "sha256:6688aeb55ad4aaa0",
@@ -1518,7 +1518,7 @@
       "type": "markdown",
       "kind": "normal",
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 19
+      "srcIndex": 13
     },
     {
       "type": "markdown",
@@ -1529,13 +1529,13 @@
       "level": 1,
       "redundant": false,
       "html": "sha256:b693aee9b195a79e",
-      "srcIndex": 19
+      "srcIndex": 13
     },
     {
       "type": "markdown",
       "kind": "normal",
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 20
+      "srcIndex": 14
     },
     {
       "type": "markdown",
@@ -1546,13 +1546,13 @@
       "level": 2,
       "redundant": false,
       "html": "sha256:778c53cfc30b883f",
-      "srcIndex": 20
+      "srcIndex": 14
     },
     {
       "type": "markdown",
       "kind": "normal",
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 21
+      "srcIndex": 15
     },
     {
       "type": "markdown",
@@ -1563,13 +1563,30 @@
       "level": 2,
       "redundant": false,
       "html": "sha256:e2a2670411fc5efd",
-      "srcIndex": 21
+      "srcIndex": 15
     },
     {
       "type": "markdown",
       "kind": "normal",
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 22
+      "srcIndex": 16
+    },
+    {
+      "type": "markdown",
+      "kind": "classwork",
+      "label": "Punë në Klasë",
+      "id": "pune-ne-klase-problemi-3-pema-perfshirese-minimum-me-algoritmin-e-prim",
+      "heading": "Punë në Klasë — Problemi 3: Pema Përfshirëse Minimum me Algoritmin e Prim-it",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:bfdbc44af860eabe",
+      "srcIndex": 16
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 17
     },
     {
       "type": "markdown",
@@ -1580,13 +1597,13 @@
       "level": 1,
       "redundant": false,
       "html": "sha256:b59dc8f89eb62825",
-      "srcIndex": 22
+      "srcIndex": 17
     },
     {
       "type": "markdown",
       "kind": "normal",
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 23
+      "srcIndex": 18
     },
     {
       "type": "markdown",
@@ -1597,11 +1614,11 @@
       "level": 2,
       "redundant": false,
       "html": "sha256:a5b5639330d24428",
-      "srcIndex": 23
+      "srcIndex": 18
     },
     {
       "type": "code",
-      "srcIndex": 24,
+      "srcIndex": 19,
       "interactive": false,
       "html": "sha256:851f8e15cdfe772d",
       "raw": "sha256:7afa78b256ab22bc",
@@ -1634,7 +1651,7 @@
       "type": "markdown",
       "kind": "normal",
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 25
+      "srcIndex": 20
     },
     {
       "type": "markdown",
@@ -1645,11 +1662,11 @@
       "level": 2,
       "redundant": false,
       "html": "sha256:a4e74e29020b305a",
-      "srcIndex": 25
+      "srcIndex": 20
     },
     {
       "type": "code",
-      "srcIndex": 26,
+      "srcIndex": 21,
       "interactive": false,
       "html": "sha256:bd2b7fba4d78c767",
       "raw": "sha256:c5d34ba2d8d05e8a",
@@ -1682,7 +1699,7 @@
       "type": "markdown",
       "kind": "normal",
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 27
+      "srcIndex": 22
     },
     {
       "type": "markdown",
@@ -1693,11 +1710,11 @@
       "level": 2,
       "redundant": false,
       "html": "sha256:92772393fa7f3a0f",
-      "srcIndex": 27
+      "srcIndex": 22
     },
     {
       "type": "code",
-      "srcIndex": 28,
+      "srcIndex": 23,
       "interactive": false,
       "html": "sha256:c51c7abcd860606d",
       "raw": "sha256:341190047810e444",
@@ -1752,8 +1769,8 @@
   },
   "missingScripts": [],
   "stats": {
-    "cells": 29,
-    "markdown": 20,
+    "cells": 24,
+    "markdown": 15,
     "code": 9,
     "codeLines": 3119
   },

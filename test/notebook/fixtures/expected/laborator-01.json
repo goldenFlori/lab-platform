@@ -290,9 +290,9 @@
       "type": "code",
       "srcIndex": 4,
       "interactive": false,
-      "html": "sha256:73dd1367c57af180",
-      "raw": "sha256:9accd67b6ef2ad74",
-      "lines": 122,
+      "html": "sha256:b383b792f5d734b4",
+      "raw": "sha256:d94efe96ad49dffe",
+      "lines": 91,
       "collapsed": true,
       "summary": [
         {
@@ -306,93 +306,48 @@
         {
           "t": "def",
           "n": "mat_kohen"
-        },
-        {
-          "t": "def",
-          "n": "krijo_grafik"
-        },
-        {
-          "t": "def",
-          "n": "on_hover"
-        },
-        {
-          "t": "def",
-          "n": "krahasim_algoritmesh"
         }
       ],
       "flags": {
         "pygame": false,
         "tkinter": false,
         "widgets": false,
-        "plotly": false,
+        "plotly": true,
         "subprocess": false,
         "sysexit": false,
         "networkx": false,
-        "matplotlib": true
+        "matplotlib": false
       },
       "externalScripts": [],
       "outputs": [
         {
           "kind": "stream",
           "stream": "stdout",
-          "text": "======================================================================\nUSHTRIM 1: LISTA E VOGËL (10)\n======================================================================\n\nINSERTION SORT:\nRandom:  0.00000333 sek\nSorted:  0.00000092 sek (RASTI MË I MIRË)\nReverse: 0.00000271 sek (RASTI MË I KEQ)\n\nSELECTION SORT:\nRandom:  0.00000271 sek\nSorted:  0.00000212 sek\nReverse: 0.00000204 sek",
+          "text": "     n | rasti    | Insertion (ms) | Selection (ms)\n----------------------------------------------------\n    10 | Random   |         0.0023 |         0.0028\n    10 | Sorted   |         0.0008 |         0.0025\n    10 | Reverse  |         0.0035 |         0.0028\n    30 | Random   |         0.0144 |         0.0178\n    30 | Sorted   |         0.0022 |         0.0160\n    30 | Reverse  |         0.0278 |         0.0177\n   100 | Random   |         0.1297 |         0.1409\n   100 | Sorted   |         0.0061 |         0.1232\n   100 | Reverse  |         0.2051 |         0.1175\n   300 | Random   |         0.8011 |         1.0863\n   300 | Sorted   |         0.0143 |         0.8638\n   300 | Reverse  |         1.5296 |         0.8449\n  1000 | Random   |         9.5858 |         9.8338\n  1000 | Sorted   |         0.0475 |         8.4109\n  1000 | Reverse  |        15.0979 |         8.3424\n  2000 | Random   |        29.5494 |        29.9644\n  2000 | Sorted   |         0.0739 |        29.0830\n  2000 | Reverse  |        58.0760 |        32.5068",
           "truncated": false
         },
         {
-          "kind": "image",
-          "file": "img-1dcba779abb5.png",
-          "bytes": 35588
+          "kind": "plotly",
+          "file": "plotly-e51f8f32a178.json",
+          "bytes": 9014
         },
         {
           "kind": "stream",
           "stream": "stdout",
-          "text": "======================================================================\nUSHTRIM 2: LISTA MESATARE (100)\n======================================================================\n\nINSERTION SORT:\nRandom:  0.00012608 sek\nSorted:  0.00000525 sek (RASTI MË I MIRË)\nReverse: 0.00022729 sek (RASTI MË I KEQ)\n\nSELECTION SORT:\nRandom:  0.00012596 sek\nSorted:  0.00011354 sek\nReverse: 0.00011612 sek",
-          "truncated": false
-        },
-        {
-          "kind": "image",
-          "file": "img-da03c27e4773.png",
-          "bytes": 36735
-        },
-        {
-          "kind": "stream",
-          "stream": "stdout",
-          "text": "======================================================================\nUSHTRIM 3: LISTA E MADHE (1000)\n======================================================================\n\nINSERTION SORT:\nRandom:  0.01125421 sek\nSorted:  0.00005304 sek (RASTI MË I MIRË)\nReverse: 0.02352396 sek (RASTI MË I KEQ)\n\nSELECTION SORT:\nRandom:  0.01173654 sek\nSorted:  0.01231571 sek\nReverse: 0.01278479 sek",
-          "truncated": false
-        },
-        {
-          "kind": "image",
-          "file": "img-e9c797728d87.png",
-          "bytes": 35064
-        },
-        {
-          "kind": "stream",
-          "stream": "stdout",
-          "text": "======================================================================\nUSHTRIM 4: LISTA SHUMË E MADHE (10000)\n======================================================================\n\nINSERTION SORT:\nRandom:  1.30617596 sek\nSorted:  0.00058304 sek (RASTI MË I MIRË)\nReverse: 2.56276900 sek (RASTI MË I KEQ)\n\nSELECTION SORT:\nRandom:  1.22290271 sek\nSorted:  1.26330888 sek\nReverse: 1.25283613 sek",
-          "truncated": false
-        },
-        {
-          "kind": "image",
-          "file": "img-8e68bc0efb6e.png",
-          "bytes": 32192
-        },
-        {
-          "kind": "stream",
-          "stream": "stdout",
-          "text": "======================================================================\nPËRFUNDIME KRYESORE\n======================================================================\n\n1. INSERTION SORT:\n   - Ka rast më të mirë: lista e renditur (shumë e shpejtë)\n   - Ka rast më të keq: lista kundërt (më e ngadaltë)\n   - Performancë e ndryshme sipas radhës fillestare të të dhënave\n\n2. SELECTION SORT:\n   - Ka të njëjtën kohë për të gjitha rastet!\n   - Gjithmonë bën O(n²) krahasime, pavarësisht nga input-i\n\n3. KRAHASIMI INSERTION vs SELECTION:\n   - Për lista të renditura: Insertion Sort >>> Selection Sort\n   - Për lista random: Insertion Sort ≈ Selection Sort\n   - Për lista kundërt: Selection Sort > Insertion Sort",
+          "text": "Si ta lexoni grafikun (të dy boshtet janë logaritmikë):\n- Një vijë me pjerrësi 1 rritet si n; një vijë me pjerrësi 2 rritet si n².\n  Kur n shumëzohet me 10, koha shumëzohet ~10 herë (pjerrësia 1) ose ~100 herë (pjerrësia 2).\n\nPËRFUNDIME KRYESORE\n1. INSERTION SORT varet nga rendi fillestar:\n   - Sorted: vetëm n − 1 krahasime, asnjë zhvendosje → rritet si n (rasti më i mirë).\n   - Reverse: n(n − 1)/2 zhvendosje → rritet si n² (rasti më i keq).\n2. SELECTION SORT bën gjithmonë n(n − 1)/2 krahasime, pavarësisht nga rendi:\n   të tri vijat e tij janë pothuajse njëra mbi tjetrën, me pjerrësi 2.\n3. Për lista të renditura (ose pothuajse të renditura) Insertion Sort fiton qartë;\n   për lista të rastit dhe të përmbysura, të dy rriten si n².",
           "truncated": false
         }
       ]
     }
   ],
-  "imports": ["matplotlib", "os", "plotly", "pygame", "random", "time"],
-  "dependencies": ["matplotlib", "plotly", "pygame"],
+  "imports": ["os", "plotly", "pygame", "random", "time"],
+  "dependencies": ["plotly", "pygame"],
   "flags": {
     "pygame": true,
     "tkinter": false,
     "widgets": false,
     "plotly": true,
-    "matplotlib": true,
+    "matplotlib": false,
     "networkx": false,
     "numpy": false
   },
@@ -401,30 +356,18 @@
     "cells": 5,
     "markdown": 1,
     "code": 4,
-    "codeLines": 468
+    "codeLines": 437
   },
   "hasEmbeddedHomework": false,
   "hasClasswork": false,
   "assets": [
     {
-      "file": "img-1dcba779abb5.png",
-      "bytes": 35588
-    },
-    {
-      "file": "img-8e68bc0efb6e.png",
-      "bytes": 32192
-    },
-    {
-      "file": "img-da03c27e4773.png",
-      "bytes": 36735
-    },
-    {
-      "file": "img-e9c797728d87.png",
-      "bytes": 35064
-    },
-    {
       "file": "plotly-7f743d74c485.json",
       "bytes": 64549
+    },
+    {
+      "file": "plotly-e51f8f32a178.json",
+      "bytes": 9029
     }
   ]
 }

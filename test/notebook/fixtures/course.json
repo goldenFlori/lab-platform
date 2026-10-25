@@ -14,13 +14,13 @@
           "type": "main",
           "title": "Laboratori 1 — Materiali kryesor",
           "notebook": "laborator-01.ipynb",
-          "note": "Teoria + 4 ushtrime (2 Pygame, 2 Plotly/matplotlib)."
+          "note": "Teoria + 4 ushtrime (2 Pygame, 2 Plotly)."
         },
         {
           "type": "supplementary",
           "title": "Ushtrime Shtesë — A funksionon? Induksioni & rasti më i keq",
           "notebook": "laborator-01-ushtrime-shtese.ipynb",
-          "note": "Leksioni 1 (slides 17–45): pseudokodi rresht për rresht, hipoteza e induksionit si assert, pse testet nuk vërtetojnë, inputi më i keq. 5 ushtrime me kontroll automatik + Punë në Klasë."
+          "note": "Leksioni 1 (slides 17–45): pseudokodi rresht për rresht, hipoteza e induksionit si assert, pse testet nuk vërtetojnë, inputi më i keq, qëndrueshmëria. 6 ushtrime me kontroll automatik + Punë në Klasë."
         }
       ]
     },
@@ -146,15 +146,15 @@
       "week": 7,
       "lecture": "",
       "status": "published",
-      "title": "Rrugët më të Shkurtra: Dijkstra · Bellman-Ford · Floyd-Warshall",
+      "title": "Rrugët më të Shkurtra nga një Burim: Dijkstra · Bellman-Ford",
       "topics": ["rruget", "dp"],
-      "summary": "Tre algoritmet kryesore të rrugëve më të shkurtra, kushtet e tyre dhe kompleksiteti. Nga GPS-i mbi hartën e Shqipërisë te zbulimi i cikleve negative dhe matrica e distancave.",
+      "summary": "Dy algoritmet kryesore të rrugëve më të shkurtra nga një burim, kushtet e tyre dhe kompleksiteti. Nga GPS-i mbi hartën e Shqipërisë te rindërtimi i rrugës dhe zbulimi i cikleve negative me kod.",
       "resources": [
         {
           "type": "main",
           "title": "Laboratori 7 — Materiali kryesor",
           "notebook": "laborator-07.ipynb",
-          "note": "6 ushtrime Pygame + Punë në Klasë me 4 probleme."
+          "note": "4 ushtrime Pygame + 1 me kontroll automatik (rruga nga prev[], cikli negativ) + Punë në Klasë me 3 probleme."
         },
         {
           "type": "supplementary",
@@ -179,13 +179,13 @@
       "status": "published",
       "title": "Floyd-Warshall & Rrjedhat Maksimale: Edmonds-Karp",
       "topics": ["rruget", "dp", "rrjedha"],
-      "summary": "Programimi dinamik për të gjitha çiftet e kulmeve, dhe hyrja në rrjedhat maksimale. Tre skenarë realë: logjistika urbane, rrjeti i klinikave dhe ujësjellësi në emergjencë.",
+      "summary": "Programimi dinamik për të gjitha çiftet e kulmeve, dhe hyrja në rrjedhat maksimale. Matrica e distancave, logjistika urbane, rrjeti i klinikave, gara e rrugëve dhe ujësjellësi në emergjencë.",
       "resources": [
         {
           "type": "main",
           "title": "Laboratori 8 — Materiali kryesor",
           "notebook": "laborator-08.ipynb",
-          "note": "Pseudokodi i plotë, matricat D dhe P, 3 skenarë realë + 7 pyetje reflektuese."
+          "note": "Pseudokodi i plotë, matricat D dhe P, 4 ushtrime Floyd-Warshall (2 nga Lab 7), Edmonds-Karp, Punë në Klasë + 8 pyetje reflektuese."
         }
       ]
     },
@@ -208,15 +208,15 @@
           "type": "supplementary",
           "title": "Ushtrime Shtesë — Ndërtoni Ford-Fulkerson-in hap pas hapi",
           "notebook": "laborator-09-ushtrime-shtese.ipynb",
-          "note": "Leksionet 5–6: rrjedha e lejueshme, kapaciteti i prerjes, pse dështon greedy, rrjeta mbetëse, rritRrjedhë, FF/EK, shembulli me C, prerja min nga Gf. 8 ushtrime + Punë në Klasë."
+          "note": "Leksionet 5–6: rrjedha e lejueshme, kapaciteti i prerjes, pse dështon greedy, rrjeta mbetëse, rritRrjedhë, FF/EK, shembulli me C, prerja min nga Gf. 8 ushtrime + Punë në Klasë + 3 detyra shtëpie."
         }
       ],
       "homework": [
         {
           "embedded": true,
-          "title": "3 detyra: Min-Cut i rrjetit ISP, Ford-Fulkerson dhe Edmonds-Karp mbi rrjetin hekurudhor",
+          "title": "3 detyra: rrjeti ISP, DFS kundrejt BFS mbi rrjetin hekurudhor, ku të investojmë",
           "anchor": "detyra-shtepie",
-          "note": "Brenda fletores — ndryshohen vetëm vlerat e shënuara me `# TODO`."
+          "note": "Në fund të Ushtrimeve Shtesë, mbi funksionet tuaja; çdo detyrë kontrollohet me `kontrollo(...)`."
         }
       ]
     },
