@@ -41,6 +41,8 @@ test("a student's run counts in the pilot report, which prints on two pages", as
     '1ditë-studenti · nga 1 student',
   );
   await expect(report).toContainText('Vetëm numra');
+  // #153: the learning section is there, empty until students answer predictions.
+  await expect(report.getByTestId('pilot-learning')).toContainText('Të nxënit: përgjigjet e para');
   await expect(report).not.toContainText(E2E_ACCOUNT.fullName);
 
   if (!isMobile) {
