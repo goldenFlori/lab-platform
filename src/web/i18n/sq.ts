@@ -1,6 +1,7 @@
 // The interface in Albanian, the source language (#19). en.ts must have the same messages.
 // Messages with values are functions; keep the wording here plain and student-facing.
 
+import type { PredictionTopic } from '../../shared/predictions';
 import { RETENTION } from '../../shared/retention';
 
 const minutes = (n: number) => `${n} ${n === 1 ? 'minute' : 'minutash'}`;
@@ -521,6 +522,17 @@ export const sq = {
     perLabCaption: 'Aktiviteti sipas laboratorit',
     noLabs: 'Ky kurs nuk ka ende laboratorë.',
     lab: 'Laboratori',
+    understanding: {
+      title: 'Kuptimi: parashikimet dhe tabelat e gjurmimit',
+      help: 'Përgjigjja e parë e studentëve te vendimet e vizualizimeve dhe te rreshtat e tabelave, për çdo vizualizim nga pesë studentë e lart. Është ushtrim, jo notë.',
+      empty:
+        'Ende asnjë vizualizim me përgjigje nga pesë studentë e lart. Shfaqen kur studentët të përdorin "Parashiko" ose tabelat e gjurmimit në laboratorë.',
+      summary: (students: number, rate: number) => `${students} studentë · ${rate}% të sakta në provën e parë`,
+      hardest: 'Vendimet më të vështira',
+      decision: (rate: number, students: number) => `${rate}% të sakta nga ${students} studentë`,
+      answer: (answer: string) => `Përgjigjja: ${answer}`,
+      wrong: (pick: string, students: number) => `Gabimi më i shpeshtë: ${pick} (${students})`,
+    },
   },
   python: {
     run: 'Ekzekuto',
@@ -627,10 +639,38 @@ export const sq = {
     due: (when: string) => `Afati: ${when}`,
     missed: (when: string) => `Afati mbaroi më ${when}, pa dorëzim`,
     grade: (score: number, of: number) => `Nota: ${score}/${of}`,
+    understanding: {
+      title: 'Kuptimi im',
+      lead: 'Sa herë e gjetët në provën e parë hapin e algoritmit (me "Parashiko" te vizualizimet) ose rreshtin e tabelës së gjurmimit. Është ushtrim, jo notë.',
+      empty:
+        'Ende asgjë këtu. Ndizni "Parashiko" te një vizualizim i laboratorit ose plotësoni një tabelë gjurmimi, dhe rezultatet shfaqen këtu.',
+      right: (right: number, asked: number) => `${right} nga ${asked} të sakta në provën e parë`,
+      review: (topic: string) => `Për ta përsëritur: **${topic}**, ku keni më pak përgjigje të sakta në provën e parë.`,
+    },
   },
+  topics: {
+    insertion: 'Insertion Sort',
+    selection: 'Selection Sort',
+    merge: 'Merge Sort',
+    bfs: 'BFS',
+    dfs: 'DFS',
+    kruskal: 'Kruskal',
+    prim: 'Prim',
+    topo: 'Renditja topologjike',
+    dijkstra: 'Dijkstra',
+    bellman: 'Bellman-Ford',
+    floyd: 'Floyd-Warshall',
+    flow: 'Rrjedha max: ngushtica',
+    'trace-kruskal': 'Tabela: Kruskal',
+    'trace-prim': 'Tabela: Prim',
+    'trace-kahn': 'Tabela: Kahn',
+    'trace-dijkstra': 'Tabela: Dijkstra',
+    'trace-bellman': 'Tabela: Bellman-Ford',
+    'trace-floyd': 'Tabela: Floyd-Warshall',
+  } satisfies Record<PredictionTopic, string>,
   privacy: {
     title: 'Privatësia',
-    updated: 'Përditësuar më 19 tetor 2026',
+    updated: 'Përditësuar më 25 tetor 2026',
     intro:
       'Kjo faqe tregon cilat të dhëna ruan Lab Platform, pse, ku, për sa kohë dhe kush i sheh. Institucioni juaj (p.sh. fakulteti) vendos për të dhënat e studentëve të tij; platforma i përpunon në emër të tij.',
     sections: [
@@ -641,6 +681,7 @@ export const sq = {
           'Në cilat institucione, kurse dhe grupe jeni, dhe me çfarë roli.',
           'Kodin që ndryshoni në fletore, që ta gjeni në çdo pajisje. Stafi nuk e sheh derisa ta dorëzoni.',
           'Ushtrimet që zgjidhni, punën që dorëzoni dhe notat.',
+          'Përgjigjen e parë që jepni te vendimet e vizualizimeve ("Parashiko") dhe te rreshtat e tabelave të gjurmimit: nëse ishte e saktë dhe cila ishte. Është ushtrim, jo notë; stafi e sheh vetëm si numra, nga pesë studentë e lart.',
           'Aktivitetin si numra: të shumtën një shënim në ditë për çdo laborator dhe lloj (e hapët, e shkarkuat, provuat një vizualizim, zgjidhët një ushtrim, ekzekutuat kodin, morët pjesë në një Live Lab).',
           'Pyetjet "Shpjego gabimin" me përgjigjen e AI-së, dhe sa kërkesa me AI bëni në ditë.',
           'Një cookie për hyrjen, që ju mban të identifikuar, dhe emrin e shfletuesit për çdo hyrje.',
@@ -676,7 +717,7 @@ export const sq = {
         items: [
           `Hyrja: mbaron pas ${RETENTION.sessionDays} ditësh pa përdorim.`,
           `Pyetjet "Shpjego gabimin" me përgjigjet: ${RETENTION.aiQuestionDays} ditë.`,
-          `Aktiviteti ditor (laboratorët e hapur, ekzekutimet, Live Lab), numërimet e AI dhe historia e Live Lab: ${RETENTION.activityYears} vjet.`,
+          `Aktiviteti ditor (laboratorët e hapur, ekzekutimet, Live Lab), përgjigjet e para te parashikimet dhe tabelat, numërimet e AI dhe historia e Live Lab: ${RETENTION.activityYears} vjet.`,
           `Një kërkesë për fshirje, pasi trajtohet: ${RETENTION.handledRequestYears} vit.`,
           'Kodi, dorëzimet, notat dhe pjesa tjetër: sa kohë ekziston kursi. Kur institucioni fshin një kurs, fshihen edhe të dhënat e tij.',
           'Çdo natë platforma fshin vetë atë që ka kaluar afatin.',

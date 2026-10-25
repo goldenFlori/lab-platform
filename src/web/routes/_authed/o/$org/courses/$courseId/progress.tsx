@@ -1,7 +1,9 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
-import { ArrowLeft, CircleCheck, Clock, Lightbulb, Send, Star } from 'lucide-react';
+import { ArrowLeft, BrainCircuit, CircleCheck, Clock, Lightbulb, Send, Star } from 'lucide-react';
+import type { TopicResult } from '../../../../../../../shared/predictions';
 import type { LabProgress, NotebookProgress } from '../../../../../../../shared/progress';
+import { RichText } from '../../../../../../../viz/kit/RichText';
 import { t as messages, useT } from '../../../../../../i18n';
 import { aiStatusQuery } from '../../../../../../lib/ai';
 import { ApiError } from '../../../../../../lib/api';
@@ -76,6 +78,8 @@ function ProgressPage() {
         </p>
       )}
 
+      <Understanding topics={data.topics} />
+
       {data.labs.length === 0 ? (
         <p className="mt-8 text-sm text-muted">{t.progress.noLabs}</p>
       ) : (
@@ -86,6 +90,54 @@ function ProgressPage() {
             </li>
           ))}
         </ul>
+      )}
+    </section>
+  );
+}
+
+/** First-try results per topic (#151), and the one to review: the lowest, once it has three answers. */
+function Understanding({ topics }: { topics: TopicResult[] }) {
+  const t = useT();
+  const weakest = topics
+    .filter((r) => r.asked >= 3 && r.right < r.asked)
+    .sort((a, b) => a.right / a.asked - b.right / b.asked)[0];
+  return (
+    <section className="mt-8 rounded-2xl border border-border bg-surface p-4 sm:p-5" data-testid="understanding">
+      <h2 className="flex items-center gap-2 font-semibold">
+        <BrainCircuit className="size-5 text-accent" aria-hidden="true" /> {t.progress.understanding.title}
+      </h2>
+      <p className="mt-1 text-sm text-muted">{t.progress.understanding.lead}</p>
+      {topics.length === 0 ? (
+        <p className="mt-3 text-sm text-muted">{t.progress.understanding.empty}</p>
+      ) : (
+        <>
+          <ul className="mt-4 grid gap-x-6 gap-y-3 sm:grid-cols-2">
+            {topics.map((r) => (
+              <li key={r.topic} className="text-sm">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="font-medium">{t.topics[r.topic]}</span>
+                  <span className="text-xs text-muted tabular-nums">
+                    {t.progress.understanding.right(r.right, r.asked)}
+                  </span>
+                </div>
+                <div className="mt-1 h-2 overflow-hidden rounded-full bg-surface-secondary" aria-hidden="true">
+                  <div
+                    className="h-full rounded-full"
+                    style={{
+                      width: `${(100 * r.right) / r.asked}%`,
+                      background: r.right / r.asked >= 0.7 ? 'var(--state-done)' : 'var(--state-frontier)',
+                    }}
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+          {weakest && (
+            <p className="mt-4 text-sm">
+              <RichText text={t.progress.understanding.review(t.topics[weakest.topic])} />
+            </p>
+          )}
+        </>
       )}
     </section>
   );

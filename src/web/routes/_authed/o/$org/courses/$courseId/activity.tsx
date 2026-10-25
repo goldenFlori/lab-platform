@@ -1,10 +1,11 @@
 import { Alert } from '@heroui/react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
-import { ArrowLeft, BarChart3, FileBarChart, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, BarChart3, BrainCircuit, FileBarChart, ShieldCheck } from 'lucide-react';
 import type { ActivityReport } from '../../../../../../../shared/activity';
+import type { EmbedUnderstanding } from '../../../../../../../shared/predictions';
 import { type Messages, t as messages, useT } from '../../../../../../i18n';
-import { activityQuery } from '../../../../../../lib/activity';
+import { activityQuery, understandingQuery } from '../../../../../../lib/activity';
 import { ApiError } from '../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../lib/brand';
 import { courseQuery } from '../../../../../../lib/courses';
@@ -100,7 +101,10 @@ function ActivityPage() {
           {t.common.loading}
         </p>
       ) : (
-        <Report report={report.data} org={org} courseId={courseId} />
+        <>
+          <Report report={report.data} org={org} courseId={courseId} />
+          <Understanding org={org} courseId={courseId} group={group} />
+        </>
       )}
     </section>
   );
@@ -267,6 +271,75 @@ function Report({ report, org, courseId }: { report: ActivityReport; org: string
         )}
       </div>
     </>
+  );
+}
+
+/**
+ * First-try results (#151): per embedded visualization with five students or more, how many got its
+ * decisions right at the first try, and its hardest decisions with the wrong answer most gave.
+ */
+function Understanding({ org, courseId, group }: { org: string; courseId: string; group: string | undefined }) {
+  const t = useT();
+  const T = t.activity.understanding;
+  const query = useQuery(understandingQuery(org, courseId, group));
+  if (!query.data) return null;
+  const { embeds } = query.data;
+  return (
+    <div
+      className="mt-8 rounded-3xl border border-border bg-surface p-5 shadow-surface sm:p-7"
+      data-testid="understanding"
+    >
+      <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+        <BrainCircuit className="size-5 text-accent" aria-hidden="true" /> {T.title}
+      </h2>
+      <p className="mt-1 text-sm text-muted">{T.help}</p>
+      {embeds.length === 0 ? (
+        <p className="mt-4 text-sm text-muted">{T.empty}</p>
+      ) : (
+        <ul className="mt-5 grid gap-4">
+          {embeds.map((e) => (
+            <EmbedResult key={`${e.notebook}-${e.cell}-${e.labId}`} embed={e} />
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function EmbedResult({ embed }: { embed: EmbedUnderstanding }) {
+  const t = useT();
+  const T = t.activity.understanding;
+  const rate = percent(embed.right, embed.answers);
+  return (
+    <li className="rounded-2xl border border-border p-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="font-medium">
+          <span className="text-muted">{embed.lab}.</span> {embed.title ?? embed.notebook}
+        </h3>
+        <span className="text-xs text-muted">{embed.topics.map((topic) => t.topics[topic]).join(' · ')}</span>
+      </div>
+      <p className="mt-1 text-sm text-muted">{T.summary(embed.students, rate)}</p>
+      <span className="mt-1.5 block h-1.5 w-full max-w-sm overflow-hidden rounded-full bg-default" aria-hidden="true">
+        <span className="block h-full rounded-full bg-accent" style={{ width: `${rate}%` }} />
+      </span>
+      {embed.hardest.length > 0 && (
+        <div className="mt-3">
+          <h4 className="text-xs font-semibold tracking-wider text-muted uppercase">{T.hardest}</h4>
+          <ul className="mt-2 grid gap-2 text-sm">
+            {embed.hardest.map((d) => (
+              <li key={d.prompt} className="rounded-xl bg-surface-secondary px-3 py-2">
+                <p>{d.prompt}</p>
+                <p className="mt-0.5 text-xs text-muted">
+                  {T.decision(percent(d.right, d.students), d.students)}
+                  {d.answer && ` · ${T.answer(d.answer)}`}
+                  {d.wrong && ` · ${T.wrong(d.wrong.pick, d.wrong.students)}`}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </li>
   );
 }
 
