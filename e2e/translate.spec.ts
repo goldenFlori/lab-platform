@@ -29,7 +29,9 @@ test('a pedagog translates a notebook, edits it and saves it; its code still run
   });
 
   await staff.goto(pageUrl);
-  await staff.getByRole('button', { name: 'Përkthe fletoren' }).click();
+  // From the lab header's AI menu (#98, #130).
+  await staff.getByRole('button', { name: 'Mjetet me AI' }).click();
+  await staff.getByRole('menuitem', { name: /Përkthe fletoren/ }).click();
   const panel = staff.getByTestId('translate');
   await panel.getByRole('button', { name: 'Përkthe', exact: true }).click();
   const first = panel.getByLabel('Përkthimi i pjesës 1');

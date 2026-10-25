@@ -748,6 +748,7 @@ export const sq = {
     stop: 'Ndalo',
     failed: 'Shkarkimi nuk u krye. Provoni sërish.',
   },
+  labMenu: { label: 'Më shumë veprime me fletoret' },
   footer: {
     privacy: 'Privatësia',
   },
