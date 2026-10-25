@@ -333,7 +333,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   settles (ties accepted), which element Selection Sort puts in each position. Options come from
   the algorithm's state, never in an order that gives the answer away; a wrong guess shows the right
   answer and why, and a score is kept. Built into the kit (`usePredict`), so any visualization
-  can add it. Next: code editor polish (#131).
+  can add it (PR #141).
+- **2026-10-25:** #131 done. A failed run marks the line where it stopped, in the code students read
+  and in the editor (from the cell's traceback), until the code changes. The editor gains line
+  numbers and the palette's accent for the active line and selection. Syntax colours stay GitHub's,
+  matching the code highlighted at upload. Next: the recursion-tree visualization (#133).
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and

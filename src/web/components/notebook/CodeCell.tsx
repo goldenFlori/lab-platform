@@ -12,7 +12,7 @@ import {
   Trophy,
   Users,
 } from 'lucide-react';
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import type { CodeCell as Cell } from '../../../notebook/types';
 import { useT } from '../../i18n';
 import { useCodeEdits } from '../../lib/code-edits';
@@ -21,7 +21,7 @@ import { useLive } from '../../lib/live-context';
 import { sanitize } from '../../lib/sanitize';
 import { usePython } from '../../python/PythonProvider';
 import { Output } from './Output';
-import { RunButtons, useRunOutput } from './RunControls';
+import { RunButtons, useErrorLine, useRunOutput } from './RunControls';
 
 // Loaded the first time someone edits a cell (#49).
 const CodeEditor = lazy(() => import('./CodeEditor'));
@@ -49,13 +49,8 @@ export function CodeCell({
   const editable = !presenting && edits !== null && runnable !== undefined;
   const edited = editable && edits.edited(cell);
   const editorOpen = editable && (editing || edited);
-  const code = (
-    <div
-      className="nb-shiki"
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: sanitized; the converter's highlighted code
-      dangerouslySetInnerHTML={{ __html: sanitize(cell.html) }}
-    />
-  );
+  const failedLine = useErrorLine(cell);
+  const code = <ReadOnlyCode html={cell.html} errorLine={editorOpen ? null : failedLine} />;
 
   if (cell.interactive) {
     const f = cell.flags;
@@ -149,6 +144,7 @@ export function CodeCell({
                 onChange={(next) => edits.change(cell, next)}
                 label={t.edits.editorLabel(runnable.number)}
                 autoFocus={editing && !edited}
+                errorLine={failedLine}
               />
             </Suspense>
             {edited && (
@@ -176,6 +172,25 @@ export function CodeCell({
       </div>
       {!presenting && <Outputs cell={cell} fileUrl={fileUrl} />}
     </div>
+  );
+}
+
+/** The converter's highlighted code, with the line where the last run failed marked (#131). */
+function ReadOnlyCode({ html, errorLine }: { html: string; errorLine: number | null }) {
+  const box = useRef<HTMLDivElement>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: new html means new line elements to mark
+  useEffect(() => {
+    const lines = box.current?.querySelectorAll('.line');
+    if (!lines) return;
+    for (const [i, line] of lines.entries()) line.classList.toggle('nb-error-line', i + 1 === errorLine);
+  }, [errorLine, html]);
+  return (
+    <div
+      ref={box}
+      className="nb-shiki"
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: sanitized; the converter's highlighted code
+      dangerouslySetInnerHTML={{ __html: sanitize(html) }}
+    />
   );
 }
 

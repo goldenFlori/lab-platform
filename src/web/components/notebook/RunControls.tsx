@@ -16,7 +16,7 @@ import { useT } from '../../i18n';
 import { useCodeEdits } from '../../lib/code-edits';
 import { useExercises } from '../../lib/exercises';
 import { usePython, useSessionState } from '../../python/PythonProvider';
-import type { CheckResult } from '../../python/runner';
+import { type CheckResult, errorLine } from '../../python/runner';
 import type { CellRun } from '../../python/session';
 import { ExplainError, type ExplainTarget } from './ExplainError';
 import { PlotlyFigure } from './PlotlyFigure';
@@ -103,6 +103,15 @@ export function PresentRunButtons({ cell }: { cell: CodeCell }) {
 }
 
 /** The cell's latest run, to show in place of its stored outputs; null when it has not run here. */
+/** The line of this cell where its last run stopped with an error (#131), if it did. */
+export function useErrorLine(cell: CodeCell): number | null {
+  const python = usePython();
+  const state = useSessionState(python?.session);
+  const runnable = python?.cells.get(cell);
+  const outcome = runnable ? state.runs.get(runnable.key)?.outcome : undefined;
+  return runnable && outcome?.kind === 'error' ? errorLine(outcome.traceback, runnable.number) : null;
+}
+
 export function useRunOutput(cell: CodeCell) {
   const python = usePython();
   const state = useSessionState(python?.session);

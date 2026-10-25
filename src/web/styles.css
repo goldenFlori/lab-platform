@@ -571,6 +571,17 @@ select:not([multiple]):not([size]) {
   color: var(--shiki-dark);
 }
 
+/* The line where a cell's last run failed (#131), in the read-only code */
+/* The band reaches into the code block's left padding (1.15rem), where the bar sits clear of the text. */
+.nb-shiki .line.nb-error-line {
+  display: inline-block;
+  min-width: calc(100% + 1.15rem);
+  margin-left: -1.15rem;
+  padding-left: calc(1.15rem - 3px);
+  border-left: 3px solid var(--state-reject);
+  background: color-mix(in oklab, var(--state-reject) 12%, transparent);
+}
+
 /* The code editor (#49): GitHub's light and dark colours, as Shiki uses for the code it shows */
 .nb-editor .cm-editor {
   color: #24292e;

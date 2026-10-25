@@ -305,5 +305,17 @@ export type RunCheck = { test: string | null };
 /** The cell's file name in tracebacks, numbered from 1 as students count cells. */
 export const cellFile = (index: number) => `<cell ${index + 1}>`;
 
+/**
+ * The line of cell `number` where a traceback stopped (#131), from its last frame in that cell;
+ * null when the error happened elsewhere, for example in a function defined in another cell.
+ */
+export function errorLine(traceback: string, number: number): number | null {
+  let line: number | null = null;
+  for (const match of traceback.matchAll(/File "<cell (\d+)>", line (\d+)/g)) {
+    if (Number(match[1]) === number) line = Number(match[2]);
+  }
+  return line;
+}
+
 /** Packages a cell needs that Pyodide does not ship; installed with micropip from PyPI. */
 export const MICROPIP_PACKAGES: Record<string, RegExp> = { plotly: /^\s*(?:import|from)\s+plotly\b/m };
