@@ -749,6 +749,15 @@ export const sq = {
     failed: 'Shkarkimi nuk u krye. Provoni sërish.',
   },
   labMenu: { label: 'Më shumë veprime me fletoret' },
+  path: {
+    title: 'Rruga juaj',
+    summary: (started: number, total: number, solved: number, exercises: number) =>
+      `${started} nga ${total} laboratorë të filluar${exercises ? ` · ${solved}/${exercises} ushtrime` : ''}`,
+    states: { new: 'Pa filluar', progress: 'Në punë', handed: 'Dorëzuar', graded: 'Me notë' },
+    node: (n: number, title: string, state: string, solved: number, exercises: number) =>
+      `Laboratori ${n}: ${title} — ${state}${exercises ? `, ${solved} nga ${exercises} ushtrime` : ''}`,
+    next: (n: number) => `Vazhdo me Laboratorin ${n}`,
+  },
   footer: {
     privacy: 'Privatësia',
   },
