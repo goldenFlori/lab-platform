@@ -52,4 +52,7 @@ export const VIZ: Record<VisualizerId, { Component: ReturnType<typeof load> }> =
   'pema-rekursive': {
     Component: load(() => import('./RecursionTreeViz')),
   },
+  'kruskal-prim': {
+    Component: load(() => import('./KruskalPrimViz')),
+  },
 };

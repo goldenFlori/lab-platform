@@ -16,6 +16,7 @@ export const VISUALIZERS = {
   'rrjedha-max': 'Rrjedha max & prerja min',
   ciftezimi: 'Çiftëzimi & caktimet',
   'pema-rekursive': 'Pema rekursive',
+  'kruskal-prim': 'Kruskal me union-find & Prim',
 } as const;
 
 export type VisualizerId = keyof typeof VISUALIZERS;
