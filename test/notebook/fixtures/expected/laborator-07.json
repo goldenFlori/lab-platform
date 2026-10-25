@@ -1,10 +1,28 @@
 {
-  "title": "Laboratori 7 — Rrugët më të Shkurtra: Dijkstra · Bellman-Ford · Floyd-Warshall",
+  "title": "Laboratori 7 — Rrugët më të Shkurtra nga një Burim: Dijkstra · Bellman-Ford",
   "toc": [
     {
       "id": "algoritmet-qe-trajtohen",
       "title": "Algoritmet që trajtohen",
       "level": 2,
+      "kind": "normal"
+    },
+    {
+      "id": "dijkstra",
+      "title": "Dijkstra",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "bellman-ford",
+      "title": "Bellman-Ford",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "krahasimi",
+      "title": "Krahasimi",
+      "level": 3,
       "kind": "normal"
     },
     {
@@ -14,10 +32,34 @@
       "kind": "exercise"
     },
     {
+      "id": "teoria-dijkstra-ne-navigimin-gps",
+      "title": "Teoria: Dijkstra në navigimin GPS",
+      "level": 3,
+      "kind": "theory"
+    },
+    {
+      "id": "animacioni",
+      "title": "Animacioni",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
       "id": "ushtrimi-2-dijkstra-interaktiv-nderto-grafin-tend",
       "title": "Ushtrimi 2 — Dijkstra Interaktiv: Ndërto Grafin Tënd",
       "level": 2,
       "kind": "exercise"
+    },
+    {
+      "id": "teoria-dijkstra-dhe-peshet-jo-negative",
+      "title": "Teoria: Dijkstra dhe peshet jo-negative",
+      "level": 3,
+      "kind": "theory"
+    },
+    {
+      "id": "animacioni-2",
+      "title": "Animacioni",
+      "level": 3,
+      "kind": "normal"
     },
     {
       "id": "ushtrimi-3-bellman-ford-rrjeti-i-dorezimit",
@@ -26,20 +68,38 @@
       "kind": "exercise"
     },
     {
+      "id": "teoria-bellman-ford-me-peshe-negative",
+      "title": "Teoria: Bellman-Ford me peshe negative",
+      "level": 3,
+      "kind": "theory"
+    },
+    {
+      "id": "animacioni-3",
+      "title": "Animacioni",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
       "id": "ushtrimi-4-bellman-ford-kuiz",
       "title": "Ushtrimi 4 — Bellman-Ford Kuiz",
       "level": 2,
       "kind": "exercise"
     },
     {
-      "id": "ushtrimi-5-floyd-warshall-matrica-e-distancave",
-      "title": "Ushtrimi 5 — Floyd-Warshall: Matrica e Distancave",
-      "level": 2,
-      "kind": "exercise"
+      "id": "teoria-konceptet-kryesore-te-bellman-ford",
+      "title": "Teoria: Konceptet kryesore të Bellman-Ford",
+      "level": 3,
+      "kind": "theory"
     },
     {
-      "id": "ushtrimi-6-floyd-warshall-gara-e-rrugeve",
-      "title": "Ushtrimi 6 — Floyd-Warshall: Gara e Rrugëve",
+      "id": "loja",
+      "title": "Loja",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-5-nga-teoria-ne-kod-rruga-nga-prev-dhe-cikli-negativ",
+      "title": "Ushtrimi 5 — Nga teoria në kod: rruga nga `prev[]` dhe cikli negativ",
       "level": 2,
       "kind": "exercise"
     },
@@ -48,6 +108,24 @@
       "title": "Punë në Klasë",
       "level": 2,
       "kind": "classwork"
+    },
+    {
+      "id": "problemi-1-dijkstra-me-dore",
+      "title": "Problemi 1 — Dijkstra me dorë",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "problemi-2-bellman-ford-dhe-ciklet-negative",
+      "title": "Problemi 2 — Bellman-Ford dhe Ciklet Negative",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "problemi-3-krahasimi-i-algoritmeve",
+      "title": "Problemi 3 — Krahasimi i algoritmeve",
+      "level": 3,
+      "kind": "normal"
     }
   ],
   "tocFull": [
@@ -70,12 +148,6 @@
       "kind": "normal"
     },
     {
-      "id": "floyd-warshall",
-      "title": "Floyd-Warshall",
-      "level": 3,
-      "kind": "normal"
-    },
-    {
       "id": "krahasimi",
       "title": "Krahasimi",
       "level": 3,
@@ -154,40 +226,10 @@
       "kind": "normal"
     },
     {
-      "id": "ushtrimi-5-floyd-warshall-matrica-e-distancave",
-      "title": "Ushtrimi 5 — Floyd-Warshall: Matrica e Distancave",
+      "id": "ushtrimi-5-nga-teoria-ne-kod-rruga-nga-prev-dhe-cikli-negativ",
+      "title": "Ushtrimi 5 — Nga teoria në kod: rruga nga `prev[]` dhe cikli negativ",
       "level": 2,
       "kind": "exercise"
-    },
-    {
-      "id": "teoria-floyd-warshall-dhe-programimi-dinamik",
-      "title": "Teoria: Floyd-Warshall dhe programimi dinamik",
-      "level": 3,
-      "kind": "theory"
-    },
-    {
-      "id": "animacioni-ekran-i-ndare",
-      "title": "Animacioni — Ekran i ndarë",
-      "level": 3,
-      "kind": "normal"
-    },
-    {
-      "id": "ushtrimi-6-floyd-warshall-gara-e-rrugeve",
-      "title": "Ushtrimi 6 — Floyd-Warshall: Gara e Rrugëve",
-      "level": 2,
-      "kind": "exercise"
-    },
-    {
-      "id": "teoria-rindertimi-i-rruges",
-      "title": "Teoria: Rindërtimi i rrugës",
-      "level": 3,
-      "kind": "theory"
-    },
-    {
-      "id": "loja-8-raunde",
-      "title": "Loja — 8 Raunde",
-      "level": 3,
-      "kind": "normal"
     },
     {
       "id": "pune-ne-klase",
@@ -208,14 +250,8 @@
       "kind": "normal"
     },
     {
-      "id": "problemi-3-floyd-warshall-me-dore",
-      "title": "Problemi 3 — Floyd-Warshall me dorë",
-      "level": 3,
-      "kind": "normal"
-    },
-    {
-      "id": "problemi-4-krahasimi-i-algoritmeve",
-      "title": "Problemi 4 — Krahasimi i algoritmeve",
+      "id": "problemi-3-krahasimi-i-algoritmeve",
+      "title": "Problemi 3 — Krahasimi i algoritmeve",
       "level": 3,
       "kind": "normal"
     }
@@ -237,11 +273,6 @@
       "kind": "normal"
     },
     {
-      "id": "floyd-warshall",
-      "title": "Floyd-Warshall",
-      "kind": "normal"
-    },
-    {
       "id": "krahasimi",
       "title": "Krahasimi",
       "kind": "normal"
@@ -307,34 +338,9 @@
       "kind": "normal"
     },
     {
-      "id": "ushtrimi-5-floyd-warshall-matrica-e-distancave",
-      "title": "Ushtrimi 5 — Floyd-Warshall: Matrica e Distancave",
+      "id": "ushtrimi-5-nga-teoria-ne-kod-rruga-nga-prev-dhe-cikli-negativ",
+      "title": "Ushtrimi 5 — Nga teoria në kod: rruga nga `prev[]` dhe cikli negativ",
       "kind": "exercise"
-    },
-    {
-      "id": "teoria-floyd-warshall-dhe-programimi-dinamik",
-      "title": "Teoria: Floyd-Warshall dhe programimi dinamik",
-      "kind": "theory"
-    },
-    {
-      "id": "animacioni-ekran-i-ndare",
-      "title": "Animacioni — Ekran i ndarë",
-      "kind": "normal"
-    },
-    {
-      "id": "ushtrimi-6-floyd-warshall-gara-e-rrugeve",
-      "title": "Ushtrimi 6 — Floyd-Warshall: Gara e Rrugëve",
-      "kind": "exercise"
-    },
-    {
-      "id": "teoria-rindertimi-i-rruges",
-      "title": "Teoria: Rindërtimi i rrugës",
-      "kind": "theory"
-    },
-    {
-      "id": "loja-8-raunde",
-      "title": "Loja — 8 Raunde",
-      "kind": "normal"
     },
     {
       "id": "pune-ne-klase",
@@ -352,13 +358,8 @@
       "kind": "normal"
     },
     {
-      "id": "problemi-3-floyd-warshall-me-dore",
-      "title": "Problemi 3 — Floyd-Warshall me dorë",
-      "kind": "normal"
-    },
-    {
-      "id": "problemi-4-krahasimi-i-algoritmeve",
-      "title": "Problemi 4 — Krahasimi i algoritmeve",
+      "id": "problemi-3-krahasimi-i-algoritmeve",
+      "title": "Problemi 3 — Krahasimi i algoritmeve",
       "kind": "normal"
     }
   ],
@@ -378,7 +379,7 @@
       "heading": "Algoritmet që trajtohen",
       "level": 2,
       "redundant": false,
-      "html": "sha256:31668ea49c6e1ace",
+      "html": "sha256:b5f1610e2e7fe429",
       "srcIndex": 0
     },
     {
@@ -389,7 +390,7 @@
       "heading": "Dijkstra",
       "level": 3,
       "redundant": false,
-      "html": "sha256:c07a65175de3761a",
+      "html": "sha256:9b695667cee32afa",
       "srcIndex": 0
     },
     {
@@ -400,18 +401,7 @@
       "heading": "Bellman-Ford",
       "level": 3,
       "redundant": false,
-      "html": "sha256:dc5ca2a235f169a1",
-      "srcIndex": 0
-    },
-    {
-      "type": "markdown",
-      "kind": "normal",
-      "label": null,
-      "id": "floyd-warshall",
-      "heading": "Floyd-Warshall",
-      "level": 3,
-      "redundant": false,
-      "html": "sha256:e8e2622b5e6b3691",
+      "html": "sha256:3183885417f50283",
       "srcIndex": 0
     },
     {
@@ -422,7 +412,7 @@
       "heading": "Krahasimi",
       "level": 3,
       "redundant": false,
-      "html": "sha256:40f8e92796aa45dd",
+      "html": "sha256:5907721a7858e8ad",
       "srcIndex": 0
     },
     {
@@ -716,7 +706,7 @@
       "heading": "Teoria: Konceptet kryesore të Bellman-Ford",
       "level": 3,
       "redundant": false,
-      "html": "sha256:260509a0a848b06b",
+      "html": "sha256:5880856ef100baeb",
       "srcIndex": 7
     },
     {
@@ -779,72 +769,38 @@
       "type": "markdown",
       "kind": "exercise",
       "label": "Ushtrim",
-      "id": "ushtrimi-5-floyd-warshall-matrica-e-distancave",
-      "heading": "Ushtrimi 5 — Floyd-Warshall: Matrica e Distancave",
+      "id": "ushtrimi-5-nga-teoria-ne-kod-rruga-nga-prev-dhe-cikli-negativ",
+      "heading": "Ushtrimi 5 — Nga teoria në kod: rruga nga `prev[]` dhe cikli negativ",
       "level": 2,
       "redundant": false,
-      "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 9
-    },
-    {
-      "type": "markdown",
-      "kind": "theory",
-      "label": "Teori",
-      "id": "teoria-floyd-warshall-dhe-programimi-dinamik",
-      "heading": "Teoria: Floyd-Warshall dhe programimi dinamik",
-      "level": 3,
-      "redundant": false,
-      "html": "sha256:037621a0717dda95",
-      "srcIndex": 9
-    },
-    {
-      "type": "markdown",
-      "kind": "normal",
-      "label": null,
-      "id": "animacioni-ekran-i-ndare",
-      "heading": "Animacioni — Ekran i ndarë",
-      "level": 3,
-      "redundant": false,
-      "html": "sha256:ed7b498fb42f5ca8",
+      "html": "sha256:7145cb3f9773e41f",
       "srcIndex": 9
     },
     {
       "type": "code",
       "srcIndex": 10,
-      "interactive": true,
-      "html": "sha256:32617577de2ba89a",
-      "raw": "sha256:f82ec30b393ef929",
-      "lines": 298,
+      "interactive": false,
+      "html": "sha256:544364eef185325e",
+      "raw": "sha256:d8a05260c980999f",
+      "lines": 41,
       "collapsed": true,
       "summary": [
         {
           "t": "def",
-          "n": "build_steps"
+          "n": "kontrollo"
         },
         {
           "t": "def",
-          "n": "get_path"
-        },
-        {
-          "t": "def",
-          "n": "draw_graph"
-        },
-        {
-          "t": "def",
-          "n": "draw_matrix"
-        },
-        {
-          "t": "def",
-          "n": "advance_step"
+          "n": "bellman_ford"
         }
       ],
       "flags": {
-        "pygame": true,
+        "pygame": false,
         "tkinter": false,
         "widgets": false,
         "plotly": false,
         "subprocess": false,
-        "sysexit": true,
+        "sysexit": false,
         "networkx": false,
         "matplotlib": false
       },
@@ -852,89 +808,87 @@
       "outputs": []
     },
     {
-      "type": "markdown",
-      "kind": "normal",
-      "html": "sha256:0070878e334b94c3",
-      "srcIndex": 11
-    },
-    {
-      "type": "markdown",
-      "kind": "exercise",
-      "label": "Ushtrim",
-      "id": "ushtrimi-6-floyd-warshall-gara-e-rrugeve",
-      "heading": "Ushtrimi 6 — Floyd-Warshall: Gara e Rrugëve",
-      "level": 2,
-      "redundant": false,
-      "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 11
-    },
-    {
-      "type": "markdown",
-      "kind": "theory",
-      "label": "Teori",
-      "id": "teoria-rindertimi-i-rruges",
-      "heading": "Teoria: Rindërtimi i rrugës",
-      "level": 3,
-      "redundant": false,
-      "html": "sha256:8ac20606c476ed74",
-      "srcIndex": 11
-    },
-    {
-      "type": "markdown",
-      "kind": "normal",
-      "label": null,
-      "id": "loja-8-raunde",
-      "heading": "Loja — 8 Raunde",
-      "level": 3,
-      "redundant": false,
-      "html": "sha256:a4d21ea694799072",
-      "srcIndex": 11
+      "type": "code",
+      "srcIndex": 11,
+      "interactive": false,
+      "html": "sha256:08903b3fd851751b",
+      "raw": "sha256:f654d10f4562cf62",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
     },
     {
       "type": "code",
       "srcIndex": 12,
-      "interactive": true,
-      "html": "sha256:9d26bd79e75eb5ee",
-      "raw": "sha256:60fdbaad03a3fd76",
-      "lines": 348,
-      "collapsed": true,
-      "summary": [
-        {
-          "t": "def",
-          "n": "make_graph"
-        },
-        {
-          "t": "def",
-          "n": "floyd_warshall"
-        },
-        {
-          "t": "def",
-          "n": "get_path"
-        },
-        {
-          "t": "def",
-          "n": "current_src_dst"
-        },
-        {
-          "t": "def",
-          "n": "path_cost"
-        },
-        {
-          "t": "def",
-          "n": "draw_graph"
-        },
-        {
-          "t": "def",
-          "n": "next_round"
-        }
-      ],
+      "interactive": false,
+      "html": "sha256:0bed78caa44e70af",
+      "raw": "sha256:203feb6116493d4b",
+      "lines": 13,
+      "collapsed": false,
+      "summary": [],
       "flags": {
-        "pygame": true,
+        "pygame": false,
         "tkinter": false,
         "widgets": false,
         "plotly": false,
         "subprocess": false,
-        "sysexit": true,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 13,
+      "interactive": false,
+      "html": "sha256:5d30a7deac9dd29b",
+      "raw": "sha256:8ae24aae27ff8d7d",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 14,
+      "interactive": false,
+      "html": "sha256:c14a198718d0fb4f",
+      "raw": "sha256:61c0f59b240a7860",
+      "lines": 11,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
         "networkx": false,
         "matplotlib": false
       },
@@ -944,8 +898,14 @@
     {
       "type": "markdown",
       "kind": "normal",
+      "html": "sha256:a4c68190cf2b37b9",
+      "srcIndex": 15
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 13
+      "srcIndex": 16
     },
     {
       "type": "markdown",
@@ -956,7 +916,7 @@
       "level": 2,
       "redundant": false,
       "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 13
+      "srcIndex": 16
     },
     {
       "type": "markdown",
@@ -966,8 +926,8 @@
       "heading": "Problemi 1 — Dijkstra me dorë",
       "level": 3,
       "redundant": false,
-      "html": "sha256:5a2c933971e7cba7",
-      "srcIndex": 13
+      "html": "sha256:61c14ed5470a4670",
+      "srcIndex": 16
     },
     {
       "type": "markdown",
@@ -977,30 +937,19 @@
       "heading": "Problemi 2 — Bellman-Ford dhe Ciklet Negative",
       "level": 3,
       "redundant": false,
-      "html": "sha256:53ac4a3b776fc558",
-      "srcIndex": 13
+      "html": "sha256:ee819456dd170005",
+      "srcIndex": 16
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
-      "id": "problemi-3-floyd-warshall-me-dore",
-      "heading": "Problemi 3 — Floyd-Warshall me dorë",
+      "id": "problemi-3-krahasimi-i-algoritmeve",
+      "heading": "Problemi 3 — Krahasimi i algoritmeve",
       "level": 3,
       "redundant": false,
-      "html": "sha256:8483c6700cfe3fff",
-      "srcIndex": 13
-    },
-    {
-      "type": "markdown",
-      "kind": "normal",
-      "label": null,
-      "id": "problemi-4-krahasimi-i-algoritmeve",
-      "heading": "Problemi 4 — Krahasimi i algoritmeve",
-      "level": 3,
-      "redundant": false,
-      "html": "sha256:42d0e4eaca0464ab",
-      "srcIndex": 13
+      "html": "sha256:ac213d8b2384b95e",
+      "srcIndex": 16
     }
   ],
   "imports": ["pygame"],
@@ -1016,10 +965,10 @@
   },
   "missingScripts": [],
   "stats": {
-    "cells": 14,
+    "cells": 17,
     "markdown": 8,
-    "code": 6,
-    "codeLines": 2051
+    "code": 9,
+    "codeLines": 1476
   },
   "hasEmbeddedHomework": false,
   "hasClasswork": true,

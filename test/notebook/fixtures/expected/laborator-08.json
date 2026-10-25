@@ -8,16 +8,34 @@
       "kind": "normal"
     },
     {
-      "id": "ushtrimi-1-sistemi-logjistik-i-shperndarjes-urbane-urbanpost",
-      "title": "Ushtrimi 1 — Sistemi Logjistik i Shpërndarjes Urbane (UrbanPost)",
+      "id": "ushtrimi-1-floyd-warshall-matrica-e-distancave",
+      "title": "Ushtrimi 1 — Floyd-Warshall: Matrica e Distancave",
       "level": 2,
       "kind": "exercise"
     },
     {
-      "id": "ushtrimi-2-rrjeti-i-klinikave-dhe-transportit-te-urgjences-mjekesore",
-      "title": "Ushtrimi 2 — Rrjeti i Klinikave dhe Transportit të Urgjencës Mjekësore",
+      "id": "ushtrimi-2-sistemi-logjistik-i-shperndarjes-urbane-urbanpost",
+      "title": "Ushtrimi 2 — Sistemi Logjistik i Shpërndarjes Urbane (UrbanPost)",
       "level": 2,
       "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-rrjeti-i-klinikave-dhe-transportit-te-urgjences-mjekesore",
+      "title": "Ushtrimi 3 — Rrjeti i Klinikave dhe Transportit të Urgjencës Mjekësore",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-floyd-warshall-gara-e-rrugeve",
+      "title": "Ushtrimi 4 — Floyd-Warshall: Gara e Rrugëve",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase-floyd-warshall-me-dore",
+      "title": "Punë në Klasë — Floyd-Warshall me dorë",
+      "level": 2,
+      "kind": "classwork"
     },
     {
       "id": "3-edmonds-karp-rrjedhat-maksimale",
@@ -26,8 +44,8 @@
       "kind": "normal"
     },
     {
-      "id": "ushtrimi-3-menaxhimi-i-rrjetit-urban-te-ujesjellesit-gjate-emergjences",
-      "title": "Ushtrimi 3 — Menaxhimi i Rrjetit Urban të Ujësjellësit gjatë Emergjencës",
+      "id": "ushtrimi-5-menaxhimi-i-rrjetit-urban-te-ujesjellesit-gjate-emergjences",
+      "title": "Ushtrimi 5 — Menaxhimi i Rrjetit Urban të Ujësjellësit gjatë Emergjencës",
       "level": 2,
       "kind": "exercise"
     },
@@ -64,6 +82,12 @@
       "kind": "normal"
     },
     {
+      "id": "po-dijkstra-nga-cdo-kulm",
+      "title": "Po Dijkstra nga çdo kulm?",
+      "level": 4,
+      "kind": "normal"
+    },
+    {
       "id": "ideja-e-programimit-dinamik",
       "title": "Ideja e Programimit Dinamik",
       "level": 3,
@@ -88,14 +112,32 @@
       "kind": "normal"
     },
     {
-      "id": "trajtimi-i-cikleve-negative",
-      "title": "Trajtimi i Cikleve Negative",
+      "id": "ciklet-negative-shikoni-diagonalen",
+      "title": "Ciklet negative: shikoni diagonalen",
       "level": 3,
       "kind": "normal"
     },
     {
-      "id": "ushtrimi-1-sistemi-logjistik-i-shperndarjes-urbane-urbanpost",
-      "title": "Ushtrimi 1 — Sistemi Logjistik i Shpërndarjes Urbane (UrbanPost)",
+      "id": "ushtrimi-1-floyd-warshall-matrica-e-distancave",
+      "title": "Ushtrimi 1 — Floyd-Warshall: Matrica e Distancave",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "teoria-floyd-warshall-dhe-programimi-dinamik",
+      "title": "Teoria: Floyd-Warshall dhe programimi dinamik",
+      "level": 3,
+      "kind": "theory"
+    },
+    {
+      "id": "animacioni-ekran-i-ndare",
+      "title": "Animacioni — Ekran i ndarë",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-2-sistemi-logjistik-i-shperndarjes-urbane-urbanpost",
+      "title": "Ushtrimi 2 — Sistemi Logjistik i Shpërndarjes Urbane (UrbanPost)",
       "level": 2,
       "kind": "exercise"
     },
@@ -142,14 +184,14 @@
       "kind": "normal"
     },
     {
-      "id": "implementimi-i-ushtrimit-1-urbanpost",
-      "title": "Implementimi i Ushtrimit 1 — UrbanPost",
+      "id": "implementimi-i-ushtrimit-2-urbanpost",
+      "title": "Implementimi i Ushtrimit 2 — UrbanPost",
       "level": 3,
       "kind": "normal"
     },
     {
-      "id": "ushtrimi-2-rrjeti-i-klinikave-dhe-transportit-te-urgjences-mjekesore",
-      "title": "Ushtrimi 2 — Rrjeti i Klinikave dhe Transportit të Urgjencës Mjekësore",
+      "id": "ushtrimi-3-rrjeti-i-klinikave-dhe-transportit-te-urgjences-mjekesore",
+      "title": "Ushtrimi 3 — Rrjeti i Klinikave dhe Transportit të Urgjencës Mjekësore",
       "level": 2,
       "kind": "exercise"
     },
@@ -190,10 +232,34 @@
       "kind": "normal"
     },
     {
-      "id": "implementimi-i-ushtrimit-2-rrjeti-mjekesor",
-      "title": "Implementimi i Ushtrimit 2 — Rrjeti Mjekësor",
+      "id": "implementimi-i-ushtrimit-3-rrjeti-mjekesor",
+      "title": "Implementimi i Ushtrimit 3 — Rrjeti Mjekësor",
       "level": 3,
       "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-4-floyd-warshall-gara-e-rrugeve",
+      "title": "Ushtrimi 4 — Floyd-Warshall: Gara e Rrugëve",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "teoria-rindertimi-i-rruges",
+      "title": "Teoria: Rindërtimi i rrugës",
+      "level": 3,
+      "kind": "theory"
+    },
+    {
+      "id": "loja-8-raunde",
+      "title": "Loja — 8 Raunde",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "pune-ne-klase-floyd-warshall-me-dore",
+      "title": "Punë në Klasë — Floyd-Warshall me dorë",
+      "level": 2,
+      "kind": "classwork"
     },
     {
       "id": "3-edmonds-karp-rrjedhat-maksimale",
@@ -226,8 +292,8 @@
       "kind": "normal"
     },
     {
-      "id": "ushtrimi-3-menaxhimi-i-rrjetit-urban-te-ujesjellesit-gjate-emergjences",
-      "title": "Ushtrimi 3 — Menaxhimi i Rrjetit Urban të Ujësjellësit gjatë Emergjencës",
+      "id": "ushtrimi-5-menaxhimi-i-rrjetit-urban-te-ujesjellesit-gjate-emergjences",
+      "title": "Ushtrimi 5 — Menaxhimi i Rrjetit Urban të Ujësjellësit gjatë Emergjencës",
       "level": 2,
       "kind": "exercise"
     },
@@ -315,6 +381,11 @@
       "kind": "normal"
     },
     {
+      "id": "po-dijkstra-nga-cdo-kulm",
+      "title": "Po Dijkstra nga çdo kulm?",
+      "kind": "normal"
+    },
+    {
       "id": "ideja-e-programimit-dinamik",
       "title": "Ideja e Programimit Dinamik",
       "kind": "normal"
@@ -335,13 +406,28 @@
       "kind": "normal"
     },
     {
-      "id": "trajtimi-i-cikleve-negative",
-      "title": "Trajtimi i Cikleve Negative",
+      "id": "ciklet-negative-shikoni-diagonalen",
+      "title": "Ciklet negative: shikoni diagonalen",
       "kind": "normal"
     },
     {
-      "id": "ushtrimi-1-sistemi-logjistik-i-shperndarjes-urbane-urbanpost",
-      "title": "Ushtrimi 1 — Sistemi Logjistik i Shpërndarjes Urbane (UrbanPost)",
+      "id": "ushtrimi-1-floyd-warshall-matrica-e-distancave",
+      "title": "Ushtrimi 1 — Floyd-Warshall: Matrica e Distancave",
+      "kind": "exercise"
+    },
+    {
+      "id": "teoria-floyd-warshall-dhe-programimi-dinamik",
+      "title": "Teoria: Floyd-Warshall dhe programimi dinamik",
+      "kind": "theory"
+    },
+    {
+      "id": "animacioni-ekran-i-ndare",
+      "title": "Animacioni — Ekran i ndarë",
+      "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-2-sistemi-logjistik-i-shperndarjes-urbane-urbanpost",
+      "title": "Ushtrimi 2 — Sistemi Logjistik i Shpërndarjes Urbane (UrbanPost)",
       "kind": "exercise"
     },
     {
@@ -380,13 +466,13 @@
       "kind": "normal"
     },
     {
-      "id": "implementimi-i-ushtrimit-1-urbanpost",
-      "title": "Implementimi i Ushtrimit 1 — UrbanPost",
+      "id": "implementimi-i-ushtrimit-2-urbanpost",
+      "title": "Implementimi i Ushtrimit 2 — UrbanPost",
       "kind": "normal"
     },
     {
-      "id": "ushtrimi-2-rrjeti-i-klinikave-dhe-transportit-te-urgjences-mjekesore",
-      "title": "Ushtrimi 2 — Rrjeti i Klinikave dhe Transportit të Urgjencës Mjekësore",
+      "id": "ushtrimi-3-rrjeti-i-klinikave-dhe-transportit-te-urgjences-mjekesore",
+      "title": "Ushtrimi 3 — Rrjeti i Klinikave dhe Transportit të Urgjencës Mjekësore",
       "kind": "exercise"
     },
     {
@@ -420,9 +506,29 @@
       "kind": "normal"
     },
     {
-      "id": "implementimi-i-ushtrimit-2-rrjeti-mjekesor",
-      "title": "Implementimi i Ushtrimit 2 — Rrjeti Mjekësor",
+      "id": "implementimi-i-ushtrimit-3-rrjeti-mjekesor",
+      "title": "Implementimi i Ushtrimit 3 — Rrjeti Mjekësor",
       "kind": "normal"
+    },
+    {
+      "id": "ushtrimi-4-floyd-warshall-gara-e-rrugeve",
+      "title": "Ushtrimi 4 — Floyd-Warshall: Gara e Rrugëve",
+      "kind": "exercise"
+    },
+    {
+      "id": "teoria-rindertimi-i-rruges",
+      "title": "Teoria: Rindërtimi i rrugës",
+      "kind": "theory"
+    },
+    {
+      "id": "loja-8-raunde",
+      "title": "Loja — 8 Raunde",
+      "kind": "normal"
+    },
+    {
+      "id": "pune-ne-klase-floyd-warshall-me-dore",
+      "title": "Punë në Klasë — Floyd-Warshall me dorë",
+      "kind": "classwork"
     },
     {
       "id": "3-edmonds-karp-rrjedhat-maksimale",
@@ -450,8 +556,8 @@
       "kind": "normal"
     },
     {
-      "id": "ushtrimi-3-menaxhimi-i-rrjetit-urban-te-ujesjellesit-gjate-emergjences",
-      "title": "Ushtrimi 3 — Menaxhimi i Rrjetit Urban të Ujësjellësit gjatë Emergjencës",
+      "id": "ushtrimi-5-menaxhimi-i-rrjetit-urban-te-ujesjellesit-gjate-emergjences",
+      "title": "Ushtrimi 5 — Menaxhimi i Rrjetit Urban të Ujësjellësit gjatë Emergjencës",
       "kind": "exercise"
     },
     {
@@ -547,7 +653,18 @@
       "heading": "Pse kjo është ndryshe nga Dijkstra?",
       "level": 3,
       "redundant": false,
-      "html": "sha256:4dd447c37c951562",
+      "html": "sha256:950762325325f317",
+      "srcIndex": 1
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "po-dijkstra-nga-cdo-kulm",
+      "heading": "Po Dijkstra nga çdo kulm?",
+      "level": 4,
+      "redundant": false,
+      "html": "sha256:00cd9962c0654040",
       "srcIndex": 1
     },
     {
@@ -598,11 +715,11 @@
       "type": "markdown",
       "kind": "normal",
       "label": null,
-      "id": "trajtimi-i-cikleve-negative",
-      "heading": "Trajtimi i Cikleve Negative",
+      "id": "ciklet-negative-shikoni-diagonalen",
+      "heading": "Ciklet negative: shikoni diagonalen",
       "level": 3,
       "redundant": false,
-      "html": "sha256:c6cd5f0f13320493",
+      "html": "sha256:f18ff71d1b2de4ec",
       "srcIndex": 1
     },
     {
@@ -615,12 +732,94 @@
       "type": "markdown",
       "kind": "exercise",
       "label": "Ushtrim",
-      "id": "ushtrimi-1-sistemi-logjistik-i-shperndarjes-urbane-urbanpost",
-      "heading": "Ushtrimi 1 — Sistemi Logjistik i Shpërndarjes Urbane (UrbanPost)",
+      "id": "ushtrimi-1-floyd-warshall-matrica-e-distancave",
+      "heading": "Ushtrimi 1 — Floyd-Warshall: Matrica e Distancave",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 2
+    },
+    {
+      "type": "markdown",
+      "kind": "theory",
+      "label": "Teori",
+      "id": "teoria-floyd-warshall-dhe-programimi-dinamik",
+      "heading": "Teoria: Floyd-Warshall dhe programimi dinamik",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:037621a0717dda95",
+      "srcIndex": 2
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "animacioni-ekran-i-ndare",
+      "heading": "Animacioni — Ekran i ndarë",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:ed7b498fb42f5ca8",
+      "srcIndex": 2
+    },
+    {
+      "type": "code",
+      "srcIndex": 3,
+      "interactive": true,
+      "html": "sha256:32617577de2ba89a",
+      "raw": "sha256:f82ec30b393ef929",
+      "lines": 298,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "build_steps"
+        },
+        {
+          "t": "def",
+          "n": "get_path"
+        },
+        {
+          "t": "def",
+          "n": "draw_graph"
+        },
+        {
+          "t": "def",
+          "n": "draw_matrix"
+        },
+        {
+          "t": "def",
+          "n": "advance_step"
+        }
+      ],
+      "flags": {
+        "pygame": true,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": true,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 4
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-2-sistemi-logjistik-i-shperndarjes-urbane-urbanpost",
+      "heading": "Ushtrimi 2 — Sistemi Logjistik i Shpërndarjes Urbane (UrbanPost)",
       "level": 2,
       "redundant": false,
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 2
+      "srcIndex": 4
     },
     {
       "type": "markdown",
@@ -631,7 +830,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:909362dd0e457270",
-      "srcIndex": 2
+      "srcIndex": 4
     },
     {
       "type": "markdown",
@@ -642,7 +841,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 2
+      "srcIndex": 4
     },
     {
       "type": "markdown",
@@ -653,7 +852,7 @@
       "level": 4,
       "redundant": false,
       "html": "sha256:50ed186aec12a4aa",
-      "srcIndex": 2
+      "srcIndex": 4
     },
     {
       "type": "markdown",
@@ -664,7 +863,7 @@
       "level": 4,
       "redundant": false,
       "html": "sha256:0a86078db09900d3",
-      "srcIndex": 2
+      "srcIndex": 4
     },
     {
       "type": "markdown",
@@ -675,7 +874,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:615394d1f3c96268",
-      "srcIndex": 2
+      "srcIndex": 4
     },
     {
       "type": "markdown",
@@ -686,7 +885,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:59d999ab32b09843",
-      "srcIndex": 2
+      "srcIndex": 4
     },
     {
       "type": "markdown",
@@ -697,22 +896,22 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:e848bf1a74885780",
-      "srcIndex": 2
+      "srcIndex": 4
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
-      "id": "implementimi-i-ushtrimit-1-urbanpost",
-      "heading": "Implementimi i Ushtrimit 1 — UrbanPost",
+      "id": "implementimi-i-ushtrimit-2-urbanpost",
+      "heading": "Implementimi i Ushtrimit 2 — UrbanPost",
       "level": 3,
       "redundant": false,
       "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 3
+      "srcIndex": 5
     },
     {
       "type": "code",
-      "srcIndex": 4,
+      "srcIndex": 6,
       "interactive": true,
       "html": "sha256:6941e4ae82726eda",
       "raw": "sha256:2288e7d419a443c6",
@@ -793,18 +992,18 @@
       "type": "markdown",
       "kind": "normal",
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 5
+      "srcIndex": 7
     },
     {
       "type": "markdown",
       "kind": "exercise",
       "label": "Ushtrim",
-      "id": "ushtrimi-2-rrjeti-i-klinikave-dhe-transportit-te-urgjences-mjekesore",
-      "heading": "Ushtrimi 2 — Rrjeti i Klinikave dhe Transportit të Urgjencës Mjekësore",
+      "id": "ushtrimi-3-rrjeti-i-klinikave-dhe-transportit-te-urgjences-mjekesore",
+      "heading": "Ushtrimi 3 — Rrjeti i Klinikave dhe Transportit të Urgjencës Mjekësore",
       "level": 2,
       "redundant": false,
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 5
+      "srcIndex": 7
     },
     {
       "type": "markdown",
@@ -815,7 +1014,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:9c39b9d7fcc2beff",
-      "srcIndex": 5
+      "srcIndex": 7
     },
     {
       "type": "markdown",
@@ -826,7 +1025,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 5
+      "srcIndex": 7
     },
     {
       "type": "markdown",
@@ -837,7 +1036,7 @@
       "level": 4,
       "redundant": false,
       "html": "sha256:1e8372716f912bb9",
-      "srcIndex": 5
+      "srcIndex": 7
     },
     {
       "type": "markdown",
@@ -848,7 +1047,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:87498bed97706868",
-      "srcIndex": 5
+      "srcIndex": 7
     },
     {
       "type": "markdown",
@@ -859,7 +1058,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:9dd8d152df81db6c",
-      "srcIndex": 5
+      "srcIndex": 7
     },
     {
       "type": "markdown",
@@ -870,22 +1069,22 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:e0ba4b778a519b7f",
-      "srcIndex": 5
+      "srcIndex": 7
     },
     {
       "type": "markdown",
       "kind": "normal",
       "label": null,
-      "id": "implementimi-i-ushtrimit-2-rrjeti-mjekesor",
-      "heading": "Implementimi i Ushtrimit 2 — Rrjeti Mjekësor",
+      "id": "implementimi-i-ushtrimit-3-rrjeti-mjekesor",
+      "heading": "Implementimi i Ushtrimit 3 — Rrjeti Mjekësor",
       "level": 3,
       "redundant": false,
       "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 6
+      "srcIndex": 8
     },
     {
       "type": "code",
-      "srcIndex": 7,
+      "srcIndex": 9,
       "interactive": true,
       "html": "sha256:1457361b60fa9eb5",
       "raw": "sha256:41e693470cfad2a0",
@@ -966,7 +1165,114 @@
       "type": "markdown",
       "kind": "normal",
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 8
+      "srcIndex": 10
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-4-floyd-warshall-gara-e-rrugeve",
+      "heading": "Ushtrimi 4 — Floyd-Warshall: Gara e Rrugëve",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e3b0c44298fc1c14",
+      "srcIndex": 10
+    },
+    {
+      "type": "markdown",
+      "kind": "theory",
+      "label": "Teori",
+      "id": "teoria-rindertimi-i-rruges",
+      "heading": "Teoria: Rindërtimi i rrugës",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:78e8bab7bde6e332",
+      "srcIndex": 10
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "loja-8-raunde",
+      "heading": "Loja — 8 Raunde",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:a4d21ea694799072",
+      "srcIndex": 10
+    },
+    {
+      "type": "code",
+      "srcIndex": 11,
+      "interactive": true,
+      "html": "sha256:9d26bd79e75eb5ee",
+      "raw": "sha256:60fdbaad03a3fd76",
+      "lines": 348,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "make_graph"
+        },
+        {
+          "t": "def",
+          "n": "floyd_warshall"
+        },
+        {
+          "t": "def",
+          "n": "get_path"
+        },
+        {
+          "t": "def",
+          "n": "current_src_dst"
+        },
+        {
+          "t": "def",
+          "n": "path_cost"
+        },
+        {
+          "t": "def",
+          "n": "draw_graph"
+        },
+        {
+          "t": "def",
+          "n": "next_round"
+        }
+      ],
+      "flags": {
+        "pygame": true,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": true,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 12
+    },
+    {
+      "type": "markdown",
+      "kind": "classwork",
+      "label": "Punë në Klasë",
+      "id": "pune-ne-klase-floyd-warshall-me-dore",
+      "heading": "Punë në Klasë — Floyd-Warshall me dorë",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:85d6b2d7a49c1025",
+      "srcIndex": 12
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 13
     },
     {
       "type": "markdown",
@@ -977,7 +1283,7 @@
       "level": 2,
       "redundant": false,
       "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 8
+      "srcIndex": 13
     },
     {
       "type": "markdown",
@@ -988,7 +1294,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:140237aa49a5261d",
-      "srcIndex": 8
+      "srcIndex": 13
     },
     {
       "type": "markdown",
@@ -999,7 +1305,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:8561e4d76e3cac07",
-      "srcIndex": 8
+      "srcIndex": 13
     },
     {
       "type": "markdown",
@@ -1010,7 +1316,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:99b46b2c38cbbd76",
-      "srcIndex": 8
+      "srcIndex": 13
     },
     {
       "type": "markdown",
@@ -1021,24 +1327,24 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:e6c0367325220778",
-      "srcIndex": 8
+      "srcIndex": 13
     },
     {
       "type": "markdown",
       "kind": "normal",
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 9
+      "srcIndex": 14
     },
     {
       "type": "markdown",
       "kind": "exercise",
       "label": "Ushtrim",
-      "id": "ushtrimi-3-menaxhimi-i-rrjetit-urban-te-ujesjellesit-gjate-emergjences",
-      "heading": "Ushtrimi 3 — Menaxhimi i Rrjetit Urban të Ujësjellësit gjatë Emergjencës",
+      "id": "ushtrimi-5-menaxhimi-i-rrjetit-urban-te-ujesjellesit-gjate-emergjences",
+      "heading": "Ushtrimi 5 — Menaxhimi i Rrjetit Urban të Ujësjellësit gjatë Emergjencës",
       "level": 2,
       "redundant": false,
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 9
+      "srcIndex": 14
     },
     {
       "type": "markdown",
@@ -1049,7 +1355,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:523fc11abf50f1ca",
-      "srcIndex": 9
+      "srcIndex": 14
     },
     {
       "type": "markdown",
@@ -1060,7 +1366,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:e7c9815dc2a4df63",
-      "srcIndex": 9
+      "srcIndex": 14
     },
     {
       "type": "markdown",
@@ -1071,7 +1377,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 9
+      "srcIndex": 14
     },
     {
       "type": "markdown",
@@ -1082,7 +1388,7 @@
       "level": 4,
       "redundant": false,
       "html": "sha256:07938f2df47db8a9",
-      "srcIndex": 9
+      "srcIndex": 14
     },
     {
       "type": "markdown",
@@ -1093,7 +1399,7 @@
       "level": 4,
       "redundant": false,
       "html": "sha256:cccaf6c6bd000d40",
-      "srcIndex": 9
+      "srcIndex": 14
     },
     {
       "type": "markdown",
@@ -1104,7 +1410,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:cb2b9351b0ba37ba",
-      "srcIndex": 9
+      "srcIndex": 14
     },
     {
       "type": "markdown",
@@ -1115,11 +1421,11 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:e3b0c44298fc1c14",
-      "srcIndex": 10
+      "srcIndex": 15
     },
     {
       "type": "code",
-      "srcIndex": 11,
+      "srcIndex": 16,
       "interactive": true,
       "html": "sha256:1da023811ae14ed5",
       "raw": "sha256:3752e4de325ca0fd",
@@ -1200,7 +1506,7 @@
       "type": "markdown",
       "kind": "normal",
       "html": "sha256:0070878e334b94c3",
-      "srcIndex": 12
+      "srcIndex": 17
     },
     {
       "type": "markdown",
@@ -1211,7 +1517,7 @@
       "level": 2,
       "redundant": false,
       "html": "sha256:62264b78ada8c075",
-      "srcIndex": 12
+      "srcIndex": 17
     },
     {
       "type": "markdown",
@@ -1222,7 +1528,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:5c12899c891bb435",
-      "srcIndex": 12
+      "srcIndex": 17
     },
     {
       "type": "markdown",
@@ -1233,7 +1539,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:ff48d525313be57f",
-      "srcIndex": 12
+      "srcIndex": 17
     },
     {
       "type": "markdown",
@@ -1243,8 +1549,8 @@
       "heading": "Pyetje Reflektuese",
       "level": 2,
       "redundant": false,
-      "html": "sha256:34bb4cb08425de72",
-      "srcIndex": 12
+      "html": "sha256:e335e74a59ff9e79",
+      "srcIndex": 17
     }
   ],
   "imports": ["collections", "copy", "pygame"],
@@ -1260,12 +1566,12 @@
   },
   "missingScripts": [],
   "stats": {
-    "cells": 14,
-    "markdown": 11,
-    "code": 3,
-    "codeLines": 2869
+    "cells": 18,
+    "markdown": 13,
+    "code": 5,
+    "codeLines": 3515
   },
   "hasEmbeddedHomework": false,
-  "hasClasswork": false,
+  "hasClasswork": true,
   "assets": []
 }

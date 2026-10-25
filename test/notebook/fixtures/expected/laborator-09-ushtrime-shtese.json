@@ -66,6 +66,30 @@
       "title": "Pyetje Reflektuese",
       "level": 2,
       "kind": "reflect"
+    },
+    {
+      "id": "detyra-shtepie",
+      "title": "Detyra Shtëpie",
+      "level": 2,
+      "kind": "homework"
+    },
+    {
+      "id": "detyra-1-rrjeti-i-internetit-rrjedha-max-dhe-lidhjet-kritike",
+      "title": "Detyra 1 — Rrjeti i internetit: rrjedha max dhe lidhjet kritike",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "detyra-2-rrjeti-hekurudhor-ford-fulkerson-dfs-kundrejt-edmonds-karp-bf",
+      "title": "Detyra 2 — Rrjeti hekurudhor: Ford-Fulkerson (DFS) kundrejt Edmonds-Karp (BFS)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "detyra-3-ku-te-investojme",
+      "title": "Detyra 3 — Ku të investojmë?",
+      "level": 3,
+      "kind": "normal"
     }
   ],
   "tocFull": [
@@ -134,6 +158,30 @@
       "title": "Pyetje Reflektuese",
       "level": 2,
       "kind": "reflect"
+    },
+    {
+      "id": "detyra-shtepie",
+      "title": "Detyra Shtëpie",
+      "level": 2,
+      "kind": "homework"
+    },
+    {
+      "id": "detyra-1-rrjeti-i-internetit-rrjedha-max-dhe-lidhjet-kritike",
+      "title": "Detyra 1 — Rrjeti i internetit: rrjedha max dhe lidhjet kritike",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "detyra-2-rrjeti-hekurudhor-ford-fulkerson-dfs-kundrejt-edmonds-karp-bf",
+      "title": "Detyra 2 — Rrjeti hekurudhor: Ford-Fulkerson (DFS) kundrejt Edmonds-Karp (BFS)",
+      "level": 3,
+      "kind": "normal"
+    },
+    {
+      "id": "detyra-3-ku-te-investojme",
+      "title": "Detyra 3 — Ku të investojmë?",
+      "level": 3,
+      "kind": "normal"
     }
   ],
   "sections": [
@@ -191,6 +239,26 @@
       "id": "pyetje-reflektuese",
       "title": "Pyetje Reflektuese",
       "kind": "reflect"
+    },
+    {
+      "id": "detyra-shtepie",
+      "title": "Detyra Shtëpie",
+      "kind": "homework"
+    },
+    {
+      "id": "detyra-1-rrjeti-i-internetit-rrjedha-max-dhe-lidhjet-kritike",
+      "title": "Detyra 1 — Rrjeti i internetit: rrjedha max dhe lidhjet kritike",
+      "kind": "normal"
+    },
+    {
+      "id": "detyra-2-rrjeti-hekurudhor-ford-fulkerson-dfs-kundrejt-edmonds-karp-bf",
+      "title": "Detyra 2 — Rrjeti hekurudhor: Ford-Fulkerson (DFS) kundrejt Edmonds-Karp (BFS)",
+      "kind": "normal"
+    },
+    {
+      "id": "detyra-3-ku-te-investojme",
+      "title": "Detyra 3 — Ku të investojmë?",
+      "kind": "normal"
     }
   ],
   "cells": [
@@ -805,6 +873,206 @@
       "redundant": false,
       "html": "sha256:0e5e1aa47610e695",
       "srcIndex": 33
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:0070878e334b94c3",
+      "srcIndex": 34
+    },
+    {
+      "type": "markdown",
+      "kind": "homework",
+      "label": "Detyrë Shtëpie",
+      "id": "detyra-shtepie",
+      "heading": "Detyra Shtëpie",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:5684602e0214f408",
+      "srcIndex": 34
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "detyra-1-rrjeti-i-internetit-rrjedha-max-dhe-lidhjet-kritike",
+      "heading": "Detyra 1 — Rrjeti i internetit: rrjedha max dhe lidhjet kritike",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:2195a26dd4054674",
+      "srcIndex": 35
+    },
+    {
+      "type": "code",
+      "srcIndex": 36,
+      "interactive": false,
+      "html": "sha256:9153843cf32e8aaf",
+      "raw": "sha256:102ce727b2b2062b",
+      "lines": 11,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 37,
+      "interactive": false,
+      "html": "sha256:3d0885f349ac4788",
+      "raw": "sha256:20ace2b908b26052",
+      "lines": 12,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:da1278ac32eb57ff",
+      "srcIndex": 38
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "detyra-2-rrjeti-hekurudhor-ford-fulkerson-dfs-kundrejt-edmonds-karp-bf",
+      "heading": "Detyra 2 — Rrjeti hekurudhor: Ford-Fulkerson (DFS) kundrejt Edmonds-Karp (BFS)",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:6a3102e4b856760d",
+      "srcIndex": 39
+    },
+    {
+      "type": "code",
+      "srcIndex": 40,
+      "interactive": false,
+      "html": "sha256:bce4c951907ba2ef",
+      "raw": "sha256:a8b01a48c0cff592",
+      "lines": 11,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 41,
+      "interactive": false,
+      "html": "sha256:2ebce2701f2558e0",
+      "raw": "sha256:c481625a6b2fd915",
+      "lines": 13,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:1f4c4b44be573f99",
+      "srcIndex": 42
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "label": null,
+      "id": "detyra-3-ku-te-investojme",
+      "heading": "Detyra 3 — Ku të investojmë?",
+      "level": 3,
+      "redundant": false,
+      "html": "sha256:b9a28efcc7efc81f",
+      "srcIndex": 43
+    },
+    {
+      "type": "code",
+      "srcIndex": 44,
+      "interactive": false,
+      "html": "sha256:fefe197e605cee04",
+      "raw": "sha256:2f2be31b27835b6e",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 45,
+      "interactive": false,
+      "html": "sha256:84064a63683fd27f",
+      "raw": "sha256:b2abfb5e4b8c897d",
+      "lines": 15,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:a2cbd64c5d12266f",
+      "srcIndex": 46
     }
   ],
   "imports": ["collections", "itertools", "matplotlib", "networkx"],
@@ -820,12 +1088,12 @@
   },
   "missingScripts": [],
   "stats": {
-    "cells": 34,
-    "markdown": 15,
-    "code": 19,
-    "codeLines": 340
+    "cells": 47,
+    "markdown": 22,
+    "code": 25,
+    "codeLines": 405
   },
-  "hasEmbeddedHomework": false,
+  "hasEmbeddedHomework": true,
   "hasClasswork": true,
   "assets": [
     {

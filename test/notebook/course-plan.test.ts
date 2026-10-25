@@ -44,16 +44,16 @@ describe('planning the course import', () => {
     // Each part is a notebook of whole cells, and its visualizations follow their cells.
     const whole = JSON.parse(notebook('laborator-05.ipynb')).cells;
     const [opening, ...rest] = JSON.parse(part6?.raw ?? '').cells;
-    expect(rest).toEqual(whole.slice(11, 19));
+    expect(rest).toEqual(whole.slice(8, 13));
     // It starts at its heading, as on the site, without the rule above it.
-    expect(opening).toEqual({ ...whole[10], source: whole[10].source.slice(2) });
-    expect(JSON.parse(part5?.raw ?? '').cells).toEqual([...whole.slice(0, 10), ...whole.slice(19)]);
+    expect(opening).toEqual({ ...whole[7], source: whole[7].source.slice(2) });
+    expect(JSON.parse(part5?.raw ?? '').cells).toEqual([...whole.slice(0, 7), ...whole.slice(13)]);
     expect(part5?.embeds.map((e) => [e.cell, e.viz])).toEqual([
-      [3, 'labirinti'],
+      [2, 'labirinti'],
+      [4, 'grafet'],
       [6, 'grafet'],
-      [9, 'grafet'],
     ]);
-    expect(part6?.embeds.map((e) => e.cell)).toEqual([2, 5, 8]);
+    expect(part6?.embeds.map((e) => e.cell)).toEqual([1, 3, 5]);
     expect(lab6?.notebooks[1]).toMatchObject({
       kind: 'extra',
       title: 'Detyrë shtëpie — Komponentet e Lidhura Fort & Renditjet Topologjike',

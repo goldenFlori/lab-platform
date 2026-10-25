@@ -272,24 +272,6 @@
       "title": "Detyra Shtëpie",
       "level": 2,
       "kind": "homework"
-    },
-    {
-      "id": "detyre-1-max-flow-min-cut-rrjeti-i-internetit",
-      "title": "Detyrë 1 — Max-Flow & Min-Cut: Rrjeti i Internetit",
-      "level": 3,
-      "kind": "normal"
-    },
-    {
-      "id": "detyre-2-ford-fulkerson-dfs-rrjeti-hekurudhor",
-      "title": "Detyrë 2 — Ford-Fulkerson (DFS): Rrjeti Hekurudhor",
-      "level": 3,
-      "kind": "normal"
-    },
-    {
-      "id": "detyre-3-edmonds-karp-bfs-krahasimi-me-ford-fulkerson",
-      "title": "Detyrë 3 — Edmonds-Karp (BFS): Krahasimi me Ford-Fulkerson",
-      "level": 3,
-      "kind": "normal"
     }
   ],
   "sections": [
@@ -487,21 +469,6 @@
       "id": "detyra-shtepie",
       "title": "Detyra Shtëpie",
       "kind": "homework"
-    },
-    {
-      "id": "detyre-1-max-flow-min-cut-rrjeti-i-internetit",
-      "title": "Detyrë 1 — Max-Flow & Min-Cut: Rrjeti i Internetit",
-      "kind": "normal"
-    },
-    {
-      "id": "detyre-2-ford-fulkerson-dfs-rrjeti-hekurudhor",
-      "title": "Detyrë 2 — Ford-Fulkerson (DFS): Rrjeti Hekurudhor",
-      "kind": "normal"
-    },
-    {
-      "id": "detyre-3-edmonds-karp-bfs-krahasimi-me-ford-fulkerson",
-      "title": "Detyrë 3 — Edmonds-Karp (BFS): Krahasimi me Ford-Fulkerson",
-      "kind": "normal"
     }
   ],
   "cells": [
@@ -1369,40 +1336,7 @@
       "heading": "Detyra Shtëpie",
       "level": 2,
       "redundant": false,
-      "html": "sha256:6ec31e444f5a5b06",
-      "srcIndex": 11
-    },
-    {
-      "type": "markdown",
-      "kind": "normal",
-      "label": null,
-      "id": "detyre-1-max-flow-min-cut-rrjeti-i-internetit",
-      "heading": "Detyrë 1 — Max-Flow & Min-Cut: Rrjeti i Internetit",
-      "level": 3,
-      "redundant": false,
-      "html": "sha256:c9a2d8ee25699f2d",
-      "srcIndex": 11
-    },
-    {
-      "type": "markdown",
-      "kind": "normal",
-      "label": null,
-      "id": "detyre-2-ford-fulkerson-dfs-rrjeti-hekurudhor",
-      "heading": "Detyrë 2 — Ford-Fulkerson (DFS): Rrjeti Hekurudhor",
-      "level": 3,
-      "redundant": false,
-      "html": "sha256:b21439bd26e6eba6",
-      "srcIndex": 11
-    },
-    {
-      "type": "markdown",
-      "kind": "normal",
-      "label": null,
-      "id": "detyre-3-edmonds-karp-bfs-krahasimi-me-ford-fulkerson",
-      "heading": "Detyrë 3 — Edmonds-Karp (BFS): Krahasimi me Ford-Fulkerson",
-      "level": 3,
-      "redundant": false,
-      "html": "sha256:c102d5c79d6f8c34",
+      "html": "sha256:14a8297ff3bd5f8e",
       "srcIndex": 11
     }
   ],
