@@ -221,6 +221,15 @@ describe('managing notebooks', () => {
     expect((await set({ ...problem, directed: true })).status).toBe(400);
     expect((await set({ ...problem, edges: [{ u: 'A', v: 'Z', w: 1 }] })).status).toBe(400);
     expect((await set({ ...problem, source: null })).status).toBe(400);
+    // Or a variant per student (#167), when it can be made.
+    const variant = (v: unknown) =>
+      pedagog.call(url, {
+        method: 'PUT',
+        body: { embeds: [{ cell: 2, viz: 'tabela-gjurmimit', props: { variant: v } }] },
+      });
+    expect((await variant({ algorithm: 'kruskal', nodes: 6, directed: false })).status).toBe(200);
+    expect((await variant({ algorithm: 'kruskal', nodes: 12, directed: false })).status).toBe(400);
+    expect((await variant({ algorithm: 'kahn', nodes: 5, directed: false })).status).toBe(400);
     // Other visualizations' props are their own business.
     const other = await pedagog.call(url, {
       method: 'PUT',

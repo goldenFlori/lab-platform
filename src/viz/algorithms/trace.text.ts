@@ -69,6 +69,11 @@ const sq = {
   },
   custom: {
     name: (algorithm: string) => `Problemi i pedagogut · ${algorithm}`,
+    variantName: (algorithm: string) => `Varianti juaj · ${algorithm}`,
+    example: 'Shembull: në laborator, çdo student merr grafin e vet',
+    variantOf: 'Varianti i',
+    mine: 'Juaji',
+    key: 'Tabela e pritur e këtij varianti (vetëm për stafin)',
     algorithms: {
       dijkstra: 'Dijkstra',
       bellman: 'Bellman-Ford',
@@ -181,6 +186,11 @@ export const TRACE_TEXT = bilingual<TraceText>(sq, {
   },
   custom: {
     name: (algorithm) => `The pedagog's problem · ${algorithm}`,
+    variantName: (algorithm) => `Your variant · ${algorithm}`,
+    example: 'An example: in a lab, every student gets their own graph',
+    variantOf: 'Variant of',
+    mine: 'Yours',
+    key: "This variant's expected table (staff only)",
     algorithms: {
       dijkstra: 'Dijkstra',
       bellman: 'Bellman-Ford',

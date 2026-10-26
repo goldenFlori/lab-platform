@@ -7,6 +7,7 @@ import type { Embed } from '../../../shared/notebooks';
 import { isVisualizerId } from '../../../shared/visualizers';
 import { type Messages, useT } from '../../i18n';
 import { useExercises } from '../../lib/exercises';
+import { LearnerProvider } from '../../lib/learner';
 import { ResultsProvider } from '../../lib/results';
 import { sanitize } from '../../lib/sanitize';
 import { VizEmbed } from '../VizEmbed';
@@ -59,7 +60,13 @@ export function NotebookView({
       <div id={embedAnchor(id, embed.cell)} className="my-2 scroll-mt-24">
         {notebookRef ? (
           <ResultsProvider notebookRef={notebookRef} cell={embed.cell}>
-            <VizEmbed viz={embed.viz} props={embed.props} label={`${label} · ${embed.title ?? ''}`} />
+            <LearnerProvider
+              notebookRef={notebookRef}
+              cell={embed.cell}
+              variant={embed.viz === 'tabela-gjurmimit' && !!embed.props?.variant}
+            >
+              <VizEmbed viz={embed.viz} props={embed.props} label={`${label} · ${embed.title ?? ''}`} />
+            </LearnerProvider>
           </ResultsProvider>
         ) : (
           <VizEmbed viz={embed.viz} props={embed.props} label={`${label} · ${embed.title ?? ''}`} />

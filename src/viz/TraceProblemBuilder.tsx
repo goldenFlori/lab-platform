@@ -1,21 +1,27 @@
 import { useMemo, useState } from 'react';
 import {
   FIXED_DIRECTION,
+  isTraceProblem,
   NEEDS_SOURCE,
   PROBLEM_LIMITS,
   problemIssue,
   TRACE_ALGORITHMS,
   type TraceAlgorithm,
   type TraceProblem,
+  type TraceVariant,
+  VARIANT_SIZES,
+  variantIssue,
+  variantProblem,
   WEIGHTED,
 } from '../shared/trace-problem';
-import { display, traceOf } from './algorithms/trace';
+import { traceOf } from './algorithms/trace';
 import { TRACE_TEXT } from './algorithms/trace.text';
 import { TRACE_PRESET_IDS, TRACE_PRESETS, type TracePresetId } from './algorithms/trace-presets';
 import { Choice, Field, Segmented, Toggle } from './kit/controls';
 import { type EdgeLook, GraphCanvas, type NodeLook } from './kit/GraphCanvas';
 import { StepNote } from './kit/shell';
 import { bilingual, useText } from './kit/text';
+import { TraceKey } from './TraceKey';
 
 // The builder of a pedagog's own trace problem (#166), in the embeds editor: click the canvas for a
 // vertex, two vertices for an edge, choose the algorithm and where it starts, and read the table the
@@ -23,6 +29,13 @@ import { bilingual, useText } from './kit/text';
 
 const TEXT = bilingual(
   {
+    mode: 'Grafi',
+    one: 'Një për të gjithë',
+    each: 'Një për çdo student',
+    size: 'Kulme',
+    example: 'Një shembull variantesh',
+    eachHelp: (rows: number) =>
+      `Çdo student merr grafin e vet me këto rregulla (këtu një shembull): ${rows} rreshta. Stafi sheh variantin e çdo studenti te laboratori.`,
     start: 'Nis nga',
     startPick: 'Një problem i laboratorit…',
     algorithm: 'Algoritmi',
@@ -52,6 +65,13 @@ const TEXT = bilingual(
     },
   },
   {
+    mode: 'Graph',
+    one: 'One for everyone',
+    each: 'One per student',
+    size: 'Vertices',
+    example: 'An example variant',
+    eachHelp: (rows) =>
+      `Every student gets their own graph by these rules (here, an example): ${rows} rows. Staff see each student's variant in the lab.`,
     start: 'Start from',
     startPick: 'A problem of the labs…',
     algorithm: 'Algorithm',
@@ -108,13 +128,109 @@ function withAlgorithm(p: TraceProblem, algorithm: TraceAlgorithm): TraceProblem
 
 const clamp = (v: number, most: number) => Math.round(Math.min(Math.max(v, 30), most - 30));
 
+/**
+ * The builder: one graph for the whole class (#166), or a variant per student (#167) of the chosen
+ * algorithm and size. It reports the embed's props: `{ problem }` or `{ variant }`.
+ */
 export default function TraceProblemBuilder({
   value,
   onChange,
 }: {
-  value: TraceProblem | null;
-  onChange: (problem: TraceProblem) => void;
+  value: Record<string, unknown> | null;
+  onChange: (props: { problem: TraceProblem } | { variant: TraceVariant }) => void;
 }) {
+  const X = useText(TEXT);
+  const startVariant = variantIssue(value?.variant) === null ? (value?.variant as TraceVariant) : null;
+  const [mode, setMode] = useState<'one' | 'each'>(startVariant ? 'each' : 'one');
+  const [problem] = useState<TraceProblem | null>(isTraceProblem(value?.problem) ? value.problem : null);
+  return (
+    <div className="grid gap-3">
+      <Field label={X.mode}>
+        <Segmented
+          label={X.mode}
+          value={mode}
+          onChange={setMode}
+          options={[
+            { value: 'one', label: X.one },
+            { value: 'each', label: X.each },
+          ]}
+        />
+      </Field>
+      {mode === 'one' ? (
+        <OneGraph value={problem} onChange={(p) => onChange({ problem: p })} />
+      ) : (
+        <PerStudent value={startVariant} onChange={(v) => onChange({ variant: v })} />
+      )}
+    </div>
+  );
+}
+
+/** A variant per student (#167): what the graphs look like, with one example and its table. */
+function PerStudent({ value, onChange }: { value: TraceVariant | null; onChange: (v: TraceVariant) => void }) {
+  const X = useText(TEXT);
+  const T = useText(TRACE_TEXT);
+  const [spec, setSpec] = useState<TraceVariant>(value ?? { algorithm: 'prim', nodes: 6, directed: false });
+  const change = (next: TraceVariant) => {
+    const fixed = FIXED_DIRECTION[next.algorithm];
+    const [least, most] = VARIANT_SIZES[next.algorithm === 'floyd' ? 'floyd' : 'other'];
+    const clean = { ...next, directed: fixed ?? next.directed, nodes: Math.min(Math.max(next.nodes, least), most) };
+    setSpec(clean);
+    onChange(clean);
+  };
+  const [least, most] = VARIANT_SIZES[spec.algorithm === 'floyd' ? 'floyd' : 'other'];
+  const example = useMemo(() => variantProblem(spec, 'shembull'), [spec]);
+  const trace = useMemo(() => traceOf(example, T.words), [example, T]);
+  return (
+    <div className="grid gap-3" data-testid="trace-variant-builder">
+      <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
+        <Field label={X.algorithm}>
+          <Choice
+            label={X.algorithm}
+            value={spec.algorithm}
+            className="w-44"
+            onChange={(algorithm) => change({ ...spec, algorithm })}
+            options={TRACE_ALGORITHMS.map((a) => ({ value: a, label: T.custom.algorithms[a] }))}
+          />
+        </Field>
+        <Field label={X.size}>
+          <Choice
+            label={X.size}
+            value={String(spec.nodes)}
+            className="w-28"
+            onChange={(n) => change({ ...spec, nodes: Number(n) })}
+            options={Array.from({ length: most - least + 1 }, (_, i) => ({
+              value: String(least + i),
+              label: String(least + i),
+            }))}
+          />
+        </Field>
+        {FIXED_DIRECTION[spec.algorithm] === undefined && (
+          <Toggle label={X.directed} value={spec.directed} onChange={(directed) => change({ ...spec, directed })} />
+        )}
+      </div>
+      <StepNote tone="success" text={X.eachHelp(trace.rows.length)} />
+      <div className="rounded-2xl border border-border bg-[var(--viz-canvas)] bg-grid">
+        <GraphCanvas
+          nodes={example.nodes}
+          edges={example.edges}
+          directed={example.directed}
+          showWeights={WEIGHTED[spec.algorithm]}
+          ariaLabel={X.example}
+          maxHeight="320px"
+        />
+      </div>
+      <details className="rounded-xl border border-border bg-surface p-3 text-sm">
+        <summary className="cursor-pointer font-medium">{X.key}</summary>
+        <div className="mt-2">
+          <TraceKey trace={trace} W={T.words} />
+        </div>
+      </details>
+    </div>
+  );
+}
+
+/** One graph for the whole class (#166). */
+function OneGraph({ value, onChange }: { value: TraceProblem | null; onChange: (problem: TraceProblem) => void }) {
   const X = useText(TEXT);
   const T = useText(TRACE_TEXT);
   const [problem, setProblem] = useState<TraceProblem>(value ?? START);
@@ -283,28 +399,8 @@ export default function TraceProblemBuilder({
       {trace && (
         <details className="rounded-xl border border-border bg-surface p-3 text-sm">
           <summary className="cursor-pointer font-medium">{X.key}</summary>
-          <div className="mt-2 overflow-x-auto">
-            <table className="border-collapse font-mono text-xs">
-              <tbody>
-                {[trace.given, ...trace.rows].map((row) => (
-                  <tr key={row.label} className="border-t border-separator">
-                    <th className="pr-3 text-left font-sans font-medium whitespace-nowrap">{row.label}</th>
-                    {trace.matrix
-                      ? trace.matrix.map((a) => (
-                          <td key={a} className="px-1.5 py-1 whitespace-nowrap">
-                            {(trace.matrix ?? []).map((b) => row.cells[`${a},${b}`]).join(' ')}
-                          </td>
-                        ))
-                      : trace.columns.map((c) => (
-                          <td key={c.key} className="px-1.5 py-1 whitespace-nowrap">
-                            <span className="text-muted">{c.label}: </span>
-                            {display(c.kind, row.cells[c.key] ?? '', T.words)}
-                          </td>
-                        ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="mt-2">
+            <TraceKey trace={trace} W={T.words} />
           </div>
         </details>
       )}
