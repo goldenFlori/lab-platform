@@ -34,7 +34,10 @@ describe('exercises a notebook checks itself', () => {
     'laborator-02-ushtrime-shtese.ipynb': 4,
     'laborator-03-ushtrime-shtese.ipynb': 3,
     'laborator-04-ushtrime-shtese.ipynb': 8,
+    'laborator-05-ushtrime-shtese.ipynb': 8,
+    'laborator-06-ushtrime-shtese.ipynb': 7,
     'laborator-07.ipynb': 2,
+    'laborator-08-ushtrime-shtese.ipynb': 6,
     'laborator-09-ushtrime-shtese.ipynb': 10,
     'laborator-10.ipynb': 3,
   };

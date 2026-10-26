@@ -1,0 +1,596 @@
+{
+  "title": "Laboratori 8 · Ushtrime Shtesë — Floyd-Warshall në kod: rrugët, ciklet negative dhe mbyllja kalimtare",
+  "toc": [
+    {
+      "id": "kujtues-teorik",
+      "title": "Kujtues teorik",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "ushtrimi-1-matrica-e-peshave",
+      "title": "Ushtrimi 1 — Matrica e peshave",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-floyd-warshall-me-hapin-tjeter",
+      "title": "Ushtrimi 2 — Floyd-Warshall me hapin tjetër",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-rruga-nga-nxt",
+      "title": "Ushtrimi 3 — Rruga nga `nxt`",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-ciklet-negative",
+      "title": "Ushtrimi 4 — Ciklet negative",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-5-mbyllja-kalimtare-warshall",
+      "title": "Ushtrimi 5 — Mbyllja kalimtare (Warshall)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-6-dijkstra-nga-cdo-kulm",
+      "title": "Ushtrimi 6 — Dijkstra nga çdo kulm",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "kujtues-teorik",
+      "title": "Kujtues teorik",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "ushtrimi-1-matrica-e-peshave",
+      "title": "Ushtrimi 1 — Matrica e peshave",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-floyd-warshall-me-hapin-tjeter",
+      "title": "Ushtrimi 2 — Floyd-Warshall me hapin tjetër",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-rruga-nga-nxt",
+      "title": "Ushtrimi 3 — Rruga nga `nxt`",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-ciklet-negative",
+      "title": "Ushtrimi 4 — Ciklet negative",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-5-mbyllja-kalimtare-warshall",
+      "title": "Ushtrimi 5 — Mbyllja kalimtare (Warshall)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-6-dijkstra-nga-cdo-kulm",
+      "title": "Ushtrimi 6 — Dijkstra nga çdo kulm",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "sections": [
+    {
+      "id": "kujtues-teorik",
+      "title": "Kujtues teorik",
+      "kind": "theory"
+    },
+    {
+      "id": "ushtrimi-1-matrica-e-peshave",
+      "title": "Ushtrimi 1 — Matrica e peshave",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-floyd-warshall-me-hapin-tjeter",
+      "title": "Ushtrimi 2 — Floyd-Warshall me hapin tjetër",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-rruga-nga-nxt",
+      "title": "Ushtrimi 3 — Rruga nga `nxt`",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-ciklet-negative",
+      "title": "Ushtrimi 4 — Ciklet negative",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-5-mbyllja-kalimtare-warshall",
+      "title": "Ushtrimi 5 — Mbyllja kalimtare (Warshall)",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-6-dijkstra-nga-cdo-kulm",
+      "title": "Ushtrimi 6 — Dijkstra nga çdo kulm",
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "kind": "reflect"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:3bcc7b87dd00b783",
+      "srcIndex": 0,
+      "intro": true
+    },
+    {
+      "type": "markdown",
+      "kind": "theory",
+      "label": "Teori",
+      "id": "kujtues-teorik",
+      "heading": "Kujtues teorik",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:84b5e8e466a382d3",
+      "srcIndex": 1
+    },
+    {
+      "type": "code",
+      "srcIndex": 2,
+      "interactive": false,
+      "html": "sha256:a990ca853248483b",
+      "raw": "sha256:a5aeecd2d422af0e",
+      "lines": 48,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "kontrollo"
+        },
+        {
+          "t": "def",
+          "n": "harqet_e_rastit"
+        },
+        {
+          "t": "def",
+          "n": "_rruget_e_thjeshta"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-1-matrica-e-peshave",
+      "heading": "Ushtrimi 1 — Matrica e peshave",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:ef2f7d0955478ab0",
+      "srcIndex": 3
+    },
+    {
+      "type": "code",
+      "srcIndex": 4,
+      "interactive": false,
+      "html": "sha256:6fd3ae242a6ec878",
+      "raw": "sha256:123fd335f9152b51",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 5,
+      "interactive": false,
+      "html": "sha256:5f116cb473b37d05",
+      "raw": "sha256:5108d45c010c0144",
+      "lines": 7,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-2-floyd-warshall-me-hapin-tjeter",
+      "heading": "Ushtrimi 2 — Floyd-Warshall me hapin tjetër",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:65f579c1340ab41b",
+      "srcIndex": 6
+    },
+    {
+      "type": "code",
+      "srcIndex": 7,
+      "interactive": false,
+      "html": "sha256:2fb33258a29f6f14",
+      "raw": "sha256:aa2c35283d94209b",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 8,
+      "interactive": false,
+      "html": "sha256:48555af63788a90f",
+      "raw": "sha256:f3d396be1d6ff4a4",
+      "lines": 17,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-3-rruga-nga-nxt",
+      "heading": "Ushtrimi 3 — Rruga nga `nxt`",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:b636e9b0ddc0d04c",
+      "srcIndex": 9
+    },
+    {
+      "type": "code",
+      "srcIndex": 10,
+      "interactive": false,
+      "html": "sha256:52270de1192f1777",
+      "raw": "sha256:806428500319affe",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 11,
+      "interactive": false,
+      "html": "sha256:416c7abb73d589cc",
+      "raw": "sha256:6aa862031d8403ac",
+      "lines": 21,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-4-ciklet-negative",
+      "heading": "Ushtrimi 4 — Ciklet negative",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:7c102e4ba1ac2324",
+      "srcIndex": 12
+    },
+    {
+      "type": "code",
+      "srcIndex": 13,
+      "interactive": false,
+      "html": "sha256:e3699def259f7eeb",
+      "raw": "sha256:592f22fb97d98278",
+      "lines": 8,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 14,
+      "interactive": false,
+      "html": "sha256:03125a03584ff346",
+      "raw": "sha256:14528b6247c4b024",
+      "lines": 12,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:7f1f8829248f24c6",
+      "srcIndex": 15
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-5-mbyllja-kalimtare-warshall",
+      "heading": "Ushtrimi 5 — Mbyllja kalimtare (Warshall)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:a677cdeead92ccd4",
+      "srcIndex": 16
+    },
+    {
+      "type": "code",
+      "srcIndex": 17,
+      "interactive": false,
+      "html": "sha256:9f95d6b26c92c4e7",
+      "raw": "sha256:5bbf6a944b245259",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 18,
+      "interactive": false,
+      "html": "sha256:be2057e70416e76b",
+      "raw": "sha256:7d2f2f4762cbb3d2",
+      "lines": 11,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-6-dijkstra-nga-cdo-kulm",
+      "heading": "Ushtrimi 6 — Dijkstra nga çdo kulm",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:fd5740787680e769",
+      "srcIndex": 19
+    },
+    {
+      "type": "code",
+      "srcIndex": 20,
+      "interactive": false,
+      "html": "sha256:860178c8616aa9fc",
+      "raw": "sha256:60b88ed641d7a2ca",
+      "lines": 8,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 21,
+      "interactive": false,
+      "html": "sha256:b3fb34d11b1986ae",
+      "raw": "sha256:de0ef2fbefa32252",
+      "lines": 11,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "classwork",
+      "label": "Punë në Klasë",
+      "id": "pune-ne-klase",
+      "heading": "Punë në Klasë",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:04854e8e57172863",
+      "srcIndex": 22
+    },
+    {
+      "type": "markdown",
+      "kind": "reflect",
+      "label": "Pyetje Reflektuese",
+      "id": "pyetje-reflektuese",
+      "heading": "Pyetje Reflektuese",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:0aa18d4e688c63b7",
+      "srcIndex": 23
+    }
+  ],
+  "imports": ["heapq", "itertools", "random"],
+  "dependencies": [],
+  "flags": {
+    "pygame": false,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": false,
+    "matplotlib": false,
+    "networkx": false,
+    "numpy": false
+  },
+  "missingScripts": [],
+  "stats": {
+    "cells": 24,
+    "markdown": 11,
+    "code": 13,
+    "codeLines": 155
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": true,
+  "assets": []
+}

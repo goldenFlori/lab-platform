@@ -926,7 +926,7 @@
       "heading": "Problemi 1 — Dijkstra me dorë",
       "level": 3,
       "redundant": false,
-      "html": "sha256:61c14ed5470a4670",
+      "html": "sha256:11c769bb78c72f69",
       "srcIndex": 16
     },
     {
@@ -937,8 +937,8 @@
       "heading": "Problemi 2 — Bellman-Ford dhe Ciklet Negative",
       "level": 3,
       "redundant": false,
-      "html": "sha256:ee819456dd170005",
-      "srcIndex": 16
+      "html": "sha256:5f9c1628a04bc385",
+      "srcIndex": 17
     },
     {
       "type": "markdown",
@@ -949,7 +949,7 @@
       "level": 3,
       "redundant": false,
       "html": "sha256:ac213d8b2384b95e",
-      "srcIndex": 16
+      "srcIndex": 18
     }
   ],
   "imports": ["pygame"],
@@ -965,8 +965,8 @@
   },
   "missingScripts": [],
   "stats": {
-    "cells": 17,
-    "markdown": 8,
+    "cells": 19,
+    "markdown": 10,
     "code": 9,
     "codeLines": 1476
   },

@@ -1,0 +1,70 @@
+{
+  "laborator-03-ushtrime-shtese.ipynb": [
+    {
+      "cell": 8,
+      "viz": "pema-rekursive",
+      "title": "Pema rekursive e Merge Sort"
+    }
+  ],
+  "laborator-05-ushtrime-shtese.ipynb": [
+    {
+      "cell": 22,
+      "viz": "kruskal-prim",
+      "title": "Kruskal me union-find, krahas Prim"
+    }
+  ],
+  "laborator-05.ipynb": [
+    {
+      "cell": 9,
+      "viz": "tabela-gjurmimit",
+      "title": "Gjurmoni Kahn-in",
+      "props": {
+        "preset": "lab06-kahn"
+      }
+    },
+    {
+      "cell": 15,
+      "viz": "tabela-gjurmimit",
+      "title": "Gjurmoni Kruskal-in",
+      "props": {
+        "preset": "lab05-kruskal"
+      }
+    },
+    {
+      "cell": 16,
+      "viz": "tabela-gjurmimit",
+      "title": "Gjurmoni Prim-in",
+      "props": {
+        "preset": "lab05-prim"
+      }
+    }
+  ],
+  "laborator-07.ipynb": [
+    {
+      "cell": 16,
+      "viz": "tabela-gjurmimit",
+      "title": "Gjurmoni Dijkstra-n",
+      "props": {
+        "preset": "lab07-dijkstra"
+      }
+    },
+    {
+      "cell": 17,
+      "viz": "tabela-gjurmimit",
+      "title": "Gjurmoni Bellman-Ford-in",
+      "props": {
+        "preset": "lab07-bellman"
+      }
+    }
+  ],
+  "laborator-08.ipynb": [
+    {
+      "cell": 12,
+      "viz": "tabela-gjurmimit",
+      "title": "Gjurmoni Floyd-Warshall-in",
+      "props": {
+        "preset": "lab08-floyd"
+      }
+    }
+  ]
+}

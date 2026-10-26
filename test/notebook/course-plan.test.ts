@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { planCourse, type SiteCourse } from '../../scripts/course-import/plan';
 import site from './fixtures/course.json';
 import embeds from './fixtures/embeds.json';
+import platformEmbeds from './fixtures/platform-embeds.json';
 
 // The course import's plan (#16), on the course site's own labs and notebooks.
 
@@ -51,6 +52,30 @@ describe('planning the course import', () => {
     expect(lab6?.notebooks[0]?.embeds.find((e) => e.viz === 'tabela-gjurmimit')?.cell).toBe(2);
   });
 
+  it("places the course repo's own list of platform visualizations (#161)", async () => {
+    const labs = await planCourse({
+      site: { ...only(3, 5, 6, 7, 8), platformEmbeds: platformEmbeds as SiteCourse['platformEmbeds'] },
+      notebook,
+      solutions: new Map(),
+    });
+    const traces = labs.flatMap((lab) =>
+      lab.notebooks.flatMap((nb) =>
+        nb.embeds.filter((e) => e.viz === 'tabela-gjurmimit').map((e) => [lab.n, e.props?.preset]),
+      ),
+    );
+    expect(traces).toEqual([
+      [5, 'lab05-kruskal'],
+      [5, 'lab05-prim'],
+      [6, 'lab06-kahn'],
+      [7, 'lab07-dijkstra'],
+      [7, 'lab07-bellman'],
+      [8, 'lab08-floyd'],
+    ]);
+    const extra = (n: number) => labs.find((lab) => lab.n === n)?.notebooks.find((nb) => nb.kind === 'extra');
+    expect(extra(3)?.embeds.map((e) => e.viz)).toContain('pema-rekursive');
+    expect(extra(5)?.embeds.map((e) => e.viz)).toEqual(['kruskal-prim']);
+  });
+
   it('refuses a visualization the platform does not have, or a cell the site already uses', async () => {
     const plan = (platformEmbeds: SiteCourse['platformEmbeds']) =>
       planCourse({ site: { ...only(5), platformEmbeds }, notebook, solutions: new Map() });
@@ -92,10 +117,11 @@ describe('planning the course import', () => {
       [6, 'grafet'],
     ]);
     expect(part6?.embeds.map((e) => e.cell)).toEqual([1, 3, 5]);
-    expect(lab6?.notebooks[1]).toMatchObject({
-      kind: 'extra',
-      title: 'Detyrë shtëpie — Komponentet e Lidhura Fort & Renditjet Topologjike',
-    });
+    // Its extra exercises (#28 in the course repo), then its homework.
+    expect(lab6?.notebooks.slice(1).map((nb) => [nb.kind, nb.title])).toEqual([
+      ['extra', 'Ushtrime Shtesë — Kahn, DFS dhe Kosaraju në kod'],
+      ['extra', 'Detyrë shtëpie — Komponentet e Lidhura Fort & Renditjet Topologjike'],
+    ]);
   });
 
   it('adds a solution after the notebooks, only where it solves one of them', async () => {

@@ -1,0 +1,668 @@
+{
+  "title": "Laboratori 6 · Ushtrime Shtesë — Renditja topologjike dhe komponentet e lidhura fort, në kod",
+  "toc": [
+    {
+      "id": "kujtues-teorik",
+      "title": "Kujtues teorik",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "ushtrimi-1-a-eshte-renditje-topologjike",
+      "title": "Ushtrimi 1 — A është renditje topologjike?",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-algoritmi-i-kahn-it",
+      "title": "Ushtrimi 2 — Algoritmi i Kahn-it",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-renditja-nga-dfs",
+      "title": "Ushtrimi 3 — Renditja nga DFS",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-sa-renditje-ka",
+      "title": "Ushtrimi 4 — Sa renditje ka?",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-5-grafi-i-transpozuar",
+      "title": "Ushtrimi 5 — Grafi i transpozuar",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-6-algoritmi-i-kosaraju-t",
+      "title": "Ushtrimi 6 — Algoritmi i Kosaraju-t",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-7-grafi-i-kondensuar",
+      "title": "Ushtrimi 7 — Grafi i kondensuar",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "kujtues-teorik",
+      "title": "Kujtues teorik",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "ushtrimi-1-a-eshte-renditje-topologjike",
+      "title": "Ushtrimi 1 — A është renditje topologjike?",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-algoritmi-i-kahn-it",
+      "title": "Ushtrimi 2 — Algoritmi i Kahn-it",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-renditja-nga-dfs",
+      "title": "Ushtrimi 3 — Renditja nga DFS",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-sa-renditje-ka",
+      "title": "Ushtrimi 4 — Sa renditje ka?",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-5-grafi-i-transpozuar",
+      "title": "Ushtrimi 5 — Grafi i transpozuar",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-6-algoritmi-i-kosaraju-t",
+      "title": "Ushtrimi 6 — Algoritmi i Kosaraju-t",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-7-grafi-i-kondensuar",
+      "title": "Ushtrimi 7 — Grafi i kondensuar",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "sections": [
+    {
+      "id": "kujtues-teorik",
+      "title": "Kujtues teorik",
+      "kind": "theory"
+    },
+    {
+      "id": "ushtrimi-1-a-eshte-renditje-topologjike",
+      "title": "Ushtrimi 1 — A është renditje topologjike?",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-algoritmi-i-kahn-it",
+      "title": "Ushtrimi 2 — Algoritmi i Kahn-it",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-renditja-nga-dfs",
+      "title": "Ushtrimi 3 — Renditja nga DFS",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-sa-renditje-ka",
+      "title": "Ushtrimi 4 — Sa renditje ka?",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-5-grafi-i-transpozuar",
+      "title": "Ushtrimi 5 — Grafi i transpozuar",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-6-algoritmi-i-kosaraju-t",
+      "title": "Ushtrimi 6 — Algoritmi i Kosaraju-t",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-7-grafi-i-kondensuar",
+      "title": "Ushtrimi 7 — Grafi i kondensuar",
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "kind": "reflect"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:22e3fea360e63b94",
+      "srcIndex": 0,
+      "intro": true
+    },
+    {
+      "type": "markdown",
+      "kind": "theory",
+      "label": "Teori",
+      "id": "kujtues-teorik",
+      "heading": "Kujtues teorik",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:d4945c68e8c184cd",
+      "srcIndex": 1
+    },
+    {
+      "type": "code",
+      "srcIndex": 2,
+      "interactive": false,
+      "html": "sha256:47bd6f70442a2f17",
+      "raw": "sha256:8a04ff68d3fd6adb",
+      "lines": 49,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "kontrollo"
+        },
+        {
+          "t": "def",
+          "n": "nga_harqet"
+        },
+        {
+          "t": "def",
+          "n": "dag_i_rastit"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-1-a-eshte-renditje-topologjike",
+      "heading": "Ushtrimi 1 — A është renditje topologjike?",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:29d8bead1df6ea40",
+      "srcIndex": 3
+    },
+    {
+      "type": "code",
+      "srcIndex": 4,
+      "interactive": false,
+      "html": "sha256:9bb8813ac9e70772",
+      "raw": "sha256:a3893e0e81e98fa7",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 5,
+      "interactive": false,
+      "html": "sha256:8c77ac4891aa9c81",
+      "raw": "sha256:ad5f2d5d23a87091",
+      "lines": 11,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-2-algoritmi-i-kahn-it",
+      "heading": "Ushtrimi 2 — Algoritmi i Kahn-it",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:7d60702dbc59b23e",
+      "srcIndex": 6
+    },
+    {
+      "type": "code",
+      "srcIndex": 7,
+      "interactive": false,
+      "html": "sha256:ccfd5e28b958b192",
+      "raw": "sha256:f8998967997b44d1",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 8,
+      "interactive": false,
+      "html": "sha256:8d7b55668ca31bc2",
+      "raw": "sha256:c37616ccf4832765",
+      "lines": 14,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-3-renditja-nga-dfs",
+      "heading": "Ushtrimi 3 — Renditja nga DFS",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:c4b5d7fcb959da23",
+      "srcIndex": 9
+    },
+    {
+      "type": "code",
+      "srcIndex": 10,
+      "interactive": false,
+      "html": "sha256:7deef24b5a0ea17b",
+      "raw": "sha256:5169f5c36ce8d7a9",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 11,
+      "interactive": false,
+      "html": "sha256:29ef28302559658f",
+      "raw": "sha256:7ade4c13aba14b44",
+      "lines": 9,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:7e2f319e848afd84",
+      "srcIndex": 12
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-4-sa-renditje-ka",
+      "heading": "Ushtrimi 4 — Sa renditje ka?",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:854ca468f4d35e81",
+      "srcIndex": 13
+    },
+    {
+      "type": "code",
+      "srcIndex": 14,
+      "interactive": false,
+      "html": "sha256:c772f4a5c6c43c5f",
+      "raw": "sha256:f68fe2dc41653755",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 15,
+      "interactive": false,
+      "html": "sha256:2bff8dbf03f4132a",
+      "raw": "sha256:ecb62db2534a5a5f",
+      "lines": 11,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-5-grafi-i-transpozuar",
+      "heading": "Ushtrimi 5 — Grafi i transpozuar",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:d2d1d91b67d8588e",
+      "srcIndex": 16
+    },
+    {
+      "type": "code",
+      "srcIndex": 17,
+      "interactive": false,
+      "html": "sha256:43cdaa140c33ee29",
+      "raw": "sha256:6791ba8d158103b9",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 18,
+      "interactive": false,
+      "html": "sha256:49cb89d188e0bd11",
+      "raw": "sha256:f3ebaa400d7f15d8",
+      "lines": 6,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-6-algoritmi-i-kosaraju-t",
+      "heading": "Ushtrimi 6 — Algoritmi i Kosaraju-t",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:7b217ef9750be077",
+      "srcIndex": 19
+    },
+    {
+      "type": "code",
+      "srcIndex": 20,
+      "interactive": false,
+      "html": "sha256:8ff70d11048b4bd0",
+      "raw": "sha256:e3d5180ef6c844f1",
+      "lines": 6,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 21,
+      "interactive": false,
+      "html": "sha256:936654f5f0cd66d1",
+      "raw": "sha256:135bece8d3ea8f54",
+      "lines": 28,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-7-grafi-i-kondensuar",
+      "heading": "Ushtrimi 7 — Grafi i kondensuar",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:b9e6cb6c8b50051f",
+      "srcIndex": 22
+    },
+    {
+      "type": "code",
+      "srcIndex": 23,
+      "interactive": false,
+      "html": "sha256:a934dc3653e2e499",
+      "raw": "sha256:5ede2b7fbacce646",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 24,
+      "interactive": false,
+      "html": "sha256:ff109a67f0fa6560",
+      "raw": "sha256:cc956dd1696d4743",
+      "lines": 14,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "classwork",
+      "label": "Punë në Klasë",
+      "id": "pune-ne-klase",
+      "heading": "Punë në Klasë",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:be6aca690d0e0e03",
+      "srcIndex": 25
+    },
+    {
+      "type": "markdown",
+      "kind": "reflect",
+      "label": "Pyetje Reflektuese",
+      "id": "pyetje-reflektuese",
+      "heading": "Pyetje Reflektuese",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:913ae182c92649db",
+      "srcIndex": 26
+    }
+  ],
+  "imports": ["collections", "itertools", "random"],
+  "dependencies": [],
+  "flags": {
+    "pygame": false,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": false,
+    "matplotlib": false,
+    "networkx": false,
+    "numpy": false
+  },
+  "missingScripts": [],
+  "stats": {
+    "cells": 27,
+    "markdown": 12,
+    "code": 15,
+    "codeLines": 166
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": true,
+  "assets": []
+}

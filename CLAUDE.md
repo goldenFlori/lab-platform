@@ -110,7 +110,7 @@ live in its git-ignored `zgjidhjet/`; never publish them.
   Drizzle and schema imports elsewhere in `src/api`. A new tenant table needs `org_id`,
   `(parent_id, org_id)` foreign keys, `org_id` in every unique index, and an entry in
   `test/api/tenant-isolation.test.ts`.
-- **The converter must keep making the course site's cells.** The 19 fixture notebooks and their
+- **The converter must keep making the course site's cells.** The 22 fixture notebooks and their
   snapshots in `test/notebook/fixtures` are the specification. Change a snapshot only on
   purpose, with `scripts/snapshot-course-notebooks.ts`, which also copies the site's embeds
   (`embeds.json`, used by the end-to-end tests). Run `npm run format` after it: the script writes
