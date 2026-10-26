@@ -2,15 +2,23 @@ import { Button } from '@heroui/react';
 import { Eye, Pause, Play, RotateCcw, Table2 } from 'lucide-react';
 import { type KeyboardEvent, useEffect, useMemo, useState } from 'react';
 import type { PredictionTopic } from '../shared/predictions';
-import { isTraceProblem, type TraceProblem } from '../shared/trace-problem';
+import {
+  isTraceProblem,
+  type TraceProblem,
+  type TraceVariant,
+  variantIssue,
+  variantProblem,
+} from '../shared/trace-problem';
 import { display, firstWrong, type Trace, type TraceRow, traceIds, traceOf } from './algorithms/trace';
 import { TRACE_TEXT, type TraceText } from './algorithms/trace.text';
 import { isTracePresetId, TRACE_PRESET_IDS, TRACE_PRESETS, type TracePresetId } from './algorithms/trace-presets';
 import { Choice, Field } from './kit/controls';
 import { type EdgeLook, type GEdge, type GNode, GraphCanvas, type NodeLook } from './kit/GraphCanvas';
+import { useLearner } from './kit/learner';
 import { hash, result, useResults } from './kit/results';
 import { Panel, StepNote, VizShell } from './kit/shell';
 import { useText } from './kit/text';
+import { TraceKey } from './TraceKey';
 
 // Trace tables (#150): the hand-tracing class problems, checked row by row. The student fills a
 // row as on paper; a wrong row marks its first wrong cell with the rule it breaks, never the
@@ -45,34 +53,64 @@ function ruleOf(p: TraceProblem, X: TraceText) {
 export default function TraceTableViz({
   preset: initial = 'lab07-dijkstra',
   problem,
+  variant,
 }: {
   preset?: string;
   /** A pedagog's own problem (#166); ignored unless it follows the rules. */
   problem?: unknown;
+  /** Or a problem made for each student from their seed (#167). */
+  variant?: unknown;
 }) {
   const X = useText(TRACE_TEXT);
+  const learner = useLearner();
   const [presetId, setPresetId] = useState<TracePresetId>(isTracePresetId(initial) ? initial : 'lab07-dijkstra');
-  const own = isTraceProblem(problem) ? problem : null;
-  const shown: Shown = own
+  // Staff may look at a student's variant instead of their own.
+  const [looking, setLooking] = useState('');
+  const spec = variantIssue(variant) === null ? (variant as TraceVariant) : null;
+  const seed = looking || learner?.seed || 'shembull';
+  const own = spec ? variantProblem(spec, seed) : isTraceProblem(problem) ? problem : null;
+  const staff = !!spec && (learner?.others.length ?? 0) > 0;
+  const shown: Shown = spec
     ? {
-        id: `custom-${hash(JSON.stringify(own))}`,
-        name: X.custom.name(X.custom.algorithms[own.algorithm]),
-        rule: ruleOf(own, X),
-        problem: own,
+        // One id for the whole class: row k of every student's table counts as the same step (#151).
+        id: `variant-${hash(JSON.stringify(spec))}`,
+        name: learner ? X.custom.variantName(X.custom.algorithms[spec.algorithm]) : X.custom.example,
+        rule: ruleOf(own as TraceProblem, X),
+        problem: own as TraceProblem,
       }
-    : {
-        id: presetId,
-        name: X.presets[presetId]?.name ?? presetId,
-        rule: X.presets[presetId]?.rule ?? ruleOf(TRACE_PRESETS[presetId], X),
-        problem: TRACE_PRESETS[presetId],
-      };
+    : own
+      ? {
+          id: `custom-${hash(JSON.stringify(own))}`,
+          name: X.custom.name(X.custom.algorithms[own.algorithm]),
+          rule: ruleOf(own, X),
+          problem: own,
+        }
+      : {
+          id: presetId,
+          name: X.presets[presetId]?.name ?? presetId,
+          rule: X.presets[presetId]?.rule ?? ruleOf(TRACE_PRESETS[presetId], X),
+          problem: TRACE_PRESETS[presetId],
+        };
   return (
     <VizShell
       title={X.title}
       subtitle={X.subtitle}
       icon={<Table2 />}
       toolbar={
-        own ? undefined : (
+        staff ? (
+          <Field label={X.custom.variantOf}>
+            <Choice
+              label={X.custom.variantOf}
+              value={looking}
+              onChange={setLooking}
+              className="w-64"
+              options={[
+                { value: '', label: X.custom.mine },
+                ...(learner?.others ?? []).map((o) => ({ value: o.seed, label: o.name })),
+              ]}
+            />
+          </Field>
+        ) : own ? undefined : (
           <Field label={X.problem}>
             <Choice
               label={X.problem}
@@ -85,8 +123,19 @@ export default function TraceTableViz({
         )
       }
     >
-      {/* A new problem starts a new table. */}
-      <TraceTable key={shown.id} item={shown} X={X} />
+      {/* A new problem (or another student's variant) starts a new table. */}
+      <TraceTable key={`${shown.id}|${seed}`} item={shown} X={X} />
+      {staff && (
+        <details
+          className="mx-4 mb-4 rounded-xl border border-border bg-surface p-3 text-sm sm:mx-5"
+          data-testid="trace-key"
+        >
+          <summary className="cursor-pointer font-medium">{X.custom.key}</summary>
+          <div className="mt-2">
+            <TraceKey trace={traceOf(shown.problem, X.words)} W={X.words} />
+          </div>
+        </details>
+      )}
     </VizShell>
   );
 }

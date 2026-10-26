@@ -3,7 +3,7 @@ import { PencilRuler, Plus, Sparkles, Trash2 } from 'lucide-react';
 import { type FormEvent, lazy, Suspense, useMemo, useState } from 'react';
 import type { StoredNotebook } from '../../../notebook/stored';
 import type { Embed } from '../../../shared/notebooks';
-import { isTraceProblem, problemIssue } from '../../../shared/trace-problem';
+import { problemIssue, variantIssue } from '../../../shared/trace-problem';
 import { VISUALIZER_IDS } from '../../../shared/visualizers';
 import { type Messages, useT } from '../../i18n';
 
@@ -18,11 +18,11 @@ const MAX_EMBEDS = 60;
 const TraceProblemBuilder = lazy(() => import('../../../viz/TraceProblemBuilder'));
 const TRACE = 'tabela-gjurmimit';
 
-/** The problem in a row's props, when it has one. */
-function problemOf(props: string) {
+/** A row's props as an object, for the builder; null when there are none or they are not JSON. */
+function propsOf(props: string) {
   try {
-    const value = JSON.parse(props) as { problem?: unknown };
-    return isTraceProblem(value?.problem) ? value.problem : null;
+    const value: unknown = JSON.parse(props);
+    return value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : null;
   } catch {
     return null;
   }
@@ -82,6 +82,7 @@ function parseRows(t: Messages, rows: Row[]): Embed[] | string {
       }
     }
     if (row.viz === TRACE && props?.problem !== undefined && problemIssue(props.problem)) return t.embeds.badProblem(n);
+    if (row.viz === TRACE && props?.variant !== undefined && variantIssue(props.variant)) return t.embeds.badProblem(n);
     embeds.push({ cell: Number(row.cell), viz: row.viz, title: row.title.trim() || null, props });
   }
   if (new Set(embeds.map((e) => e.cell)).size !== embeds.length) {
@@ -181,8 +182,8 @@ export function EmbedsEditor({
                   <div className="sm:col-span-2">
                     <Suspense fallback={null}>
                       <TraceProblemBuilder
-                        value={problemOf(row.props)}
-                        onChange={(problem) => change(row.key, 'props', JSON.stringify({ problem }))}
+                        value={propsOf(row.props)}
+                        onChange={(props) => change(row.key, 'props', JSON.stringify(props))}
                       />
                     </Suspense>
                   </div>
