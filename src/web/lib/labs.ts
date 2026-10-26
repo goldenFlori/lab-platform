@@ -80,7 +80,12 @@ export function fromLocalInput(value: string) {
  */
 export function formatMoment(iso: string) {
   const date = new Date(iso);
-  const time = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
   const { common, labs } = t();
-  return labs.moment(date.getDate(), common.months[date.getMonth()] ?? '', date.getFullYear(), time);
+  return labs.moment(date.getDate(), common.months[date.getMonth()] ?? '', date.getFullYear(), formatTime(iso));
+}
+
+/** "10:00" in this browser's time zone. */
+export function formatTime(iso: string) {
+  const date = new Date(iso);
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }

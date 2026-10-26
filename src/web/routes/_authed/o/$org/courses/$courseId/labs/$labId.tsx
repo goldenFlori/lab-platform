@@ -27,6 +27,7 @@ import { DeleteNotebook } from '../../../../../../../components/notebook/DeleteN
 import { EditsBar } from '../../../../../../../components/notebook/EditsBar';
 import { EmbedsEditor } from '../../../../../../../components/notebook/EmbedsEditor';
 import { ExercisesEditor } from '../../../../../../../components/notebook/ExercisesEditor';
+import { KolokiumCard } from '../../../../../../../components/notebook/KolokiumCard';
 import { NotebookTranslate } from '../../../../../../../components/notebook/NotebookTranslate';
 import { NotebookUpload } from '../../../../../../../components/notebook/NotebookUpload';
 import { embedAnchor, NotebookView } from '../../../../../../../components/notebook/NotebookView';
@@ -222,6 +223,18 @@ function LabPage() {
               )}
             </div>
           )}
+
+          {lab.kolokia?.map((kolokium) => (
+            <KolokiumCard
+              key={kolokium.notebookId}
+              kolokium={kolokium}
+              org={org}
+              courseId={courseId}
+              labId={labId}
+              current={current?.id === kolokium.notebookId}
+              onNotebook={() => void navigate({ search: (s) => ({ ...s, notebook: kolokium.notebookId }) })}
+            />
+          ))}
 
           {notebooks.length > 1 && current && (
             <nav aria-label={t.lab.notebooks} className="mt-8">
