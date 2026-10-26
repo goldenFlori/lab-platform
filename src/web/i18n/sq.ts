@@ -402,6 +402,10 @@ export const sq = {
     remove: (n: number) => `Hiq vizualizimin ${n}`,
     add: 'Shto vizualizim',
     save: 'Ruaj vizualizimet',
+    build: 'Ndërto problemin',
+    hideBuild: 'Mbyll ndërtuesin',
+    badProblem: (n: number) =>
+      `Problemi i tabelës te rreshti ${n} nuk plotëson rregullat: hapni ndërtuesin për të parë cilën.`,
   },
   present: {
     pageTitle: 'Prezantim',

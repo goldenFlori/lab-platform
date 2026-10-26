@@ -400,6 +400,9 @@ export const en: Messages = {
     remove: (n: number) => `Remove visualization ${n}`,
     add: 'Add a visualization',
     save: 'Save the visualizations',
+    build: 'Build the problem',
+    hideBuild: 'Close the builder',
+    badProblem: (n) => `The table's problem in row ${n} breaks a rule: open the builder to see which.`,
   },
   present: {
     pageTitle: 'Presentation',
