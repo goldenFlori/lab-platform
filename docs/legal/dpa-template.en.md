@@ -227,7 +227,7 @@ The administrator downloads the Institution's data at any time as one JSON file.
 - people (without password hashes) and memberships;
 - course structure;
 - notebooks with their original files;
-- exercises, submissions and grades;
+- exercises, submissions (with the start times of timed tests) and grades;
 - activity, first-try results, AI records, Live Lab history, surveys, deletion requests and erasures.
 
 Students' unsubmitted code stays private to them and is not in it.
