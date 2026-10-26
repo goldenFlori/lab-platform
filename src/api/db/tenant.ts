@@ -46,6 +46,7 @@ import {
   files,
   grades,
   groups,
+  kolokiumStarts,
   labAccess,
   labActivity,
   labs,
@@ -1102,22 +1103,90 @@ function tenantSubmissions(db: Db, orgId: string) {
   return {
     assignmentsOf(notebookId: string) {
       return db
-        .select({ groupId: assignments.groupId, dueAt: assignments.dueAt })
+        .select({
+          groupId: assignments.groupId,
+          dueAt: assignments.dueAt,
+          opensAt: assignments.opensAt,
+          minutes: assignments.minutes,
+        })
         .from(assignments)
         .where(and(eq(assignments.orgId, orgId), eq(assignments.notebookId, notebookId)));
     },
 
-    /** Opens the notebook to the group until `dueAt`, or moves the deadline. */
-    async open(notebookId: string, groupId: string, dueAt: Date) {
+    /** Opens the notebook to the group until `dueAt`, or moves the deadline; a kolokium with its window. */
+    async open(notebookId: string, groupId: string, dueAt: Date, kolokium?: { opensAt: Date; minutes: number } | null) {
+      const window = { opensAt: kolokium?.opensAt ?? null, minutes: kolokium?.minutes ?? null };
       await rethrowMissingParent(
         db
           .insert(assignments)
-          .values({ id: uuidv7(), orgId, notebookId, groupId, dueAt })
+          .values({ id: uuidv7(), orgId, notebookId, groupId, dueAt, ...window })
           .onConflictDoUpdate({
             target: [assignments.orgId, assignments.notebookId, assignments.groupId],
-            set: { dueAt },
+            set: { dueAt, ...window },
           }),
       );
+    },
+
+    /**
+     * The kolokia (#169) of these groups in a course, each with the user's start and hand-in if any: what
+     * the lab context needs to hide other labs while one runs and to keep its notebook closed until they
+     * start.
+     */
+    kolokiaFor(courseId: string, groupIds: string[], userId: string) {
+      if (!groupIds.length) return Promise.resolve([]);
+      return db
+        .select({
+          notebookId: assignments.notebookId,
+          labId: notebooks.labId,
+          title: notebooks.title,
+          opensAt: assignments.opensAt,
+          dueAt: assignments.dueAt,
+          minutes: assignments.minutes,
+          startedAt: kolokiumStarts.startedAt,
+          submittedAt: submissions.submittedAt,
+        })
+        .from(assignments)
+        .innerJoin(notebooks, and(eq(notebooks.id, assignments.notebookId), eq(notebooks.orgId, orgId)))
+        .innerJoin(labs, and(eq(labs.id, notebooks.labId), eq(labs.orgId, orgId)))
+        .leftJoin(
+          kolokiumStarts,
+          and(
+            eq(kolokiumStarts.orgId, orgId),
+            eq(kolokiumStarts.notebookId, assignments.notebookId),
+            eq(kolokiumStarts.userId, userId),
+          ),
+        )
+        .leftJoin(
+          submissions,
+          and(
+            eq(submissions.orgId, orgId),
+            eq(submissions.notebookId, assignments.notebookId),
+            eq(submissions.userId, userId),
+          ),
+        )
+        .where(
+          and(
+            eq(assignments.orgId, orgId),
+            eq(labs.courseId, courseId),
+            inArray(assignments.groupId, groupIds),
+            isNotNull(assignments.opensAt),
+          ),
+        );
+    },
+
+    /** Starts the user's kolokium clock; starting again keeps the first start. */
+    async start(notebookId: string, userId: string, startedAt: Date) {
+      await rethrowMissingParent(
+        db.insert(kolokiumStarts).values({ id: uuidv7(), orgId, notebookId, userId, startedAt }).onConflictDoNothing(),
+      );
+    },
+
+    /** When each student started the notebook's kolokium, for staff. */
+    startsOf(notebookId: string) {
+      return db
+        .select({ userId: kolokiumStarts.userId, startedAt: kolokiumStarts.startedAt })
+        .from(kolokiumStarts)
+        .where(and(eq(kolokiumStarts.orgId, orgId), eq(kolokiumStarts.notebookId, notebookId)));
     },
 
     async close(notebookId: string, groupId: string) {
@@ -1636,112 +1705,119 @@ function tenantPersonal(db: Db, orgId: string) {
   return {
     async export(userId: string): Promise<Omit<OrganizationData, 'organization'>> {
       const nb = (column: SQLiteColumn) => and(eq(notebooks.id, column), eq(notebooks.orgId, orgId));
-      const [member, opened, edits, traced, solved, predicted, handed, graded, asked, used, requests] = await db.batch([
-        db
-          .select({ role: memberships.role, course: courses.title, group: groups.name, since: memberships.createdAt })
-          .from(memberships)
-          .leftJoin(courses, and(eq(courses.id, memberships.courseId), eq(courses.orgId, orgId)))
-          .leftJoin(groups, and(eq(groups.id, memberships.groupId), eq(groups.orgId, orgId)))
-          .where(and(eq(memberships.orgId, orgId), eq(memberships.userId, userId))),
-        db
-          .select({ lab: labs.title, kind: labActivity.kind, day: labActivity.day })
-          .from(labActivity)
-          .innerJoin(labs, and(eq(labs.id, labActivity.labId), eq(labs.orgId, orgId)))
-          .where(and(eq(labActivity.orgId, orgId), eq(labActivity.userId, userId)))
-          .orderBy(asc(labActivity.day)),
-        db
-          .select({
-            notebook: notebooks.title,
-            cell: codeEdits.cell,
-            code: codeEdits.code,
-            savedAt: codeEdits.updatedAt,
-          })
-          .from(codeEdits)
-          .innerJoin(notebooks, nb(codeEdits.notebookId))
-          .where(and(eq(codeEdits.orgId, orgId), eq(codeEdits.userId, userId))),
-        db
-          .select({
-            notebook: notebooks.title,
-            cell: traceAnswers.cell,
-            rows: traceAnswers.rows,
-            savedAt: traceAnswers.updatedAt,
-          })
-          .from(traceAnswers)
-          .innerJoin(notebooks, nb(traceAnswers.notebookId))
-          .where(and(eq(traceAnswers.orgId, orgId), eq(traceAnswers.userId, userId))),
-        db
-          .select({ notebook: notebooks.title, cell: exerciseCompletions.cell, at: exerciseCompletions.completedAt })
-          .from(exerciseCompletions)
-          .innerJoin(notebooks, nb(exerciseCompletions.notebookId))
-          .where(and(eq(exerciseCompletions.orgId, orgId), eq(exerciseCompletions.userId, userId))),
-        db
-          .select({
-            notebook: notebooks.title,
-            cell: predictionResults.cell,
-            topic: predictionResults.topic,
-            prompt: predictionResults.prompt,
-            pick: predictionResults.pick,
-            correct: predictionResults.correct,
-            day: predictionResults.day,
-          })
-          .from(predictionResults)
-          .innerJoin(notebooks, nb(predictionResults.notebookId))
-          .where(and(eq(predictionResults.orgId, orgId), eq(predictionResults.userId, userId)))
-          .orderBy(asc(predictionResults.day)),
-        db
-          .select({
-            notebook: notebooks.title,
-            code: submissions.code,
-            solved: submissions.solved,
-            attempts: submissions.attempts,
-            at: submissions.submittedAt,
-          })
-          .from(submissions)
-          .innerJoin(notebooks, nb(submissions.notebookId))
-          .where(and(eq(submissions.orgId, orgId), eq(submissions.userId, userId))),
-        db
-          .select({
-            notebook: notebooks.title,
-            autoScore: grades.autoScore,
-            score: grades.score,
-            maxScore: grades.maxScore,
-            feedback: grades.feedback,
-            releasedAt: grades.releasedAt,
-          })
-          .from(grades)
-          .innerJoin(notebooks, nb(grades.notebookId))
-          .where(and(eq(grades.orgId, orgId), eq(grades.userId, userId), isNotNull(grades.releasedAt))),
-        db
-          .select({
-            notebook: notebooks.title,
-            cell: aiQuestions.cell,
-            code: aiQuestions.code,
-            error: aiQuestions.error,
-            answer: aiQuestions.answer,
-            at: aiQuestions.createdAt,
-          })
-          .from(aiQuestions)
-          .innerJoin(notebooks, nb(aiQuestions.notebookId))
-          .where(and(eq(aiQuestions.orgId, orgId), eq(aiQuestions.userId, userId))),
-        db
-          .select({ course: courses.title, day: aiUsage.day, requests: aiUsage.requests })
-          .from(aiUsage)
-          .innerJoin(courses, and(eq(courses.id, aiUsage.courseId), eq(courses.orgId, orgId)))
-          .where(and(eq(aiUsage.orgId, orgId), eq(aiUsage.userId, userId))),
-        db
-          .select({
-            note: deletionRequests.note,
-            at: deletionRequests.createdAt,
-            handledAt: deletionRequests.handledAt,
-          })
-          .from(deletionRequests)
-          .where(and(eq(deletionRequests.orgId, orgId), eq(deletionRequests.userId, userId))),
-      ]);
+      const [member, opened, edits, traced, started, solved, predicted, handed, graded, asked, used, requests] =
+        await db.batch([
+          db
+            .select({ role: memberships.role, course: courses.title, group: groups.name, since: memberships.createdAt })
+            .from(memberships)
+            .leftJoin(courses, and(eq(courses.id, memberships.courseId), eq(courses.orgId, orgId)))
+            .leftJoin(groups, and(eq(groups.id, memberships.groupId), eq(groups.orgId, orgId)))
+            .where(and(eq(memberships.orgId, orgId), eq(memberships.userId, userId))),
+          db
+            .select({ lab: labs.title, kind: labActivity.kind, day: labActivity.day })
+            .from(labActivity)
+            .innerJoin(labs, and(eq(labs.id, labActivity.labId), eq(labs.orgId, orgId)))
+            .where(and(eq(labActivity.orgId, orgId), eq(labActivity.userId, userId)))
+            .orderBy(asc(labActivity.day)),
+          db
+            .select({
+              notebook: notebooks.title,
+              cell: codeEdits.cell,
+              code: codeEdits.code,
+              savedAt: codeEdits.updatedAt,
+            })
+            .from(codeEdits)
+            .innerJoin(notebooks, nb(codeEdits.notebookId))
+            .where(and(eq(codeEdits.orgId, orgId), eq(codeEdits.userId, userId))),
+          db
+            .select({
+              notebook: notebooks.title,
+              cell: traceAnswers.cell,
+              rows: traceAnswers.rows,
+              savedAt: traceAnswers.updatedAt,
+            })
+            .from(traceAnswers)
+            .innerJoin(notebooks, nb(traceAnswers.notebookId))
+            .where(and(eq(traceAnswers.orgId, orgId), eq(traceAnswers.userId, userId))),
+          db
+            .select({ notebook: notebooks.title, startedAt: kolokiumStarts.startedAt })
+            .from(kolokiumStarts)
+            .innerJoin(notebooks, nb(kolokiumStarts.notebookId))
+            .where(and(eq(kolokiumStarts.orgId, orgId), eq(kolokiumStarts.userId, userId))),
+          db
+            .select({ notebook: notebooks.title, cell: exerciseCompletions.cell, at: exerciseCompletions.completedAt })
+            .from(exerciseCompletions)
+            .innerJoin(notebooks, nb(exerciseCompletions.notebookId))
+            .where(and(eq(exerciseCompletions.orgId, orgId), eq(exerciseCompletions.userId, userId))),
+          db
+            .select({
+              notebook: notebooks.title,
+              cell: predictionResults.cell,
+              topic: predictionResults.topic,
+              prompt: predictionResults.prompt,
+              pick: predictionResults.pick,
+              correct: predictionResults.correct,
+              day: predictionResults.day,
+            })
+            .from(predictionResults)
+            .innerJoin(notebooks, nb(predictionResults.notebookId))
+            .where(and(eq(predictionResults.orgId, orgId), eq(predictionResults.userId, userId)))
+            .orderBy(asc(predictionResults.day)),
+          db
+            .select({
+              notebook: notebooks.title,
+              code: submissions.code,
+              solved: submissions.solved,
+              attempts: submissions.attempts,
+              at: submissions.submittedAt,
+            })
+            .from(submissions)
+            .innerJoin(notebooks, nb(submissions.notebookId))
+            .where(and(eq(submissions.orgId, orgId), eq(submissions.userId, userId))),
+          db
+            .select({
+              notebook: notebooks.title,
+              autoScore: grades.autoScore,
+              score: grades.score,
+              maxScore: grades.maxScore,
+              feedback: grades.feedback,
+              releasedAt: grades.releasedAt,
+            })
+            .from(grades)
+            .innerJoin(notebooks, nb(grades.notebookId))
+            .where(and(eq(grades.orgId, orgId), eq(grades.userId, userId), isNotNull(grades.releasedAt))),
+          db
+            .select({
+              notebook: notebooks.title,
+              cell: aiQuestions.cell,
+              code: aiQuestions.code,
+              error: aiQuestions.error,
+              answer: aiQuestions.answer,
+              at: aiQuestions.createdAt,
+            })
+            .from(aiQuestions)
+            .innerJoin(notebooks, nb(aiQuestions.notebookId))
+            .where(and(eq(aiQuestions.orgId, orgId), eq(aiQuestions.userId, userId))),
+          db
+            .select({ course: courses.title, day: aiUsage.day, requests: aiUsage.requests })
+            .from(aiUsage)
+            .innerJoin(courses, and(eq(courses.id, aiUsage.courseId), eq(courses.orgId, orgId)))
+            .where(and(eq(aiUsage.orgId, orgId), eq(aiUsage.userId, userId))),
+          db
+            .select({
+              note: deletionRequests.note,
+              at: deletionRequests.createdAt,
+              handledAt: deletionRequests.handledAt,
+            })
+            .from(deletionRequests)
+            .where(and(eq(deletionRequests.orgId, orgId), eq(deletionRequests.userId, userId))),
+        ]);
       return {
         memberships: member.map((m) => ({ ...m, since: iso(m.since) })),
         labsOpened: opened,
         codeEdits: edits.map((e) => ({ ...e, savedAt: iso(e.savedAt) })),
         traceAnswers: traced.map((t) => ({ ...t, savedAt: iso(t.savedAt) })),
+        kolokiumStarts: started.map((k) => ({ ...k, startedAt: iso(k.startedAt) })),
         exercisesSolved: solved.map((s) => ({ ...s, at: iso(s.at) })),
         firstTries: predicted,
         submissions: handed.map((s) => ({ ...s, at: iso(s.at) })),
@@ -1841,6 +1917,7 @@ function tenantPersonal(db: Db, orgId: string) {
         db.delete(labActivity).where(and(eq(labActivity.orgId, orgId), eq(labActivity.userId, userId))),
         db.delete(codeEdits).where(and(eq(codeEdits.orgId, orgId), eq(codeEdits.userId, userId))),
         db.delete(traceAnswers).where(and(eq(traceAnswers.orgId, orgId), eq(traceAnswers.userId, userId))),
+        db.delete(kolokiumStarts).where(and(eq(kolokiumStarts.orgId, orgId), eq(kolokiumStarts.userId, userId))),
         db
           .delete(exerciseCompletions)
           .where(and(eq(exerciseCompletions.orgId, orgId), eq(exerciseCompletions.userId, userId))),
@@ -1927,6 +2004,7 @@ const EXPORTABLE: Record<Exclude<ExportPart, 'people'>, Exportable> = {
   grades: { table: grades, orgId: grades.orgId, id: grades.id },
   exerciseCompletions: { table: exerciseCompletions, orgId: exerciseCompletions.orgId, id: exerciseCompletions.id },
   predictionResults: { table: predictionResults, orgId: predictionResults.orgId, id: predictionResults.id },
+  kolokiumStarts: { table: kolokiumStarts, orgId: kolokiumStarts.orgId, id: kolokiumStarts.id },
   labActivity: { table: labActivity, orgId: labActivity.orgId, id: labActivity.id },
   aiUsage: { table: aiUsage, orgId: aiUsage.orgId },
   aiQuestions: { table: aiQuestions, orgId: aiQuestions.orgId, id: aiQuestions.id, limit: 200 },

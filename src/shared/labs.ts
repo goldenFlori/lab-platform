@@ -47,6 +47,8 @@ export type LabView = {
   summary: string | null;
   /** Students: may they see the solutions now? Staff always may. */
   solutionsAvailable: boolean;
+  /** Students: the lab's kolokia for their groups (#169), also before they may read the notebook. */
+  kolokia?: import('./submissions').Kolokium[];
   /** Staff only: the rules, and what they mean for the course and for each group right now. */
   visibility?: {
     rules: LabRule[];

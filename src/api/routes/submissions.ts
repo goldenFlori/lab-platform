@@ -13,7 +13,7 @@ import {
 import type { TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
 import { forbidden, invalidRequest } from './course-context';
-import { type LabContext, notebookInUrl } from './lab-context';
+import { kolokiumViews, type LabContext, labContext, notebookInUrl, visibleLab } from './lab-context';
 
 // Handing in work (#52), under …/labs/:labId/notebooks/:notebookId.
 //
@@ -28,6 +28,10 @@ const summaryOf = (row: { solved: number[]; attempts: number; submittedAt: Date 
   solved: row.solved,
 });
 
+/** A group's kolokium settings, or null for a plain deadline (#169). */
+const setupOf = (a: { opensAt: Date | null; minutes: number | null }) =>
+  a.opensAt && a.minutes ? { opensAt: a.opensAt.toISOString(), minutes: a.minutes } : null;
+
 /** The course's groups in which this user may do `capability`. */
 const groupsWhere = (c: Context<TenantEnv>, ctx: LabContext, capability: 'lab.publish' | 'submission.review') =>
   ctx.groups.filter((g) => c.var.access.can(capability, { courseId: ctx.course.id, groupId: g.id }));
@@ -35,6 +39,13 @@ const groupsWhere = (c: Context<TenantEnv>, ctx: LabContext, capability: 'lab.pu
 /** The latest deadline among the user's own groups, and whether one of them is still open. */
 /** The user's latest deadline for the notebook among their groups, and whether it is still open. */
 export async function deadlineFor(c: Context<TenantEnv>, ctx: LabContext, notebookId: string) {
+  // A kolokium (#169): open only from the student's start until their end, and handed in once.
+  const kolokium = kolokiumViews(ctx).find((k) => k.notebookId === notebookId);
+  if (kolokium) {
+    const { labId: _, ...view } = kolokium;
+    const running = !!view.endsAt && ctx.now.getTime() < Date.parse(view.endsAt) && !view.submittedAt;
+    return { dueAt: new Date(view.dueAt), open: running, kolokium: view };
+  }
   const mine = new Set(
     ctx.groups
       .filter((g) => c.var.access.can('submission.create', { courseId: ctx.course.id, groupId: g.id }))
@@ -45,7 +56,7 @@ export async function deadlineFor(c: Context<TenantEnv>, ctx: LabContext, notebo
     .map((a) => a.dueAt.getTime());
   if (!due.length) return null;
   const latest = Math.max(...due);
-  return { dueAt: new Date(latest), open: latest > Date.now() };
+  return { dueAt: new Date(latest), open: latest > Date.now(), kolokium: null };
 }
 
 /** A grade as its student sees it: only once released. */
@@ -68,7 +79,7 @@ export const submissionRoutes = new Hono<TenantEnv>()
     return c.json(
       list
         .filter((a) => seen.has(a.groupId))
-        .map((a): Assignment => ({ groupId: a.groupId, dueAt: a.dueAt.toISOString() })),
+        .map((a): Assignment => ({ groupId: a.groupId, dueAt: a.dueAt.toISOString(), kolokium: setupOf(a) })),
     );
   })
 
@@ -78,9 +89,14 @@ export const submissionRoutes = new Hono<TenantEnv>()
     const groupId = c.req.param('groupId');
     if (!ctx.groups.some((g) => g.id === groupId)) throw new NotFoundError();
     if (!c.var.access.can('lab.publish', { courseId: ctx.course.id, groupId })) return forbidden(c);
-    const dueAt = c.req.valid('json').dueAt;
-    await c.var.tenant.submissions.open(nb.id, groupId, new Date(dueAt));
-    return c.json({ groupId, dueAt: new Date(dueAt).toISOString() } satisfies Assignment);
+    const { dueAt, kolokium } = c.req.valid('json');
+    const window = kolokium ? { opensAt: new Date(kolokium.opensAt), minutes: kolokium.minutes } : null;
+    await c.var.tenant.submissions.open(nb.id, groupId, new Date(dueAt), window);
+    return c.json({
+      groupId,
+      dueAt: new Date(dueAt).toISOString(),
+      kolokium: window ? { opensAt: window.opensAt.toISOString(), minutes: window.minutes } : null,
+    } satisfies Assignment);
   })
 
   // Closes it; what was handed in stays.
@@ -107,7 +123,26 @@ export const submissionRoutes = new Hono<TenantEnv>()
       grade: released(grade),
       open: deadline?.open ?? false,
       submission: row ? summaryOf(row) : null,
+      kolokium: deadline?.kolokium ?? null,
     } satisfies MySubmission);
+  })
+
+  // Starts the student's kolokium clock (#169), between its opening and its due time. It cannot use
+  // notebookInUrl: the notebook stays closed to the student until they start.
+  .post('/kolokium/start', async (c) => {
+    const ctx = await labContext(c);
+    const lab = visibleLab(c, ctx);
+    const notebookId = c.req.param('notebookId');
+    const kolokium = kolokiumViews(ctx, lab.id).find((k) => k.notebookId === notebookId);
+    if (!kolokium) throw new NotFoundError();
+    const now = ctx.now.getTime();
+    if (now < Date.parse(kolokium.opensAt) || now >= Date.parse(kolokium.dueAt)) {
+      return c.json({ error: 'closed' }, 409);
+    }
+    await c.var.tenant.submissions.start(kolokium.notebookId, c.var.user?.id as string, ctx.now);
+    const started = kolokiumViews(await labContext(c), lab.id).find((k) => k.notebookId === notebookId);
+    const { labId: _, ...view } = started ?? kolokium;
+    return c.json(view);
   })
 
   // Hands in the user's saved code and solved exercises, before the deadline.
@@ -127,11 +162,16 @@ export const submissionRoutes = new Hono<TenantEnv>()
     // The graded trace tables' rows go in as they are (#168); the server scores them when grading.
     await c.var.tenant.submissions.submit({ notebookId: nb.id, userId, code, solved, traces });
     const row = await c.var.tenant.submissions.of(nb.id, userId);
+    // A kolokium is handed in once (#169): after this, it is closed to the student.
+    const kolokium = deadline.kolokium
+      ? { ...deadline.kolokium, submittedAt: row?.submittedAt.toISOString() ?? null }
+      : null;
     return c.json({
       dueAt: deadline.dueAt.toISOString(),
       grade: released(await c.var.tenant.grading.of(nb.id, userId)),
-      open: true,
+      open: !kolokium,
       submission: row ? summaryOf(row) : null,
+      kolokium,
     } satisfies MySubmission);
   })
 
@@ -142,16 +182,21 @@ export const submissionRoutes = new Hono<TenantEnv>()
     if (!allowed.length) return forbidden(c);
     const group = c.req.query('group') || allowed[0]?.id || null;
     if (!allowed.some((g) => g.id === group)) return forbidden(c);
-    const [deadlines, rows] = await Promise.all([
+    const [deadlines, rows, starts] = await Promise.all([
       c.var.tenant.submissions.assignmentsOf(nb.id),
       c.var.tenant.submissions.ofGroup(nb.id, group as string),
+      c.var.tenant.submissions.startsOf(nb.id),
     ]);
     return c.json({
-      groups: allowed.map((g) => ({
-        id: g.id,
-        name: g.name,
-        dueAt: deadlines.find((d) => d.groupId === g.id)?.dueAt.toISOString() ?? null,
-      })),
+      groups: allowed.map((g) => {
+        const deadline = deadlines.find((d) => d.groupId === g.id);
+        return {
+          id: g.id,
+          name: g.name,
+          dueAt: deadline?.dueAt.toISOString() ?? null,
+          kolokium: deadline ? setupOf(deadline) : null,
+        };
+      }),
       group,
       students: rows.map((row) => ({
         id: row.id,
@@ -161,6 +206,7 @@ export const submissionRoutes = new Hono<TenantEnv>()
           row.submittedAt && row.solved && row.attempts !== null
             ? summaryOf({ solved: row.solved, attempts: row.attempts, submittedAt: row.submittedAt })
             : null,
+        startedAt: starts.find((s) => s.userId === row.id)?.startedAt.toISOString() ?? null,
       })),
     } satisfies SubmissionList);
   })

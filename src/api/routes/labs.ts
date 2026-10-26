@@ -6,7 +6,7 @@ import type { TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
 import { labActivityRoutes } from './activity';
 import { forbidden, invalidRequest } from './course-context';
-import { type Lab, type LabContext, labContext, openToViewer, visibleLab } from './lab-context';
+import { kolokiumViews, type Lab, type LabContext, labContext, openToViewer, visibleLab } from './lab-context';
 import { liveRoutes } from './live';
 import { notebookRoutes } from './notebooks';
 
@@ -20,7 +20,9 @@ function view(ctx: LabContext, lab: Lab): LabView {
   const base = { id: lab.id, n: lab.n, title: lab.title, week: lab.week, summary: lab.summary };
   if (!ctx.staff) {
     const solutionsAvailable = ctx.viewerGroups.some((groupId) => solutionsOpen(ruleForGroup(rules, groupId), ctx.now));
-    return { ...base, solutionsAvailable };
+    // Its kolokia (#169), also before the student may read the notebook, so the page can offer to start.
+    const kolokia = kolokiumViews(ctx, lab.id).map(({ labId: _, ...k }) => k);
+    return { ...base, solutionsAvailable, ...(kolokia.length ? { kolokia } : {}) };
   }
   return {
     ...base,

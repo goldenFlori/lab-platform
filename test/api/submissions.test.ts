@@ -51,7 +51,7 @@ describe('opening a notebook for submission', () => {
     const later = at(7200);
     await open(pedagog, seed.group.id, later);
     const res = await pedagog.call(`${nbPath}/assignments`);
-    expect((await res.json()) as Assignment[]).toEqual([{ groupId: seed.group.id, dueAt: later }]);
+    expect((await res.json()) as Assignment[]).toEqual([{ groupId: seed.group.id, dueAt: later, kolokium: null }]);
     expect((await ana.call(`${nbPath}/assignments`)).status).toBe(403);
   });
 
@@ -64,12 +64,12 @@ describe('opening a notebook for submission', () => {
 describe('handing in work', () => {
   it("copies the student's saved code and solved exercises, and can be repeated until the deadline", async () => {
     const { seed, pedagog, ana, open, submit, mine, edit } = await setup();
-    expect(await mine(ana)).toEqual({ dueAt: null, grade: null, open: false, submission: null });
+    expect(await mine(ana)).toEqual({ dueAt: null, grade: null, open: false, submission: null, kolokium: null });
     expect((await submit(ana)).status).toBe(403);
 
     const dueAt = at(3600);
     await open(pedagog, seed.group.id, dueAt);
-    expect(await mine(ana)).toEqual({ dueAt, grade: null, open: true, submission: null });
+    expect(await mine(ana)).toEqual({ dueAt, grade: null, open: true, submission: null, kolokium: null });
     await edit(ana, 4, 'def shuma(a, b):\n    return a + b');
     await seed.tenant.exercises.complete({ notebookId: seed.notebook.id, cell: 4, userId: ana.user.id });
     const first = await submit(ana);
@@ -133,7 +133,7 @@ describe('reading submissions', () => {
     const res = await list(assistant);
     expect(res.status).toBe(200);
     const body = (await res.json()) as SubmissionList;
-    expect(body.groups).toEqual([{ id: seed.group.id, name: 'Grupi A', dueAt }]);
+    expect(body.groups).toEqual([{ id: seed.group.id, name: 'Grupi A', dueAt, kolokium: null }]);
     expect(body.students.map((s) => [s.id, s.submission?.attempts ?? null])).toEqual(
       expect.arrayContaining([
         [ana.user.id, 1],

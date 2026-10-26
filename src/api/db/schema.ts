@@ -606,6 +606,9 @@ export const assignments = sqliteTable(
     notebookId: text('notebook_id').notNull(),
     groupId: text('group_id').notNull(),
     dueAt: integer('due_at', { mode: 'timestamp' }).notNull(),
+    /** A kolokium (#169): when students may start, and the minutes each has from their start. */
+    opensAt: integer('opens_at', { mode: 'timestamp' }),
+    minutes: integer('minutes'),
     createdAt: createdAt(),
   },
   (t) => [
@@ -620,6 +623,31 @@ export const assignments = sqliteTable(
       foreignColumns: [groups.id, groups.orgId],
     }).onDelete('cascade'),
     uniqueIndex('assignments_notebook_group_unique').on(t.orgId, t.notebookId, t.groupId),
+  ],
+);
+
+/**
+ * When a student started a kolokium (#169): their clock runs from here, for the assignment's minutes.
+ * One per student and notebook; starting again changes nothing.
+ */
+export const kolokiumStarts = sqliteTable(
+  'kolokium_starts',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    notebookId: text('notebook_id').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    startedAt: integer('started_at', { mode: 'timestamp' }).notNull(),
+  },
+  (t) => [
+    foreignKey({
+      name: 'kolokium_starts_notebook_fk',
+      columns: [t.notebookId, t.orgId],
+      foreignColumns: [notebooks.id, notebooks.orgId],
+    }).onDelete('cascade'),
+    uniqueIndex('kolokium_starts_unique').on(t.orgId, t.notebookId, t.userId),
   ],
 );
 

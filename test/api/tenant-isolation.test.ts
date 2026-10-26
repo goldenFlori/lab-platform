@@ -118,6 +118,9 @@ describe('cross-tenant isolation: links to another organization', () => {
     await expect(
       a.tenant.traceAnswers.save({ notebookId: b.notebook.id, userId: a.user.id, cell: 1, rows: [] }),
     ).rejects.toBeInstanceOf(NotFoundError);
+    await expect(a.tenant.submissions.start(b.notebook.id, a.user.id, new Date())).rejects.toBeInstanceOf(
+      NotFoundError,
+    );
     await expect(
       a.tenant.predictions.record({
         notebookId: b.notebook.id,

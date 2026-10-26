@@ -13,6 +13,8 @@ export type OrganizationData = {
   codeEdits: { notebook: string; cell: number; code: string; savedAt: When }[];
   /** Rows of graded trace tables, as saved while their notebook was open (#168). */
   traceAnswers: { notebook: string; cell: number; rows: Record<string, string>[]; savedAt: When }[];
+  /** Kolokia started, and when (#169). */
+  kolokiumStarts: { notebook: string; startedAt: When }[];
   exercisesSolved: { notebook: string; cell: number; at: When }[];
   /** First answers to the decisions of visualizations and trace tables (#151). */
   firstTries: {
