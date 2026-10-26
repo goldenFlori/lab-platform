@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { Exercise } from './exercises';
-import { problemIssue } from './trace-problem';
+import { problemIssue, variantIssue } from './trace-problem';
 import { isVisualizerId } from './visualizers';
 
 // Request and response shapes for a lab's notebooks, their files and embeds (#14). The app
@@ -38,6 +38,12 @@ export const embedsInput = z.object({
       (list) =>
         list.every((e) => e.viz !== 'tabela-gjurmimit' || !e.props?.problem || problemIssue(e.props.problem) === null),
       'Invalid trace problem',
+    )
+    // And a variant per student (#167) must be one that can be made.
+    .refine(
+      (list) =>
+        list.every((e) => e.viz !== 'tabela-gjurmimit' || !e.props?.variant || variantIssue(e.props.variant) === null),
+      'Invalid trace variant',
     ),
 });
 
