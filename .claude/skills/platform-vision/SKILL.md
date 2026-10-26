@@ -440,6 +440,13 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   only its lab, and "Explain the error" is off. Staff see who has not started, who is working and
   until when, and who handed in, refreshed every 15 seconds. The server keeps the start and refuses a
   late hand-in. Next: #170, the assessment report.
+- **2026-10-27:** #170 done, and with it Phase 10. Under a notebook's submissions, staff who review
+  read the assessment report for one group or all of theirs: per exercise, how many passed, gave a
+  wrong result, failed to run or did not write it; per graded trace table row, how many got it right,
+  left it empty, and the most common first mistake ("Pesha deri tani = 99, 4 students"). For a
+  variant only the column is counted, since every graph differs. Counts only, from five students up,
+  a mistake from two, never a name. The group's grades CSV gains the trace tables' points and
+  maximum. Next: plan Phase 11.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
@@ -493,6 +500,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-26 | A graded trace table is never checked in the browser: rows are filled unchecked while its notebook is open, handed in, and scored by the server from the same shared code, with partial credit per right row. A table that checked each row would let everyone reach the answer by trying | Decided |
 | 2026-10-26 | A trace variant is generated from the student's id, the notebook and the cell, by shared code the browser and the server both run: no stored copy per student, the same graph every time, and the server can rebuild it to grade. First-try counts treat row k of every variant as one step, so the class's hardest rows still show | Decided |
 | 2026-10-27 | A kolokium runs on each student's own clock (start any time in a window, then fixed minutes, never past the deadline), not one shared start: a late or reconnecting student loses no time, and a room needs no synchronised "go". The server keeps the start time, so the time limit holds even if the page is reloaded or its clock is changed. Only the kolokium's lab is visible and AI help is off while it runs | Decided |
+| 2026-10-27 | The assessment report is for everyone who reviews a group (assistants too), as counts: a part shows from five students, a wrong value from two, and a variant's mistakes by column only. It tells the pedagog what to reteach without becoming a list of who got what wrong | Decided |
 | 2026-10-26 | Phase 10 is "Fair assessment": students can learn every algorithm, but a grade cannot rest on checks in their browser or on one graph shared by a whole room, and only the owner could author problems. Assessment is also what a second institution asks about first | Decided |
 | 2026-10-26 | Phase 9 is "Every lab, coded and checked": Labs 5, 6 and 8 were the only graph labs where students never wrote the algorithms, and writing them is what the exam and later courses ask. The platform's own visualizations are declared in the course repo (platform.mjs), so the import places them, not staff by hand | Decided |
 | 2026-10-25 | First-try results are practice data: kept once per student and decision (later tries change nothing), shown to the student per topic and to staff with analytics only as counts from five students up, with the hardest decisions and the most common wrong answer, never names; two years like activity. A decision is identified by its step and its options as ids, so both languages count as one | Decided |
