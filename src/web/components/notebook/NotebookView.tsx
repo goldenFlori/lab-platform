@@ -4,9 +4,11 @@ import { Fragment, type ReactNode } from 'react';
 import type { StoredNotebook } from '../../../notebook/stored';
 import type { MarkdownCell, SectionKind } from '../../../notebook/types';
 import type { Embed } from '../../../shared/notebooks';
+import { tracePoints } from '../../../shared/trace-grading';
 import { isVisualizerId } from '../../../shared/visualizers';
 import { type Messages, useT } from '../../i18n';
 import { useExercises } from '../../lib/exercises';
+import { HandInProvider } from '../../lib/hand-in';
 import { LearnerProvider } from '../../lib/learner';
 import { ResultsProvider } from '../../lib/results';
 import { sanitize } from '../../lib/sanitize';
@@ -65,7 +67,13 @@ export function NotebookView({
               cell={embed.cell}
               variant={embed.viz === 'tabela-gjurmimit' && !!embed.props?.variant}
             >
-              <VizEmbed viz={embed.viz} props={embed.props} label={`${label} · ${embed.title ?? ''}`} />
+              {embed.viz === 'tabela-gjurmimit' && tracePoints(embed.props) > 0 ? (
+                <HandInProvider notebookRef={notebookRef} cell={embed.cell}>
+                  <VizEmbed viz={embed.viz} props={embed.props} label={`${label} · ${embed.title ?? ''}`} />
+                </HandInProvider>
+              ) : (
+                <VizEmbed viz={embed.viz} props={embed.props} label={`${label} · ${embed.title ?? ''}`} />
+              )}
             </LearnerProvider>
           </ResultsProvider>
         ) : (

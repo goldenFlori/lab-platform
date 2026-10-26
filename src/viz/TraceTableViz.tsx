@@ -14,10 +14,12 @@ import { TRACE_TEXT, type TraceText } from './algorithms/trace.text';
 import { isTracePresetId, TRACE_PRESET_IDS, TRACE_PRESETS, type TracePresetId } from './algorithms/trace-presets';
 import { Choice, Field } from './kit/controls';
 import { type EdgeLook, type GEdge, type GNode, GraphCanvas, type NodeLook } from './kit/GraphCanvas';
+import { type HandIn, useHandIn } from './kit/hand-in';
 import { useLearner } from './kit/learner';
 import { hash, result, useResults } from './kit/results';
 import { Panel, StepNote, VizShell } from './kit/shell';
 import { useText } from './kit/text';
+import { TraceHandIn } from './TraceHandIn';
 import { TraceKey } from './TraceKey';
 
 // Trace tables (#150): the hand-tracing class problems, checked row by row. The student fills a
@@ -63,6 +65,7 @@ export default function TraceTableViz({
 }) {
   const X = useText(TRACE_TEXT);
   const learner = useLearner();
+  const handIn = useHandIn();
   const [presetId, setPresetId] = useState<TracePresetId>(isTracePresetId(initial) ? initial : 'lab07-dijkstra');
   // Staff may look at a student's variant instead of their own.
   const [looking, setLooking] = useState('');
@@ -123,8 +126,20 @@ export default function TraceTableViz({
         )
       }
     >
-      {/* A new problem (or another student's variant) starts a new table. */}
-      <TraceTable key={`${shown.id}|${seed}`} item={shown} X={X} />
+      {/* A graded table on a lab page is filled unchecked and handed in (#168); staff practise on it. */}
+      {handIn && !handIn.state?.staff ? (
+        <HandInView key={`${shown.id}|${seed}`} item={shown} X={X} handIn={handIn} />
+      ) : (
+        <>
+          {handIn?.state?.staff && (
+            <div className="px-4 pt-4 sm:px-5">
+              <StepNote tone="warning" text={X.graded.staff(handIn.state.points)} />
+            </div>
+          )}
+          {/* A new problem (or another student's variant) starts a new table. */}
+          <TraceTable key={`${shown.id}|${seed}`} item={shown} X={X} />
+        </>
+      )}
       {staff && (
         <details
           className="mx-4 mb-4 rounded-xl border border-border bg-surface p-3 text-sm sm:mx-5"
@@ -137,6 +152,59 @@ export default function TraceTableViz({
         </details>
       )}
     </VizShell>
+  );
+}
+
+/** A graded table for a student (#168): their graph and rule, and the rows they fill or filled. */
+function HandInView({ item, X, handIn }: { item: Shown; X: TraceText; handIn: HandIn }) {
+  const { problem } = item;
+  const trace = useMemo<Trace>(() => traceOf(problem, X.words), [problem, X]);
+  const edges: GEdge[] = useMemo(() => problem.edges.map(({ u, v, w }) => ({ u, v, w })), [problem]);
+  const { state } = handIn;
+  const column = (key: string) =>
+    trace.matrix ? `D[${key.replace(',', '][')}]` : (trace.columns.find((c) => c.key === key)?.label ?? key);
+  return (
+    <div className="grid gap-4 p-4 sm:p-5" data-testid="trace-graded">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="rounded-2xl border border-border bg-[var(--viz-canvas)] bg-grid">
+          <GraphCanvas
+            nodes={problem.nodes}
+            edges={edges}
+            directed={problem.directed}
+            shape={problem.nodes.some((n) => n.id.length > 2) ? 'pill' : 'circle'}
+            ariaLabel={item.name}
+            maxHeight="340px"
+          />
+        </div>
+        <div className="flex flex-col gap-3">
+          <p className="text-sm text-muted">
+            <strong className="text-foreground">{X.rule}:</strong> {item.rule}
+          </p>
+          <StepNote
+            tone={state?.open ? 'accent' : 'warning'}
+            text={
+              !state
+                ? X.graded.loading
+                : state.open
+                  ? X.graded.open(state.points)
+                  : state.rows.length
+                    ? X.graded.yours
+                    : X.graded.closed(state.points)
+            }
+          />
+        </div>
+      </div>
+      {state && (state.open || state.rows.length > 0) && (
+        <TraceHandIn
+          trace={trace}
+          W={X.words}
+          rows={state.rows}
+          editable={state.open}
+          onChange={handIn.save}
+          label={(row, key) => `${row} · ${column(key)}`}
+        />
+      )}
+    </div>
   );
 }
 

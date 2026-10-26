@@ -67,6 +67,16 @@ const sq = {
     done: (right: number, rows: number) =>
       `Tabela është plotë: ${right} nga ${rows} rreshta të saktë që në provën e parë. Klikoni një rresht për ta parë në graf.`,
   },
+  graded: {
+    open: (points: number) =>
+      `Kjo tabelë vlerësohet: ${points} pikë. Plotësoni të gjitha rreshtat; përgjigjet ruhen ndërsa shkruani dhe dorëzohen me fletoren. Nuk kontrollohen deri në vlerësim.`,
+    closed: (points: number) =>
+      `Kjo tabelë vlerësohet (${points} pikë) dhe plotësohet vetëm kur fletorja hapet për dorëzim.`,
+    yours: 'Përgjigjet tuaja, siç u ruajtën. I vlerëson serveri pasi dorëzohen.',
+    staff: (points: number) =>
+      `Tabelë me notë: ${points} pikë. Studentët e plotësojnë pa kontroll kur fletorja hapet për dorëzim; ju e provoni këtu si ushtrim.`,
+    loading: 'Duke ngarkuar përgjigjet…',
+  },
   custom: {
     name: (algorithm: string) => `Problemi i pedagogut · ${algorithm}`,
     variantName: (algorithm: string) => `Varianti juaj · ${algorithm}`,
@@ -183,6 +193,16 @@ export const TRACE_TEXT = bilingual<TraceText>(sq, {
     revealed: (row) => `Row ${row} was shown. Compare it with yours before going on.`,
     done: (right, rows) =>
       `The table is complete: ${right} of ${rows} rows right at the first try. Click a row to see it on the graph.`,
+  },
+  graded: {
+    open: (points) =>
+      `This table is graded: ${points} points. Fill every row; your answers are saved as you type and handed in with the notebook. They are not checked until grading.`,
+    closed: (points) =>
+      `This table is graded (${points} points) and is filled only when the notebook is open for submission.`,
+    yours: 'Your answers, as saved. The server grades them once handed in.',
+    staff: (points) =>
+      `A graded table: ${points} points. Students fill it unchecked when the notebook is open for submission; you can try it here as practice.`,
+    loading: 'Loading the answers…',
   },
   custom: {
     name: (algorithm) => `The pedagog's problem · ${algorithm}`,

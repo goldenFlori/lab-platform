@@ -1068,7 +1068,9 @@ export const en: Messages = {
     released: 'Released',
     notReleased: 'Not released',
     grade: (score: number, max: number) => `${score}/${max}`,
-    auto: (score: number, max: number) => `From the run: ${score}/${max}`,
+    auto: (score: number, max: number) => `Automatic (code and tables): ${score}/${max}`,
+    trace: (right: number, rows: number, score: number, points: number) =>
+      `Trace table: ${right}/${rows} rows right · ${score}/${points} points`,
     score: 'Grade',
     scoreHelp: 'Empty for the grade from the run.',
     feedback: 'Feedback for the student',
