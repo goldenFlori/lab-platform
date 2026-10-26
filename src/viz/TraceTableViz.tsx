@@ -2,211 +2,106 @@ import { Button } from '@heroui/react';
 import { Eye, Pause, Play, RotateCcw, Table2 } from 'lucide-react';
 import { type KeyboardEvent, useEffect, useMemo, useState } from 'react';
 import type { PredictionTopic } from '../shared/predictions';
-import { natural } from './algorithms/graphs';
-import { layeredLayout } from './algorithms/scc';
-import {
-  bellmanTrace,
-  dijkstraTrace,
-  display,
-  firstWrong,
-  floydTrace,
-  kahnTrace,
-  kruskalTrace,
-  primTrace,
-  type Trace,
-  type TraceRow,
-} from './algorithms/trace';
+import { isTraceProblem, type TraceProblem } from '../shared/trace-problem';
+import { display, firstWrong, type Trace, type TraceRow, traceIds, traceOf } from './algorithms/trace';
 import { TRACE_TEXT, type TraceText } from './algorithms/trace.text';
+import { isTracePresetId, TRACE_PRESET_IDS, TRACE_PRESETS, type TracePresetId } from './algorithms/trace-presets';
 import { Choice, Field } from './kit/controls';
 import { type EdgeLook, type GEdge, type GNode, GraphCanvas, type NodeLook } from './kit/GraphCanvas';
-import { result, useResults } from './kit/results';
+import { hash, result, useResults } from './kit/results';
 import { Panel, StepNote, VizShell } from './kit/shell';
 import { useText } from './kit/text';
 
 // Trace tables (#150): the hand-tracing class problems, checked row by row. The student fills a
 // row as on paper; a wrong row marks its first wrong cell with the rule it breaks, never the
 // value; after three tries the row can be shown. The graph beside it shows any finished row.
+// A lab can give the course's own problems (a preset) or a pedagog's own (`problem`, #166).
 
-type PresetId = 'lab07-dijkstra' | 'lab07-bellman' | 'lab05-kruskal' | 'lab05-prim' | 'lab06-kahn' | 'lab08-floyd';
-
-interface Preset {
-  id: PresetId;
-  /** What the table practises, for the student's results (#151). */
-  topic: PredictionTopic;
-  nodes: GNode[];
-  edges: GEdge[];
-  directed: boolean;
-  pill?: boolean;
-  trace: (ids: string[], edges: GEdge[], directed: boolean, T: TraceText) => Trace;
+/** What a table needs besides the problem: how it is named, its tie rule, its key for the results. */
+interface Shown {
+  id: string;
+  name: string;
+  rule: string;
+  problem: TraceProblem;
 }
-
-const E = (list: [string, string, number?][]): GEdge[] => list.map(([u, v, w]) => ({ u, v, w }));
-const N = (list: [string, number, number][]): GNode[] => list.map(([id, x, y]) => ({ id, x, y }));
-
-// The Lab 5 class problems' graph (Problems 2 and 3), edges in the listed order.
-const LAB5 = {
-  nodes: N([
-    ['A', 360, 55],
-    ['B', 150, 190],
-    ['C', 570, 190],
-    ['D', 150, 365],
-    ['E', 570, 365],
-  ]),
-  edges: E([
-    ['A', 'B', 6],
-    ['A', 'C', 1],
-    ['B', 'C', 5],
-    ['B', 'D', 3],
-    ['C', 'D', 4],
-    ['C', 'E', 2],
-    ['D', 'E', 8],
-  ]),
-};
-
-// The course DAG of Lab 6's Kahn trace, vertices in the order they join the queue.
-const COURSES = ['MAT1', 'MAT2', 'PRG1', 'ALG1', 'PRG2', 'OS', 'DB', 'NET'];
-const COURSE_EDGES = E([
-  ['MAT1', 'MAT2'],
-  ['MAT2', 'ALG1'],
-  ['ALG1', 'DB'],
-  ['DB', 'NET'],
-  ['MAT1', 'PRG1'],
-  ['PRG1', 'PRG2'],
-  ['PRG2', 'OS'],
-  ['OS', 'DB'],
-  ['PRG2', 'NET'],
-]);
-
-export const TRACE_PRESETS: Preset[] = [
-  {
-    id: 'lab07-dijkstra',
-    topic: 'trace-dijkstra',
-    directed: true,
-    nodes: N([
-      ['A', 90, 90],
-      ['B', 330, 90],
-      ['D', 570, 90],
-      ['C', 330, 320],
-      ['E', 570, 320],
-      ['F', 690, 210],
-    ]),
-    edges: E([
-      ['A', 'B', 4],
-      ['A', 'C', 6],
-      ['B', 'C', 2],
-      ['B', 'D', 3],
-      ['C', 'E', 1],
-      ['D', 'E', 1],
-      ['D', 'F', 7],
-      ['E', 'F', 2],
-    ]),
-    trace: (ids, edges, directed, T) => dijkstraTrace({ ids, edges, directed }, 'A', T.words),
-  },
-  {
-    id: 'lab07-bellman',
-    topic: 'trace-bellman',
-    directed: true,
-    nodes: N([
-      ['A', 100, 90],
-      ['B', 360, 90],
-      ['C', 620, 90],
-      ['D', 360, 330],
-    ]),
-    edges: E([
-      ['A', 'B', 1],
-      ['B', 'C', -4],
-      ['B', 'D', 2],
-      ['C', 'D', -1],
-      ['D', 'A', 3],
-    ]),
-    trace: (ids, edges, directed, T) => bellmanTrace({ ids, edges, directed }, 'A', T.words),
-  },
-  {
-    id: 'lab05-kruskal',
-    topic: 'trace-kruskal',
-    directed: false,
-    ...LAB5,
-    trace: (ids, edges, directed, T) => kruskalTrace({ ids, edges, directed }, T.words),
-  },
-  {
-    id: 'lab05-prim',
-    topic: 'trace-prim',
-    directed: false,
-    ...LAB5,
-    trace: (ids, edges, directed, T) => primTrace({ ids, edges, directed }, 'A', T.words),
-  },
-  {
-    id: 'lab06-kahn',
-    topic: 'trace-kahn',
-    directed: true,
-    pill: true,
-    nodes: layeredLayout(COURSES, COURSE_EDGES, 720, 380).map(({ id, x, y }) => ({ id, x, y })),
-    edges: COURSE_EDGES,
-    trace: (ids, edges, directed, T) => kahnTrace({ ids, edges, directed }, T.words),
-  },
-  {
-    id: 'lab08-floyd',
-    topic: 'trace-floyd',
-    directed: true,
-    nodes: N([
-      ['0', 120, 80],
-      ['1', 480, 80],
-      ['2', 480, 320],
-      ['3', 120, 320],
-    ]),
-    edges: E([
-      ['0', '1', 3],
-      ['0', '3', 7],
-      ['1', '0', 8],
-      ['1', '2', 2],
-      ['2', '0', 5],
-      ['2', '3', 1],
-      ['3', '0', 2],
-    ]),
-    trace: (ids, edges, directed, T) => floydTrace({ ids, edges, directed }, T.words),
-  },
-];
 
 const soft = (c: string, p = 26) => `color-mix(in oklab, ${c} ${p}%, var(--surface))`;
 
-export default function TraceTableViz({ preset: initial = 'lab07-dijkstra' }: { preset?: string }) {
+/** The tie rule of a problem, written out with its own vertices and edges. */
+function ruleOf(p: TraceProblem, X: TraceText) {
+  const R = X.custom.rules;
+  switch (p.algorithm) {
+    case 'bellman':
+      return R.bellman(p.edges.map((e) => `${e.u}→${e.v}`).join(', '), p.nodes.length - 1);
+    case 'kahn':
+      return R.kahn(p.nodes.map((n) => n.id).join(', '));
+    case 'floyd':
+      return R.floyd(traceIds(p).join(', '));
+    default:
+      return R[p.algorithm];
+  }
+}
+
+export default function TraceTableViz({
+  preset: initial = 'lab07-dijkstra',
+  problem,
+}: {
+  preset?: string;
+  /** A pedagog's own problem (#166); ignored unless it follows the rules. */
+  problem?: unknown;
+}) {
   const X = useText(TRACE_TEXT);
-  const [presetId, setPresetId] = useState<PresetId>(
-    TRACE_PRESETS.some((p) => p.id === initial) ? (initial as PresetId) : 'lab07-dijkstra',
-  );
-  const preset = TRACE_PRESETS.find((p) => p.id === presetId) ?? (TRACE_PRESETS[0] as Preset);
+  const [presetId, setPresetId] = useState<TracePresetId>(isTracePresetId(initial) ? initial : 'lab07-dijkstra');
+  const own = isTraceProblem(problem) ? problem : null;
+  const shown: Shown = own
+    ? {
+        id: `custom-${hash(JSON.stringify(own))}`,
+        name: X.custom.name(X.custom.algorithms[own.algorithm]),
+        rule: ruleOf(own, X),
+        problem: own,
+      }
+    : {
+        id: presetId,
+        name: X.presets[presetId]?.name ?? presetId,
+        rule: X.presets[presetId]?.rule ?? ruleOf(TRACE_PRESETS[presetId], X),
+        problem: TRACE_PRESETS[presetId],
+      };
   return (
     <VizShell
       title={X.title}
       subtitle={X.subtitle}
       icon={<Table2 />}
       toolbar={
-        <Field label={X.problem}>
-          <Choice
-            label={X.problem}
-            value={presetId}
-            onChange={setPresetId}
-            className="w-64"
-            options={TRACE_PRESETS.map((p) => ({ value: p.id, label: X.presets[p.id]?.name ?? p.id }))}
-          />
-        </Field>
+        own ? undefined : (
+          <Field label={X.problem}>
+            <Choice
+              label={X.problem}
+              value={presetId}
+              onChange={setPresetId}
+              className="w-64"
+              options={TRACE_PRESET_IDS.map((id) => ({ value: id, label: X.presets[id]?.name ?? id }))}
+            />
+          </Field>
+        )
       }
     >
       {/* A new problem starts a new table. */}
-      <TraceTable key={presetId} preset={preset} X={X} />
+      <TraceTable key={shown.id} item={shown} X={X} />
     </VizShell>
   );
 }
 
 type Result = 'right' | 'later' | 'revealed';
 
-function TraceTable({ preset, X }: { preset: Preset; X: TraceText }) {
+function TraceTable({ item, X }: { item: Shown; X: TraceText }) {
+  const { problem } = item;
+  const topic = `trace-${problem.algorithm}` as PredictionTopic;
   // Vertices alphabetically, except Kahn's, whose queue follows the order the problem lists them in.
-  const ids = useMemo(
-    () => (preset.id === 'lab06-kahn' ? COURSES : preset.nodes.map((n) => n.id).sort(natural)),
-    [preset],
-  );
-  const trace = useMemo(() => preset.trace(ids, preset.edges, preset.directed, X), [preset, ids, X]);
+  const ids = useMemo(() => traceIds(problem), [problem]);
+  const trace = useMemo<Trace>(() => traceOf(problem, X.words), [problem, X]);
+  const nodes: GNode[] = problem.nodes;
+  const edges: GEdge[] = useMemo(() => problem.edges.map(({ u, v, w }) => ({ u, v, w })), [problem]);
+  const pill = problem.nodes.some((n) => n.id.length > 2);
   const W = X.words;
   const [results, setResults] = useState<Result[]>([]);
   const at = results.length;
@@ -258,12 +153,12 @@ function TraceTable({ preset, X }: { preset: Preset; X: TraceText }) {
     if (tries === 0)
       report?.(
         result({
-          topic: preset.topic,
-          decision: `${preset.id}:${at}`,
+          topic,
+          decision: `${item.id}:${at}`,
           right: !wrong,
           pick: wrong ? X.cell(cellName(wrong.key, wrong.column.label)) : '',
           answer: '',
-          prompt: `${X.presets[preset.id]?.name ?? preset.id} · ${row.label}`,
+          prompt: `${item.name} · ${row.label}`,
         }),
       );
     if (!wrong) {
@@ -340,7 +235,7 @@ function TraceTable({ preset, X }: { preset: Preset; X: TraceText }) {
   const edgeLook = (_: GEdge, i: number): EdgeLook =>
     view.mark.edges.includes(i) ? { stroke: 'var(--state-path)', width: 4, front: true } : {};
 
-  const rule = X.presets[preset.id]?.rule;
+  const rule = item.rule;
   const cellClass = (key: string) =>
     `w-full min-w-[3.2rem] rounded-lg border bg-surface px-2 py-1.5 text-center font-mono text-sm outline-none focus:border-accent ${
       wrongKey === key ? 'border-danger ring-2 ring-danger/40' : 'border-border'
@@ -355,13 +250,13 @@ function TraceTable({ preset, X }: { preset: Preset; X: TraceText }) {
       <div className="flex min-w-0 flex-col gap-3">
         <div className="rounded-2xl border border-border bg-[var(--viz-canvas)] bg-grid">
           <GraphCanvas
-            nodes={preset.nodes}
-            edges={preset.edges}
-            directed={preset.directed}
-            shape={preset.pill ? 'pill' : 'circle'}
+            nodes={nodes}
+            edges={edges}
+            directed={problem.directed}
+            shape={pill ? 'pill' : 'circle'}
             nodeLook={nodeLook}
             edgeLook={edgeLook}
-            ariaLabel={X.presets[preset.id]?.name ?? preset.id}
+            ariaLabel={item.name}
             maxHeight="360px"
           />
         </div>

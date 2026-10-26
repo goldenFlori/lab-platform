@@ -1,8 +1,9 @@
 import { Alert, Button } from '@heroui/react';
-import { Plus, Sparkles, Trash2 } from 'lucide-react';
-import { type FormEvent, useMemo, useState } from 'react';
+import { PencilRuler, Plus, Sparkles, Trash2 } from 'lucide-react';
+import { type FormEvent, lazy, Suspense, useMemo, useState } from 'react';
 import type { StoredNotebook } from '../../../notebook/stored';
 import type { Embed } from '../../../shared/notebooks';
+import { isTraceProblem, problemIssue } from '../../../shared/trace-problem';
 import { VISUALIZER_IDS } from '../../../shared/visualizers';
 import { type Messages, useT } from '../../i18n';
 
@@ -12,6 +13,20 @@ import { type Messages, useT } from '../../i18n';
 type Row = { key: string; cell: string; viz: string; title: string; props: string };
 
 const MAX_EMBEDS = 60;
+
+/** Where a pedagog builds a trace table's own problem (#166); its code loads when it opens. */
+const TraceProblemBuilder = lazy(() => import('../../../viz/TraceProblemBuilder'));
+const TRACE = 'tabela-gjurmimit';
+
+/** The problem in a row's props, when it has one. */
+function problemOf(props: string) {
+  try {
+    const value = JSON.parse(props) as { problem?: unknown };
+    return isTraceProblem(value?.problem) ? value.problem : null;
+  } catch {
+    return null;
+  }
+}
 
 const shorten = (text: string, max = 70) => {
   const flat = text.replace(/\s+/g, ' ').trim();
@@ -66,6 +81,7 @@ function parseRows(t: Messages, rows: Row[]): Embed[] | string {
         return t.embeds.badJson(n);
       }
     }
+    if (row.viz === TRACE && props?.problem !== undefined && problemIssue(props.problem)) return t.embeds.badProblem(n);
     embeds.push({ cell: Number(row.cell), viz: row.viz, title: row.title.trim() || null, props });
   }
   if (new Set(embeds.map((e) => e.cell)).size !== embeds.length) {
@@ -89,6 +105,7 @@ export function EmbedsEditor({
   const cells = useMemo(() => cellChoices(t, notebook), [t, notebook]);
   const [rows, setRows] = useState<Row[]>(() => toRows(embeds));
   const [status, setStatus] = useState<{ tone: 'danger' | 'success'; text: string } | null>(null);
+  const [building, setBuilding] = useState<string | null>(null);
 
   const change = (key: string, field: keyof Row, value: string) =>
     setRows((list) => list.map((row) => (row.key === key ? { ...row, [field]: value } : row)));
@@ -160,7 +177,26 @@ export function EmbedsEditor({
                     className={`${field} font-mono text-[0.85rem]`}
                   />
                 </label>
-                <div className="sm:col-span-2">
+                {row.viz === TRACE && building === row.key && (
+                  <div className="sm:col-span-2">
+                    <Suspense fallback={null}>
+                      <TraceProblemBuilder
+                        value={problemOf(row.props)}
+                        onChange={(problem) => change(row.key, 'props', JSON.stringify({ problem }))}
+                      />
+                    </Suspense>
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-2 sm:col-span-2">
+                  {row.viz === TRACE && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onPress={() => setBuilding((open) => (open === row.key ? null : row.key))}
+                    >
+                      <PencilRuler className="size-4" /> {building === row.key ? t.embeds.hideBuild : t.embeds.build}
+                    </Button>
+                  )}
                   <Button
                     size="sm"
                     variant="ghost"

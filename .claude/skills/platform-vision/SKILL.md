@@ -410,6 +410,15 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   `platform.mjs` (course PRs #34, #36): every cell of all 22 runs in Pyodide, the 21 new checks are
   found and wait for the student, and the import places the six trace tables, the recursion tree
   and Kruskal & Prim. Next: the owner re-imports the course and runs the dry run with FSHN.
+- **2026-10-26:** Phase 10 planned as the "Phase 10: Fair assessment" milestone, issues #166–#170:
+  pedagogs' own trace problems, a variant per student, trace tables graded on the server, the
+  kolokium (a timed, one-attempt assessment) and the assessment report.
+- **2026-10-26:** #166 done. In the embeds editor, a trace table opens a builder: click for vertices
+  and edges with weights, choose the algorithm (Dijkstra, Bellman-Ford, Prim, Kruskal, Kahn,
+  Floyd-Warshall) and the start, or begin from a lab's problem; the expected table shows for staff.
+  The problem is stored as the embed's props and the lab draws it like a course problem, with its own
+  tie rule. One set of rules (`src/shared/trace-problem.ts`) is checked by the builder and the API.
+  Next: #167, a variant for every student.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
@@ -460,6 +469,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-12 | The survey is anonymous by design: ratings are stored only as counts, comments with random ids, no time and no author, in a WITHOUT ROWID table; who answered is kept apart, only to ask once. Results show from five answers | Decided |
 | 2026-10-12 | A real mobile app means an installable web app (PWA) first; a store app (Capacitor) only if a need appears | Decided |
 | 2026-10-25 | Phase 8 is "Understanding, measured" before SaaS: students predict and trace every algorithm by hand, checked at once, and first-try results are counted (never graded). Teaching quality comes first, and the January pilot must show learning, not only use, before a second institution signs | Decided |
+| 2026-10-26 | Phase 10 is "Fair assessment": students can learn every algorithm, but a grade cannot rest on checks in their browser or on one graph shared by a whole room, and only the owner could author problems. Assessment is also what a second institution asks about first | Decided |
 | 2026-10-26 | Phase 9 is "Every lab, coded and checked": Labs 5, 6 and 8 were the only graph labs where students never wrote the algorithms, and writing them is what the exam and later courses ask. The platform's own visualizations are declared in the course repo (platform.mjs), so the import places them, not staff by hand | Decided |
 | 2026-10-25 | First-try results are practice data: kept once per student and decision (later tries change nothing), shown to the student per topic and to staff with analytics only as counts from five students up, with the hardest decisions and the most common wrong answer, never names; two years like activity. A decision is identified by its step and its options as ids, so both languages count as one | Decided |
 | 2026-10-25 | Predict mode asks only decisions that can go either way, and caps long runs by order, never by outcome (4 per Bellman-Ford pass, 3 per Floyd-Warshall k), so practice stays short and the cap gives nothing away | Decided |
