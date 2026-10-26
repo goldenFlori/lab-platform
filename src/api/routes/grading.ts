@@ -8,6 +8,7 @@ import {
   gradingInput,
   type StaffGrade,
 } from '../../shared/grading';
+import { scoreTrace, type TraceScore, tracePoints, traceProblemFor } from '../../shared/trace-grading';
 import type { TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
 import { forbidden, invalidRequest } from './course-context';
@@ -44,6 +45,7 @@ const staffGrade = (row: {
   autoScore: number;
   maxScore: number;
   results: { cell: number; status: string }[];
+  traces: TraceScore[];
   score: number | null;
   feedback: string | null;
   gradedAt: Date;
@@ -53,6 +55,7 @@ const staffGrade = (row: {
   autoScore: row.autoScore,
   maxScore: row.maxScore,
   results: row.results as GradeResult[],
+  traces: row.traces,
   score: row.score,
   feedback: row.feedback,
   gradedAt: row.gradedAt.toISOString(),
@@ -107,7 +110,27 @@ export const gradingRoutes = new Hono<TenantEnv>()
     const { ctx, nb } = await notebookInUrl(c);
     const userId = await gradedStudent(c, ctx);
     if (!userId) return forbidden(c);
-    await c.var.tenant.grading.record({ notebookId: nb.id, userId, ...c.req.valid('json') });
+    // The browser's run scores the code; the server scores the trace tables itself (#168).
+    const run = c.req.valid('json');
+    const [embeds, handed] = await Promise.all([
+      c.var.tenant.notebooks.embedsOf(nb.id),
+      c.var.tenant.submissions.tracesOf(nb.id, userId),
+    ]);
+    const traces: TraceScore[] = embeds
+      .filter((e) => e.viz === 'tabela-gjurmimit' && tracePoints(e.props) > 0)
+      .map((e) => {
+        const problem = traceProblemFor(e.props, { userId, notebookId: nb.id, cell: e.cell });
+        const answers = handed.find((t) => t.cell === e.cell)?.rows ?? [];
+        return { cell: e.cell, ...scoreTrace(problem, answers, tracePoints(e.props)) };
+      });
+    await c.var.tenant.grading.record({
+      notebookId: nb.id,
+      userId,
+      autoScore: run.autoScore + traces.reduce((n, t) => n + t.score, 0),
+      maxScore: run.maxScore + traces.reduce((n, t) => n + t.points, 0),
+      results: run.results,
+      traces,
+    });
     const row = await c.var.tenant.grading.of(nb.id, userId);
     return c.json(row ? staffGrade(row) : null);
   })

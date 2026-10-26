@@ -11,6 +11,8 @@ export type OrganizationData = {
   memberships: { role: string; course: string | null; group: string | null; since: When }[];
   labsOpened: { lab: string; kind: string; day: string }[];
   codeEdits: { notebook: string; cell: number; code: string; savedAt: When }[];
+  /** Rows of graded trace tables, as saved while their notebook was open (#168). */
+  traceAnswers: { notebook: string; cell: number; rows: Record<string, string>[]; savedAt: When }[];
   exercisesSolved: { notebook: string; cell: number; at: When }[];
   /** First answers to the decisions of visualizations and trace tables (#151). */
   firstTries: {

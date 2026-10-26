@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { MAX_TEST } from './exercise-limits';
 import type { CheckStatus } from './exercises';
+import type { TraceScore } from './trace-grading';
 
 // Grading on the pedagog's machine (#53): points and hidden tests per exercise (staff only), the
 // grades a batch re-run produces, the pedagog's adjustments, and their release. The app imports
@@ -44,6 +45,8 @@ export type StaffGrade = {
   autoScore: number;
   maxScore: number;
   results: GradeResult[];
+  /** Each graded trace table's rows right, scored by the server and included in autoScore (#168). */
+  traces: TraceScore[];
   score: number | null;
   feedback: string | null;
   gradedAt: string;

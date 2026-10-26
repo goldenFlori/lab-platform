@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { Exercise } from './exercises';
+import { tracePointsOk } from './trace-grading';
 import { problemIssue, variantIssue } from './trace-problem';
 import { isVisualizerId } from './visualizers';
 
@@ -44,7 +45,9 @@ export const embedsInput = z.object({
       (list) =>
         list.every((e) => e.viz !== 'tabela-gjurmimit' || !e.props?.variant || variantIssue(e.props.variant) === null),
       'Invalid trace variant',
-    ),
+    )
+    // A graded trace table (#168) is worth a whole number of points.
+    .refine((list) => list.every((e) => e.viz !== 'tabela-gjurmimit' || tracePointsOk(e.props)), 'Invalid points'),
 });
 
 export type Embed = { cell: number; viz: string; title: string | null; props: Record<string, unknown> | null };

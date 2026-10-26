@@ -60,6 +60,7 @@ import {
   surveyRatings,
   surveyRespondents,
   surveys,
+  traceAnswers,
   users,
 } from './schema';
 
@@ -570,6 +571,34 @@ function tenantStudents(db: Db, orgId: string) {
         db.update(users).set({ passwordHash }).where(eq(users.id, userId)),
         db.delete(sessions).where(eq(sessions.userId, userId)),
       ]);
+    },
+  };
+}
+
+/** A student's rows of graded trace tables (#168): each user reads and writes only their own. */
+function tenantTraceAnswers(db: Db, orgId: string) {
+  const mine = (notebookId: string, userId: string) =>
+    and(eq(traceAnswers.orgId, orgId), eq(traceAnswers.notebookId, notebookId), eq(traceAnswers.userId, userId));
+  return {
+    ofUser(notebookId: string, userId: string) {
+      return db
+        .select({ cell: traceAnswers.cell, rows: traceAnswers.rows })
+        .from(traceAnswers)
+        .where(mine(notebookId, userId))
+        .orderBy(asc(traceAnswers.cell));
+    },
+
+    async save(row: { notebookId: string; userId: string; cell: number; rows: Record<string, string>[] }) {
+      const updatedAt = new Date();
+      await rethrowMissingParent(
+        db
+          .insert(traceAnswers)
+          .values({ ...row, id: uuidv7(), orgId, updatedAt })
+          .onConflictDoUpdate({
+            target: [traceAnswers.orgId, traceAnswers.notebookId, traceAnswers.cell, traceAnswers.userId],
+            set: { rows: row.rows, updatedAt },
+          }),
+      );
     },
   };
 }
@@ -1105,17 +1134,36 @@ function tenantSubmissions(db: Db, orgId: string) {
       userId: string;
       code: { cell: number; code: string }[];
       solved: number[];
+      traces?: { cell: number; rows: Record<string, string>[] }[];
     }) {
       const submittedAt = new Date();
+      const traces = row.traces ?? [];
       await rethrowMissingParent(
         db
           .insert(submissions)
-          .values({ ...row, id: uuidv7(), orgId, attempts: 1, submittedAt })
+          .values({ ...row, traces, id: uuidv7(), orgId, attempts: 1, submittedAt })
           .onConflictDoUpdate({
             target: [submissions.orgId, submissions.notebookId, submissions.userId],
-            set: { code: row.code, solved: row.solved, submittedAt, attempts: sql`${submissions.attempts} + 1` },
+            set: {
+              code: row.code,
+              solved: row.solved,
+              traces,
+              submittedAt,
+              attempts: sql`${submissions.attempts} + 1`,
+            },
           }),
       );
+    },
+
+    /** The trace tables' rows a student handed in (#168), for the server to grade. */
+    async tracesOf(notebookId: string, userId: string) {
+      const [row] = await db
+        .select({ traces: submissions.traces })
+        .from(submissions)
+        .where(
+          and(eq(submissions.orgId, orgId), eq(submissions.notebookId, notebookId), eq(submissions.userId, userId)),
+        );
+      return row?.traces ?? [];
     },
 
     async of(notebookId: string, userId: string) {
@@ -1206,15 +1254,17 @@ function tenantGrading(db: Db, orgId: string) {
       autoScore: number;
       maxScore: number;
       results: { cell: number; status: string }[];
+      traces?: { cell: number; rows: number; right: number; points: number; score: number }[];
     }) {
       const gradedAt = new Date();
+      const traces = row.traces ?? [];
       await rethrowMissingParent(
         db
           .insert(grades)
-          .values({ ...row, id: uuidv7(), orgId, gradedAt })
+          .values({ ...row, traces, id: uuidv7(), orgId, gradedAt })
           .onConflictDoUpdate({
             target: [grades.orgId, grades.notebookId, grades.userId],
-            set: { autoScore: row.autoScore, maxScore: row.maxScore, results: row.results, gradedAt },
+            set: { autoScore: row.autoScore, maxScore: row.maxScore, results: row.results, traces, gradedAt },
           }),
       );
     },
@@ -1586,7 +1636,7 @@ function tenantPersonal(db: Db, orgId: string) {
   return {
     async export(userId: string): Promise<Omit<OrganizationData, 'organization'>> {
       const nb = (column: SQLiteColumn) => and(eq(notebooks.id, column), eq(notebooks.orgId, orgId));
-      const [member, opened, edits, solved, predicted, handed, graded, asked, used, requests] = await db.batch([
+      const [member, opened, edits, traced, solved, predicted, handed, graded, asked, used, requests] = await db.batch([
         db
           .select({ role: memberships.role, course: courses.title, group: groups.name, since: memberships.createdAt })
           .from(memberships)
@@ -1609,6 +1659,16 @@ function tenantPersonal(db: Db, orgId: string) {
           .from(codeEdits)
           .innerJoin(notebooks, nb(codeEdits.notebookId))
           .where(and(eq(codeEdits.orgId, orgId), eq(codeEdits.userId, userId))),
+        db
+          .select({
+            notebook: notebooks.title,
+            cell: traceAnswers.cell,
+            rows: traceAnswers.rows,
+            savedAt: traceAnswers.updatedAt,
+          })
+          .from(traceAnswers)
+          .innerJoin(notebooks, nb(traceAnswers.notebookId))
+          .where(and(eq(traceAnswers.orgId, orgId), eq(traceAnswers.userId, userId))),
         db
           .select({ notebook: notebooks.title, cell: exerciseCompletions.cell, at: exerciseCompletions.completedAt })
           .from(exerciseCompletions)
@@ -1681,6 +1741,7 @@ function tenantPersonal(db: Db, orgId: string) {
         memberships: member.map((m) => ({ ...m, since: iso(m.since) })),
         labsOpened: opened,
         codeEdits: edits.map((e) => ({ ...e, savedAt: iso(e.savedAt) })),
+        traceAnswers: traced.map((t) => ({ ...t, savedAt: iso(t.savedAt) })),
         exercisesSolved: solved.map((s) => ({ ...s, at: iso(s.at) })),
         firstTries: predicted,
         submissions: handed.map((s) => ({ ...s, at: iso(s.at) })),
@@ -1779,6 +1840,7 @@ function tenantPersonal(db: Db, orgId: string) {
         db.delete(memberships).where(and(eq(memberships.orgId, orgId), eq(memberships.userId, userId))),
         db.delete(labActivity).where(and(eq(labActivity.orgId, orgId), eq(labActivity.userId, userId))),
         db.delete(codeEdits).where(and(eq(codeEdits.orgId, orgId), eq(codeEdits.userId, userId))),
+        db.delete(traceAnswers).where(and(eq(traceAnswers.orgId, orgId), eq(traceAnswers.userId, userId))),
         db
           .delete(exerciseCompletions)
           .where(and(eq(exerciseCompletions.orgId, orgId), eq(exerciseCompletions.userId, userId))),
@@ -2031,6 +2093,7 @@ export function forTenant(db: Db, orgId: string) {
     notebooks: tenantNotebooks(db, orgId),
     activity: tenantActivity(db, orgId),
     codeEdits: tenantCodeEdits(db, orgId),
+    traceAnswers: tenantTraceAnswers(db, orgId),
     exercises: tenantExercises(db, orgId),
     predictions: tenantPredictions(db, orgId),
     submissions: tenantSubmissions(db, orgId),
