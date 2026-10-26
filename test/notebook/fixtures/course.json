@@ -110,6 +110,12 @@
             "ranges": [[null, "ushtrimi-4-komponentet-e-lidhura-fort"], ["pune-ne-klase", null]]
           },
           "note": "Ushtrimet 1–3, Punë në Klasë dhe Detyrat e Shtëpisë."
+        },
+        {
+          "type": "supplementary",
+          "title": "Ushtrime Shtesë — BFS, DFS, Kruskal dhe Prim në kod",
+          "notebook": "laborator-05-ushtrime-shtese.ipynb",
+          "note": "BFS me largesat dhe shtegun, komponentet, grafi dyanësor, DFS me kohët, bashkësitë disjunkte, Kruskal dhe Prim. 8 ushtrime me kontroll automatik + Punë në Klasë."
         }
       ],
       "homework": [
@@ -138,6 +144,12 @@
             "ranges": [["ushtrimi-4-komponentet-e-lidhura-fort", "pune-ne-klase"]]
           },
           "note": "SCC, Renditjet Topologjike dhe loja interaktive e renditjes topologjike."
+        },
+        {
+          "type": "supplementary",
+          "title": "Ushtrime Shtesë — Kahn, DFS dhe Kosaraju në kod",
+          "notebook": "laborator-06-ushtrime-shtese.ipynb",
+          "note": "Kontrolli i një renditjeje, Kahn me zbulimin e ciklit, renditja nga DFS, numri i renditjeve, grafi i transpozuar, Kosaraju dhe grafi i kondensuar. 7 ushtrime me kontroll automatik + Punë në Klasë."
         }
       ]
     },
@@ -186,6 +198,12 @@
           "title": "Laboratori 8 — Materiali kryesor",
           "notebook": "laborator-08.ipynb",
           "note": "Pseudokodi i plotë, matricat D dhe P, 4 ushtrime Floyd-Warshall (2 nga Lab 7), Edmonds-Karp, Punë në Klasë + 8 pyetje reflektuese."
+        },
+        {
+          "type": "supplementary",
+          "title": "Ushtrime Shtesë — Floyd-Warshall në kod",
+          "notebook": "laborator-08-ushtrime-shtese.ipynb",
+          "note": "Matrica e peshave, Floyd-Warshall me hapin tjetër, rindërtimi i rrugës, ciklet negative, mbyllja kalimtare (Warshall) dhe Dijkstra nga çdo kulm. 6 ushtrime me kontroll automatik + Punë në Klasë."
         }
       ]
     },

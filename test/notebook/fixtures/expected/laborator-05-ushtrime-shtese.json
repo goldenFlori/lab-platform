@@ -1,0 +1,767 @@
+{
+  "title": "Laboratori 5 · Ushtrime Shtesë — Përshkimi i grafeve dhe pema përfshirëse minimum, në kod",
+  "toc": [
+    {
+      "id": "kujtues-teorik",
+      "title": "Kujtues teorik",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "ushtrimi-1-bfs-largesat-dhe-prinderit",
+      "title": "Ushtrimi 1 — BFS: largesat dhe prindërit",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-shtegu-nga-prind",
+      "title": "Ushtrimi 2 — Shtegu nga `prind`",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-komponentet-e-lidhura",
+      "title": "Ushtrimi 3 — Komponentet e lidhura",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-grafi-dyanesor",
+      "title": "Ushtrimi 4 — Grafi dyanësor",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-5-dfs-me-kohet",
+      "title": "Ushtrimi 5 — DFS me kohët",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-6-bashkesite-disjunkte-union-find",
+      "title": "Ushtrimi 6 — Bashkësitë disjunkte (union-find)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-7-kruskal",
+      "title": "Ushtrimi 7 — Kruskal",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-8-prim",
+      "title": "Ushtrimi 8 — Prim",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "tocFull": [
+    {
+      "id": "kujtues-teorik",
+      "title": "Kujtues teorik",
+      "level": 2,
+      "kind": "theory"
+    },
+    {
+      "id": "ushtrimi-1-bfs-largesat-dhe-prinderit",
+      "title": "Ushtrimi 1 — BFS: largesat dhe prindërit",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-shtegu-nga-prind",
+      "title": "Ushtrimi 2 — Shtegu nga `prind`",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-komponentet-e-lidhura",
+      "title": "Ushtrimi 3 — Komponentet e lidhura",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-grafi-dyanesor",
+      "title": "Ushtrimi 4 — Grafi dyanësor",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-5-dfs-me-kohet",
+      "title": "Ushtrimi 5 — DFS me kohët",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-6-bashkesite-disjunkte-union-find",
+      "title": "Ushtrimi 6 — Bashkësitë disjunkte (union-find)",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-7-kruskal",
+      "title": "Ushtrimi 7 — Kruskal",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-8-prim",
+      "title": "Ushtrimi 8 — Prim",
+      "level": 2,
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "level": 2,
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "level": 2,
+      "kind": "reflect"
+    }
+  ],
+  "sections": [
+    {
+      "id": "kujtues-teorik",
+      "title": "Kujtues teorik",
+      "kind": "theory"
+    },
+    {
+      "id": "ushtrimi-1-bfs-largesat-dhe-prinderit",
+      "title": "Ushtrimi 1 — BFS: largesat dhe prindërit",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-2-shtegu-nga-prind",
+      "title": "Ushtrimi 2 — Shtegu nga `prind`",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-3-komponentet-e-lidhura",
+      "title": "Ushtrimi 3 — Komponentet e lidhura",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-4-grafi-dyanesor",
+      "title": "Ushtrimi 4 — Grafi dyanësor",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-5-dfs-me-kohet",
+      "title": "Ushtrimi 5 — DFS me kohët",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-6-bashkesite-disjunkte-union-find",
+      "title": "Ushtrimi 6 — Bashkësitë disjunkte (union-find)",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-7-kruskal",
+      "title": "Ushtrimi 7 — Kruskal",
+      "kind": "exercise"
+    },
+    {
+      "id": "ushtrimi-8-prim",
+      "title": "Ushtrimi 8 — Prim",
+      "kind": "exercise"
+    },
+    {
+      "id": "pune-ne-klase",
+      "title": "Punë në Klasë",
+      "kind": "classwork"
+    },
+    {
+      "id": "pyetje-reflektuese",
+      "title": "Pyetje Reflektuese",
+      "kind": "reflect"
+    }
+  ],
+  "cells": [
+    {
+      "type": "markdown",
+      "kind": "normal",
+      "html": "sha256:7ebcdbf67327e15d",
+      "srcIndex": 0,
+      "intro": true
+    },
+    {
+      "type": "markdown",
+      "kind": "theory",
+      "label": "Teori",
+      "id": "kujtues-teorik",
+      "heading": "Kujtues teorik",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:d67246352f547df9",
+      "srcIndex": 1
+    },
+    {
+      "type": "code",
+      "srcIndex": 2,
+      "interactive": false,
+      "html": "sha256:0604b47649cc1178",
+      "raw": "sha256:358a571005496919",
+      "lines": 57,
+      "collapsed": true,
+      "summary": [
+        {
+          "t": "def",
+          "n": "kontrollo"
+        },
+        {
+          "t": "def",
+          "n": "nga_brinjet"
+        },
+        {
+          "t": "def",
+          "n": "pasi_plotesohet"
+        }
+      ],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": true,
+        "matplotlib": true
+      },
+      "externalScripts": [],
+      "outputs": [
+        {
+          "kind": "image",
+          "file": "img-4c80c789f40c.png",
+          "bytes": 18050
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-1-bfs-largesat-dhe-prinderit",
+      "heading": "Ushtrimi 1 — BFS: largesat dhe prindërit",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:a98a5663b0856da1",
+      "srcIndex": 3
+    },
+    {
+      "type": "code",
+      "srcIndex": 4,
+      "interactive": false,
+      "html": "sha256:31ee86b5e55b38e6",
+      "raw": "sha256:bd895c068cae12fe",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 5,
+      "interactive": false,
+      "html": "sha256:8f14efbca5b3b2b1",
+      "raw": "sha256:9002caff46b97dc0",
+      "lines": 28,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-2-shtegu-nga-prind",
+      "heading": "Ushtrimi 2 — Shtegu nga `prind`",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:0c7c11a3a139088c",
+      "srcIndex": 6
+    },
+    {
+      "type": "code",
+      "srcIndex": 7,
+      "interactive": false,
+      "html": "sha256:e7179c7306ce0823",
+      "raw": "sha256:ddabea379061f3e8",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 8,
+      "interactive": false,
+      "html": "sha256:4fcad01c6b174e73",
+      "raw": "sha256:68079b35f9ace368",
+      "lines": 9,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 9,
+      "interactive": false,
+      "html": "sha256:22c85f80ae283615",
+      "raw": "sha256:284ed25650b6f567",
+      "lines": 20,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-3-komponentet-e-lidhura",
+      "heading": "Ushtrimi 3 — Komponentet e lidhura",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:c46d386f11f5d84e",
+      "srcIndex": 10
+    },
+    {
+      "type": "code",
+      "srcIndex": 11,
+      "interactive": false,
+      "html": "sha256:0ad073f60cdb2c64",
+      "raw": "sha256:73016d3685dee6a4",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 12,
+      "interactive": false,
+      "html": "sha256:0f739ef5f4db64a0",
+      "raw": "sha256:db33e29545392fe7",
+      "lines": 14,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-4-grafi-dyanesor",
+      "heading": "Ushtrimi 4 — Grafi dyanësor",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:c2ee5244a8be09ed",
+      "srcIndex": 13
+    },
+    {
+      "type": "code",
+      "srcIndex": 14,
+      "interactive": false,
+      "html": "sha256:6d17042db3f8bd98",
+      "raw": "sha256:21935d19d752839a",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 15,
+      "interactive": false,
+      "html": "sha256:de264d2d1dbdb9d6",
+      "raw": "sha256:793932f28921405a",
+      "lines": 19,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-5-dfs-me-kohet",
+      "heading": "Ushtrimi 5 — DFS me kohët",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:829ade5d271371e0",
+      "srcIndex": 16
+    },
+    {
+      "type": "code",
+      "srcIndex": 17,
+      "interactive": false,
+      "html": "sha256:2f0d8f39940371a1",
+      "raw": "sha256:47264c7c1972c1a2",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 18,
+      "interactive": false,
+      "html": "sha256:977ca9e197010fbe",
+      "raw": "sha256:6df3b1036d45a641",
+      "lines": 18,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-6-bashkesite-disjunkte-union-find",
+      "heading": "Ushtrimi 6 — Bashkësitë disjunkte (union-find)",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:62cd6054bb0a1d82",
+      "srcIndex": 19
+    },
+    {
+      "type": "code",
+      "srcIndex": 20,
+      "interactive": false,
+      "html": "sha256:16ac0546ecd01099",
+      "raw": "sha256:7a7da9233b0ea118",
+      "lines": 12,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 21,
+      "interactive": false,
+      "html": "sha256:a560f287575ec04d",
+      "raw": "sha256:0444226ac41fa9ff",
+      "lines": 17,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-7-kruskal",
+      "heading": "Ushtrimi 7 — Kruskal",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e5cbc88a6a502a54",
+      "srcIndex": 22
+    },
+    {
+      "type": "code",
+      "srcIndex": 23,
+      "interactive": false,
+      "html": "sha256:712faadeada15592",
+      "raw": "sha256:b8458a8dbac8d581",
+      "lines": 8,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 24,
+      "interactive": false,
+      "html": "sha256:08339e7e665aebd6",
+      "raw": "sha256:e980bcc3bd7ad1f4",
+      "lines": 27,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "exercise",
+      "label": "Ushtrim",
+      "id": "ushtrimi-8-prim",
+      "heading": "Ushtrimi 8 — Prim",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:1bf89932eae9e663",
+      "srcIndex": 25
+    },
+    {
+      "type": "code",
+      "srcIndex": 26,
+      "interactive": false,
+      "html": "sha256:9b75fc66e0da3a61",
+      "raw": "sha256:3c5d9079546e880e",
+      "lines": 3,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "srcIndex": 27,
+      "interactive": false,
+      "html": "sha256:7e6382c5211193fa",
+      "raw": "sha256:f20b6d3875c08369",
+      "lines": 15,
+      "collapsed": false,
+      "summary": [],
+      "flags": {
+        "pygame": false,
+        "tkinter": false,
+        "widgets": false,
+        "plotly": false,
+        "subprocess": false,
+        "sysexit": false,
+        "networkx": false,
+        "matplotlib": false
+      },
+      "externalScripts": [],
+      "outputs": []
+    },
+    {
+      "type": "markdown",
+      "kind": "classwork",
+      "label": "Punë në Klasë",
+      "id": "pune-ne-klase",
+      "heading": "Punë në Klasë",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e0e4d767503d380a",
+      "srcIndex": 28
+    },
+    {
+      "type": "markdown",
+      "kind": "reflect",
+      "label": "Pyetje Reflektuese",
+      "id": "pyetje-reflektuese",
+      "heading": "Pyetje Reflektuese",
+      "level": 2,
+      "redundant": false,
+      "html": "sha256:e83eccb215208570",
+      "srcIndex": 29
+    }
+  ],
+  "imports": ["collections", "heapq", "itertools", "matplotlib", "networkx", "random"],
+  "dependencies": ["matplotlib", "networkx"],
+  "flags": {
+    "pygame": false,
+    "tkinter": false,
+    "widgets": false,
+    "plotly": false,
+    "matplotlib": true,
+    "networkx": true,
+    "numpy": false
+  },
+  "missingScripts": [],
+  "stats": {
+    "cells": 30,
+    "markdown": 12,
+    "code": 18,
+    "codeLines": 262
+  },
+  "hasEmbeddedHomework": false,
+  "hasClasswork": true,
+  "assets": [
+    {
+      "file": "img-4c80c789f40c.png",
+      "bytes": 18050
+    }
+  ]
+}

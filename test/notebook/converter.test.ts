@@ -20,7 +20,7 @@ const expectedByName = new Map(Object.entries(expected).map(([path, value]) => [
 describe('the converter on the course notebooks', () => {
   it('has a snapshot for every fixture notebook', () => {
     expect(Object.keys(notebooks).map(name).sort()).toEqual([...expectedByName.keys()].sort());
-    expect(Object.keys(notebooks).length).toBe(19);
+    expect(Object.keys(notebooks).length).toBe(22);
   });
 
   it.each(Object.keys(notebooks).map(name))('%s gives the same cells as the course site', async (notebook) => {
