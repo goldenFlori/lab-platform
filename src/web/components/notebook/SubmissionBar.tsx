@@ -7,12 +7,13 @@ import { ApiError } from '../../lib/api';
 import { useCodeEdits } from '../../lib/code-edits';
 import { formatMoment } from '../../lib/labs';
 import type { NotebookRef } from '../../lib/notebooks';
-import { mySubmissionQuery, useSubmit } from '../../lib/submissions';
+import { clock, mySubmissionQuery, useNow, useSubmit } from '../../lib/submissions';
 
 /**
  * Above the notebook, for a student whose group has it open for submission (#52): the deadline,
  * what they handed in, and handing in, after their last changes are saved. Their grade and the
- * pedagog's feedback show here once released (#53).
+ * pedagog's feedback show here once released (#53). A kolokium (#169) shows its time left, and is
+ * handed in once.
  */
 export function SubmissionBar({ notebookRef }: { notebookRef: NotebookRef }) {
   const t = useT();
@@ -21,7 +22,11 @@ export function SubmissionBar({ notebookRef }: { notebookRef: NotebookRef }) {
   const submit = useSubmit(notebookRef);
   const [message, setMessage] = useState<{ tone: 'success' | 'danger'; text: string } | null>(null);
   const data = query.data;
+  const ends = data?.kolokium?.endsAt ? Date.parse(data.kolokium.endsAt) : null;
+  const now = useNow(!!data?.open && ends !== null);
   if (!data || (!data.dueAt && !data.submission)) return null;
+  // A kolokium closes on the student's own clock, without asking the server.
+  const open = data.open && (ends === null || now < ends);
 
   async function handIn() {
     setMessage(null);
@@ -49,11 +54,15 @@ export function SubmissionBar({ notebookRef }: { notebookRef: NotebookRef }) {
         <div className="min-w-0">
           <p className="flex items-center gap-2 font-semibold">
             <CalendarClock className="size-4 shrink-0 text-accent" aria-hidden="true" />
-            {data.dueAt
-              ? data.open
-                ? t.submissions.due(formatMoment(data.dueAt))
-                : t.submissions.over(formatMoment(data.dueAt))
-              : t.submissions.title}
+            {open && ends !== null
+              ? t.kolokium.left(clock(ends - now))
+              : data.kolokium
+                ? t.kolokium.title
+                : data.dueAt
+                  ? open
+                    ? t.submissions.due(formatMoment(data.dueAt))
+                    : t.submissions.over(formatMoment(data.dueAt))
+                  : t.submissions.title}
           </p>
           <p className="mt-0.5 flex items-center gap-1.5 text-muted">
             {submission ? (
@@ -66,7 +75,7 @@ export function SubmissionBar({ notebookRef }: { notebookRef: NotebookRef }) {
             )}
           </p>
         </div>
-        {data.open && (
+        {open && (
           <AlertDialog>
             <Button size="sm" variant={submission ? 'secondary' : 'primary'} isPending={submit.isPending}>
               <Send className="size-4" /> {submission ? t.submissions.again : t.submissions.submit}
@@ -78,7 +87,9 @@ export function SubmissionBar({ notebookRef }: { notebookRef: NotebookRef }) {
                     <AlertDialog.Icon status="accent" />
                     <AlertDialog.Heading>{t.submissions.confirmTitle}</AlertDialog.Heading>
                   </AlertDialog.Header>
-                  <AlertDialog.Body>{t.submissions.confirmText}</AlertDialog.Body>
+                  <AlertDialog.Body>
+                    {data.kolokium ? t.kolokium.confirmHandIn : t.submissions.confirmText}
+                  </AlertDialog.Body>
                   <AlertDialog.Footer>
                     <Button slot="close" variant="tertiary">
                       {t.common.cancel}

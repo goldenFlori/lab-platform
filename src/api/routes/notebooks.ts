@@ -30,6 +30,7 @@ import {
   labContext,
   mayReadNotebook,
   notebookInUrl,
+  runningKolokia,
   solutionsOpenTo,
   visibleLab,
 } from './lab-context';
@@ -352,6 +353,8 @@ export const notebookRoutes = new Hono<TenantEnv>()
     const exercise = (await c.var.tenant.exercises.of(nb.id)).find((e) => e.cell === question.cell);
     const mode = exercise?.ai ?? 'hints';
     if (mode === 'off') return c.json({ error: 'ai_off' }, 403);
+    // No AI help while a kolokium runs for the student's group (#169).
+    if (!ctx.staff && runningKolokia(ctx).length) return c.json({ error: 'ai_off' }, 403);
     const { cell, code, error } = question;
     const keep = (answer: string) =>
       c.var.tenant.ai.ask({

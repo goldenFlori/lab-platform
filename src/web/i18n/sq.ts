@@ -1051,6 +1051,38 @@ export const sq = {
     back: 'Kthehu te laboratori',
     dismiss: 'Mbyll',
   },
+  kolokium: {
+    title: 'Kolokium',
+    option: 'Kolokium me kohë',
+    optionHelp:
+      'Secili student e nis kur të dojë nga hapja deri në afat dhe ka aq minuta sa caktoni, të paktën sa ka mbetur deri në afat. E dorëzon një herë. Gjatë kolokiumit studentët e grupit shohin vetëm këtë laborator, dhe ndihma e AI është e fikur.',
+    opensAt: (group: string) => `Nisja e lejuar për ${group} nga`,
+    minutes: 'Minuta',
+    pickOpens: 'Zgjidhni kur hapet kolokiumi: para afatit.',
+    pickMinutes: (min: number, max: number) => `Kohëzgjatja: nga ${min} deri në ${max} minuta.`,
+    setup: (minutes: number, opens: string) => `Kolokium: ${minutes} minuta, nisja nga ${opens}`,
+    upcoming: (when: string, minutes: number) => `Hapet më ${when}. Nga nisja do të keni ${minutes} minuta.`,
+    ready: (minutes: number, due: string) =>
+      `Mund ta nisni deri më ${due}. Nga nisja keni ${minutes} minuta dhe e dorëzoni një herë.`,
+    start: 'Nis kolokiumin',
+    confirmTitle: 'Të niset kolokiumi?',
+    confirmText: (minutes: number) =>
+      `Ora nis menjëherë dhe nuk ndalet: keni ${minutes} minuta, jo më shumë se afati. Gjatë kolokiumit shihni vetëm këtë laborator dhe ndihma e AI është e fikur. Puna dorëzohet një herë.`,
+    left: (clock: string) => `Koha e mbetur: ${clock}`,
+    goTo: 'Hap fletoren',
+    handedIn: (when: string) => `Dorëzuat më ${when}. Kolokiumi mbaroi për ju.`,
+    timeUp: 'Koha mbaroi. Puna që nuk u dorëzua nuk mund të dorëzohet më.',
+    missed: (when: string) => `Kolokiumi u mbyll më ${when}.`,
+    startFailed: 'Kolokiumi nuk u nis. Provoni sërish.',
+    notOpen: 'Kolokiumi nuk është i hapur tani.',
+    confirmHandIn:
+      'Dorëzohet kodi juaj siç është ruajtur tani, bashkë me ushtrimet dhe tabelat. Kolokiumi dorëzohet vetëm një herë: pas kësaj nuk mund ta ndryshoni.',
+    column: 'Kolokiumi',
+    notStarted: 'Pa nisur',
+    working: (until: string) => `Po punon, deri në ${until}`,
+    startedAt: (when: string) => `Nisi në ${when}`,
+    refresh: 'Rifreskohet vetë çdo 15 sekonda.',
+  },
   grading: {
     setupTitle: 'Vlerësimi: pikët dhe testet e fshehura',
     setupHelp:

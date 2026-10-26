@@ -1047,6 +1047,38 @@ export const en: Messages = {
     back: 'Back to the lab',
     dismiss: 'Close',
   },
+  kolokium: {
+    title: 'Timed test',
+    option: 'Timed test (kolokium)',
+    optionHelp:
+      'Each student starts it whenever they like between its opening and the deadline, and has the minutes you set, or what is left until the deadline if less. They hand it in once. While it runs, the group’s students see only this lab, and AI help is off.',
+    opensAt: (group: string) => `${group} may start from`,
+    minutes: 'Minutes',
+    pickOpens: 'Choose when the test opens: before the deadline.',
+    pickMinutes: (min: number, max: number) => `Length: from ${min} to ${max} minutes.`,
+    setup: (minutes: number, opens: string) => `Timed test: ${minutes} minutes, starting from ${opens}`,
+    upcoming: (when: string, minutes: number) => `Opens on ${when}. From your start you will have ${minutes} minutes.`,
+    ready: (minutes: number, due: string) =>
+      `You can start it until ${due}. From your start you have ${minutes} minutes, and you hand it in once.`,
+    start: 'Start the test',
+    confirmTitle: 'Start the test?',
+    confirmText: (minutes: number) =>
+      `The clock starts now and does not stop: you have ${minutes} minutes, never past the deadline. While it runs you see only this lab and AI help is off. You hand in once.`,
+    left: (clock: string) => `Time left: ${clock}`,
+    goTo: 'Open the notebook',
+    handedIn: (when: string) => `You handed in on ${when}. The test is over for you.`,
+    timeUp: 'Time is up. Work not handed in can no longer be handed in.',
+    missed: (when: string) => `The test closed on ${when}.`,
+    startFailed: 'The test did not start. Please try again.',
+    notOpen: 'The test is not open now.',
+    confirmHandIn:
+      'Your code as it is saved now is handed in, with your exercises and tables. A timed test is handed in once: after this you cannot change it.',
+    column: 'Timed test',
+    notStarted: 'Not started',
+    working: (until: string) => `Working, until ${until}`,
+    startedAt: (when: string) => `Started at ${when}`,
+    refresh: 'Refreshes on its own every 15 seconds.',
+  },
   grading: {
     setupTitle: 'Grading: points and hidden tests',
     setupHelp:

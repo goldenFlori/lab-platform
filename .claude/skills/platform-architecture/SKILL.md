@@ -264,7 +264,8 @@ exercises(id, org_id, notebook_id, cell, title, test?)  -- built (#51)
 exercise_completions(id, org_id, notebook_id, cell, user_id, created_at)  -- built (#51)
 prediction_results(id, org_id, notebook_id, cell, user_id, topic, decision, correct, pick, answer, prompt, day)  -- built (#151): first try only
 trace_answers(id, org_id, notebook_id, cell, user_id, rows, updated_at)  -- built (#168): private until handed in; submissions.traces and grades.traces hold the copy and the server's score
-assignments(id, org_id, notebook_id, group_id, due_at)  -- built (#52)
+assignments(id, org_id, notebook_id, group_id, due_at, opens_at?, minutes?)  -- built (#52); opens_at and minutes make it a kolokium (#169)
+kolokium_starts(id, org_id, notebook_id, user_id, started_at)  -- built (#169): one start per student; their end = min(start + minutes, due_at), enforced by the API
 submissions(id, org_id, notebook_id, user_id, code, solved, attempts, submitted_at)  -- built (#52)
 exercise_grading(id, org_id, notebook_id, cell, points, hidden_test?)  -- built (#53)
 grades(id, org_id, notebook_id, user_id, auto_score, max_score, results, score?, feedback?, graded_at, released_at?)  -- built (#53)

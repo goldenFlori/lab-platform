@@ -229,7 +229,7 @@ Administratori shkarkon në çdo kohë të dhënat e Institucionit si një skeda
 - njerëzit (pa hash-e fjalëkalimesh) dhe anëtarësimet;
 - strukturën e kurseve;
 - fletoret me skedarët origjinalë;
-- ushtrimet, dorëzimet dhe notat;
+- ushtrimet, dorëzimet (me orët e nisjes së kolokiumeve) dhe notat;
 - aktivitetin, përgjigjet e para, të dhënat e AI-së, historinë e Live Lab, anketat, kërkesat për fshirje dhe
   fshirjet.
 

@@ -1,19 +1,19 @@
 import { Alert, Button } from '@heroui/react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
-import { ArrowLeft, ChevronDown, CircleCheck, Clock, Download } from 'lucide-react';
+import { ArrowLeft, ChevronDown, CircleCheck, Clock, Download, Timer } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { StoredNotebook } from '../../../../../../../../notebook/stored';
 import type { Exercise } from '../../../../../../../../shared/exercises';
 import type { ExerciseGrading, StaffGrade } from '../../../../../../../../shared/grading';
-import type { SubmissionList } from '../../../../../../../../shared/submissions';
+import { type KolokiumSetup, kolokiumEnd, type SubmissionList } from '../../../../../../../../shared/submissions';
 import { GradeChip, GradeGroupBar, GradeReview, GradingSetup } from '../../../../../../../components/notebook/Grading';
 import { t as messages, useT } from '../../../../../../../i18n';
 import { ApiError } from '../../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../../lib/brand';
 import { downloadCsv, fileSlug } from '../../../../../../../lib/csv';
 import { gradesQuery, gradingSetupQuery } from '../../../../../../../lib/grading';
-import { formatMoment, labQuery } from '../../../../../../../lib/labs';
+import { formatMoment, formatTime, labQuery } from '../../../../../../../lib/labs';
 import { type NotebookRef, notebookQuery, notebooksQuery, renderedQuery } from '../../../../../../../lib/notebooks';
 import { submissionDetailQuery, submissionListQuery } from '../../../../../../../lib/submissions';
 
@@ -57,7 +57,17 @@ function SubmissionsPage() {
   const ready = list.notebooks.filter((nb) => nb.ready && nb.kind !== 'solution');
   const current = ready.find((nb) => nb.id === chosen) ?? ready.find((nb) => nb.kind === 'main') ?? ready[0];
   const ref: NotebookRef = { org, courseId, labId, notebookId: current?.id ?? '' };
-  const submissions = useQuery({ ...submissionListQuery(ref, group), enabled: !!current, retry: false });
+  const submissions = useQuery({
+    ...submissionListQuery(ref, group),
+    enabled: !!current,
+    retry: false,
+    // While a kolokium (#169) can still be started or handed in, staff watch it fill up.
+    refetchInterval: (query) => {
+      const data = query.state.data;
+      const shown = data?.groups.find((g) => g.id === data.group);
+      return shown?.kolokium && shown.dueAt && Date.now() < Date.parse(shown.dueAt) ? 15_000 : false;
+    },
+  });
   const detail = useQuery({ ...notebookQuery(ref), enabled: !!current });
   const rendered = useQuery({ ...renderedQuery(ref), enabled: !!current });
   // Staff who grade get the points and hidden tests; others are refused, and do not grade here.
@@ -232,6 +242,15 @@ function Group({
           <Clock className="size-4" aria-hidden="true" />
           {shown?.dueAt ? t.submissions.openUntil(formatMoment(shown.dueAt)) : t.submissions.noDeadline}
         </p>
+        {shown?.kolokium && (
+          <p className="mt-1 flex flex-wrap items-center gap-x-1.5 text-sm text-muted">
+            <Timer className="size-4" aria-hidden="true" />
+            {t.kolokium.setup(shown.kolokium.minutes, formatMoment(shown.kolokium.opensAt))}
+            {shown.dueAt && Date.now() < Date.parse(shown.dueAt) && (
+              <span className="text-xs">· {t.kolokium.refresh}</span>
+            )}
+          </p>
+        )}
         {setup && data.group && handedIn > 0 && (
           <GradeGroupBar
             notebookRef={notebookRef}
@@ -261,6 +280,7 @@ function Group({
                 notebookRef={notebookRef}
                 exercises={exercises}
                 notebook={notebook}
+                kolokium={shown?.kolokium && shown.dueAt ? { ...shown.kolokium, dueAt: shown.dueAt } : null}
                 grading={setup && data.group ? { group: data.group, grade: gradeOf.get(student.id) } : null}
               />
             ))}
@@ -276,12 +296,15 @@ function Student({
   notebookRef,
   exercises,
   notebook,
+  kolokium,
   grading,
 }: {
   student: SubmissionList['students'][number];
   notebookRef: NotebookRef;
   exercises: Exercise[];
   notebook: StoredNotebook | undefined;
+  /** The group's kolokium (#169), to say who started and who is still working. */
+  kolokium: (KolokiumSetup & { dueAt: string }) | null;
   grading: { group: string; grade: StaffGrade | undefined } | null;
 }) {
   const t = useT();
@@ -308,6 +331,8 @@ function Student({
               <p className="text-xs text-muted">{t.submissions.solvedOf(submission.solved.length, exercises.length)}</p>
             )}
           </div>
+        ) : kolokium ? (
+          <KolokiumState startedAt={student.startedAt} kolokium={kolokium} />
         ) : (
           <p className="text-sm text-muted">{t.submissions.missing}</p>
         )}
@@ -330,6 +355,30 @@ function Student({
       )}
       {open && <SubmittedCode userId={student.id} notebookRef={notebookRef} notebook={notebook} />}
     </li>
+  );
+}
+
+/** Where a student who has not handed in stands in the kolokium: not started, working, or out of time. */
+function KolokiumState({
+  startedAt,
+  kolokium,
+}: {
+  startedAt: string | null;
+  kolokium: KolokiumSetup & { dueAt: string };
+}) {
+  const t = useT();
+  if (!startedAt) return <p className="text-sm text-muted">{t.kolokium.notStarted}</p>;
+  const ends = kolokiumEnd(Date.parse(startedAt), kolokium.minutes, Date.parse(kolokium.dueAt));
+  const time = (ms: number) => formatTime(new Date(ms).toISOString());
+  return Date.now() < ends ? (
+    <p className="flex items-center gap-1.5 text-sm text-accent">
+      <Timer className="size-4" aria-hidden="true" /> {t.kolokium.working(time(ends))}
+    </p>
+  ) : (
+    <div className="text-sm">
+      <p className="text-muted">{t.submissions.missing}</p>
+      <p className="text-xs text-muted">{t.kolokium.startedAt(time(Date.parse(startedAt)))}</p>
+    </div>
   );
 }
 

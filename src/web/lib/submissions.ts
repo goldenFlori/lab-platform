@@ -1,6 +1,15 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { Assignment, MySubmission, SubmissionDetail, SubmissionList } from '../../shared/submissions';
+import { useEffect, useState } from 'react';
+import type {
+  Assignment,
+  Kolokium,
+  KolokiumSetup,
+  MySubmission,
+  SubmissionDetail,
+  SubmissionList,
+} from '../../shared/submissions';
 import { api } from './api';
+import { labQuery, labsQuery } from './labs';
 import { type NotebookRef, notebookQuery, notebooksPath } from './notebooks';
 
 // Handing in work (#52): the student's own submission, and for staff the deadlines per group and
@@ -39,7 +48,16 @@ export function useSubmit(ref: NotebookRef) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () => api<MySubmission>(`${notebookPath(ref)}/submission`, { method: 'POST' }),
-    onSuccess: (data) => queryClient.setQueryData(mySubmissionQuery(ref).queryKey, data),
+    onSuccess: (data) => {
+      queryClient.setQueryData(mySubmissionQuery(ref).queryKey, data);
+      // A kolokium ends with its hand-in, and the lab's card says so (#169).
+      if (data.kolokium) {
+        void queryClient.invalidateQueries({
+          queryKey: labQuery(ref.org, ref.courseId, ref.labId).queryKey,
+          exact: true,
+        });
+      }
+    },
   });
 }
 
@@ -49,10 +67,10 @@ export function useAssignmentChanges(ref: NotebookRef) {
   const refresh = () => queryClient.invalidateQueries({ queryKey: assignmentsQuery(ref).queryKey });
   return {
     open: useMutation({
-      mutationFn: ({ groupId, dueAt }: { groupId: string; dueAt: string }) =>
+      mutationFn: ({ groupId, dueAt, kolokium }: { groupId: string; dueAt: string; kolokium: KolokiumSetup | null }) =>
         api<Assignment>(`${notebookPath(ref)}/assignments/${encodeURIComponent(groupId)}`, {
           method: 'PUT',
-          body: { dueAt },
+          body: { dueAt, kolokium },
         }),
       onSuccess: refresh,
     }),
@@ -62,4 +80,39 @@ export function useAssignmentChanges(ref: NotebookRef) {
       onSuccess: refresh,
     }),
   };
+}
+
+/**
+ * The student starts their kolokium's clock (#169). Its notebook opens to them then, so the lab and
+ * its notebooks load again.
+ */
+export function useStartKolokium(org: string, courseId: string, labId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (notebookId: string) =>
+      api<Kolokium>(`${notebooksPath(org, courseId, labId)}/${encodeURIComponent(notebookId)}/kolokium/start`, {
+        method: 'POST',
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: labsQuery(org, courseId).queryKey }),
+  });
+}
+
+/** The time now, again every `ms` while `running`: for a countdown. */
+export function useNow(running: boolean, ms = 1000) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!running) return;
+    setNow(Date.now());
+    const id = setInterval(() => setNow(Date.now()), ms);
+    return () => clearInterval(id);
+  }, [running, ms]);
+  return now;
+}
+
+/** "42:07", or "1:02:07" from an hour: what is left of a kolokium. */
+export function clock(ms: number) {
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const [h, m, sec] = [Math.floor(s / 3600), Math.floor((s % 3600) / 60), s % 60];
+  return h ? `${h}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`;
 }
