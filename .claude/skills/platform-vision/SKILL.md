@@ -419,6 +419,13 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   The problem is stored as the embed's props and the lab draws it like a course problem, with its own
   tie rule. One set of rules (`src/shared/trace-problem.ts`) is checked by the builder and the API.
   Next: #167, a variant for every student.
+- **2026-10-26:** #167 done. A trace table can be asked as a variant per student: the pedagog picks
+  the algorithm, the number of vertices and the direction, and each student gets their own graph,
+  generated from their id, the notebook and the cell (the same one every time; two students rarely
+  share it). Variants are made so they are equally hard: connected from A, DAGs for Kahn and for a
+  directed Bellman-Ford (no negative cycle), distinct weights for the spanning trees. Staff choose any
+  student of the groups they manage and see their graph and its expected table. The generator is
+  shared code, so the server can rebuild a student's problem to grade it. Next: #168.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
@@ -469,6 +476,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-12 | The survey is anonymous by design: ratings are stored only as counts, comments with random ids, no time and no author, in a WITHOUT ROWID table; who answered is kept apart, only to ask once. Results show from five answers | Decided |
 | 2026-10-12 | A real mobile app means an installable web app (PWA) first; a store app (Capacitor) only if a need appears | Decided |
 | 2026-10-25 | Phase 8 is "Understanding, measured" before SaaS: students predict and trace every algorithm by hand, checked at once, and first-try results are counted (never graded). Teaching quality comes first, and the January pilot must show learning, not only use, before a second institution signs | Decided |
+| 2026-10-26 | A trace variant is generated from the student's id, the notebook and the cell, by shared code the browser and the server both run: no stored copy per student, the same graph every time, and the server can rebuild it to grade. First-try counts treat row k of every variant as one step, so the class's hardest rows still show | Decided |
 | 2026-10-26 | Phase 10 is "Fair assessment": students can learn every algorithm, but a grade cannot rest on checks in their browser or on one graph shared by a whole room, and only the owner could author problems. Assessment is also what a second institution asks about first | Decided |
 | 2026-10-26 | Phase 9 is "Every lab, coded and checked": Labs 5, 6 and 8 were the only graph labs where students never wrote the algorithms, and writing them is what the exam and later courses ask. The platform's own visualizations are declared in the course repo (platform.mjs), so the import places them, not staff by hand | Decided |
 | 2026-10-25 | First-try results are practice data: kept once per student and decision (later tries change nothing), shown to the student per topic and to staff with analytics only as counts from five students up, with the hardest decisions and the most common wrong answer, never names; two years like activity. A decision is identified by its step and its options as ids, so both languages count as one | Decided |
