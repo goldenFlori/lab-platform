@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { Exercise } from './exercises';
+import { problemIssue } from './trace-problem';
 import { isVisualizerId } from './visualizers';
 
 // Request and response shapes for a lab's notebooks, their files and embeds (#14). The app
@@ -31,7 +32,13 @@ export const embedsInput = z.object({
     )
     .max(60)
     .refine((list) => new Set(list.map((e) => e.cell)).size === list.length, 'One embed per cell')
-    .refine((list) => list.every((e) => JSON.stringify(e.props ?? {}).length <= 4000), 'Props too large'),
+    .refine((list) => list.every((e) => JSON.stringify(e.props ?? {}).length <= 4000), 'Props too large')
+    // A trace table with a pedagog's own problem (#166) must be one the table can trace.
+    .refine(
+      (list) =>
+        list.every((e) => e.viz !== 'tabela-gjurmimit' || !e.props?.problem || problemIssue(e.props.problem) === null),
+      'Invalid trace problem',
+    ),
 });
 
 export type Embed = { cell: number; viz: string; title: string | null; props: Record<string, unknown> | null };

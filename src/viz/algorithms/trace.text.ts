@@ -1,3 +1,4 @@
+import type { TraceAlgorithm } from '../../shared/trace-problem';
 import { bilingual } from '../kit/text';
 import type { TraceWords } from './trace';
 
@@ -65,6 +66,26 @@ const sq = {
     revealed: (row: string) => `Rreshti ${row} u tregua. Krahasojeni me tuajin para se të vazhdoni.`,
     done: (right: number, rows: number) =>
       `Tabela është plotë: ${right} nga ${rows} rreshta të saktë që në provën e parë. Klikoni një rresht për ta parë në graf.`,
+  },
+  custom: {
+    name: (algorithm: string) => `Problemi i pedagogut · ${algorithm}`,
+    algorithms: {
+      dijkstra: 'Dijkstra',
+      bellman: 'Bellman-Ford',
+      prim: 'Prim',
+      kruskal: 'Kruskal',
+      kahn: 'Kahn',
+      floyd: 'Floyd-Warshall',
+    } as Record<TraceAlgorithm, string>,
+    rules: {
+      dijkstra: 'Kulmet e barabarta zgjidhen sipas alfabetit.',
+      prim: 'Në barazim, merret brinja e parë sipas alfabetit.',
+      kruskal: 'Brinjët shqyrtohen sipas peshës; në barazim, sipas rendit të listës.',
+      bellman: (edges: string, passes: number) =>
+        `Brinjët relaksohen në rendin ${edges}; ${passes} kalime dhe një më shumë si kontroll.`,
+      kahn: (order: string) => `Kulmet hyjnë në radhë sipas rendit ${order}.`,
+      floyd: (ks: string) => `k merr vlerat ${ks} me radhë; plotësoni të gjithë matricën pas çdo k.`,
+    },
   },
   presets: {
     'lab07-dijkstra': {
@@ -157,6 +178,26 @@ export const TRACE_TEXT = bilingual<TraceText>(sq, {
     revealed: (row) => `Row ${row} was shown. Compare it with yours before going on.`,
     done: (right, rows) =>
       `The table is complete: ${right} of ${rows} rows right at the first try. Click a row to see it on the graph.`,
+  },
+  custom: {
+    name: (algorithm) => `The pedagog's problem · ${algorithm}`,
+    algorithms: {
+      dijkstra: 'Dijkstra',
+      bellman: 'Bellman-Ford',
+      prim: 'Prim',
+      kruskal: 'Kruskal',
+      kahn: 'Kahn',
+      floyd: 'Floyd-Warshall',
+    },
+    rules: {
+      dijkstra: 'Equal vertices are taken alphabetically.',
+      prim: 'On a tie, the first edge alphabetically.',
+      kruskal: 'Edges are taken by weight; on a tie, in their listed order.',
+      bellman: (edges, passes) =>
+        `Edges are relaxed in the order ${edges}; ${passes} passes and one more as the check.`,
+      kahn: (order) => `Vertices join the queue in the order ${order}.`,
+      floyd: (ks) => `k takes the values ${ks} in turn; fill the whole matrix after each k.`,
+    },
   },
   presets: {
     'lab07-dijkstra': { name: 'Lab 7 · Dijkstra from A', rule: 'Equal vertices are taken alphabetically.' },

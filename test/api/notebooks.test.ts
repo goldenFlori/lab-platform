@@ -191,6 +191,44 @@ describe('managing notebooks', () => {
     ).toBe(400);
   });
 
+  // #166: a trace table with a pedagog's own problem is saved only if it can be traced.
+  it("keeps a trace table's own problem only when it follows the rules", async () => {
+    const { seed, pedagog, notebooks } = await setup();
+    const url = `${notebooks}/${seed.notebook.id}/embeds`;
+    const set = (problem: unknown) =>
+      pedagog.call(url, {
+        method: 'PUT',
+        body: { embeds: [{ cell: 2, viz: 'tabela-gjurmimit', props: { problem } }] },
+      });
+    const problem = {
+      algorithm: 'prim',
+      directed: false,
+      nodes: [
+        { id: 'A', x: 100, y: 100 },
+        { id: 'B', x: 300, y: 100 },
+        { id: 'C', x: 200, y: 300 },
+      ],
+      edges: [
+        { u: 'A', v: 'B', w: 4 },
+        { u: 'B', v: 'C', w: 1 },
+        { u: 'A', v: 'C', w: 2 },
+      ],
+      source: 'A',
+    };
+    const res = await set(problem);
+    expect(res.status).toBe(200);
+    expect((await json<NotebookDetail>(res)).embeds[0]?.props).toEqual({ problem });
+    expect((await set({ ...problem, directed: true })).status).toBe(400);
+    expect((await set({ ...problem, edges: [{ u: 'A', v: 'Z', w: 1 }] })).status).toBe(400);
+    expect((await set({ ...problem, source: null })).status).toBe(400);
+    // Other visualizations' props are their own business.
+    const other = await pedagog.call(url, {
+      method: 'PUT',
+      body: { embeds: [{ cell: 2, viz: 'grafet', props: { problem: 'anything' } }] },
+    });
+    expect(other.status).toBe(200);
+  });
+
   it('removes a notebook with its files, chunks and embeds', async () => {
     const { pedagog, notebooks, open, upload } = await setup();
     await open();

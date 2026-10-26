@@ -5,6 +5,7 @@
  *  that what they type can be compared after normalizing it.
  * ===================================================================== */
 
+import type { TraceAlgorithm, TraceProblem } from '../../shared/trace-problem';
 import type { GEdge } from '../kit/GraphCanvas';
 import { natural } from './graphs';
 
@@ -386,4 +387,28 @@ export function floydTrace({ ids, edges, directed }: Graph, W: TraceWords): Trac
     rows,
     matrix: ids,
   };
+}
+
+/* ------------------------------------------------------------ any problem */
+
+/**
+ * The vertices in the order the trace uses them: Kahn's queue follows the problem's own order; the
+ * other algorithms take ties alphabetically.
+ */
+export const traceIds = (p: TraceProblem) =>
+  p.algorithm === 'kahn' ? p.nodes.map((n) => n.id) : p.nodes.map((n) => n.id).sort(natural);
+
+/** The table a problem asks for (#166): the course's presets and a pedagog's own alike. */
+export function traceOf(p: TraceProblem, W: TraceWords): Trace {
+  const g = { ids: traceIds(p), edges: p.edges.map(({ u, v, w }) => ({ u, v, w })), directed: p.directed };
+  const src = p.source ?? g.ids[0] ?? '';
+  const by: Record<TraceAlgorithm, () => Trace> = {
+    dijkstra: () => dijkstraTrace(g, src, W),
+    bellman: () => bellmanTrace(g, src, W),
+    prim: () => primTrace(g, src, W),
+    kruskal: () => kruskalTrace(g, W),
+    kahn: () => kahnTrace(g, W),
+    floyd: () => floydTrace(g, W),
+  };
+  return by[p.algorithm]();
 }

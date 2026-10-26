@@ -12,7 +12,7 @@ export const VizResults = createContext<ReportResult | null>(null);
 export const useResults = () => useContext(VizResults);
 
 /** A short, stable hash of a string (FNV-1a), in base 36. */
-function hash(text: string) {
+export function hash(text: string) {
   let h = 0x811c9dc5;
   for (let i = 0; i < text.length; i++) {
     h ^= text.charCodeAt(i);
