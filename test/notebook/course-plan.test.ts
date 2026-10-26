@@ -24,6 +24,44 @@ const only = (...labs: number[]): SiteCourse => ({
 });
 
 describe('planning the course import', () => {
+  // #160: the platform's own visualizations, listed apart from the site's, land in the right lab's part.
+  it("places the platform's own visualizations beside the site's", async () => {
+    const platformEmbeds = {
+      'laborator-05.ipynb': [
+        { cell: 15, viz: 'tabela-gjurmimit', title: 'Kruskal me dorë', props: { preset: 'lab05-kruskal' } },
+        { cell: 16, viz: 'tabela-gjurmimit', props: { preset: 'lab05-prim' } },
+        { cell: 9, viz: 'tabela-gjurmimit', props: { preset: 'lab06-kahn' } },
+      ],
+    };
+    const [lab5, lab6] = await planCourse({ site: { ...only(5, 6), platformEmbeds }, notebook, solutions: new Map() });
+    // Lab 5's part keeps cells 0–6 and 13 on, so the class problems 15 and 16 become 9 and 10.
+    const part5 = lab5?.notebooks[0]?.embeds ?? [];
+    expect(part5.map((e) => [e.cell, e.viz])).toEqual([
+      [2, 'labirinti'],
+      [4, 'grafet'],
+      [6, 'grafet'],
+      [9, 'tabela-gjurmimit'],
+      [10, 'tabela-gjurmimit'],
+    ]);
+    expect(part5.slice(3).map((e) => [e.title, e.props?.preset])).toEqual([
+      ['Kruskal me dorë', 'lab05-kruskal'],
+      [null, 'lab05-prim'],
+    ]);
+    // Lab 6's part starts at cell 7, so the topological sort at 9 becomes 2.
+    expect(lab6?.notebooks[0]?.embeds.find((e) => e.viz === 'tabela-gjurmimit')?.cell).toBe(2);
+  });
+
+  it('refuses a visualization the platform does not have, or a cell the site already uses', async () => {
+    const plan = (platformEmbeds: SiteCourse['platformEmbeds']) =>
+      planCourse({ site: { ...only(5), platformEmbeds }, notebook, solutions: new Map() });
+    await expect(plan({ 'laborator-05.ipynb': [{ cell: 15, viz: 'nuk-ekziston' }] })).rejects.toThrow(
+      'the platform has no visualization "nuk-ekziston"',
+    );
+    await expect(plan({ 'laborator-05.ipynb': [{ cell: 2, viz: 'pema-rekursive' }] })).rejects.toThrow(
+      'cell 2 has a visualization on the site already',
+    );
+  });
+
   it('gives labs 5 and 6 each their own part of the notebook they share on the site', async () => {
     const [lab5, lab6] = await planCourse({ site: only(5, 6), notebook, solutions: new Map() });
     const [part5, part6] = [lab5?.notebooks[0], lab6?.notebooks[0]];

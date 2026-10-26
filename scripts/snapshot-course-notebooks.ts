@@ -9,7 +9,7 @@
 // these notebooks (site/content/course.mjs) to test/notebook/fixtures/embeds.json, and its labs
 // and homework to course.json, the course import's fixture (#16).
 
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { normalize } from '../test/notebook/normalize.ts';
@@ -56,6 +56,19 @@ const fixtureEmbeds = Object.fromEntries(
 );
 writeFileSync(join(fixtures, 'embeds.json'), `${JSON.stringify(fixtureEmbeds, null, 2)}\n`);
 console.log(`✔ embeds.json (${Object.keys(fixtureEmbeds).length} notebooks)`);
+
+// The platform's own visualizations (#160), when the course repo lists any in site/content/platform.mjs.
+const platformFile = resolve(courseRepo, 'site/content/platform.mjs');
+const platform = existsSync(platformFile)
+  ? ((await import(pathToFileURL(platformFile).href)) as { embeds: Record<string, unknown[]> }).embeds
+  : {};
+const fixturePlatform = Object.fromEntries(
+  Object.entries(platform)
+    .filter(([file]) => notebooks.has(file))
+    .sort(([a], [b]) => a.localeCompare(b)),
+);
+writeFileSync(join(fixtures, 'platform-embeds.json'), `${JSON.stringify(fixturePlatform, null, 2)}\n`);
+console.log(`✔ platform-embeds.json (${Object.keys(fixturePlatform).length} notebooks)`);
 
 // The labs and homework as the course site lists them, for the import (scripts/course-import).
 writeFileSync(

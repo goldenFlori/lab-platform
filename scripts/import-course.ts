@@ -49,9 +49,14 @@ const solutions = new Map(
     .map((file) => [file, readFileSync(join(solutionsDir, file), 'utf8')]),
 );
 const title = args.title ?? site.course.title;
+// The platform's own visualizations (#160), when the course repo lists any.
+const platformFile = join(from, 'site/content/platform.mjs');
+const platformEmbeds = existsSync(platformFile)
+  ? ((await import(pathToFileURL(platformFile).href)) as { embeds: SiteCourse['embeds'] }).embeds
+  : {};
 
 const labs = await planCourse({
-  site: { title, labs: site.labs, homework: site.homework, embeds: site.embeds },
+  site: { title, labs: site.labs, homework: site.homework, embeds: site.embeds, platformEmbeds },
   notebook: (file) => readFileSync(join(from, 'site/content/notebooks', file), 'utf8'),
   solutions,
 });
