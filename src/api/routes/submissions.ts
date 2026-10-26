@@ -33,7 +33,8 @@ const groupsWhere = (c: Context<TenantEnv>, ctx: LabContext, capability: 'lab.pu
   ctx.groups.filter((g) => c.var.access.can(capability, { courseId: ctx.course.id, groupId: g.id }));
 
 /** The latest deadline among the user's own groups, and whether one of them is still open. */
-async function deadlineFor(c: Context<TenantEnv>, ctx: LabContext, notebookId: string) {
+/** The user's latest deadline for the notebook among their groups, and whether it is still open. */
+export async function deadlineFor(c: Context<TenantEnv>, ctx: LabContext, notebookId: string) {
   const mine = new Set(
     ctx.groups
       .filter((g) => c.var.access.can('submission.create', { courseId: ctx.course.id, groupId: g.id }))
@@ -116,13 +117,15 @@ export const submissionRoutes = new Hono<TenantEnv>()
     const deadline = await deadlineFor(c, ctx, nb.id);
     if (!deadline) return forbidden(c);
     if (!deadline.open) return c.json({ error: 'closed' }, 409);
-    const [edits, solved] = await Promise.all([
+    const [edits, solved, traces] = await Promise.all([
       c.var.tenant.codeEdits.ofUser(nb.id, userId),
       c.var.tenant.exercises.doneBy(nb.id, userId),
+      c.var.tenant.traceAnswers.ofUser(nb.id, userId),
     ]);
     const code = edits.map((e) => ({ cell: e.cell, code: e.code }));
     if (code.reduce((n, e) => n + e.code.length, 0) > MAX_SUBMISSION_CODE) return c.json({ error: 'too_large' }, 413);
-    await c.var.tenant.submissions.submit({ notebookId: nb.id, userId, code, solved });
+    // The graded trace tables' rows go in as they are (#168); the server scores them when grading.
+    await c.var.tenant.submissions.submit({ notebookId: nb.id, userId, code, solved, traces });
     const row = await c.var.tenant.submissions.of(nb.id, userId);
     return c.json({
       dueAt: deadline.dueAt.toISOString(),

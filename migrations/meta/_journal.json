@@ -141,6 +141,13 @@
       "when": 1792967530351,
       "tag": "0019_prediction_results",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "6",
+      "when": 1793048699072,
+      "tag": "0020_trace_answers",
+      "breakpoints": true
     }
   ]
 }

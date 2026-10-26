@@ -16,6 +16,8 @@ import {
 } from '../../shared/notebooks';
 import { predictionInput } from '../../shared/predictions';
 import { searchSectionsInput } from '../../shared/search';
+import { type TraceAnswers, traceAnswersInput } from '../../shared/trace-answers';
+import { tracePoints } from '../../shared/trace-grading';
 import { streamAi } from '../ai/gateway';
 import { explainMessages } from '../ai/purposes';
 import type { TenantEnv } from '../auth/access';
@@ -31,7 +33,7 @@ import {
   solutionsOpenTo,
   visibleLab,
 } from './lab-context';
-import { submissionRoutes } from './submissions';
+import { deadlineFor, submissionRoutes } from './submissions';
 
 // A lab's notebooks (#14), under /api/orgs/:org/courses/:courseId/labs/:labId/notebooks.
 //
@@ -85,6 +87,15 @@ async function detail(c: Context<TenantEnv>, nb: Notebook): Promise<NotebookDeta
 }
 
 /** A cell number from the URL: a notebook's own cell index. */
+/** A graded trace table's points at this cell (#168), or null when there is none. */
+async function gradedTrace(c: Context<TenantEnv>, notebookId: string, param: string | undefined) {
+  const cell = cellParam(param);
+  if (cell === null) return null;
+  const embed = (await c.var.tenant.notebooks.embedsOf(notebookId)).find((e) => e.cell === cell);
+  const points = embed?.viz === 'tabela-gjurmimit' ? tracePoints(embed.props) : 0;
+  return points > 0 ? points : null;
+}
+
 function cellParam(value: string | undefined) {
   const cell = Number(value);
   return Number.isInteger(cell) && cell >= 0 && cell <= 10_000 ? cell : null;
@@ -291,6 +302,44 @@ export const notebookRoutes = new Hono<TenantEnv>()
         day: today(),
       });
     }
+    return c.body(null, 204);
+  })
+
+  // A graded trace table (#168): the user's saved rows, and whether they may still change them. A
+  // practice table (no points) has none: its rows are checked in the browser and never kept.
+  .get('/:notebookId/embeds/:cell/trace', async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    const points = await gradedTrace(c, nb.id, c.req.param('cell'));
+    if (points === null) throw new NotFoundError();
+    const userId = c.var.user?.id as string;
+    const [saved, deadline] = await Promise.all([
+      c.var.tenant.traceAnswers.ofUser(nb.id, userId),
+      ctx.staff ? null : deadlineFor(c, ctx, nb.id),
+    ]);
+    const cell = Number(c.req.param('cell'));
+    return c.json({
+      rows: saved.find((s) => s.cell === cell)?.rows ?? [],
+      open: deadline?.open ?? false,
+      staff: ctx.staff,
+      points,
+    } satisfies TraceAnswers);
+  })
+
+  // Saves them as the student types, only while the notebook is open to them for submission.
+  .put('/:notebookId/embeds/:cell/trace', zValidator('json', traceAnswersInput, invalidRequest), async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    const points = await gradedTrace(c, nb.id, c.req.param('cell'));
+    if (points === null) throw new NotFoundError();
+    if (ctx.staff) return forbidden(c);
+    const deadline = await deadlineFor(c, ctx, nb.id);
+    if (!deadline) return forbidden(c);
+    if (!deadline.open) return c.json({ error: 'closed' }, 409);
+    await c.var.tenant.traceAnswers.save({
+      notebookId: nb.id,
+      userId: c.var.user?.id as string,
+      cell: Number(c.req.param('cell')),
+      rows: c.req.valid('json').rows,
+    });
     return c.body(null, 204);
   })
 

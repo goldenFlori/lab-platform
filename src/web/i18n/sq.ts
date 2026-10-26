@@ -1072,7 +1072,9 @@ export const sq = {
     released: 'Publikuar',
     notReleased: 'Pa publikuar',
     grade: (score: number, max: number) => `${score}/${max}`,
-    auto: (score: number, max: number) => `Nga ekzekutimi: ${score}/${max}`,
+    auto: (score: number, max: number) => `Automatike (kodi dhe tabelat): ${score}/${max}`,
+    trace: (right: number, rows: number, score: number, points: number) =>
+      `Tabela e gjurmimit: ${right}/${rows} rreshta të saktë · ${score}/${points} pikë`,
     score: 'Nota',
     scoreHelp: 'Bosh për notën nga ekzekutimi.',
     feedback: 'Komenti për studentin',

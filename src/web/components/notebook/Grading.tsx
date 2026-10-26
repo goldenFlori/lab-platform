@@ -259,6 +259,12 @@ export function GradeReview({
             {t.grading.status[r.status]} {titles.get(r.cell) ?? r.cell}
           </li>
         ))}
+        {/* Trace tables, scored by the server from the rows handed in (#168). */}
+        {grade.traces.map((tr) => (
+          <li key={`trace-${tr.cell}`} className={tr.right === tr.rows ? 'text-success' : 'text-warning'}>
+            {t.grading.trace(tr.right, tr.rows, tr.score, tr.points)}
+          </li>
+        ))}
       </ul>
       <p className="text-xs text-muted">{t.grading.auto(grade.autoScore, grade.maxScore)}</p>
       <div className="grid gap-3 sm:grid-cols-[8rem_1fr]">

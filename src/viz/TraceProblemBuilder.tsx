@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { tracePoints } from '../shared/trace-grading';
 import {
   FIXED_DIRECTION,
   isTraceProblem,
@@ -30,6 +31,10 @@ import { TraceKey } from './TraceKey';
 const TEXT = bilingual(
   {
     mode: 'Grafi',
+    points: 'Pikë për notë',
+    practice: 'ushtrim',
+    pointsHelp:
+      'Pa pikë, tabela është ushtrim: çdo rresht kontrollohet menjëherë. Me pikë, kur fletorja hapet për dorëzim, studentët e plotësojnë pa kontroll, ajo dorëzohet me fletoren dhe serveri e vlerëson.',
     one: 'Një për të gjithë',
     each: 'Një për çdo student',
     size: 'Kulme',
@@ -66,6 +71,10 @@ const TEXT = bilingual(
   },
   {
     mode: 'Graph',
+    points: 'Points for the grade',
+    practice: 'practice',
+    pointsHelp:
+      'Without points the table is practice: each row is checked at once. With points, when the notebook is open for submission, students fill it unchecked, it is handed in with the notebook and the server grades it.',
     one: 'One for everyone',
     each: 'One per student',
     size: 'Vertices',
@@ -137,29 +146,69 @@ export default function TraceProblemBuilder({
   onChange,
 }: {
   value: Record<string, unknown> | null;
-  onChange: (props: { problem: TraceProblem } | { variant: TraceVariant }) => void;
+  onChange: (props: ({ problem: TraceProblem } | { variant: TraceVariant }) & { points?: number }) => void;
 }) {
   const X = useText(TEXT);
   const startVariant = variantIssue(value?.variant) === null ? (value?.variant as TraceVariant) : null;
   const [mode, setMode] = useState<'one' | 'each'>(startVariant ? 'each' : 'one');
   const [problem] = useState<TraceProblem | null>(isTraceProblem(value?.problem) ? value.problem : null);
+  // The last problem or variant, so changing the points keeps it (#168).
+  const [base, setBase] = useState<{ problem: TraceProblem } | { variant: TraceVariant } | null>(
+    startVariant ? { variant: startVariant } : problem ? { problem } : null,
+  );
+  const [points, setPoints] = useState(tracePoints(value) ? String(tracePoints(value)) : '');
+  const emit = (next: { problem: TraceProblem } | { variant: TraceVariant } | null, p = points) => {
+    if (!next) return;
+    const n = Number(p);
+    onChange(Number.isInteger(n) && n > 0 && n <= 1000 ? { ...next, points: n } : next);
+  };
   return (
     <div className="grid gap-3">
-      <Field label={X.mode}>
-        <Segmented
-          label={X.mode}
-          value={mode}
-          onChange={setMode}
-          options={[
-            { value: 'one', label: X.one },
-            { value: 'each', label: X.each },
-          ]}
-        />
-      </Field>
+      <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
+        <Field label={X.mode}>
+          <Segmented
+            label={X.mode}
+            value={mode}
+            onChange={setMode}
+            options={[
+              { value: 'one', label: X.one },
+              { value: 'each', label: X.each },
+            ]}
+          />
+        </Field>
+        <Field label={X.points}>
+          <input
+            type="number"
+            aria-label={X.points}
+            min={1}
+            max={1000}
+            value={points}
+            placeholder={X.practice}
+            onChange={(e) => {
+              setPoints(e.target.value);
+              emit(base, e.target.value);
+            }}
+            className="h-9 w-32 rounded-xl border border-border bg-surface px-2 font-mono text-sm"
+          />
+        </Field>
+      </div>
+      <p className="text-xs text-muted">{X.pointsHelp}</p>
       {mode === 'one' ? (
-        <OneGraph value={problem} onChange={(p) => onChange({ problem: p })} />
+        <OneGraph
+          value={problem}
+          onChange={(p) => {
+            setBase({ problem: p });
+            emit({ problem: p });
+          }}
+        />
       ) : (
-        <PerStudent value={startVariant} onChange={(v) => onChange({ variant: v })} />
+        <PerStudent
+          value={startVariant}
+          onChange={(v) => {
+            setBase({ variant: v });
+            emit({ variant: v });
+          }}
+        />
       )}
     </div>
   );

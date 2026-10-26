@@ -531,6 +531,35 @@ export const exerciseCompletions = sqliteTable(
 );
 
 /**
+ * A student's rows of a graded trace table (#168), saved as they fill them while its notebook is open
+ * for submission. Private like their code edits: staff read them only once handed in, as a copy in the
+ * submission. Gone with the notebook or the user.
+ */
+export const traceAnswers = sqliteTable(
+  'trace_answers',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    notebookId: text('notebook_id').notNull(),
+    /** The trace table's embed cell. */
+    cell: integer('cell').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    rows: text('rows', { mode: 'json' }).$type<Record<string, string>[]>().notNull(),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+  },
+  (t) => [
+    foreignKey({
+      name: 'trace_answers_notebook_fk',
+      columns: [t.notebookId, t.orgId],
+      foreignColumns: [notebooks.id, notebooks.orgId],
+    }).onDelete('cascade'),
+    uniqueIndex('trace_answers_unique').on(t.orgId, t.notebookId, t.cell, t.userId),
+  ],
+);
+
+/**
  * A student's first answer to one decision of an embedded visualization (#151): a predict question
  * or a trace table's row, right or not and what they picked. Kept once; later tries change nothing.
  * Practice, not grading: staff read it only as counts. Gone with the notebook or the user.
@@ -613,6 +642,11 @@ export const submissions = sqliteTable(
     code: text('code', { mode: 'json' }).$type<{ cell: number; code: string }[]>().notNull(),
     /** The exercises (cells) solved when it was handed in. */
     solved: text('solved', { mode: 'json' }).$type<number[]>().notNull(),
+    /** The graded trace tables' rows as the student filled them, by embed cell (#168). */
+    traces: text('traces', { mode: 'json' })
+      .$type<{ cell: number; rows: Record<string, string>[] }[]>()
+      .notNull()
+      .default(sql`'[]'`),
     attempts: integer('attempts').notNull(),
     submittedAt: integer('submitted_at', { mode: 'timestamp' }).notNull(),
   },
@@ -667,6 +701,11 @@ export const grades = sqliteTable(
     maxScore: integer('max_score').notNull(),
     /** Each exercise's result in the re-run, by cell. */
     results: text('results', { mode: 'json' }).$type<{ cell: number; status: string }[]>().notNull(),
+    /** Each graded trace table's rows right, scored by the server (#168); included in autoScore. */
+    traces: text('traces', { mode: 'json' })
+      .$type<{ cell: number; rows: number; right: number; points: number; score: number }[]>()
+      .notNull()
+      .default(sql`'[]'`),
     score: integer('score'),
     feedback: text('feedback'),
     gradedAt: integer('graded_at', { mode: 'timestamp' }).notNull(),
