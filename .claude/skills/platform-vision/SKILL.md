@@ -405,6 +405,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   recursion tree, Kruskal & Prim) from the course repo's `site/content/platform.mjs`, beside the
   site's; an unknown id or a cell the site already uses stops it before anything is uploaded. Next:
   the course repo lists them, then #161 refreshes the fixtures.
+- **2026-10-26:** #161 done, and with it Phase 9. The fixtures carry the three new extra notebooks
+  (22 in all), Lab 7's class work split into one cell per problem, and the course repo's
+  `platform.mjs` (course PRs #34, #36): every cell of all 22 runs in Pyodide, the 21 new checks are
+  found and wait for the student, and the import places the six trace tables, the recursion tree
+  and Kruskal & Prim. Next: the owner re-imports the course and runs the dry run with FSHN.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
