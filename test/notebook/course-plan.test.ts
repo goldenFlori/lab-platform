@@ -50,7 +50,7 @@ describe('planning the course import', () => {
     ]);
     // Lab 6's part starts at cell 7, so the topological sort at 9 becomes 2.
     expect(lab6?.notebooks[0]?.embeds.find((e) => e.viz === 'tabela-gjurmimit')?.cell).toBe(2);
-  });
+  }, 60_000);
 
   it("places the course repo's own list of platform visualizations (#161)", async () => {
     const labs = await planCourse({
@@ -74,7 +74,8 @@ describe('planning the course import', () => {
     const extra = (n: number) => labs.find((lab) => lab.n === n)?.notebooks.find((nb) => nb.kind === 'extra');
     expect(extra(3)?.embeds.map((e) => e.viz)).toContain('pema-rekursive');
     expect(extra(5)?.embeds.map((e) => e.viz)).toEqual(['kruskal-prim']);
-  });
+    // Converts five labs' notebooks: more than the default 5 s on a busy CI runner.
+  }, 60_000);
 
   it('refuses a visualization the platform does not have, or a cell the site already uses', async () => {
     const plan = (platformEmbeds: SiteCourse['platformEmbeds']) =>
