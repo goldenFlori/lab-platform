@@ -3,6 +3,7 @@ import { renderNotebook } from '../../src/notebook/index.ts';
 import { isSolutionOf } from '../../src/notebook/slides.ts';
 import { type StoredNotebook, toStored } from '../../src/notebook/stored.ts';
 import type { Embed, NotebookKind } from '../../src/shared/notebooks.ts';
+import { isVisualizerId } from '../../src/shared/visualizers.ts';
 
 // What a course site (the course repo's site/content/course.mjs) becomes on the platform (#16):
 // its labs, each with its notebooks converted and its visualizations placed, and the solutions
@@ -25,6 +26,11 @@ export type SiteCourse = {
   }[];
   homework: { lab: number; title: string; status: string; notebook: string }[];
   embeds: Record<string, SiteEmbed[]>;
+  /**
+   * Visualizations only the platform has (#160), such as the trace tables: the course repo lists them
+   * in site/content/platform.mjs, which the site never reads, by notebook and cell like `embeds`.
+   */
+  platformEmbeds?: Record<string, SiteEmbed[]>;
 };
 
 export type CourseSource = {
@@ -67,6 +73,24 @@ const embedsOf = (list: SiteEmbed[] | undefined): Embed[] =>
   (list ?? [])
     .map((e) => ({ cell: e.cell, viz: e.viz, title: e.title ?? null, props: e.props ?? null }))
     .sort((a, b) => a.cell - b.cell);
+
+/**
+ * A notebook's embeds: the site's, and the platform's own beside them. A cell takes one visualization,
+ * and only one the platform knows, so a clash or an unknown id stops the import before it starts.
+ */
+function embedsFor(site: SiteCourse, file: string): Embed[] {
+  const own = site.platformEmbeds?.[file] ?? [];
+  for (const e of own) {
+    if (!isVisualizerId(e.viz))
+      throw new Error(`${file}: the platform has no visualization "${e.viz}" (cell ${e.cell})`);
+  }
+  const taken = new Set((site.embeds[file] ?? []).map((e) => e.cell));
+  for (const e of own) {
+    if (taken.has(e.cell)) throw new Error(`${file}: cell ${e.cell} has a visualization on the site already`);
+    taken.add(e.cell);
+  }
+  return embedsOf([...(site.embeds[file] ?? []), ...own]);
+}
 
 /**
  * The cells of `ranges`, as a notebook of its own. A range starts at a heading's anchor, which must
@@ -115,7 +139,7 @@ export async function planCourse({ site, notebook, solutions }: CourseSource): P
       if (!resource.notebook) continue;
       const file = resource.notebook;
       let raw = notebook(file);
-      let embeds = embedsOf(site.embeds[file]);
+      let embeds = embedsFor(site, file);
       let originalName = file;
       if (resource.sections) {
         // Labs 5 and 6 share one notebook on the site; here each lab gets its own part of it.
@@ -145,7 +169,7 @@ export async function planCourse({ site, notebook, solutions }: CourseSource): P
         originalName: homework.notebook,
         raw,
         ...(await convert(raw)),
-        embeds: embedsOf(site.embeds[homework.notebook]),
+        embeds: embedsFor(site, homework.notebook),
       });
     }
     labs.push({ n: lab.n, title: lab.title, week: lab.week ?? null, summary: lab.summary ?? null, notebooks });

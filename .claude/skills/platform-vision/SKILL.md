@@ -397,6 +397,14 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   rows checked. It prints with the rest, and is the evidence of learning for the Startup Albania
   application. Next: the owner re-imports the course, places the trace tables on the class problems,
   and runs the dry run with the FSHN course.
+- **2026-10-26:** Phase 9 planned as the "Phase 9: Every lab, coded and checked" milestone, issues
+  #160–#161, beside the course repo's "Coded exercises 2026/27" milestone: Labs 5, 6 and 8 get extra
+  notebooks where students write BFS, DFS, union-find, Kruskal, Prim, Kahn, Kosaraju and
+  Floyd-Warshall with `kontrollo(...)` checks (course PRs #30–#32, merged).
+- **2026-10-26:** #160 done. The course import places the platform's own visualizations (trace tables,
+  recursion tree, Kruskal & Prim) from the course repo's `site/content/platform.mjs`, beside the
+  site's; an unknown id or a cell the site already uses stops it before anything is uploaded. Next:
+  the course repo lists them, then #161 refreshes the fixtures.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
@@ -447,6 +455,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-12 | The survey is anonymous by design: ratings are stored only as counts, comments with random ids, no time and no author, in a WITHOUT ROWID table; who answered is kept apart, only to ask once. Results show from five answers | Decided |
 | 2026-10-12 | A real mobile app means an installable web app (PWA) first; a store app (Capacitor) only if a need appears | Decided |
 | 2026-10-25 | Phase 8 is "Understanding, measured" before SaaS: students predict and trace every algorithm by hand, checked at once, and first-try results are counted (never graded). Teaching quality comes first, and the January pilot must show learning, not only use, before a second institution signs | Decided |
+| 2026-10-26 | Phase 9 is "Every lab, coded and checked": Labs 5, 6 and 8 were the only graph labs where students never wrote the algorithms, and writing them is what the exam and later courses ask. The platform's own visualizations are declared in the course repo (platform.mjs), so the import places them, not staff by hand | Decided |
 | 2026-10-25 | First-try results are practice data: kept once per student and decision (later tries change nothing), shown to the student per topic and to staff with analytics only as counts from five students up, with the hardest decisions and the most common wrong answer, never names; two years like activity. A decision is identified by its step and its options as ids, so both languages count as one | Decided |
 | 2026-10-25 | Predict mode asks only decisions that can go either way, and caps long runs by order, never by outcome (4 per Bellman-Ford pass, 3 per Floyd-Warshall k), so practice stays short and the cap gives nothing away | Decided |
 | 2026-10-10 | Search without FTS5: D1 cannot export databases with virtual tables, and backups must keep working. The server sends each user the text of what they may see; the browser matches it as they type | Decided |
