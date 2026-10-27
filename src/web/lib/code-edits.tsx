@@ -126,7 +126,7 @@ export function CodeEditsProvider({
     setEdits((typed) => new Map([...saved, ...kept, ...typed]));
     setVersion((v) => v + 1);
     setLoaded(true);
-  }, [query.data]);
+  }, [query.data, draft]);
 
   /** One request with up to MAX_WORK_CELLS of what waits: kept, refused for the day's limit, or failed. */
   const send = useCallback(
