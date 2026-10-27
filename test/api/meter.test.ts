@@ -1,6 +1,7 @@
 import { env } from 'cloudflare:workers';
 import { describe, expect, it } from 'vitest';
 import { createDb } from '../../src/api/db';
+import { grantsOf } from '../../src/api/db/access';
 import { emptyTally, meterD1 } from '../../src/api/db/meter';
 import { forTenant } from '../../src/api/db/tenant';
 import { seedOrganization } from './fixtures';
@@ -52,5 +53,21 @@ describe('the database meter', () => {
     // forReport is one batch of three statements.
     const batch = await cost(() => tenant.submissions.forReport(at.notebookId, [seed.group.id]));
     expect(batch.queries).toBe(3);
+  });
+
+  it("reads a user's memberships without scanning the organization (#182)", async () => {
+    const { seed, at } = await metered();
+    for (let i = 0; i < 30; i++) {
+      const other = await seed.tenant.users.create(
+        { username: `s${i}`, fullName: `S ${i}`, passwordHash: 'x' },
+        'student',
+      );
+      await seed.tenant.memberships.create({ userId: other.id, role: 'student', groupId: seed.group.id });
+    }
+    await seed.tenant.memberships.create({ userId: at.userId, role: 'student', groupId: seed.group.id });
+    const tally = emptyTally();
+    expect(await grantsOf(createDb(meterD1(env.DB, tally)), seed.org.id, at.userId)).toHaveLength(2);
+    // Its own two rows and their roles, whatever the size of the class.
+    expect(tally.read).toBeLessThanOrEqual(8);
   });
 });

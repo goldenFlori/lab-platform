@@ -235,6 +235,9 @@ export const memberships = sqliteTable(
     uniqueIndex('memberships_course_unique').on(t.userId, t.orgId, t.courseId).where(sql`${t.courseId} is not null`),
     uniqueIndex('memberships_group_unique').on(t.userId, t.orgId, t.groupId).where(sql`${t.groupId} is not null`),
     index('memberships_org_idx').on(t.orgId),
+    // Every request reads the user's memberships (#182); the unique ones above are partial, so they
+    // cannot serve it, and without this it scanned the whole organization.
+    index('memberships_user_idx').on(t.userId, t.orgId),
     index('memberships_course_idx').on(t.courseId, t.orgId),
     index('memberships_group_idx').on(t.groupId, t.orgId),
   ],
