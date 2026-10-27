@@ -1,15 +1,20 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { CodeCell } from '../../notebook/types';
-import type { CodeEdit } from '../../shared/code-edits';
+import { type CodeEdit, MAX_WORK_CELLS, type WorkSaved } from '../../shared/code-edits';
 import { api } from './api';
 import { type NotebookRef, notebookQuery, notebooksPath } from './notebooks';
 
 // A student's own version of a notebook's code (#49): what they typed shows and runs instead of the
-// original, and is saved for them as they type, a moment after they stop. Code put back exactly as
-// it was is the original again, and its saved copy goes.
+// original, and is saved for them as they type. Code put back exactly as it was is the original
+// again, and its saved copy goes.
+//
+// Saving (#177): code and graded trace rows wait in one queue per notebook and go in one request, a
+// few seconds after a change but at most once every SAVE_EVERY_MS, since every request counts against
+// the free plan's daily limits. What waits is saved at once when the page is hidden or left, the
+// notebook changes, or the student hands in; a failed save keeps its changes and tries again.
 
-export type SaveState = 'saved' | 'saving' | 'failed';
+export type SaveState = 'saved' | 'pending' | 'saving' | 'failed';
 
 type CodeEditsValue = {
   /** The code to show and run: the user's own, or the original. */
@@ -23,8 +28,10 @@ type CodeEditsValue = {
   saving: SaveState;
   /** The saved edits are in place (or could not be loaded): runs use the student's code (#78). */
   ready: boolean;
-  /** Saves what is still waiting now; false when it could not be saved. */
+  /** Saves what is still waiting now, trace rows included; false when it could not be saved. */
   flush: () => Promise<boolean>;
+  /** A graded trace table's rows (#168), saved with the code. */
+  saveTrace: (cell: number, rows: Record<string, string>[]) => void;
   /** Changes when the code changes from outside the editors (loaded, or all put back), which
    * then start again from it. */
   version: number;
@@ -32,8 +39,12 @@ type CodeEditsValue = {
 
 const CodeEditsContext = createContext<CodeEditsValue | null>(null);
 
-/** Typing pauses this long before a save. */
-const SAVE_AFTER_MS = 800;
+/** A save waits this long after a change, so a burst of typing goes in one. */
+const SAVE_AFTER_MS = 3000;
+/** And comes at most this often while the student keeps typing. */
+const SAVE_EVERY_MS = 30_000;
+/** keepalive requests (a page closing) may carry at most 64 KB. */
+const KEEPALIVE_BYTES = 60_000;
 
 const editsPath = (ref: NotebookRef) =>
   `${notebooksPath(ref.org, ref.courseId, ref.labId)}/${encodeURIComponent(ref.notebookId)}/edits`;
@@ -63,8 +74,13 @@ export function CodeEditsProvider({
   const [version, setVersion] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const pending = useRef(new Map<number, string>());
+  const traces = useRef(new Map<number, Record<string, string>[]>());
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const lastSave = useRef(0);
+  const inFlight = useRef<Promise<boolean> | null>(null);
+  const queryClient = useQueryClient();
   const path = editsPath(notebookRef);
+  const workPath = `${notebooksPath(notebookRef.org, notebookRef.courseId, notebookRef.labId)}/${encodeURIComponent(notebookRef.notebookId)}/work`;
 
   // The saved edits, once loaded for this notebook; anything typed before they arrived stays on top.
   useEffect(() => {
@@ -75,43 +91,79 @@ export function CodeEditsProvider({
     setLoaded(true);
   }, [query.data]);
 
+  /** One request with up to MAX_WORK_CELLS of what waits; true when it was kept. */
   const send = useCallback(
-    (cell: number, code: string, keepalive = false) => {
-      const original = originals.get(cell);
-      const url = `/api${path}/${cell}`;
-      // keepalive lets the last save finish while the page closes.
-      return code === original
-        ? fetch(url, { method: 'DELETE', credentials: 'same-origin', keepalive })
-        : fetch(url, {
-            method: 'PUT',
-            credentials: 'same-origin',
-            keepalive,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code }),
-          });
+    async (code: [number, string][], rows: [number, Record<string, string>[]][], keepalive: boolean) => {
+      const body = JSON.stringify({
+        // The original code again means the saved copy goes.
+        code: code.map(([cell, text]) => ({ cell, code: text === originals.get(cell) ? null : text })),
+        traces: rows.map(([cell, r]) => ({ cell, rows: r })),
+      });
+      const res = await fetch(`/api${workPath}`, {
+        method: 'PUT',
+        credentials: 'same-origin',
+        keepalive: keepalive && body.length < KEEPALIVE_BYTES,
+        headers: { 'Content-Type': 'application/json' },
+        body,
+      });
+      if (!res.ok) return false;
+      // A table whose notebook closed meanwhile cannot be kept: show it as it now is.
+      const { refused } = (await res.json()) as WorkSaved;
+      for (const cell of refused) {
+        void queryClient.invalidateQueries({ queryKey: ['trace-answers', notebookRef.notebookId, cell] });
+      }
+      return true;
     },
-    [originals, path],
+    [originals, workPath, queryClient, notebookRef.notebookId],
   );
 
   const flush = useCallback(
-    async (keepalive = false) => {
+    async (keepalive = false): Promise<boolean> => {
       clearTimeout(timer.current);
-      const batch = [...pending.current];
+      // One save at a time; a flush during one waits for it (and any that started meanwhile), then
+      // saves what came since, so a hand-in never goes ahead of a save still on its way.
+      while (inFlight.current) await inFlight.current;
+      if (!pending.current.size && !traces.current.size) return true;
+      const code = [...pending.current];
+      const rows = [...traces.current];
       pending.current.clear();
-      if (!batch.length) return true;
+      traces.current.clear();
       setSaving('saving');
-      try {
-        const results = await Promise.all(batch.map(([cell, code]) => send(cell, code, keepalive)));
-        const ok = results.every((r) => r.ok);
-        setSaving(ok && pending.current.size === 0 ? 'saved' : 'failed');
-        return ok;
-      } catch {
-        setSaving('failed');
-        return false;
-      }
+      const run = (async () => {
+        try {
+          for (let i = 0; i < code.length + rows.length; i += MAX_WORK_CELLS) {
+            const part = code.slice(i, i + MAX_WORK_CELLS);
+            const left = MAX_WORK_CELLS - part.length;
+            const from = Math.max(0, i - code.length);
+            const tables = left > 0 ? rows.slice(from, from + left) : [];
+            if (!(await send(part, tables, keepalive))) throw new Error('not saved');
+          }
+          lastSave.current = Date.now();
+          return true;
+        } catch {
+          // Back in the queue, unless typed over since, and tried again later.
+          for (const [cell, text] of code) if (!pending.current.has(cell)) pending.current.set(cell, text);
+          for (const [cell, r] of rows) if (!traces.current.has(cell)) traces.current.set(cell, r);
+          timer.current = setTimeout(() => void flush(), SAVE_EVERY_MS);
+          return false;
+        }
+      })();
+      inFlight.current = run;
+      const ok = await run;
+      inFlight.current = null;
+      setSaving(!ok ? 'failed' : pending.current.size || traces.current.size ? 'pending' : 'saved');
+      return ok;
     },
     [send],
   );
+
+  /** A change waits: SAVE_AFTER_MS after it, but never sooner than SAVE_EVERY_MS after the last save. */
+  const schedule = useCallback(() => {
+    setSaving((state) => (state === 'failed' ? state : 'pending'));
+    clearTimeout(timer.current);
+    const wait = Math.max(SAVE_AFTER_MS, lastSave.current + SAVE_EVERY_MS - Date.now());
+    timer.current = setTimeout(() => void flush(), wait);
+  }, [flush]);
 
   // Leaving the page or the notebook saves what is still waiting.
   useEffect(() => {
@@ -138,9 +190,11 @@ export function CodeEditsProvider({
       change(cell, code) {
         setEdits((map) => new Map(map).set(cell.srcIndex, code));
         pending.current.set(cell.srcIndex, code);
-        setSaving('saving');
-        clearTimeout(timer.current);
-        timer.current = setTimeout(() => void flush(), SAVE_AFTER_MS);
+        schedule();
+      },
+      saveTrace(cell, rows) {
+        traces.current.set(cell, rows);
+        schedule();
       },
       reset(cell) {
         pending.current.delete(cell.srcIndex);
@@ -153,7 +207,6 @@ export function CodeEditsProvider({
       },
       resetAll() {
         pending.current.clear();
-        clearTimeout(timer.current);
         setEdits(new Map());
         setVersion((v) => v + 1);
         setSaving('saved');
@@ -165,7 +218,7 @@ export function CodeEditsProvider({
       ready: loaded || query.isError,
       flush: () => flush(),
     };
-  }, [edits, flush, originals, path, saving, version, loaded, query.isError]);
+  }, [edits, flush, schedule, originals, path, saving, version, loaded, query.isError]);
 
   return <CodeEditsContext.Provider value={value}>{children}</CodeEditsContext.Provider>;
 }

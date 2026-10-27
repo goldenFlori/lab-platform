@@ -30,7 +30,8 @@ export function SubmissionBar({ notebookRef }: { notebookRef: NotebookRef }) {
 
   async function handIn() {
     setMessage(null);
-    if (edits && (edits.saving === 'failed' || !(await edits.flush()))) {
+    // Everything typed goes first, trace rows included (#177); a save that failed is tried again here.
+    if (edits && !(await edits.flush())) {
       return setMessage({ tone: 'danger', text: t.submissions.unsaved });
     }
     try {

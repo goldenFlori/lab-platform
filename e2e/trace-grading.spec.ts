@@ -46,16 +46,18 @@ test('a student fills a graded trace table, hands it in, and the server grades i
   const graded = student.getByTestId('trace-graded');
   await expect(graded).toContainText('Kjo tabelë vlerësohet: 9 pikë.');
   // Every row at once and no checking: fill all but the last total right.
-  for (const [i, row] of expected.entries()) {
+  // Last row first, so the last cell typed is a right one: it counts only if the hand-in saved it.
+  for (const [i, row] of [...expected.entries()].reverse()) {
     const last = i === expected.length - 1;
     await graded.getByLabel(`Hapi ${i + 1} · Brinja`).fill(row.cells.edge ?? '');
     await graded.getByLabel(`Hapi ${i + 1} · Pesha deri tani`).fill(last ? '999' : (row.cells.total ?? ''));
   }
   await expect(student.getByRole('button', { name: 'Kontrollo rreshtin' })).toHaveCount(0);
-  await expect
-    .poll(async () => (await apiCall<{ rows: unknown[] }>(student, 'GET', `${nbPath}/embeds/1/trace`)).rows.length)
-    .toBe(expected.length);
-  await apiCall(student, 'POST', `${nbPath}/submission`);
+  // Handed in at once, before the rows' save would come on its own: the hand-in saves them first (#177).
+  const bar = student.getByTestId('submission');
+  await bar.getByRole('button', { name: 'Dorëzo punën' }).click();
+  await student.getByRole('alertdialog').getByRole('button', { name: 'Dorëzo punën' }).click();
+  await expect(bar).toContainText('Puna u dorëzua.');
   await student.context().close();
 
   const grade = await apiCall<StaffGrade>(staff, 'PUT', `${nbPath}/grades/${me.user.id}`, {
