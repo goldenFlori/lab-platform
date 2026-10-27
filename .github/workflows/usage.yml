@@ -1,0 +1,32 @@
+# Today's use of Cloudflare's free plan (#180), four times during the teaching day. The run fails from
+# 70% of a daily limit (Worker requests, D1 rows read or written), so GitHub emails the owner before
+# students are refused at 100%; every run writes the numbers to its summary. Needs the repository
+# secrets CLOUDFLARE_ANALYTICS_TOKEN (a token with only "Account Analytics: Read") and
+# CLOUDFLARE_ACCOUNT_ID; without the token it only warns.
+name: Usage
+
+on:
+  schedule:
+    - cron: '0 7,11,15,19 * * *' # 08:00 to 20:00 in Tirana in winter (UTC+1), 09:00 to 21:00 in summer
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  usage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CLOUDFLARE_ANALYTICS_TOKEN: ${{ secrets.CLOUDFLARE_ANALYTICS_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      # No install: the script uses only Node and fetch.
+      - name: Read today's use
+        run: node scripts/usage.ts --warn-at 70
