@@ -5,5 +5,5 @@
     "types": ["./worker-configuration.d.ts", "@cloudflare/vitest-pool-workers/types", "vite/client"]
   },
   "include": ["test"],
-  "exclude": ["test/viz"]
+  "exclude": ["test/viz", "test/scripts"]
 }
