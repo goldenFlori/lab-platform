@@ -4,12 +4,12 @@ import { z } from 'zod';
 // submission. The app imports only types from this file.
 
 /** Floyd-Warshall's largest table: 6 × 6 cells in a row, 6 rows. Other tables are far smaller. */
-export const traceAnswersInput = z.object({
-  rows: z
-    .array(z.record(z.string().max(16), z.string().max(24)))
-    .max(40)
-    .refine((rows) => rows.every((row) => Object.keys(row).length <= 40), 'Too many cells in a row'),
-});
+export const traceRows = z
+  .array(z.record(z.string().max(16), z.string().max(24)))
+  .max(40)
+  .refine((rows) => rows.every((row) => Object.keys(row).length <= 40), 'Too many cells in a row');
+
+export const traceAnswersInput = z.object({ rows: traceRows });
 
 /**
  * What the lab page needs about a graded trace table: the user's saved rows, whether they may still

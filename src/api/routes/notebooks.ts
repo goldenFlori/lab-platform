@@ -1,7 +1,7 @@
 import { zValidator } from '@hono/zod-validator';
 import { type Context, Hono } from 'hono';
 import { explainInput } from '../../shared/ai';
-import { type CodeEdit, codeEditInput } from '../../shared/code-edits';
+import { type CodeEdit, codeEditInput, type WorkSaved, workInput } from '../../shared/code-edits';
 import { type ExerciseProgress, exercisesInput } from '../../shared/exercises';
 import {
   createNotebookInput,
@@ -229,6 +229,35 @@ export const notebookRoutes = new Hono<TenantEnv>()
     if (cell === null) return c.json({ error: 'invalid_request' }, 400);
     await c.var.tenant.codeEdits.reset(nb.id, c.var.user?.id as string, cell);
     return c.body(null, 204);
+  })
+
+  // Everything a student changed since their last save, in one request (#177): code cells for anyone
+  // who may read the notebook, and graded trace rows only while it is open to the student for
+  // submission. Tables it may not keep are named in `refused`; the code is saved all the same.
+  .put('/:notebookId/work', zValidator('json', workInput, invalidRequest), async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    const { code, traces } = c.req.valid('json');
+    let kept = traces;
+    if (traces.length) {
+      const [embeds, deadline] = await Promise.all([
+        c.var.tenant.notebooks.embedsOf(nb.id),
+        ctx.staff ? null : deadlineFor(c, ctx, nb.id),
+      ]);
+      const graded = new Set(
+        embeds.filter((e) => e.viz === 'tabela-gjurmimit' && tracePoints(e.props) > 0).map((e) => e.cell),
+      );
+      kept = deadline?.open ? traces.filter((t) => graded.has(t.cell)) : [];
+    }
+    const savedAt = await c.var.tenant.codeEdits.saveWork({
+      notebookId: nb.id,
+      userId: c.var.user?.id as string,
+      code,
+      traces: kept,
+    });
+    return c.json({
+      savedAt: savedAt.toISOString(),
+      refused: traces.filter((t) => !kept.includes(t)).map((t) => t.cell),
+    } satisfies WorkSaved);
   })
 
   .delete('/:notebookId/edits', async (c) => {
