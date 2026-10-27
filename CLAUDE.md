@@ -90,6 +90,8 @@ live in its git-ignored `zgjidhjet/`; never publish them.
     (`--students N`, `--no-build`); see `platform-architecture`.
   - `npm run errors`: browser and server errors in production as they happen (`wrangler tail`); the
     last 3 days are in the dashboard's Workers Observability.
+  - `npm run usage`: today's use of the free plan's daily limits, from Cloudflare's analytics (needs
+    `CLOUDFLARE_ANALYTICS_TOKEN`; see the README). The Usage workflow runs it four times a day.
 
 ## Rules that bite
 

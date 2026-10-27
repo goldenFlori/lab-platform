@@ -642,6 +642,12 @@ at `/o/:org/courses/:id/activity`, linked from the course page.
   - Weekly (`.github/workflows/backup.yml`): `wrangler d1 export`, encrypted with the owner's
     age key before upload, kept 90 days as a private workflow artifact. GitHub never sees the
     plaintext. Never commit an export: it contains student data.
+- **Usage meter (#180):** `scripts/usage.ts` (`npm run usage`) reads today's (UTC) Worker requests
+  (`workersInvocationsAdaptive`) and D1 rows read and written (`d1AnalyticsAdaptiveGroups`) from the
+  GraphQL Analytics API for the whole account, since the limits are per account, and compares them
+  with the free plan's. The Usage workflow runs it at 07, 11, 15 and 19 UTC and fails from 70%, so
+  GitHub emails the owner; it needs `CLOUDFLARE_ANALYTICS_TOKEN` (only "Account Analytics: Read",
+  apart from the deploy token) and warns without it. Analytics are kept 31 days.
 - **Observability:** Workers Logs (free: 200,000 events a day, kept 3 days).
   - **Browser errors (#179):** `src/web/lib/report-error.ts` reports uncaught errors, rejections and
     what the error boundaries catch (not API failures, which the server logs) to

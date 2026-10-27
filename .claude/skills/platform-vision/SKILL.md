@@ -481,6 +481,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   which browser and release; never who, nor their code or answers. Kept 3 days in Cloudflare's logs;
   `npm run errors` shows them live with the server's own errors. The privacy page, the retention list
   and the agreement say so. Next: #180, the usage meter.
+- **2026-10-27:** #180 done. `npm run usage` shows today's share of the free plan's daily limits
+  (requests, rows read, rows written) from Cloudflare's analytics, and a workflow checks it four times
+  during the teaching day, emailing the owner from 70%, before students are refused. It waits for
+  the owner to create a read-only analytics token (README, "Usage"). Next: #181, a tested backup
+  restore.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and

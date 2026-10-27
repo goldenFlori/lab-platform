@@ -46,6 +46,9 @@ For the end-to-end tests, install the browser once with `npx playwright install 
 | `npm run account:create` | Create an organization's first account (see below) |
 | `npm run course:import` | Import a course site's labs, notebooks and solutions (see below) |
 | `npm run deploy` | Build and deploy from this machine (needs `npx wrangler login`); merges to `main` deploy on their own |
+| `npm run measure:class` | A class of 120 against the free plan's daily limits, on a local copy |
+| `npm run errors` | Browser and server errors in production as they happen (needs `npx wrangler login`) |
+| `npm run usage` | Today's use of the free plan's daily limits (see Usage below) |
 
 ## Layout
 
@@ -98,6 +101,21 @@ https://lab-platform.florjanimema.workers.dev
 
 `npm run deploy` deploys from your machine. Use it only to create the Worker the first time or in
 an emergency.
+
+## Usage
+
+Cloudflare's free plan allows 100,000 Worker requests, 5 million D1 rows read and 100,000 rows
+written a day, and refuses more until midnight UTC. The Usage workflow reads today's numbers four
+times a day and fails from 70% of any of them, so GitHub emails you in time; each run's summary shows
+the table. To set it up once:
+
+1. In the Cloudflare dashboard, **My Profile → API Tokens → Create Token → Create Custom Token**:
+   name it "lab-platform usage", permission **Account → Account Analytics → Read**, for your account
+   only. Nothing else: it can read counts and change nothing.
+2. Store it in the repository: `gh secret set CLOUDFLARE_ANALYTICS_TOKEN` and paste the token.
+   (`CLOUDFLARE_ACCOUNT_ID` is already there.)
+3. Run it once: **Actions → Usage → Run workflow**, or on your machine
+   `CLOUDFLARE_ANALYTICS_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… npm run usage`.
 
 ## Backups
 
