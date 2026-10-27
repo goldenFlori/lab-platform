@@ -4,6 +4,7 @@ import { Component, type ReactNode, Suspense, useEffect, useRef, useState } from
 import type { VisualizerId } from '../../shared/visualizers';
 import { VIZ, type VizProps } from '../../viz';
 import { t as messages, useT } from '../i18n';
+import { reportError } from '../lib/report-error';
 
 /** One visualization. Its code loads only when it comes near the screen. */
 export function VizEmbed({ viz, props, label }: { viz: VisualizerId; props?: VizProps | null; label?: string | null }) {
@@ -60,6 +61,11 @@ export class VizErrorBoundary extends Component<{ children: ReactNode }, { faile
 
   static getDerivedStateFromError() {
     return { failed: true };
+  }
+
+  // The owner hears of it (#179); a chunk gone after a release is the usual cause, and says so.
+  componentDidCatch(error: unknown) {
+    if (import.meta.env.PROD) reportError('render', error);
   }
 
   render() {

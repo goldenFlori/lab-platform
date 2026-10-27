@@ -697,6 +697,7 @@ export const sq = {
           'Pyetjet "Shpjego gabimin" me përgjigjen e AI-së, dhe sa kërkesa me AI bëni në ditë.',
           'Një cookie për hyrjen, që ju mban të identifikuar, dhe emrin e shfletuesit për çdo hyrje.',
           'Hyrjet e dështuara, të numëruara sipas emrit të përdoruesit dhe adresës së rrjetit për pak minuta, për të ndalur hamendësimin e fjalëkalimeve.',
+          'Kur aplikacioni has një gabim në shfletuesin tuaj: faqen (pa emra apo identifikues), mesazhin e gabimit, shfletuesin dhe versionin e aplikacionit, që ta ndreqim. Kurrë kush jeni, kodin apo përgjigjet tuaja.',
         ],
       },
       {
@@ -731,6 +732,7 @@ export const sq = {
           `Pyetjet "Shpjego gabimin" me përgjigjet: ${RETENTION.aiQuestionDays} ditë.`,
           `Aktiviteti ditor (laboratorët e hapur, ekzekutimet, Live Lab), përgjigjet e para te parashikimet dhe tabelat, numërimet e AI dhe historia e Live Lab: ${RETENTION.activityYears} vjet.`,
           `Një kërkesë për fshirje, pasi trajtohet: ${RETENTION.handledRequestYears} vit.`,
+          `Raportet e gabimeve: ${RETENTION.errorLogDays} ditë, te Cloudflare.`,
           'Kodi, dorëzimet, notat dhe pjesa tjetër: sa kohë ekziston kursi. Kur institucioni fshin një kurs, fshihen edhe të dhënat e tij.',
           'Çdo natë platforma fshin vetë atë që ka kaluar afatin.',
         ],

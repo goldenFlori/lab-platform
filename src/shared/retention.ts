@@ -14,6 +14,11 @@ export const RETENTION = {
   activityYears: 2,
   /** A deletion request once handled, so the institution can show it answered. */
   handledRequestYears: 1,
+  /**
+   * Error reports from browsers (#179) and the server's own error logs, in Cloudflare's Workers Logs:
+   * its free plan keeps them this long, and deletes them itself.
+   */
+  errorLogDays: 3,
 } as const;
 
 export const daysOf = (years: number) => years * 365;

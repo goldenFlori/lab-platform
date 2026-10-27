@@ -642,7 +642,17 @@ at `/o/:org/courses/:id/activity`, linked from the course page.
   - Weekly (`.github/workflows/backup.yml`): `wrangler d1 export`, encrypted with the owner's
     age key before upload, kept 90 days as a private workflow artifact. GitHub never sees the
     plaintext. Never commit an export: it contains student data.
-- **Observability:** Workers logs; Sentry's free tier later.
+- **Observability:** Workers Logs (free: 200,000 events a day, kept 3 days).
+  - **Browser errors (#179):** `src/web/lib/report-error.ts` reports uncaught errors, rejections and
+    what the error boundaries catch (not API failures, which the server logs) to
+    `POST /api/client-errors`: the page as its route id, the message with ids masked, the place in the
+    app's own code, the build (its script's name). At most 10 a page load, each message once. The
+    server logs each as one `{"type":"client_error", …}` line with the browser's name, at most 60 a
+    minute per isolate, and records no user.
+  - `npm run errors` follows them live with `wrangler tail` (the owner's login has `workers_tail`, not
+    observability read) and prints browser errors and the server's exceptions and error logs, never a
+    request's address, IP or headers; the last 3 days are in the dashboard (Observability, filter
+    `type = client_error`). A third-party service such as Sentry is not needed for now.
 
 ## Portability
 
