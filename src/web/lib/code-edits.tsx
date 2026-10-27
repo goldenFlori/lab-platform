@@ -3,7 +3,10 @@ import { createContext, type ReactNode, useCallback, useContext, useEffect, useM
 import type { CodeCell } from '../../notebook/types';
 import { type CodeEdit, MAX_WORK_CELLS, type WorkSaved } from '../../shared/code-edits';
 import { api } from './api';
+import { useMe } from './auth';
+import { DRAFT_PREFIX, readDraft, writeDraft } from './drafts';
 import { type NotebookRef, notebookQuery, notebooksPath } from './notebooks';
+import { reportService, serviceOf } from './service';
 
 // A student's own version of a notebook's code (#49): what they typed shows and runs instead of the
 // original, and is saved for them as they type. Code put back exactly as it was is the original
@@ -13,6 +16,10 @@ import { type NotebookRef, notebookQuery, notebooksPath } from './notebooks';
 // few seconds after a change but at most once every SAVE_EVERY_MS, since every request counts against
 // the free plan's daily limits. What waits is saved at once when the page is hidden or left, the
 // notebook changes, or the student hands in; a failed save keeps its changes and tries again.
+//
+// On the device (#178): what waits is also kept in this browser's storage until it is saved, so a
+// reload, a crash or a day's limit loses nothing; the next visit saves it. It is the user's own work,
+// under their id, and goes when saved or when anyone signs out here (lab computers are shared).
 
 export type SaveState = 'saved' | 'pending' | 'saving' | 'failed';
 
@@ -32,6 +39,8 @@ type CodeEditsValue = {
   flush: () => Promise<boolean>;
   /** A graded trace table's rows (#168), saved with the code. */
   saveTrace: (cell: number, rows: Record<string, string>[]) => void;
+  /** A table's rows kept on this device and not yet saved, which show instead of the saved ones. */
+  traceDraft: (cell: number) => Record<string, string>[] | undefined;
   /** Changes when the code changes from outside the editors (loaded, or all put back), which
    * then start again from it. */
   version: number;
@@ -45,6 +54,8 @@ const SAVE_AFTER_MS = 3000;
 const SAVE_EVERY_MS = 30_000;
 /** keepalive requests (a page closing) may carry at most 64 KB. */
 const KEEPALIVE_BYTES = 60_000;
+/** After the free plan's limit answered, try again this often, not every 30 s, until the reset. */
+const RETRY_AT_LIMIT_MS = 10 * 60_000;
 
 const editsPath = (ref: NotebookRef) =>
   `${notebooksPath(ref.org, ref.courseId, ref.labId)}/${encodeURIComponent(ref.notebookId)}/edits`;
@@ -79,40 +90,77 @@ export function CodeEditsProvider({
   const lastSave = useRef(0);
   const inFlight = useRef<Promise<boolean> | null>(null);
   const queryClient = useQueryClient();
+  const userId = useMe()?.user.id;
+  const draftKey = userId ? `${DRAFT_PREFIX}${userId}:${notebookRef.notebookId}` : null;
+  // What this device kept of the last visit, read once.
+  const [draft] = useState(() => (draftKey ? readDraft(draftKey) : null));
   const path = editsPath(notebookRef);
   const workPath = `${notebooksPath(notebookRef.org, notebookRef.courseId, notebookRef.labId)}/${encodeURIComponent(notebookRef.notebookId)}/work`;
 
-  // The saved edits, once loaded for this notebook; anything typed before they arrived stays on top.
+  /** The device copy follows the queue: what waits is kept, and nothing once all is saved. */
+  const keep = useCallback(() => {
+    if (!draftKey) return;
+    const waiting = pending.current.size || traces.current.size;
+    writeDraft(
+      draftKey,
+      waiting
+        ? {
+            code: Object.fromEntries(pending.current),
+            traces: Object.fromEntries(traces.current),
+            at: Date.now(),
+          }
+        : null,
+    );
+  }, [draftKey]);
+
+  // The saved edits, once loaded for this notebook; anything typed before they arrived stays on top,
+  // and over both, what this device kept unsaved last time (#178), which is queued again.
   useEffect(() => {
     if (!query.data) return;
     const saved = query.data.edits.map((e) => [e.cell, e.code] as const);
-    setEdits((typed) => new Map([...saved, ...typed]));
+    const kept = Object.entries(draft?.code ?? {}).map(([cell, code]) => [Number(cell), code] as const);
+    for (const [cell, code] of kept) if (!pending.current.has(cell)) pending.current.set(cell, code);
+    for (const [cell, rows] of Object.entries(draft?.traces ?? {})) {
+      if (!traces.current.has(Number(cell))) traces.current.set(Number(cell), rows);
+    }
+    setEdits((typed) => new Map([...saved, ...kept, ...typed]));
     setVersion((v) => v + 1);
     setLoaded(true);
-  }, [query.data]);
+  }, [query.data, draft]);
 
-  /** One request with up to MAX_WORK_CELLS of what waits; true when it was kept. */
+  /** One request with up to MAX_WORK_CELLS of what waits: kept, refused for the day's limit, or failed. */
   const send = useCallback(
-    async (code: [number, string][], rows: [number, Record<string, string>[]][], keepalive: boolean) => {
+    async (
+      code: [number, string][],
+      rows: [number, Record<string, string>[]][],
+      keepalive: boolean,
+    ): Promise<'ok' | 'limit' | 'failed'> => {
       const body = JSON.stringify({
         // The original code again means the saved copy goes.
         code: code.map(([cell, text]) => ({ cell, code: text === originals.get(cell) ? null : text })),
         traces: rows.map(([cell, r]) => ({ cell, rows: r })),
       });
-      const res = await fetch(`/api${workPath}`, {
-        method: 'PUT',
-        credentials: 'same-origin',
-        keepalive: keepalive && body.length < KEEPALIVE_BYTES,
-        headers: { 'Content-Type': 'application/json' },
-        body,
-      });
-      if (!res.ok) return false;
+      let res: Response;
+      try {
+        res = await fetch(`/api${workPath}`, {
+          method: 'PUT',
+          credentials: 'same-origin',
+          keepalive: keepalive && body.length < KEEPALIVE_BYTES,
+          headers: { 'Content-Type': 'application/json' },
+          body,
+        });
+      } catch {
+        reportService(null);
+        return 'failed';
+      }
+      reportService(res);
+      if (!res.ok) return serviceOf(res) === 'limit' ? 'limit' : 'failed';
       // A table whose notebook closed meanwhile cannot be kept: show it as it now is.
       const { refused } = (await res.json()) as WorkSaved;
       for (const cell of refused) {
         void queryClient.invalidateQueries({ queryKey: ['trace-answers', notebookRef.notebookId, cell] });
       }
-      return true;
+      return 'ok';
     },
     [originals, workPath, queryClient, notebookRef.notebookId],
   );
@@ -130,40 +178,56 @@ export function CodeEditsProvider({
       traces.current.clear();
       setSaving('saving');
       const run = (async () => {
-        try {
-          for (let i = 0; i < code.length + rows.length; i += MAX_WORK_CELLS) {
-            const part = code.slice(i, i + MAX_WORK_CELLS);
-            const left = MAX_WORK_CELLS - part.length;
-            const from = Math.max(0, i - code.length);
-            const tables = left > 0 ? rows.slice(from, from + left) : [];
-            if (!(await send(part, tables, keepalive))) throw new Error('not saved');
-          }
+        let outcome: 'ok' | 'limit' | 'failed' = 'ok';
+        for (let i = 0; i < code.length + rows.length && outcome === 'ok'; i += MAX_WORK_CELLS) {
+          const part = code.slice(i, i + MAX_WORK_CELLS);
+          const left = MAX_WORK_CELLS - part.length;
+          const from = Math.max(0, i - code.length);
+          const tables = left > 0 ? rows.slice(from, from + left) : [];
+          outcome = await send(part, tables, keepalive);
+        }
+        if (outcome === 'ok') {
           lastSave.current = Date.now();
           return true;
-        } catch {
-          // Back in the queue, unless typed over since, and tried again later.
-          for (const [cell, text] of code) if (!pending.current.has(cell)) pending.current.set(cell, text);
-          for (const [cell, r] of rows) if (!traces.current.has(cell)) traces.current.set(cell, r);
-          timer.current = setTimeout(() => void flush(), SAVE_EVERY_MS);
-          return false;
         }
+        // Back in the queue, unless typed over since, and tried again later: at the day's limit only
+        // now and then, since nothing is kept before the reset.
+        for (const [cell, text] of code) if (!pending.current.has(cell)) pending.current.set(cell, text);
+        for (const [cell, r] of rows) if (!traces.current.has(cell)) traces.current.set(cell, r);
+        timer.current = setTimeout(() => void flush(), outcome === 'limit' ? RETRY_AT_LIMIT_MS : SAVE_EVERY_MS);
+        return false;
       })();
       inFlight.current = run;
       const ok = await run;
       inFlight.current = null;
+      keep();
       setSaving(!ok ? 'failed' : pending.current.size || traces.current.size ? 'pending' : 'saved');
       return ok;
     },
-    [send],
+    [send, keep],
   );
+
+  // What this device kept from last time is saved once the page has loaded.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: once, when loaded
+  useEffect(() => {
+    if (loaded && (pending.current.size || traces.current.size)) schedule();
+  }, [loaded]);
+
+  // Back online: what waits goes now.
+  useEffect(() => {
+    const online = () => void flush();
+    window.addEventListener('online', online);
+    return () => window.removeEventListener('online', online);
+  }, [flush]);
 
   /** A change waits: SAVE_AFTER_MS after it, but never sooner than SAVE_EVERY_MS after the last save. */
   const schedule = useCallback(() => {
+    keep();
     setSaving((state) => (state === 'failed' ? state : 'pending'));
     clearTimeout(timer.current);
     const wait = Math.max(SAVE_AFTER_MS, lastSave.current + SAVE_EVERY_MS - Date.now());
     timer.current = setTimeout(() => void flush(), wait);
-  }, [flush]);
+  }, [flush, keep]);
 
   // Leaving the page or the notebook saves what is still waiting.
   useEffect(() => {
@@ -196,6 +260,7 @@ export function CodeEditsProvider({
         traces.current.set(cell, rows);
         schedule();
       },
+      traceDraft: (cell) => draft?.traces[cell],
       reset(cell) {
         pending.current.delete(cell.srcIndex);
         setEdits((map) => {
@@ -218,7 +283,7 @@ export function CodeEditsProvider({
       ready: loaded || query.isError,
       flush: () => flush(),
     };
-  }, [edits, flush, schedule, originals, path, saving, version, loaded, query.isError]);
+  }, [edits, flush, schedule, draft, originals, path, saving, version, loaded, query.isError]);
 
   return <CodeEditsContext.Provider value={value}>{children}</CodeEditsContext.Provider>;
 }

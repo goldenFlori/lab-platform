@@ -30,7 +30,8 @@ export function HandInProvider({
   const queue = useCodeEdits();
   const value = useMemo<HandIn>(
     () => ({
-      state: query.data,
+      // Rows this device kept unsaved (#178) show over the saved ones until they are saved.
+      state: query.data && queue?.traceDraft(cell) ? { ...query.data, rows: queue.traceDraft(cell) ?? [] } : query.data,
       save(rows) {
         if (queue) return queue.saveTrace(cell, rows);
         window.clearTimeout(timer.current);

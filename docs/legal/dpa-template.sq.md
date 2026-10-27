@@ -257,7 +257,10 @@ Kodi i padorëzuar i studentëve mbetet privat për ta dhe nuk përfshihet.
 - **Siguria e përmbajtjes:**
   - skedarët e ngarkuar shërbehen me Content Security Policy që i izolon;
   - HTML-ja e fletoreve pastrohet para se të shfaqet;
-  - kodi i studentëve ekzekutohet në shfletuesin e tyre, i izoluar nga serveri.
+  - kodi i studentëve ekzekutohet në shfletuesin e tyre, i izoluar nga serveri;
+  - puna e një studenti që ende nuk është ruajtur (kur bie lidhja ose kufiri ditor i planit falas)
+    mbahet në shfletuesin e tij, nën llogarinë e tij, derisa të ruhet, dhe fshihet atëherë ose kur
+    del nga llogaria.
 - **Të dhëna minimale:**
   - pa gjurmues të palëve të treta dhe pa reklama;
   - aktiviteti regjistrohet si numra;

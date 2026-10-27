@@ -27,6 +27,7 @@ export type ApiErrorCode =
   | 'unauthorized'
   | 'forbidden'
   | 'not_found'
+  | 'daily_limit'
   | 'internal';
 
 export type ApiErrorBody = { error: ApiErrorCode };
