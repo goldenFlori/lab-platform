@@ -462,6 +462,13 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   enrolment) into a lookup of about 5 rows. A lab hour of 120 students now reads 22% of a day's
   rows instead of 142%, a kolokium 34% instead of 183%; requests (50% and 62%) and writes come
   first now. Next: #177, fewer saves.
+- **2026-10-27:** #177 done. Students' code and graded trace rows are saved together in one request,
+  at most every 30 seconds while they type and at once when they leave, switch notebook or hand in;
+  returning to the tab no longer reloads the page's data. Handing in now waits for every save: before,
+  a student who handed in right after typing in a graded table lost every row of it from the graded
+  copy. A failed save says so and is tried again. A class of 120 now uses 16% of a day's requests in a
+  lab hour (from 50%) and 18% in a kolokium (from 62%): five lab hours or three kolokia a day fit in
+  the free plan. Next: #178, working on when a limit is reached.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and

@@ -83,27 +83,33 @@ multiplies them by a model of a lab hour and a 90-minute kolokium (its counts ar
 their reasons) and prints the class's share of the daily limits. `MEASURE=queries` also logs each
 query's rows, to find the costly ones. `test/api/meter.test.ts` keeps a save at one row written.
 
-120 students, 2026-10-27, after #182:
+120 students, 2026-10-27, after #182 and #177 (worst case: every student types the whole time):
 
-| | requests | rows read | rows written |
-|---|---|---|---|
-| lab hour (60 min) | 50,280 (50%) | 1.08M (22%) | 39,240 (39%) |
-| kolokium (90 min) | 62,160 (62%) | 1.71M (34%) | 58,560 (59%) |
+| | requests | rows read | rows written | classes a day |
+|---|---|---|---|---|
+| lab hour (60 min) | 15,960 (16%) | 0.35M (7%) | 19,320 (19%) | 5 |
+| kolokium (90 min) | 18,240 (18%) | 0.80M (16%) | 33,120 (33%) | 3 |
+
+Before #182 and #177: requests 50% and 62%, rows read 142% and 183%, rows written 39% and 59%.
 
 - **Reads were 142% and 183% before #182.** Every request read about 140 rows before its work: 123
   were the user's memberships, scanned by organization because the indexes that start with the user
   are partial. `memberships_user_idx` (user_id, org_id) makes it a lookup of about 5 rows, whatever
   the class's size, and a test keeps it so. A request's own overhead is now about 20 rows.
-- **Requests run out first now**, then writes: most of both are saves.
 - Staff following a kolokium read about 620 rows a poll (4 per student listed), about 4.5% of a day's
   reads per kolokium; the list polls only while its page is visible.
 - **Partial indexes serve only queries whose WHERE implies theirs.** A lookup by user needs its own
   index even where unique partial ones start with the user.
-- Opening a lab page is 12 requests and about 1,660 rows read; returning to the tab reloads 8 of them
-  (TanStack Query refetches stale data on focus, and everything is stale at once).
-- A code or trace save is one request; it writes 3 rows the first time (the row and two indexes),
-  then 1. Saves follow every pause in typing (0.8 s for code, 0.7 s for a trace table), so they are
-  most of a class's requests and writes (#177).
+- Opening a lab page is 12 requests and about 220 rows read. Returning to the tab reloads nothing
+  (`refetchOnWindowFocus: false`, #177); it reloaded 8 queries before.
+- **Saving work (#177):** code and graded trace rows wait in one queue per notebook
+  (`src/web/lib/code-edits.tsx`) and go in one request, `PUT …/notebooks/:id/work`: 3 s after a
+  change, at most once every 30 s, and at once when the page is hidden or left, the notebook changes
+  or the student hands in. A hand-in waits for every save; a failed one stays queued and is tried
+  again. The server writes it as multi-row upserts (at most 20 cells a request) and keeps trace rows
+  only while the notebook is open to the student, naming the tables it refused. A cell's row costs 3
+  rows written the first time (the row and two indexes), then 1. Before, each pause in typing (0.8 s,
+  0.7 s for a table) was a request, and a hand-in did not wait for a table's save.
 
 ## Design rules forced by those limits
 

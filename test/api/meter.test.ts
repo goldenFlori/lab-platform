@@ -44,6 +44,23 @@ describe('the database meter', () => {
     });
   });
 
+  it("saves a student's work in one statement per table (#177)", async () => {
+    const { at, tenant, cost } = await metered();
+    const work = {
+      ...at,
+      code: [1, 2, 3].map((cell) => ({ cell, code: `x = ${cell}` })),
+      traces: [{ cell: 9, rows: [{ edge: 'A-C' }] }],
+    };
+    await tenant.codeEdits.saveWork(work);
+    // Again, changed: updates only, one row written per cell.
+    expect(
+      await cost(() => tenant.codeEdits.saveWork({ ...work, code: work.code.map((c) => ({ ...c, code: 'y' })) })),
+    ).toMatchObject({
+      queries: 2,
+      written: 4,
+    });
+  });
+
   it('counts single rows read through raw(), and every statement of a batch', async () => {
     const { seed, at, tenant, cost } = await metered();
     await tenant.codeEdits.save({ ...at, cell: 1, code: 'x = 1' });

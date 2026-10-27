@@ -3,7 +3,10 @@ import { createRouter, type NavigateOptions, type ToOptions } from '@tanstack/re
 import { ErrorPage } from './components/ErrorPage';
 import { routeTree } from './routeTree.gen';
 
-export const queryClient = new QueryClient();
+// Coming back to the tab does not reload every query on the page (#177): it cost about eight requests
+// each time, and a class switches tabs often. Pages still load fresh data when opened; what must stay
+// current while open polls on its own (a kolokium's hand-ins) or arrives live (Live Labs).
+export const queryClient = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false } } });
 
 export const router = createRouter({
   routeTree,

@@ -632,6 +632,49 @@ function tenantCodeEdits(db: Db, orgId: string) {
       return updatedAt;
     },
 
+    /**
+     * A student's work since their last save, in one batch (#177): code cells (null puts the original
+     * back) and graded trace rows. Multi-row upserts of ROWS_PER_INSERT, so a few statements whatever
+     * changed.
+     */
+    async saveWork(work: {
+      notebookId: string;
+      userId: string;
+      code: { cell: number; code: string | null }[];
+      traces: { cell: number; rows: Record<string, string>[] }[];
+    }) {
+      const { notebookId, userId } = work;
+      const updatedAt = new Date();
+      const code = work.code.filter((c): c is { cell: number; code: string } => c.code !== null);
+      const reset = work.code.filter((c) => c.code === null).map((c) => c.cell);
+      const statements = [
+        ...inChunks(code).map((chunk) =>
+          db
+            .insert(codeEdits)
+            .values(chunk.map((c) => ({ ...c, id: uuidv7(), orgId, notebookId, userId, updatedAt })))
+            .onConflictDoUpdate({
+              target: [codeEdits.orgId, codeEdits.userId, codeEdits.notebookId, codeEdits.cell],
+              set: { code: sql`excluded.code`, updatedAt },
+            }),
+        ),
+        ...(reset.length
+          ? [db.delete(codeEdits).where(and(mine(notebookId, userId), inArray(codeEdits.cell, reset)))]
+          : []),
+        ...inChunks(work.traces).map((chunk) =>
+          db
+            .insert(traceAnswers)
+            .values(chunk.map((t) => ({ ...t, id: uuidv7(), orgId, notebookId, userId, updatedAt })))
+            .onConflictDoUpdate({
+              target: [traceAnswers.orgId, traceAnswers.notebookId, traceAnswers.cell, traceAnswers.userId],
+              set: { rows: sql`excluded.rows`, updatedAt },
+            }),
+        ),
+      ];
+      const [first, ...rest] = statements;
+      if (first) await rethrowMissingParent(db.batch([first, ...rest]));
+      return updatedAt;
+    },
+
     /** Back to the original code: one cell, or every cell of the notebook. */
     async reset(notebookId: string, userId: string, cell?: number) {
       await db
