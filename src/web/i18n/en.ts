@@ -695,6 +695,7 @@ export const en: Messages = {
           '"Explain the error" questions with the AI\'s answer, and how many AI requests you make a day.',
           'One sign-in cookie, which keeps you signed in, and the browser’s name for each sign-in.',
           'Failed sign-ins, counted by username and network address for a few minutes, to stop password guessing.',
+          'When the app meets an error in your browser: the page (without names or ids), the error message, the browser and the app version, so we can fix it. Never who you are, your code or your answers.',
         ],
       },
       {
@@ -729,6 +730,7 @@ export const en: Messages = {
           `"Explain my error" questions with their answers: ${RETENTION.aiQuestionDays} days.`,
           `Daily activity (labs opened, code runs, Live Labs), first answers to predictions and trace tables, AI use counts and Live Lab history: ${RETENTION.activityYears} years.`,
           `A deletion request, once handled: ${RETENTION.handledRequestYears} year.`,
+          `Error reports: ${RETENTION.errorLogDays} days, at Cloudflare.`,
           'Code, submissions, grades and the rest: as long as the course exists. When the institution deletes a course, its data goes with it.',
           'Every night the platform deletes on its own what has passed its period.',
         ],
