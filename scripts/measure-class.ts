@@ -34,17 +34,17 @@ const PASSWORD = 'Studenti-sakte-2026';
 const LIMITS = { requests: 100_000, read: 5_000_000, written: 100_000 };
 
 /**
- * A student's actions in one class, with the app as it is. Typing saves 0.8 s after each pause in a
- * code cell and 0.7 s after each in a trace table, so saves follow pauses, not minutes; we assume a
- * pause every 10 s while typing. A refocus is a return to the tab, which reloads the page's data.
+ * A student's actions in one class, with the app as it is. Since #177 typing (code and graded trace
+ * rows together) is saved in one request at most every 30 s, so a student who types the whole time
+ * makes 2 saves a minute: the worst case, counted here. Returning to the tab reloads nothing.
  */
 const MODEL = {
   'lab hour (60 min)': {
     'open the lab page': 1,
     'open it again (another notebook, a reload)': 2,
     'return to the tab': 15,
-    'first save of a cell': 6,
-    'later code save': 240, // 40 minutes typing, a pause every 10 s
+    'first save of new cells': 6,
+    'later save': 74, // 40 minutes typing, every 30 s, less the first saves
     'report a run': 1,
     'exercise solved': 3,
     'first answer in a visualization': 15,
@@ -54,10 +54,8 @@ const MODEL = {
     'open it again (another notebook, a reload)': 1,
     'return to the tab': 5,
     'start the kolokium': 1,
-    'first save of a cell': 4,
-    'later code save': 360, // 60 minutes typing
-    'first save of a trace table': 2,
-    'later trace save': 80, // two tables of about 30 cells, some corrected
+    'first save of new cells': 6,
+    'later save with a trace table': 114, // 60 minutes typing, every 30 s, less the first saves
     'report a run': 1,
     'exercise solved': 3,
     'hand in': 1,
@@ -327,9 +325,10 @@ try {
   );
 
   const code = c.detail.exercises[0]?.cell ?? 1;
-  const edit = (s: Api, n: number) => call(s, 'PUT', `${c.nbPath}/edits/${code}`, { code: `x = ${n}` });
-  await measure('first save of a cell', sessions, (s) => edit(s, 0));
-  await measure('later code save', sessions, (s) => edit(s, 1));
+  const work = (s: Api, n: number, traces: unknown[] = []) =>
+    call(s, 'PUT', `${c.nbPath}/work`, { code: [{ cell: code, code: `x = ${n}` }], traces });
+  await measure('first save of new cells', sessions, (s) => work(s, 0));
+  await measure('later save', sessions, (s) => work(s, 1));
   await measure('report a run', sessions, (s) => call(s, 'POST', `${c.labPath}/activity`, { kind: 'run' }));
   await measure('exercise solved', sessions, (s) => call(s, 'POST', `${c.nbPath}/exercises/${code}/done`));
   const viz = c.detail.embeds.find((e) => e.viz !== 'tabela-gjurmimit')?.cell ?? c.detail.embeds[0]?.cell ?? 0;
@@ -356,10 +355,11 @@ try {
     kolokium: { opensAt: new Date(Date.now() - 60_000).toISOString(), minutes: 90 },
   });
   await measure('start the kolokium', sessions, (s) => call(s, 'POST', `${c.nbPath}/kolokium/start`));
-  const trace = (s: Api, value: string) =>
-    call(s, 'PUT', `${c.nbPath}/embeds/${tables[0]?.cell}/trace`, { rows: [{ chosen: value }] });
-  await measure('first save of a trace table', sessions, (s) => trace(s, 'A'));
-  await measure('later trace save', sessions, (s) => trace(s, 'B'));
+  // Once with each table's first rows, then the counted save: code and a table, changed.
+  for (const s of sessions) await work(s, 2, [{ cell: tables[0]?.cell, rows: [{ chosen: 'A' }] }]);
+  await measure('later save with a trace table', sessions, (s) =>
+    work(s, 3, [{ cell: tables[0]?.cell, rows: [{ chosen: 'B' }] }]),
+  );
   await measure('hand in', sessions, (s) => call(s, 'POST', `${c.nbPath}/submission`));
   await measure('staff follow the kolokium (every 15 s)', [c.admin], (a) =>
     call(a, 'GET', `${c.nbPath}/submissions?group=${c.group.id}`),
