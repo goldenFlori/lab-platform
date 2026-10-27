@@ -1,12 +1,13 @@
 import { AlertDialog, Button } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
 import { Award, CalendarClock, CircleCheck, Send } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useT } from '../../i18n';
 import { ApiError } from '../../lib/api';
 import { useCodeEdits } from '../../lib/code-edits';
 import { formatMoment } from '../../lib/labs';
 import type { NotebookRef } from '../../lib/notebooks';
+import { currentService, useService } from '../../lib/service';
 import { clock, mySubmissionQuery, useNow, useSubmit } from '../../lib/submissions';
 
 /**
@@ -24,25 +25,49 @@ export function SubmissionBar({ notebookRef }: { notebookRef: NotebookRef }) {
   const data = query.data;
   const ends = data?.kolokium?.endsAt ? Date.parse(data.kolokium.endsAt) : null;
   const now = useNow(!!data?.open && ends !== null);
-  if (!data || (!data.dueAt && !data.submission)) return null;
-  // A kolokium closes on the student's own clock, without asking the server.
-  const open = data.open && (ends === null || now < ends);
+  // While the platform cannot be reached (#178), a pressed hand-in waits and is tried again by itself.
+  const service = useService();
+  const [waiting, setWaiting] = useState(false);
 
-  async function handIn() {
+  const handIn = useCallback(async () => {
     setMessage(null);
+    const down = () => {
+      setWaiting(true);
+      setMessage({ tone: 'danger', text: t.submissions.waiting });
+    };
     // Everything typed goes first, trace rows included (#177); a save that failed is tried again here.
     if (edits && !(await edits.flush())) {
+      if (currentService() !== 'ok') return down();
+      setWaiting(false);
       return setMessage({ tone: 'danger', text: t.submissions.unsaved });
     }
     try {
       await submit.mutateAsync();
+      setWaiting(false);
       setMessage({ tone: 'success', text: t.submissions.done });
     } catch (error) {
-      if (error instanceof ApiError && error.status === 409) void query.refetch();
+      if (currentService() !== 'ok') return down();
       const closed = error instanceof ApiError && error.status === 409;
-      setMessage({ tone: 'danger', text: closed ? t.submissions.closedError : t.submissions.failed });
+      if (closed) void query.refetch();
+      setMessage({
+        tone: 'danger',
+        text: closed ? (waiting ? t.submissions.lateAfterWait : t.submissions.closedError) : t.submissions.failed,
+      });
+      setWaiting(false);
     }
-  }
+  }, [edits, submit, query, t, waiting]);
+
+  // Again as soon as the platform answers, and once a minute meanwhile.
+  useEffect(() => {
+    if (!waiting) return;
+    if (service === 'ok') void handIn();
+    const id = setInterval(() => void handIn(), 60_000);
+    return () => clearInterval(id);
+  }, [waiting, service, handIn]);
+
+  if (!data || (!data.dueAt && !data.submission)) return null;
+  // A kolokium closes on the student's own clock, without asking the server.
+  const open = data.open && (ends === null || now < ends);
 
   const { submission } = data;
   return (

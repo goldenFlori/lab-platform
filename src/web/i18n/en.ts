@@ -679,7 +679,7 @@ export const en: Messages = {
   },
   privacy: {
     title: 'Privacy',
-    updated: 'Updated on 25 October 2026',
+    updated: 'Updated on 27 October 2026',
     intro:
       "This page says what data Lab Platform keeps, why, where, for how long and who sees it. Your institution (a faculty, say) decides about its students' data; the platform processes it on its behalf.",
     sections: [
@@ -710,6 +710,7 @@ export const en: Messages = {
         heading: 'Where it is kept',
         items: [
           "At Cloudflare. The database and Live Labs are in the European Union's jurisdiction: stored and processed only in EU data centers.",
+          'Code and tables not saved yet (for example without internet) are also kept in your browser, on this device, until they are saved; they are removed then or when you sign out. On a shared computer, sign out when you finish.',
           "Weekly backups are encrypted with the owner's key before they leave Cloudflare and kept for 90 days at GitHub (US), which sees only encrypted data.",
         ],
       },
@@ -1010,6 +1011,10 @@ export const en: Messages = {
     done: 'Your work was handed in.',
     failed: 'Your work was not handed in. Please try again.',
     closedError: 'The deadline has passed: your work was not handed in.',
+    waiting:
+      'The platform is not answering right now. Your work is kept on this device, and handing in is tried again by itself as soon as it is back: keep this page open.',
+    lateAfterWait:
+      'The platform came back after the deadline, so your work was not handed in. It stays in your account: tell your pedagog, who can move the deadline.',
     unsaved: 'Some changes are not saved yet. Check your connection and try again.',
     editorTitle: (open: number) =>
       `Submission of this notebook${open ? ` · open to ${open} ${open === 1 ? 'group' : 'groups'}` : ''}`,
@@ -1076,6 +1081,12 @@ export const en: Messages = {
     unreadable: 'unreadable',
     anyVertex: 'v',
     loadFailed: 'The report did not load. Refresh the page and try again.',
+  },
+  service: {
+    offline:
+      'No internet connection. Your work is kept on this device and saved by itself as soon as the connection is back.',
+    limit: (time: string) =>
+      `The platform has reached today's free usage limit. Your work is kept on this device and saved by itself after ${time}, when the limit resets.`,
   },
   kolokium: {
     title: 'Timed test',

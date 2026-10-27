@@ -1,6 +1,7 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { LoginInput, Me } from '../../shared/auth';
 import { ApiError, api } from './api';
+import { forgetDrafts } from './drafts';
 
 /** The signed-in user, or null. Pages that need a user check it before they load. */
 export const meQuery = queryOptions({
@@ -35,6 +36,8 @@ export function useLogout() {
     // Whatever the server said, this browser is signed out: forget everything cached for the user.
     // (clear() would drop the user without telling the components that show it.)
     onSettled: () => {
+      // Work kept on this device (#178) is not for whoever signs in next on a shared computer.
+      forgetDrafts();
       queryClient.setQueryData(meQuery.queryKey, null);
       queryClient.removeQueries({ predicate: (query) => query.queryKey[0] !== meQuery.queryKey[0] });
     },

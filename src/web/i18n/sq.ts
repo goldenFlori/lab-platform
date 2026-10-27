@@ -681,7 +681,7 @@ export const sq = {
   } satisfies Record<PredictionTopic, string>,
   privacy: {
     title: 'Privatësia',
-    updated: 'Përditësuar më 25 tetor 2026',
+    updated: 'Përditësuar më 27 tetor 2026',
     intro:
       'Kjo faqe tregon cilat të dhëna ruan Lab Platform, pse, ku, për sa kohë dhe kush i sheh. Institucioni juaj (p.sh. fakulteti) vendos për të dhënat e studentëve të tij; platforma i përpunon në emër të tij.',
     sections: [
@@ -712,6 +712,7 @@ export const sq = {
         heading: 'Ku ruhen',
         items: [
           'Te Cloudflare. Baza e të dhënave dhe Live Lab-et janë në juridiksionin e Bashkimit Evropian: ruhen dhe përpunohen vetëm në qendra të dhënash në BE.',
+          'Kodi dhe tabelat që ende nuk janë ruajtur (p.sh. pa internet) mbahen edhe në shfletuesin tuaj, në këtë pajisje, derisa të ruhen; fshihen atëherë ose kur dilni nga llogaria. Në një kompjuter të përbashkët, dilni nga llogaria kur mbaroni.',
           'Kopjet rezervë javore enkriptohen me çelësin e pronarit para se të dalin nga Cloudflare dhe mbahen 90 ditë te GitHub (SHBA), që sheh vetëm të dhëna të enkriptuara.',
         ],
       },
@@ -1014,6 +1015,10 @@ export const sq = {
     done: 'Puna u dorëzua.',
     failed: 'Puna nuk u dorëzua. Provoni sërish.',
     closedError: 'Afati ka mbaruar: puna nuk u dorëzua.',
+    waiting:
+      'Platforma nuk po përgjigjet tani. Puna juaj mbahet në këtë pajisje dhe dorëzimi provohet sërish vetë sapo të kthehet: mbajeni këtë faqe hapur.',
+    lateAfterWait:
+      'Platforma u kthye pas afatit, ndaj puna nuk u dorëzua. Ajo mbetet në llogarinë tuaj: tregojini pedagogut, që mund ta shtyjë afatin.',
     unsaved: 'Disa ndryshime nuk janë ruajtur ende. Kontrolloni internetin dhe provoni sërish.',
     editorTitle: (open: number) =>
       `Dorëzimi i kësaj fletoreje${open ? ` · hapur për ${open} ${open === 1 ? 'grup' : 'grupe'}` : ''}`,
@@ -1080,6 +1085,11 @@ export const sq = {
     unreadable: 'e palexueshme',
     anyVertex: 'v',
     loadFailed: 'Raporti nuk u ngarkua. Rifreskoni faqen dhe provoni sërish.',
+  },
+  service: {
+    offline: 'Pa lidhje me internetin. Puna juaj mbahet në këtë pajisje dhe ruhet vetë sapo lidhja të kthehet.',
+    limit: (time: string) =>
+      `Platforma arriti kufirin e përdorimit falas për sot. Puna juaj mbahet në këtë pajisje dhe ruhet vetë pas orës ${time}, kur kufiri rifillon.`,
   },
   kolokium: {
     title: 'Kolokium',
