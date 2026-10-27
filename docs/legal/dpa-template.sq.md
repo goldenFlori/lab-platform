@@ -208,7 +208,7 @@ Tiranës [ose siç parashikon marrëveshja e shërbimit].
 | Live Lab | Gjatë mësimit: kush është i lidhur, kërkesat për ndihmë, reagimet, përgjigjet e pyetjeve dhe rezultatet e sfidave. |
 | Anketat | Përgjigjet e fundit të semestrit, anonime: vlerësimet vetëm si numra, komentet pa autor dhe pa kohë. |
 | Të drejtat | Kërkesat për fshirje dhe shënimet e tyre; një shënim për çdo fshirje pa identitetin e personit. |
-| Teknike | Një seancë për çdo hyrje (hash-i i token-it, emri i shfletuesit, përdorimi i fundit); hyrjet e dështuara, të numëruara sipas emrit të përdoruesit dhe adresës së rrjetit për pak minuta. |
+| Teknike | Një seancë për çdo hyrje (hash-i i token-it, emri i shfletuesit, përdorimi i fundit); hyrjet e dështuara, të numëruara sipas emrit të përdoruesit dhe adresës së rrjetit për pak minuta; raportet e gabimeve nga shfletuesit (faqja si rrugë pa identifikues, mesazhi i gabimit, shfletuesi dhe versioni i aplikacionit; pa përdoruesin, kodin apo përgjigjet). |
 
 Nuk synohet përpunimi i kategorive të veçanta të të dhënave.
 
@@ -279,7 +279,7 @@ Kodi i padorëzuar i studentëve mbetet privat për ta dhe nuk përfshihet.
 
 | Nënpërpunuesi | Vendndodhja | Çfarë bën | Çfarë merr | Garancia |
 |---|---|---|---|---|
-| Cloudflare, Inc. | Shtetet e Bashkuara; qendra të dhënash në gjithë botën | Strehimi: Workers (aplikacioni), D1 (baza e të dhënave, juridiksioni i BE-së), Durable Objects (Live Lab, juridiksioni i BE-së), Workers AI (veçoritë e AI-së) | Të gjitha të dhënat e platformës, të ruajtura në BE; tekstin e kërkesave AI pa emra | Cloudflare Customer DPA; Kuadri i Privatësisë së të Dhënave BE–SHBA; Vendimi nr. 1/2025 |
+| Cloudflare, Inc. | Shtetet e Bashkuara; qendra të dhënash në gjithë botën | Strehimi: Workers (aplikacioni), D1 (baza e të dhënave, juridiksioni i BE-së), Durable Objects (Live Lab, juridiksioni i BE-së), Workers AI (veçoritë e AI-së), Workers Logs (raportet e gabimeve, 3 ditë) | Të gjitha të dhënat e platformës, të ruajtura në BE; tekstin e kërkesave AI pa emra | Cloudflare Customer DPA; Kuadri i Privatësisë së të Dhënave BE–SHBA; Vendimi nr. 1/2025 |
 | GitHub, Inc. | Shtetet e Bashkuara | Kodi burimor, testet automatike, kopjet rezervë javore | Vetëm kopjet rezervë të enkriptuara, që nuk mund t'i lexojë | Enkriptimi me çelësin e Operatorit; Kuadri i Privatësisë së të Dhënave [të konfirmohet certifikimi aktual] |
 
 ## Shtojca 4: Afatet e ruajtjes
@@ -294,5 +294,6 @@ privatësisë:
 | Aktiviteti ditor, përgjigjet e para, numërimet e AI-së, shënimet e Live Lab | 2 vjet |
 | Një kërkesë për fshirje e trajtuar | 1 vit pasi u trajtua |
 | Numëruesit e hyrjeve të dështuara | pak minuta |
+| Raportet e gabimeve dhe regjistrat e gabimeve të aplikacionit (Cloudflare Workers Logs) | 3 ditë |
 | Kodi i studentëve, dorëzimet, notat, anketat, pjesa tjetër | sa kohë ekziston kursi; Institucioni fshin kurset |
 | Kopjet rezervë | 90 ditë |

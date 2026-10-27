@@ -476,6 +476,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   and the privacy page and the agreement say so. A hand-in counts at the server's time, not the
   browser's, so no one can claim extra minutes; if the platform returns after a deadline, the pedagog
   moves it. Next: #179, browser errors reaching the owner.
+- **2026-10-27:** #179 done. An error in a student's or staff member's browser now reaches the owner
+  the same day: which page (by its route, never ids), what the error said, where in the app's code,
+  which browser and release; never who, nor their code or answers. Kept 3 days in Cloudflare's logs;
+  `npm run errors` shows them live with the server's own errors. The privacy page, the retention list
+  and the agreement say so. Next: #180, the usage meter.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and

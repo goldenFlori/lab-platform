@@ -206,7 +206,7 @@ fulfilled.
 | Live Labs | While a class runs: who is connected, help requests, reactions, quiz answers and challenge results. |
 | Surveys | End-of-semester answers, kept anonymous: ratings only as counts, comments with no author or time. |
 | Data rights | Deletion requests and their notes; a record of each erasure without the person's identity. |
-| Technical | A session per sign-in (a hash of its token, the browser's name, last use); failed sign-ins, counted by username and network address for a few minutes. |
+| Technical | A session per sign-in (a hash of its token, the browser's name, last use); failed sign-ins, counted by username and network address for a few minutes; error reports from browsers (the page as its route without ids, the error's message, the browser and the application's version; no user, code or answers). |
 
 No special categories of data are intended.
 
@@ -274,7 +274,7 @@ Students' unsubmitted code stays private to them and is not in it.
 
 | Sub-processor | Location | What it does | What it receives | Safeguard |
 |---|---|---|---|---|
-| Cloudflare, Inc. | United States; data centres worldwide | Hosting: Workers (the application), D1 (the database, EU jurisdiction), Durable Objects (Live Labs, EU jurisdiction), Workers AI (AI features) | All platform data, stored in the EU; AI request text without names | Cloudflare Customer DPA; EU–US Data Privacy Framework; Decision No. 1/2025 |
+| Cloudflare, Inc. | United States; data centres worldwide | Hosting: Workers (the application), D1 (the database, EU jurisdiction), Durable Objects (Live Labs, EU jurisdiction), Workers AI (AI features), Workers Logs (error reports, 3 days) | All platform data, stored in the EU; AI request text without names | Cloudflare Customer DPA; EU–US Data Privacy Framework; Decision No. 1/2025 |
 | GitHub, Inc. | United States | Source code, automated tests, weekly backups | Encrypted backups only, which it cannot read | Encryption with the Operator's key; Data Privacy Framework [confirm the current certification] |
 
 ## Annex 4: Retention
@@ -288,5 +288,6 @@ The same periods as `src/shared/retention.ts`, which the nightly job and the pri
 | Daily activity, first-try results, AI use counts, Live Lab records | 2 years |
 | A handled deletion request | 1 year after it was handled |
 | Failed sign-in counters | a few minutes |
+| Error reports and the application's error logs (Cloudflare Workers Logs) | 3 days |
 | Students' code, submissions, grades, surveys, the rest | as long as the course exists; the Institution deletes courses |
 | Backups | 90 days |
