@@ -55,10 +55,13 @@ Verified 2026-10-06. Re-check before relying on them.
   - 500 MB per database, 10 databases;
   - 2 MB per row or BLOB, 100 KB per SQL statement;
   - 50 queries per invocation;
-  - 5M rows read and 100k rows written per day;
+  - 5M rows read and 100k rows written per day, reset at 00:00 UTC (re-checked 2026-10-27);
+  - since 2026-09-01 queries fail once a day's limit is used, until the reset;
+  - a write to an indexed column counts once for the table and once per index, so an upsert on a
+    table with a unique index costs at least 2 rows;
   - Time Travel point-in-time restore for 7 days.
 
-  Limits return errors and never bill.
+  Limits return errors and never bill. Past 100k requests a day, Workers answer with error 1027.
 - **Durable Objects** (re-checked 2026-10-11):
   - available on the free plan, SQLite backend only;
   - 100,000 requests a day, 13,000 GB-s a day, 5 GB storage;
@@ -69,6 +72,32 @@ Verified 2026-10-06. Re-check before relying on them.
   - $5/month;
   - 10M requests a month and 30M CPU-ms a month;
   - D1: 25B rows read a month and 50M written; 30-day Time Travel.
+
+## Measured budget (#176)
+
+`npm run measure:class` (`scripts/measure-class.ts`) builds the app, runs it on its own local database
+with the meter on (`MEASURE=1`, never set in production; `src/api/db/meter.ts` counts every query's
+rows from D1's meta), imports the course fixtures, adds 120 students, and measures each student action:
+API calls as the app makes them, and page loads, reloads and returns to the tab in Chromium. It
+multiplies them by a model of a lab hour and a 90-minute kolokium (its counts are in the script, with
+their reasons) and prints the class's share of the daily limits. `MEASURE=queries` also logs each
+query's rows, to find the costly ones. `test/api/meter.test.ts` keeps a save at one row written.
+
+First run, 2026-10-27, 120 students:
+
+| | requests | rows read | rows written |
+|---|---|---|---|
+| lab hour (60 min) | 50,280 (50%) | 7.1M (142%) | 39,240 (39%) |
+| kolokium (90 min) | 62,160 (62%) | 9.2M (183%) | 58,560 (59%) |
+
+- **Rows read run out first.** Every request reads about 140 rows in about 10 queries before its
+  work; 123 are the user's memberships, scanned by organization because the indexes that start with
+  the user are partial (#182).
+- Opening a lab page is 12 requests and about 1,660 rows read; returning to the tab reloads 8 of them
+  (TanStack Query refetches stale data on focus, and everything is stale at once).
+- A code or trace save is one request; it writes 3 rows the first time (the row and two indexes),
+  then 1. Saves follow every pause in typing (0.8 s for code, 0.7 s for a trace table), so they are
+  most of a class's requests and writes (#177).
 
 ## Design rules forced by those limits
 

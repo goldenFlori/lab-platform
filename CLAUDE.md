@@ -86,6 +86,8 @@ live in its git-ignored `zgjidhjet/`; never publish them.
     (see the README). The end-to-end tests use it on their own database in `.wrangler/e2e`.
   - `npm run course:import -- …`: imports the course repo's labs, notebooks, embeds and
     solutions through the API (see the README); `--dry-run` shows the plan.
+  - `npm run measure:class`: a class of 120 against the free plan's daily limits, on a local copy
+    (`--students N`, `--no-build`); see `platform-architecture`.
 
 ## Rules that bite
 
