@@ -83,16 +83,22 @@ multiplies them by a model of a lab hour and a 90-minute kolokium (its counts ar
 their reasons) and prints the class's share of the daily limits. `MEASURE=queries` also logs each
 query's rows, to find the costly ones. `test/api/meter.test.ts` keeps a save at one row written.
 
-First run, 2026-10-27, 120 students:
+120 students, 2026-10-27, after #182:
 
 | | requests | rows read | rows written |
 |---|---|---|---|
-| lab hour (60 min) | 50,280 (50%) | 7.1M (142%) | 39,240 (39%) |
-| kolokium (90 min) | 62,160 (62%) | 9.2M (183%) | 58,560 (59%) |
+| lab hour (60 min) | 50,280 (50%) | 1.08M (22%) | 39,240 (39%) |
+| kolokium (90 min) | 62,160 (62%) | 1.71M (34%) | 58,560 (59%) |
 
-- **Rows read run out first.** Every request reads about 140 rows in about 10 queries before its
-  work; 123 are the user's memberships, scanned by organization because the indexes that start with
-  the user are partial (#182).
+- **Reads were 142% and 183% before #182.** Every request read about 140 rows before its work: 123
+  were the user's memberships, scanned by organization because the indexes that start with the user
+  are partial. `memberships_user_idx` (user_id, org_id) makes it a lookup of about 5 rows, whatever
+  the class's size, and a test keeps it so. A request's own overhead is now about 20 rows.
+- **Requests run out first now**, then writes: most of both are saves.
+- Staff following a kolokium read about 620 rows a poll (4 per student listed), about 4.5% of a day's
+  reads per kolokium; the list polls only while its page is visible.
+- **Partial indexes serve only queries whose WHERE implies theirs.** A lookup by user needs its own
+  index even where unique partial ones start with the user.
 - Opening a lab page is 12 requests and about 1,660 rows read; returning to the tab reloads 8 of them
   (TanStack Query refetches stale data on focus, and everything is stale at once).
 - A code or trace save is one request; it writes 3 rows the first time (the row and two indexes),
