@@ -15,6 +15,7 @@
     "db:migrate": "wrangler d1 migrations apply DB --local",
     "account:create": "node scripts/create-account.ts",
     "course:import": "node scripts/import-course.ts",
+    "measure:class": "node scripts/measure-class.ts",
     "deploy": "npm run build && wrangler deploy",
     "lint": "biome check .",
     "format": "biome check --write .",
