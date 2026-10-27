@@ -457,6 +457,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   writes and 142% of its reads; a kolokium 62%, 59% and 183%. Rows read run out first: every
   request reads about 140 rows, 123 of them the user's memberships scanned without an index. That
   became #182, next; then #177, fewer saves.
+- **2026-10-27:** #182 done. An index on memberships by user turns the permission check on every
+  request from a scan of the whole institution (123 rows with 120 students, growing with every
+  enrolment) into a lookup of about 5 rows. A lab hour of 120 students now reads 22% of a day's
+  rows instead of 142%, a kolokium 34% instead of 183%; requests (50% and 62%) and writes come
+  first now. Next: #177, fewer saves.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
