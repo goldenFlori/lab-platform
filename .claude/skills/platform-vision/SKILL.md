@@ -447,6 +447,16 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   variant only the column is counted, since every graph differs. Counts only, from five students up,
   a mistake from two, never a name. The group's grades CSV gains the trace tables' points and
   maximum. Next: plan Phase 11.
+- **2026-10-27:** Phase 11 planned as the "Phase 11: Ready for a full class" milestone, issues
+  #176–#181: measure a
+  year of students in a lab hour and a kolokium against the free plan, save students' work in far
+  fewer writes (and never hand in without the last saves), keep work on the device when a limit is
+  reached, report browser errors, a usage meter, and a tested backup restore.
+- **2026-10-27:** #176 done. `npm run measure:class` measures a class of 120 against the free plan on
+  a local copy, with the database meter on. A lab hour would use 50% of a day's requests, 39% of its
+  writes and 142% of its reads; a kolokium 62%, 59% and 183%. Rows read run out first: every
+  request reads about 140 rows, 123 of them the user's memberships scanned without an index. That
+  became #182, next; then #177, fewer saves.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
@@ -500,6 +510,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-26 | A graded trace table is never checked in the browser: rows are filled unchecked while its notebook is open, handed in, and scored by the server from the same shared code, with partial credit per right row. A table that checked each row would let everyone reach the answer by trying | Decided |
 | 2026-10-26 | A trace variant is generated from the student's id, the notebook and the cell, by shared code the browser and the server both run: no stored copy per student, the same graph every time, and the server can rebuild it to grade. First-try counts treat row k of every variant as one step, so the class's hardest rows still show | Decided |
 | 2026-10-27 | A kolokium runs on each student's own clock (start any time in a window, then fixed minutes, never past the deadline), not one shared start: a late or reconnecting student loses no time, and a room needs no synchronised "go". The server keeps the start time, so the time limit holds even if the page is reloaded or its clock is changed. Only the kolokium's lab is visible and AI help is off while it runs | Decided |
+| 2026-10-27 | Phase 11 is "Ready for a full class" before any new feature: since 2026-09-01 D1's free plan refuses queries once a day's 100k rows written are used, and saving students' work as they type could spend that in one kolokium of 120 students. The pilot must not fail in the middle of an exam, and the paid plan is over the hosting budget | Decided |
 | 2026-10-27 | The assessment report is for everyone who reviews a group (assistants too), as counts: a part shows from five students, a wrong value from two, and a variant's mistakes by column only. It tells the pedagog what to reteach without becoming a list of who got what wrong | Decided |
 | 2026-10-26 | Phase 10 is "Fair assessment": students can learn every algorithm, but a grade cannot rest on checks in their browser or on one graph shared by a whole room, and only the owner could author problems. Assessment is also what a second institution asks about first | Decided |
 | 2026-10-26 | Phase 9 is "Every lab, coded and checked": Labs 5, 6 and 8 were the only graph labs where students never wrote the algorithms, and writing them is what the exam and later courses ask. The platform's own visualizations are declared in the course repo (platform.mjs), so the import places them, not staff by hand | Decided |
