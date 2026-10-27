@@ -1,5 +1,6 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { StoredNotebook } from '../../notebook/stored';
+import type { AssessmentReport } from '../../shared/assessment-report';
 import type { Exercise } from '../../shared/exercises';
 import type { ExerciseGrading, StaffGrade } from '../../shared/grading';
 import { api } from './api';
@@ -22,6 +23,13 @@ export const gradesQuery = (ref: NotebookRef, group: string) =>
   queryOptions({
     queryKey: [...notebookQuery(ref).queryKey, 'grades', group],
     queryFn: () => api<{ grades: StaffGrade[] }>(`${base(ref)}/grades?group=${encodeURIComponent(group)}`),
+  });
+
+/** The assessment report (#170) for one group, or for all the groups the user reviews (null). */
+export const reportQuery = (ref: NotebookRef, group: string | null) =>
+  queryOptions({
+    queryKey: [...notebookQuery(ref).queryKey, 'report', group],
+    queryFn: () => api<AssessmentReport>(`${base(ref)}/report${group ? `?group=${encodeURIComponent(group)}` : ''}`),
   });
 
 export function useGradingChanges(ref: NotebookRef, group: string) {

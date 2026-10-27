@@ -6,7 +6,9 @@ import { useMemo, useState } from 'react';
 import type { StoredNotebook } from '../../../../../../../../notebook/stored';
 import type { Exercise } from '../../../../../../../../shared/exercises';
 import type { ExerciseGrading, StaffGrade } from '../../../../../../../../shared/grading';
+import type { Embed } from '../../../../../../../../shared/notebooks';
 import { type KolokiumSetup, kolokiumEnd, type SubmissionList } from '../../../../../../../../shared/submissions';
+import { AssessmentReport } from '../../../../../../../components/notebook/AssessmentReport';
 import { GradeChip, GradeGroupBar, GradeReview, GradingSetup } from '../../../../../../../components/notebook/Grading';
 import { t as messages, useT } from '../../../../../../../i18n';
 import { ApiError } from '../../../../../../../lib/api';
@@ -126,6 +128,7 @@ function SubmissionsPage() {
           data={submissions.data}
           notebookRef={ref}
           exercises={detail.data?.exercises ?? []}
+          embeds={detail.data?.embeds ?? []}
           notebook={rendered.data}
           setup={setup.data?.exercises ?? null}
           title={current?.title ?? ''}
@@ -167,6 +170,7 @@ function Group({
   data,
   notebookRef,
   exercises,
+  embeds,
   notebook,
   setup,
   title,
@@ -174,6 +178,7 @@ function Group({
   data: SubmissionList;
   notebookRef: NotebookRef;
   exercises: Exercise[];
+  embeds: Embed[];
   notebook: StoredNotebook | undefined;
   /** Points and hidden tests, for staff who grade (#53); null for staff who do not. */
   setup: ExerciseGrading[] | null;
@@ -186,11 +191,14 @@ function Group({
   const shown = data.groups.find((g) => g.id === data.group);
   const handedIn = data.students.filter((s) => s.submission).length;
 
-  // The group's grades for the institution's records (#114), released or not.
+  // The group's grades for the institution's records (#114), released or not, with the trace
+  // tables' share when the notebook has graded ones (#170).
   function downloadGrades() {
     const c = t.grading.csvColumns;
+    const traced = [...gradeOf.values()].some((g) => g.traces.length > 0);
+    const sum = (g: StaffGrade, key: 'score' | 'points') => g.traces.reduce((n, tr) => n + tr[key], 0);
     downloadCsv(t.grading.csvFile(fileSlug(`${title} ${shown?.name ?? ''}`)), [
-      [c.username, c.fullName, c.score, c.maxScore, c.released, c.gradedAt],
+      [c.username, c.fullName, c.score, c.maxScore, ...(traced ? [c.traces, c.tracesMax] : []), c.released, c.gradedAt],
       ...data.students.map((s) => {
         const g = gradeOf.get(s.id);
         return [
@@ -198,6 +206,7 @@ function Group({
           s.fullName,
           g ? (g.score ?? g.autoScore) : null,
           g?.maxScore,
+          ...(traced ? [g ? sum(g, 'score') : null, g ? sum(g, 'points') : null] : []),
           g ? (g.releasedAt ? c.yes : c.no) : null,
           g ? new Date(g.gradedAt).toLocaleDateString('sv-SE') : null,
         ];
@@ -287,6 +296,7 @@ function Group({
           </ul>
         )}
       </div>
+      {data.group && <AssessmentReport notebookRef={notebookRef} group={data.group} embeds={embeds} />}
     </>
   );
 }

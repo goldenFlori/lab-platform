@@ -1270,6 +1270,34 @@ function tenantSubmissions(db: Db, orgId: string) {
         .orderBy(asc(users.fullName));
     },
 
+    /**
+     * For the assessment report (#170): the students of these groups, the trace rows they handed in
+     * and their grades' results, in one batch. Joined through the groups, so a course of any size
+     * binds only the group ids. A student in two of the groups comes twice; the caller counts once.
+     */
+    async forReport(notebookId: string, groupIds: string[]) {
+      if (!groupIds.length) return { students: [], handedIn: [], graded: [] };
+      const inGroups = and(
+        eq(memberships.orgId, orgId),
+        inArray(memberships.groupId, groupIds),
+        eq(memberships.role, 'student'),
+      );
+      const [students, handedIn, graded] = await db.batch([
+        db.select({ userId: memberships.userId }).from(memberships).where(inGroups),
+        db
+          .select({ userId: submissions.userId, traces: submissions.traces })
+          .from(submissions)
+          .innerJoin(memberships, eq(memberships.userId, submissions.userId))
+          .where(and(inGroups, eq(submissions.orgId, orgId), eq(submissions.notebookId, notebookId))),
+        db
+          .select({ userId: grades.userId, results: grades.results })
+          .from(grades)
+          .innerJoin(memberships, eq(memberships.userId, grades.userId))
+          .where(and(inGroups, eq(grades.orgId, orgId), eq(grades.notebookId, notebookId))),
+      ]);
+      return { students, handedIn, graded };
+    },
+
     /** Whether the user is a student of one of these groups. */
     async isStudentOf(userId: string, groupIds: string[]) {
       if (!groupIds.length) return false;

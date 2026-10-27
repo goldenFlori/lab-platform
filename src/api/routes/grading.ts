@@ -1,6 +1,12 @@
 import { zValidator } from '@hono/zod-validator';
 import { type Context, Hono } from 'hono';
 import {
+  type AssessmentReport,
+  type ExerciseReport,
+  MIN_REPORT_STUDENTS,
+  traceRows,
+} from '../../shared/assessment-report';
+import {
   type CourseGrades,
   type GradeResult,
   gradeReviewInput,
@@ -9,6 +15,7 @@ import {
   type StaffGrade,
 } from '../../shared/grading';
 import { scoreTrace, type TraceScore, tracePoints, traceProblemFor } from '../../shared/trace-grading';
+import { variantIssue } from '../../shared/trace-problem';
 import type { TenantEnv } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
 import { forbidden, invalidRequest } from './course-context';
@@ -143,6 +150,73 @@ export const gradingRoutes = new Hono<TenantEnv>()
     if (!(await c.var.tenant.grading.review(nb.id, userId, c.req.valid('json')))) throw new NotFoundError();
     const row = await c.var.tenant.grading.of(nb.id, userId);
     return c.json(row ? staffGrade(row) : null);
+  })
+
+  // The assessment report (#170): how a group, or all the user reviews, did on each exercise and
+  // each trace table row. Counts only, from MIN_REPORT_STUDENTS up.
+  .get('/report', async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    const reviewed = ctx.groups
+      .filter((g) => c.var.access.can('submission.review', { courseId: ctx.course.id, groupId: g.id }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    if (!reviewed.length) return forbidden(c);
+    const group = c.req.query('group') || null;
+    if (group && !reviewed.some((g) => g.id === group)) return forbidden(c);
+    const groupIds = group ? [group] : reviewed.map((g) => g.id);
+    const [rows, embeds, exercises] = await Promise.all([
+      c.var.tenant.submissions.forReport(nb.id, groupIds),
+      c.var.tenant.notebooks.embedsOf(nb.id),
+      c.var.tenant.exercises.of(nb.id),
+    ]);
+    const once = <T extends { userId: string }>(list: T[]) => [
+      ...new Map(list.map((row) => [row.userId, row])).values(),
+    ];
+    const handedIn = once(rows.handedIn);
+    const graded = once(rows.graded);
+
+    let exerciseReport: ExerciseReport[] | null = null;
+    if (graded.length >= MIN_REPORT_STUDENTS) {
+      const cells = [...new Set(graded.flatMap((g) => g.results.map((r) => r.cell)))].sort((a, b) => a - b);
+      exerciseReport = cells.map((cell) => {
+        const counts = { pass: 0, fail: 0, error: 0, todo: 0 };
+        for (const g of graded) {
+          const status = g.results.find((r) => r.cell === cell)?.status;
+          if (status && status in counts) counts[status as keyof typeof counts]++;
+        }
+        return { cell, title: exercises.find((e) => e.cell === cell)?.title ?? '', ...counts };
+      });
+    }
+
+    const traces =
+      handedIn.length >= MIN_REPORT_STUDENTS
+        ? embeds
+            .filter((e) => e.viz === 'tabela-gjurmimit' && tracePoints(e.props) > 0)
+            .map((e) => {
+              const variant = variantIssue(e.props?.variant) === null;
+              const answers = handedIn.map((h) => ({
+                problem: traceProblemFor(e.props, { userId: h.userId, notebookId: nb.id, cell: e.cell }),
+                rows: h.traces.find((t) => t.cell === e.cell)?.rows ?? [],
+              }));
+              return {
+                cell: e.cell,
+                title: e.title ?? null,
+                points: tracePoints(e.props),
+                variant,
+                students: answers.length,
+                rows: traceRows(answers, variant),
+              };
+            })
+        : null;
+
+    return c.json({
+      groups: reviewed.map((g) => ({ id: g.id, name: g.name })),
+      group,
+      students: new Set(rows.students.map((s) => s.userId)).size,
+      handedIn: handedIn.length,
+      graded: graded.length,
+      exercises: exerciseReport,
+      traces,
+    } satisfies AssessmentReport);
   })
 
   // Shows the group's students their grades.
