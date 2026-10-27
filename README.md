@@ -49,6 +49,7 @@ For the end-to-end tests, install the browser once with `npx playwright install 
 | `npm run measure:class` | A class of 120 against the free plan's daily limits, on a local copy |
 | `npm run errors` | Browser and server errors in production as they happen (needs `npx wrangler login`) |
 | `npm run usage` | Today's use of the free plan's daily limits (see Usage below) |
+| `npm run backup:restore` | Prove the latest weekly backup restores (see Backups below) |
 
 ## Layout
 
@@ -123,10 +124,20 @@ the table. To set it up once:
   (`npx wrangler d1 time-travel restore DB --timestamp=<time>`).
 - **Weekly export:** every Monday the Backup workflow exports the database, encrypts it with the
   owner's [age](https://age-encryption.org) key and keeps it for 90 days as a workflow artifact.
-  To restore one:
-  1. Download the artifact from the workflow run and unzip it.
-  2. `age --decrypt --identity ~/lab-platform-backup.key lab-platform-YYYY-MM-DD.sql.age > backup.sql`
-  3. Import it into a new, empty database: `npx wrangler d1 execute <database> --remote --file backup.sql`
+- **Check that it restores:** `npm run backup:restore` takes the latest backup, decrypts it with
+  `~/lab-platform-backup.key`, restores it into a throwaway local database, applies any newer
+  migrations, and checks it: tables, integrity, links between rows, files, and the app opening a
+  course. It prints counts only and deletes the decrypted copy. Run it after changing the schema or
+  the backup, and once a month.
+- **Restore after a disaster** (use Time Travel instead for anything in the last 7 days):
+  1. `npm run backup:restore -- --prepared restore.sql` checks the backup and writes it in a form D1
+     can import. A raw export cannot be imported: its indexes come after the rows that need them,
+     and file chunks exceed D1's 100 KB per statement. The file is plaintext student data: keep it on
+     this machine and delete it at the end.
+  2. `npx wrangler d1 create lab-platform-restored --jurisdiction eu`
+  3. `npx wrangler d1 execute lab-platform-restored --remote --file restore.sql`
+  4. `npx wrangler d1 migrations apply lab-platform-restored --remote`
+  5. Put the new `database_id` in `wrangler.jsonc`, merge it so it deploys, and `rm restore.sql`.
 
 ## License
 

@@ -642,6 +642,16 @@ at `/o/:org/courses/:id/activity`, linked from the course page.
   - Weekly (`.github/workflows/backup.yml`): `wrangler d1 export`, encrypted with the owner's
     age key before upload, kept 90 days as a private workflow artifact. GitHub never sees the
     plaintext. Never commit an export: it contains student data.
+  - **A raw export does not import (#181).** It writes every index after all rows, but our foreign
+    keys point at (id, org_id), so SQLite needs the parent's unique index first ("foreign key
+    mismatch"); and file chunks (512 KB, as hex) exceed D1's 100 KB per statement ("statement too
+    long"). `scripts/restore-backup.ts` prepares it: tables, then indexes, then rows, and each long
+    value in pieces put back with `unhex(group_concat(… ORDER BY k))` (both work in production D1).
+  - **The drill:** `npm run backup:restore` restores the latest backup locally, applies newer
+    migrations, and checks tables, `PRAGMA quick_check` (D1 refuses `integrity_check`),
+    `foreign_key_check`, complete files and renderings, and the app opening a course as a throwaway
+    coordinator. Counts only; the plaintext lives in a private temporary folder and is deleted. First
+    run, 2026-10-27, on the 2026-10-26 backup: restores, every check passes.
 - **Usage meter (#180):** `scripts/usage.ts` (`npm run usage`) reads today's (UTC) Worker requests
   (`workersInvocationsAdaptive`) and D1 rows read and written (`d1AnalyticsAdaptiveGroups`) from the
   GraphQL Analytics API for the whole account, since the limits are per account, and compares them

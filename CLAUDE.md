@@ -92,6 +92,8 @@ live in its git-ignored `zgjidhjet/`; never publish them.
     last 3 days are in the dashboard's Workers Observability.
   - `npm run usage`: today's use of the free plan's daily limits, from Cloudflare's analytics (needs
     `CLOUDFLARE_ANALYTICS_TOKEN`; see the README). The Usage workflow runs it four times a day.
+  - `npm run backup:restore`: restores the latest backup into a throwaway local database and checks
+    it (the owner's age key); `--prepared` writes the file to import after a disaster (README).
 
 ## Rules that bite
 
