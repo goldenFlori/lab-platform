@@ -253,7 +253,9 @@ Students' unsubmitted code stays private to them and is not in it.
 - **Content safety:**
   - uploaded files are served with a sandboxing Content Security Policy;
   - notebook HTML is sanitised before it is shown;
-  - students' code runs in their browser, isolated from the server.
+  - students' code runs in their browser, isolated from the server;
+  - a student's work not yet saved (when the connection or the free plan's daily limit fails) is kept
+    in their own browser under their account until it is saved, and removed then or at sign-out.
 - **Minimal data:**
   - no third-party trackers or advertising;
   - activity is recorded as counts;

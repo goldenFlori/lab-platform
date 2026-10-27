@@ -110,6 +110,15 @@ Before #182 and #177: requests 50% and 62%, rows read 142% and 183%, rows writte
   only while the notebook is open to the student, naming the tables it refused. A cell's row costs 3
   rows written the first time (the row and two indexes), then 1. Before, each pause in typing (0.8 s,
   0.7 s for a table) was a request, and a hand-in did not wait for a table's save.
+- **When a limit is reached anyway (#178):** D1's "exceeded D1's free tier daily row …" errors answer
+  503 `daily_limit` with `Retry-After` until midnight UTC (`src/api/errors.ts`); past the requests
+  limit Cloudflare answers its own 1027 page (non-JSON). Every API answer reports to
+  `src/web/lib/service.ts`, and one banner says "no connection" or "today's limit, saved after HH:MM".
+  The save queue keeps what waits in `localStorage` (`lab-work:<user>:<notebook>`,
+  `src/web/lib/drafts.ts`) until it is saved, restores it on the next visit, retries every 10 minutes
+  at the limit (30 s otherwise, at once when back online), and every copy goes at sign-out. A pressed
+  hand-in waits and retries by itself; its time is the server's, never the browser's (which anyone
+  could change), so one arriving after the deadline is refused and the pedagog may move it.
 
 ## Design rules forced by those limits
 
