@@ -1088,6 +1088,39 @@ export const sq = {
     anyVertex: 'v',
     loadFailed: 'Raporti nuk u ngarkua. Rifreskoni faqen dhe provoni sërish.',
   },
+  ready: {
+    pageTitle: 'Gati për laboratorin',
+    title: 'Gati për laboratorin',
+    lead: (mb: number) =>
+      `Përgatiteni këtë pajisje para orës së parë: Python dhe libraritë e kursit shkarkohen një herë (rreth ${mb} MB) dhe mbahen në pajisje. Orët e tjera hapen menjëherë.`,
+    where: 'Më mirë në shtëpi ose në një rrjet të shpejtë, jo në klasë ku të gjithë shkarkojnë njëherësh.',
+    start: 'Përgatit pajisjen',
+    again: 'Provo sërish',
+    browser: 'Shfletuesi',
+    python: 'Python',
+    library: (name: string) => `Libraria ${name}`,
+    test: 'Një provë',
+    done: 'Gati',
+    progress: (percent: number) => `${percent}% e shkarkimit`,
+    ready: 'Gati! Kjo pajisje mund të ekzekutojë kodin e laboratorëve, edhe pa e shkarkuar sërish.',
+    readyBefore: 'Kjo pajisje është përgatitur më parë. Mund ta kontrolloni sërish.',
+    oldBrowser:
+      'Ky shfletues nuk mund të ekzekutojë Python këtu. Përdorni versionin e fundit të Chrome, Edge, Firefox ose Safari.',
+    lowStorage: (mb: number) => `Pak hapësirë e lirë për faqen: rreth ${mb} MB. Lironi hapësirë nëse shkarkimi ndalet.`,
+    failed: 'Shkarkimi u ndërpre. Kontrolloni internetin dhe provoni sërish: ajo që u shkarkua mbetet.',
+    testFailed: 'Python u shkarkua, por prova nuk dha rezultatin e duhur. Rifreskoni faqen dhe provoni sërish.',
+    goToCourses: 'Te kurset e mia',
+    staffTitle: 'Para orës së parë',
+    staffText: (mb: number) =>
+      `Ndani këtë lidhje me studentët para orës së parë: pajisja e secilit shkarkon një herë Python dhe libraritë (rreth ${mb} MB). Përndryshe, në fillim të orës e gjithë klasa shkarkon njëherësh në të njëjtin rrjet.`,
+    open: 'Hap faqen',
+    showQr: 'Shfaq kodin QR',
+    hideQr: 'Fshih kodin QR',
+    qrLabel: 'Kodi QR i faqes së përgatitjes',
+    studentTitle: 'Përgatitni pajisjen për Python',
+    studentText: (mb: number) =>
+      `Një herë, para orës së parë: rreth ${mb} MB, më mirë në shtëpi ose me Wi-Fi të shpejtë.`,
+  },
   service: {
     offline: 'Pa lidhje me internetin. Puna juaj mbahet në këtë pajisje dhe ruhet vetë sapo lidhja të kthehet.',
     limit: (time: string) =>

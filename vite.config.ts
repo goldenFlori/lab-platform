@@ -90,6 +90,13 @@ export default defineConfig(({ command }) => ({
   ],
   server: { headers: ISOLATION },
   worker: { format: 'es' },
+  // The Python engine's version, for what the app keeps per version (the get-ready check, #191),
+  // without importing Pyodide into the app's own bundle.
+  define: {
+    __PYODIDE_VERSION__: JSON.stringify(
+      (createRequire(import.meta.url)('pyodide/package.json') as { version: string }).version,
+    ),
+  },
   build: {
     // Largest chunk: the converter's WebAssembly (about 620 kB), loaded only when staff upload a
     // notebook. The app shell every visit loads (React, React Aria, TanStack) is about 425 kB.

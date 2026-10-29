@@ -141,6 +141,13 @@ estimate gives the engine 3.2 MB where production sends 3.5 MB). First run, 2026
   Mbit/s, half an hour on a crowded 20. Later classes download almost nothing. So the first download
   belongs before the first class (#191).
 - A lab downloads only what its cells import; the 25 MB is the whole course's set.
+- **The get-ready page (#191):** `/ready`, public, downloads it all once through the same Python as
+  the lab page (so the service worker keeps it): a browser check (WebAssembly, workers,
+  cross-origin isolation, free space; `navigator.storage.persist()` asked), the engine, then each of
+  `COURSE_LIBRARIES` (`src/web/lib/device-ready.ts`), then a test run. Nothing starts until pressed.
+  It marks the device ready per Pyodide version in `localStorage` (`__PYODIDE_VERSION__` is defined
+  by Vite, so the app does not import Pyodide); the course page then stops prompting the student.
+  Staff get the link and a QR code on the course page.
 
 - **The server only checks and stores.** Anything CPU-heavy runs in the browser:
   - notebook conversion (in the uploader's browser);
@@ -153,7 +160,8 @@ estimate gives the engine 3.2 MB where production sends 3.5 MB). First run, 2026
   with the build and Pyodide versions).
   - The service worker never touches `/api`: protected content is never cached on a device.
   - Pages come from the network, and the offline page when there is none.
-  - It keeps `/assets/*` per build, and the Python engine and packages per Pyodide version.
+  - It keeps `/assets/*` per build, and the Python engine and packages per Pyodide version, with
+    the PyPI wheels micropip installs (plotly; named by their hash, so never stale, #191).
   - Cached responses keep their COOP and COEP headers, so the app stays cross-origin isolated.
   - Cache only final responses. Cloudflare redirects `/offline.html` to `/offline`, and a
     redirected response may not answer a page.
