@@ -505,6 +505,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   of 120 starting together would pull about 3.8 GB through the room's connection, minutes to half an
   hour, so the download belongs before the first class. Measuring also found that `import numpy,
   plotly` on one line did not install plotly; fixed. Next: #191, the get-ready page.
+- **2026-10-29:** #191 done. A get-ready page (`/ready`), open to anyone, prepares a device before the
+  first class: it checks the browser, downloads Python and the course's libraries once (about 31 MB)
+  with a progress bar, runs a test and says "ready", or what to do (an old browser, little space, a
+  dropped connection). Staff share it from the course page, as a link or a QR code for the projector;
+  students see a reminder there until their device is ready. Python's packages from PyPI (plotly) are
+  now kept on the device like the rest. Next: #192, the accessibility audit.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
