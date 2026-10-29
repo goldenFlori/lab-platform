@@ -120,7 +120,27 @@ Before #182 and #177: requests 50% and 62%, rows read 142% and 183%, rows writte
   hand-in waits and retries by itself; its time is the server's, never the browser's (which anyone
   could change), so one arriving after the deadline is refused and the pedagog may move it.
 
-## Design rules forced by those limits
+## What a lab room downloads (#190)
+
+`npm run measure:room` (`scripts/measure-room.ts`, sharing `scripts/lib/local-platform.ts` with the
+class measurement) opens a lab as a student in Chromium with the service worker on, and sorts every
+byte over the network by part. Our own files are counted as Cloudflare sends them (brotli; the
+estimate gives the engine 3.2 MB where production sends 3.5 MB). First run, 2026-10-29, one device:
+
+| | download |
+|---|---|
+| sign in and open the lab (app, fonts, lab data) | 0.7 MB |
+| the Python engine, at the first run (`pyodide.asm.wasm`, `python_stdlib.zip`, …) | 6.0 MB |
+| the course's libraries (numpy, networkx, matplotlib, plotly, with their dependencies) | 25 MB |
+| any later visit, also running code with the libraries | ~0 (service worker and HTTP cache) |
+
+- The largest are plotly (9.7 MB, from PyPI), matplotlib (6.9 MB), the engine's wasm (3.2 MB),
+  numpy (2.9 MB) and the standard library (2.5 MB). Packages come from jsDelivr (Pyodide's) and
+  PyPI (plotly, through micropip), over the room's connection all the same.
+- **A first class of 120 starting together pulls about 3.8 GB:** about 6 minutes on a full 100
+  Mbit/s, half an hour on a crowded 20. Later classes download almost nothing. So the first download
+  belongs before the first class (#191).
+- A lab downloads only what its cells import; the 25 MB is the whole course's set.
 
 - **The server only checks and stores.** Anything CPU-heavy runs in the browser:
   - notebook conversion (in the uploader's browser);

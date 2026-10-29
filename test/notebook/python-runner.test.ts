@@ -1,6 +1,6 @@
 import { loadPyodide, type PyodideAPI } from 'pyodide';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { cellFile, RUNNER_PY } from '../../src/web/python/runner';
+import { cellFile, MICROPIP_PACKAGES, RUNNER_PY } from '../../src/web/python/runner';
 
 // The Python side of running cells (#47), in Pyodide under Node: what the page shows after a run.
 
@@ -184,5 +184,24 @@ describe('vizlab on graphs (#70)', () => {
       { op: 'relax', u: 'A', v: 'B', dist: 2 },
       { op: 'mark', u: 'A', v: 'B', state: 'tree' },
     ]);
+  });
+});
+
+describe('packages Pyodide does not ship', () => {
+  it('finds plotly in any import of a line, and not elsewhere', () => {
+    const plotly = MICROPIP_PACKAGES.plotly as RegExp;
+    for (const code of [
+      'import plotly',
+      'import plotly.express as px',
+      'from plotly import graph_objects',
+      'import numpy, plotly',
+      'import numpy as np, matplotlib.pyplot as plt, plotly.express',
+      'x = 1\n  import plotly',
+    ]) {
+      expect(plotly.test(code), code).toBe(true);
+    }
+    for (const code of ['import plotlyx', '# import plotly is not needed', 'print("import plotly")', 'import numpy']) {
+      expect(plotly.test(code), code).toBe(false);
+    }
   });
 });

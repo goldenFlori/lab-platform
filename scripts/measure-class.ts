@@ -8,13 +8,10 @@
 // page loads in a real browser. Then it multiplies the costs by a model of a lab hour and a kolokium
 // (the counts below, each with its reason) and prints the class's share of the daily limits.
 
-import { type ChildProcess, spawn } from 'node:child_process';
-import { mkdirSync, openSync, readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { chromium, type Page } from '@playwright/test';
-import { hashPassword } from '../src/shared/password.ts';
-import { type Api, importCourse } from './course-import/apply.ts';
-import { planCourse, type SiteCourse } from './course-import/plan.ts';
+import type { Api } from './course-import/apply.ts';
+import { call, fixtureCourse, STUDENT_PASSWORD, signIn, startLocalPlatform } from './lib/local-platform.ts';
 
 const { values: args } = parseArgs({
   options: {
@@ -25,10 +22,7 @@ const { values: args } = parseArgs({
 const STUDENTS = Number(args.students);
 const PORT = 4192;
 const BASE = `http://localhost:${PORT}`;
-const STATE = '.wrangler/measure';
-const LOG = '.wrangler/measure.log';
-const ADMIN = { username: 'measure.admin', password: 'Mat-sakte-2026' };
-const PASSWORD = 'Studenti-sakte-2026';
+const PASSWORD = STUDENT_PASSWORD;
 
 /** The free plan's daily limits (re-checked 2026-10-27; see platform-architecture). */
 const LIMITS = { requests: 100_000, read: 5_000_000, written: 100_000 };
@@ -76,67 +70,7 @@ function fail(message: string): never {
   process.exit(1);
 }
 
-/* ------------------------------------------------------------ the local server */
-
-function startServer(): ChildProcess {
-  const steps = [
-    `rm -rf ${STATE}`,
-    ...(args['no-build'] ? [] : ['npm run build']),
-    `npx wrangler d1 migrations apply DB --local --persist-to ${STATE}`,
-    `ACCOUNT_PASSWORD=${ADMIN.password} node scripts/create-account.ts --org-slug measure --org-name Measure --username ${ADMIN.username} --full-name "Measure Admin" --role admin --persist-to ${STATE}`,
-    `MEASURE=1 CLOUDFLARE_INCLUDE_PROCESS_ENV=true AI_PROVIDER=fake LIVE_JURISDICTION=none LOCAL_STATE=${STATE} npx vite preview --port ${PORT} --strictPort`,
-  ];
-  mkdirSync('.wrangler', { recursive: true });
-  const log = openSync(LOG, 'w');
-  // A clean environment: the Worker receives every variable (CLOUDFLARE_INCLUDE_PROCESS_ENV), and npm's
-  // own dozens break it.
-  const env = { PATH: process.env.PATH, HOME: process.env.HOME, TMPDIR: process.env.TMPDIR };
-  return spawn('sh', ['-c', steps.join(' && ')], { stdio: ['ignore', log, log], env });
-}
-
-async function waitForServer() {
-  for (let i = 0; i < 360; i++) {
-    try {
-      if ((await fetch(`${BASE}/api/health`)).ok) return;
-    } catch {}
-    await new Promise((r) => setTimeout(r, 500));
-  }
-  fail(`The local server did not start; see ${LOG}.`);
-}
-
-/* ------------------------------------------------------------ API sessions and the meter */
-
-async function signIn(username: string, password: string): Promise<Api> {
-  const res = await fetch(`${BASE}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Origin: BASE },
-    body: JSON.stringify({ username, password }),
-  });
-  if (!res.ok) fail(`Sign-in failed for ${username}: ${res.status}`);
-  const cookie = res.headers
-    .getSetCookie()
-    .map((c) => c.split(';')[0])
-    .join('; ');
-  return (method, path, body, headers = {}) => {
-    const bytes = body instanceof Uint8Array;
-    return fetch(`${BASE}/api${path}`, {
-      method,
-      headers: {
-        Origin: BASE,
-        Cookie: cookie,
-        ...(body !== undefined && !bytes ? { 'Content-Type': 'application/json' } : {}),
-        ...headers,
-      },
-      body: body === undefined ? undefined : bytes ? new Uint8Array(body) : JSON.stringify(body),
-    });
-  };
-}
-
-async function call<T = unknown>(api: Api, method: string, path: string, body?: unknown): Promise<T> {
-  const res = await api(method, path, body);
-  if (!res.ok) fail(`${method} ${path}: ${res.status} ${await res.text()}`);
-  return (res.status === 204 ? undefined : await res.json()) as T;
-}
+/* ------------------------------------------------------------ the meter */
 
 const meter = async (method: 'GET' | 'DELETE' = 'GET') =>
   (await (await fetch(`${BASE}/api/__meter`, { method })).json()) as Cost;
@@ -156,65 +90,6 @@ async function measure<T>(name: string, items: T[], action: (item: T) => Promise
     read: total.read / n,
     written: total.written / n,
   });
-}
-
-/* ------------------------------------------------------------ the class */
-
-const FIXTURES = 'test/notebook/fixtures';
-const site = JSON.parse(readFileSync(`${FIXTURES}/course.json`, 'utf8')) as Omit<SiteCourse, 'embeds'>;
-const read = (file: string) => readFileSync(`${FIXTURES}/${file}`, 'utf8');
-
-async function setUp() {
-  const admin = await signIn(ADMIN.username, ADMIN.password);
-  const planned = await planCourse({
-    site: {
-      ...site,
-      embeds: JSON.parse(read('embeds.json')),
-      platformEmbeds: JSON.parse(read('platform-embeds.json')),
-    },
-    notebook: (file) => read(`notebooks/${file}`),
-    solutions: new Map(),
-  });
-  const report = await importCourse(admin, {
-    org: 'measure',
-    title: 'Struktura Diskrete',
-    academicYear: '2026/27',
-    labs: planned,
-  });
-  const course = `/orgs/measure/courses/${report.course.id}`;
-  // Lab 7: Dijkstra and Bellman-Ford, with code exercises and two trace tables.
-  const lab = report.labs.find((l) => l.lab.n === 7) ?? fail('Lab 7 is missing');
-  const notebook = lab.notebooks.find((nb) => nb.kind === 'main') ?? fail('Lab 7 has no main notebook');
-  const labPath = `${course}/labs/${lab.lab.id}`;
-  const nbPath = `${labPath}/notebooks/${notebook.id}`;
-  await call(admin, 'PUT', `${labPath}/access`, {
-    groupId: null,
-    visibleFrom: new Date(Date.now() - 60_000).toISOString(),
-    visibleUntil: null,
-    solutionsFrom: null,
-  });
-  const group = await call<{ id: string }>(admin, 'POST', `${course}/groups`, { name: 'Grupi A' });
-  const passwordHash = await hashPassword(PASSWORD);
-  const usernames: string[] = [];
-  for (let i = 0; i < STUDENTS; i += 25) {
-    const students = Array.from({ length: Math.min(25, STUDENTS - i) }, (_, k) => ({
-      fullName: `Studenti ${i + k + 1}`,
-      username: 'studenti',
-      passwordHash,
-    }));
-    const made = await call<{ students: { username: string }[] }>(
-      admin,
-      'POST',
-      `${course}/groups/${group.id}/students`,
-      { students },
-    );
-    usernames.push(...made.students.map((s) => s.username));
-  }
-  const detail = await call<{
-    embeds: { cell: number; viz: string; props: Record<string, unknown> | null }[];
-    exercises: { cell: number }[];
-  }>(admin, 'GET', nbPath);
-  return { admin, report, course, labPath, nbPath, group, usernames, detail, notebookId: notebook.id };
 }
 
 /* ------------------------------------------------------------ page loads in a browser */
@@ -299,30 +174,23 @@ function report() {
 
 /* ------------------------------------------------------------ run */
 
-const server = startServer();
-const stop = () => {
-  try {
-    // The server runs under sh: stop the whole tree.
-    if (server.pid) spawn('pkill', ['-P', String(server.pid)]).on('exit', () => server.kill());
-  } catch {
-    // Already stopped.
-  }
-};
+const { stop } = await startLocalPlatform({
+  port: PORT,
+  state: '.wrangler/measure',
+  build: !args['no-build'],
+  env: { MEASURE: '1' },
+});
 process.on('exit', stop);
 process.on('SIGINT', () => process.exit(130));
 
 try {
-  await waitForServer();
-  const c = await setUp();
+  const c = await fixtureCourse(BASE, { students: STUDENTS });
   console.log(`Imported the course; ${c.usernames.length} students in Grupi A.`);
   const sessions: Api[] = [];
   await measure('sign in', c.usernames, async (u) => {
-    sessions.push(await signIn(u, PASSWORD));
+    sessions.push(await signIn(BASE, u, PASSWORD));
   });
-  await pageLoads(
-    `/o/measure/courses/${c.report.course.id}/labs/${c.labPath.split('/').pop()}?notebook=${c.notebookId}`,
-    c.usernames.slice(0, 5),
-  );
+  await pageLoads(c.pageUrl, c.usernames.slice(0, 5));
 
   const code = c.detail.exercises[0]?.cell ?? 1;
   const work = (s: Api, n: number, traces: unknown[] = []) =>

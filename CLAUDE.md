@@ -88,6 +88,8 @@ live in its git-ignored `zgjidhjet/`; never publish them.
     solutions through the API (see the README); `--dry-run` shows the plan.
   - `npm run measure:class`: a class of 120 against the free plan's daily limits, on a local copy
     (`--students N`, `--no-build`); see `platform-architecture`.
+  - `npm run measure:room`: what a student's device downloads, and a room of 120 over one connection
+    (`--mbps N`, `--no-build`); see `platform-architecture`.
   - `npm run errors`: browser and server errors in production as they happen (`wrangler tail`); the
     last 3 days are in the dashboard's Workers Observability.
   - `npm run usage`: today's use of the free plan's daily limits, from Cloudflare's analytics (needs
