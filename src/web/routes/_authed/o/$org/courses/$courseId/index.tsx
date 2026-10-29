@@ -25,6 +25,7 @@ import { CourseGradesCsv } from '../../../../../../components/CourseGradesCsv';
 import { CourseLabs } from '../../../../../../components/CourseLabs';
 import { CourseStaff } from '../../../../../../components/CourseStaff';
 import { SurveyForStaff, SurveyForStudent } from '../../../../../../components/CourseSurvey';
+import { GetReadyCard, GetReadyPrompt } from '../../../../../../components/GetReady';
 import { LearningPath } from '../../../../../../components/LearningPath';
 import { PresentJoinCode } from '../../../../../../components/PresentJoinCode';
 import { LANGUAGE_NAMES, t as messages, useT } from '../../../../../../i18n';
@@ -178,6 +179,8 @@ function CoursePage() {
         </div>
       )}
 
+      {!isStaff && !archived && <GetReadyPrompt />}
+
       {!isStaff && <LearningPath org={org} courseId={courseId} />}
 
       {!isStaff && <SurveyForStudent org={org} courseId={courseId} />}
@@ -185,6 +188,8 @@ function CoursePage() {
       {isStaff && (
         <Groups data={data} org={org} courseId={courseId} archived={archived} canManage={permissions.manage} />
       )}
+
+      {isStaff && !archived && <GetReadyCard />}
 
       <CourseLabs org={org} courseId={courseId} groups={groups} />
 
