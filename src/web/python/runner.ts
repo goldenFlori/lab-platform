@@ -317,5 +317,10 @@ export function errorLine(traceback: string, number: number): number | null {
   return line;
 }
 
-/** Packages a cell needs that Pyodide does not ship; installed with micropip from PyPI. */
-export const MICROPIP_PACKAGES: Record<string, RegExp> = { plotly: /^\s*(?:import|from)\s+plotly\b/m };
+/**
+ * Packages a cell needs that Pyodide does not ship; installed with micropip from PyPI. Found in any
+ * import of the line, also `import numpy, plotly` (#190).
+ */
+export const MICROPIP_PACKAGES: Record<string, RegExp> = {
+  plotly: /^\s*(?:from\s+plotly\b|import\s+(?:[\w.]+(?:\s+as\s+\w+)?\s*,\s*)*plotly\b)/m,
+};
