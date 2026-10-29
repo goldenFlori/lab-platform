@@ -18,6 +18,7 @@
     "measure:class": "node scripts/measure-class.ts",
     "errors": "node scripts/errors.ts",
     "usage": "node scripts/usage.ts",
+    "backup:restore": "node scripts/restore-backup.ts",
     "deploy": "npm run build && wrangler deploy",
     "lint": "biome check .",
     "format": "biome check --write .",
