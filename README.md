@@ -47,6 +47,7 @@ For the end-to-end tests, install the browser once with `npx playwright install 
 | `npm run course:import` | Import a course site's labs, notebooks and solutions (see below) |
 | `npm run deploy` | Build and deploy from this machine (needs `npx wrangler login`); merges to `main` deploy on their own |
 | `npm run measure:class` | A class of 120 against the free plan's daily limits, on a local copy |
+| `npm run measure:room` | What a student's device downloads, and a room of 120 over one connection |
 | `npm run errors` | Browser and server errors in production as they happen (needs `npx wrangler login`) |
 | `npm run usage` | Today's use of the free plan's daily limits (see Usage below) |
 | `npm run backup:restore` | Prove the latest weekly backup restores (see Backups below) |

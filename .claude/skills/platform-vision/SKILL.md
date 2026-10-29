@@ -495,6 +495,16 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   leaves a class of 120 at a fifth to a third of the free plan's day, with work kept safe, errors
   and usage visible, and backups proven. Next: plan Phase 12; the owner sets up the usage token and
   runs the drill once a month.
+- **2026-10-29:** Phase 12 planned as the "Phase 12: The lab room" milestone, issues #190–#194: what
+  a room of devices downloads over one connection, a get-ready page before the first class,
+  accessibility for every student, speed on slow devices and networks, and help in the app for
+  students and pedagogs.
+- **2026-10-29:** #190 done. `npm run measure:room` measures what a student's device downloads: 0.7
+  MB to sign in and open a lab, 6 MB for the Python engine at the first run, 25 MB for the course's
+  libraries (plotly and matplotlib most of it), and almost nothing on any later visit. A first class
+  of 120 starting together would pull about 3.8 GB through the room's connection, minutes to half an
+  hour, so the download belongs before the first class. Measuring also found that `import numpy,
+  plotly` on one line did not install plotly; fixed. Next: #191, the get-ready page.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
@@ -548,6 +558,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-26 | A graded trace table is never checked in the browser: rows are filled unchecked while its notebook is open, handed in, and scored by the server from the same shared code, with partial credit per right row. A table that checked each row would let everyone reach the answer by trying | Decided |
 | 2026-10-26 | A trace variant is generated from the student's id, the notebook and the cell, by shared code the browser and the server both run: no stored copy per student, the same graph every time, and the server can rebuild it to grade. First-try counts treat row k of every variant as one step, so the class's hardest rows still show | Decided |
 | 2026-10-27 | A kolokium runs on each student's own clock (start any time in a window, then fixed minutes, never past the deadline), not one shared start: a late or reconnecting student loses no time, and a room needs no synchronised "go". The server keeps the start time, so the time limit holds even if the page is reloaded or its clock is changed. Only the kolokium's lab is visible and AI help is off while it runs | Decided |
+| 2026-10-29 | Phase 12 is "The lab room" before SaaS: the January mini-pilot and the March semester run in a real room (one shared connection, lab PCs and cheap phones, every kind of student, pedagogs new to the platform). Self-service institutions, Google login and billing come once the pilot has shown the teaching, which the grant application needs first | Decided |
 | 2026-10-27 | A backup counts only once a restore of it has been checked. The restore drill runs on the owner's machine with their key (never in CI, which must not hold the key), after schema or backup changes and once a month | Decided |
 | 2026-10-27 | A hand-in delayed by an outage counts at the time the server receives it, never a time the browser reports: a browser's clock and requests can be changed, which would give extra minutes in a kolokium. The work is kept safe on the device instead, and the pedagog can move a deadline | Decided |
 | 2026-10-27 | Phase 11 is "Ready for a full class" before any new feature: since 2026-09-01 D1's free plan refuses queries once a day's 100k rows written are used, and saving students' work as they type could spend that in one kolokium of 120 students. The pilot must not fail in the middle of an exam, and the paid plan is over the hosting budget | Decided |
