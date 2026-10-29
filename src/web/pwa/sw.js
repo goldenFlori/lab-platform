@@ -3,7 +3,7 @@
 // - /api is never touched: protected content always comes from the server after a permission check;
 // - pages come from the network, and the offline page when there is none;
 // - the build's files (/assets, named by their content) and the Python engine and its packages
-//   (named by their version) are kept once fetched. A new build drops the old files; the engine
+//   (named by their version, or by their hash on PyPI) are kept once fetched. A new build drops the old files; the engine
 //   stays until its version changes.
 // The responses keep their own headers, so the app stays cross-origin isolated (COOP and COEP).
 
@@ -46,9 +46,12 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(fetch(request).catch(() => caches.match(OFFLINE)));
     return;
   }
+  // The engine, Pyodide's packages, and the packages micropip takes from PyPI (plotly), whose files
+  // are named by their content's hash and never change (#191).
   const engine =
     (ours && url.pathname.startsWith('/pyodide/')) ||
-    (url.hostname === 'cdn.jsdelivr.net' && url.pathname.startsWith('/pyodide/'));
+    (url.hostname === 'cdn.jsdelivr.net' && url.pathname.startsWith('/pyodide/')) ||
+    (url.hostname === 'files.pythonhosted.org' && url.pathname.endsWith('.whl'));
   if (engine) event.respondWith(kept(request, ENGINE));
   else if (ours && url.pathname.startsWith('/assets/')) event.respondWith(kept(request, SHELL));
 });
