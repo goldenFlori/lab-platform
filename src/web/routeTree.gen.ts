@@ -16,6 +16,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ReadyRouteImport } from './routes/ready'
 import { Route as AuthedCoursesRouteImport } from './routes/_authed/courses'
 import { Route as AuthedJoinRouteImport } from './routes/_authed/join'
+import { Route as AuthedPlatformRouteImport } from './routes/_authed/platform'
 import { Route as HelpIndexRouteImport } from './routes/help/index'
 import { Route as HelpGuideRouteImport } from './routes/help/$guide'
 import { Route as VisualizationsIndexRouteImport } from './routes/visualizations/index'
@@ -64,6 +65,11 @@ const AuthedCoursesRoute = AuthedCoursesRouteImport.update({
 const AuthedJoinRoute = AuthedJoinRouteImport.update({
   id: '/join',
   path: '/join',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedPlatformRoute = AuthedPlatformRouteImport.update({
+  id: '/platform',
+  path: '/platform',
   getParentRoute: () => AuthedRoute,
 } as any)
 const HelpIndexRoute = HelpIndexRouteImport.update({
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/ready': typeof ReadyRoute
   '/courses': typeof AuthedCoursesRoute
   '/join': typeof AuthedJoinRoute
+  '/platform': typeof AuthedPlatformRoute
   '/help/$guide': typeof HelpGuideRoute
   '/visualizations/$vizId': typeof VisualizationsVizIdRoute
   '/help/': typeof HelpIndexRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByTo {
   '/ready': typeof ReadyRoute
   '/courses': typeof AuthedCoursesRoute
   '/join': typeof AuthedJoinRoute
+  '/platform': typeof AuthedPlatformRoute
   '/help/$guide': typeof HelpGuideRoute
   '/visualizations/$vizId': typeof VisualizationsVizIdRoute
   '/help': typeof HelpIndexRoute
@@ -207,6 +215,7 @@ export interface FileRoutesById {
   '/ready': typeof ReadyRoute
   '/_authed/courses': typeof AuthedCoursesRoute
   '/_authed/join': typeof AuthedJoinRoute
+  '/_authed/platform': typeof AuthedPlatformRoute
   '/help/$guide': typeof HelpGuideRoute
   '/visualizations/$vizId': typeof VisualizationsVizIdRoute
   '/help/': typeof HelpIndexRoute
@@ -232,6 +241,7 @@ export interface FileRouteTypes {
     | '/ready'
     | '/courses'
     | '/join'
+    | '/platform'
     | '/help/$guide'
     | '/visualizations/$vizId'
     | '/help/'
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | '/ready'
     | '/courses'
     | '/join'
+    | '/platform'
     | '/help/$guide'
     | '/visualizations/$vizId'
     | '/help'
@@ -279,6 +290,7 @@ export interface FileRouteTypes {
     | '/ready'
     | '/_authed/courses'
     | '/_authed/join'
+    | '/_authed/platform'
     | '/help/$guide'
     | '/visualizations/$vizId'
     | '/help/'
@@ -357,6 +369,13 @@ declare module '@tanstack/react-router' {
       path: '/join'
       fullPath: '/join'
       preLoaderRoute: typeof AuthedJoinRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/platform': {
+      id: '/_authed/platform'
+      path: '/platform'
+      fullPath: '/platform'
+      preLoaderRoute: typeof AuthedPlatformRouteImport
       parentRoute: typeof AuthedRoute
     }
     '/help/': {
@@ -470,6 +489,7 @@ declare module '@tanstack/react-router' {
 interface AuthedRouteChildren {
   AuthedCoursesRoute: typeof AuthedCoursesRoute
   AuthedJoinRoute: typeof AuthedJoinRoute
+  AuthedPlatformRoute: typeof AuthedPlatformRoute
   AuthedAccountDataRoute: typeof AuthedAccountDataRoute
   AuthedOOrgCoursesCourseIdActivityRoute: typeof AuthedOOrgCoursesCourseIdActivityRoute
   AuthedOOrgCoursesCourseIdProgressRoute: typeof AuthedOOrgCoursesCourseIdProgressRoute
@@ -486,6 +506,7 @@ interface AuthedRouteChildren {
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedCoursesRoute: AuthedCoursesRoute,
   AuthedJoinRoute: AuthedJoinRoute,
+  AuthedPlatformRoute: AuthedPlatformRoute,
   AuthedAccountDataRoute: AuthedAccountDataRoute,
   AuthedOOrgCoursesCourseIdActivityRoute:
     AuthedOOrgCoursesCourseIdActivityRoute,

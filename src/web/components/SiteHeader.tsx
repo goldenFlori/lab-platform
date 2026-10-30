@@ -1,6 +1,7 @@
 import { Button, Dropdown, Kbd, Label, Modal } from '@heroui/react';
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
 import {
+  Building2,
   Check,
   GraduationCap,
   Languages,
@@ -158,6 +159,7 @@ function AccountMenu({ me }: { me: Me }) {
               if (key === 'logout') logout.mutate(undefined, { onSettled: () => navigate({ to: '/' }) });
               else if (key === 'install') installable === 'apple' ? setAppleSteps(true) : void install();
               else if (key === 'data') navigate({ to: '/account/data' });
+              else if (key === 'platform') navigate({ to: '/platform' });
               else if (key === 'sq' || key === 'en') choose(key);
             }}
           >
@@ -174,6 +176,12 @@ function AccountMenu({ me }: { me: Me }) {
               <Dropdown.Item id="install" textValue={t.install.item}>
                 <Smartphone className="size-4" />
                 <Label>{t.install.item}</Label>
+              </Dropdown.Item>
+            ) : null}
+            {me.owner ? (
+              <Dropdown.Item id="platform" textValue={t.platform.menu}>
+                <Building2 className="size-4" />
+                <Label>{t.platform.menu}</Label>
               </Dropdown.Item>
             ) : null}
             <Dropdown.Item id="data" textValue={t.myData.title}>
