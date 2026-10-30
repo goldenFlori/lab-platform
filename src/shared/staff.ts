@@ -1,11 +1,11 @@
 import { z } from 'zod';
 import { isValidPasswordHash } from './password';
+import { STAFF_ROLES, type StaffRole } from './staff-roles';
 
 // A course's teaching staff (#64): pedagogs and assistants, for the whole course or one group. The
 // app imports only types from this file.
 
-export const STAFF_ROLES = ['pedagog', 'assistant'] as const;
-export type StaffRole = (typeof STAFF_ROLES)[number];
+export { STAFF_ROLES, type StaffRole };
 
 const scope = { role: z.enum(STAFF_ROLES), groupId: z.string().min(1).max(64).nullable() };
 

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { KOLOKIUM_MINUTES, kolokiumEnd } from './kolokium';
 
 // Handing in work (#52): a notebook opened for submission per group, until a deadline, and what
 // students hand in. The app imports only types from this file.
@@ -6,8 +7,7 @@ import { z } from 'zod';
 /** Characters of changed code one submission may hold. */
 export const MAX_SUBMISSION_CODE = 1_000_000;
 
-/** A kolokium's length, in minutes, from each student's start (#169). */
-export const KOLOKIUM_MINUTES = { min: 5, max: 300 } as const;
+export { KOLOKIUM_MINUTES, kolokiumEnd };
 
 export const assignmentInput = z
   .object({
@@ -42,10 +42,6 @@ export type Kolokium = {
   endsAt: string | null;
   submittedAt: string | null;
 };
-
-/** When a student's kolokium ends: their start plus its minutes, or its due time if earlier. */
-export const kolokiumEnd = (startedAt: number, minutes: number, dueAt: number) =>
-  Math.min(startedAt + minutes * 60_000, dueAt);
 
 export type SubmissionSummary = {
   submittedAt: string;
