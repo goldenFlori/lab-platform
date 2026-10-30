@@ -251,7 +251,10 @@ Kodi i padorëzuar i studentëve mbetet privat për ta dhe nuk përfshihet.
 - **Kontrolli i qasjes:**
   - aftësi sipas rolit, të kontrolluara nga serveri në çdo kërkesë, për kursin ose grupin përkatës;
   - studentët shohin vetëm punën e tyre;
-  - stafi sheh vetëm grupet e veta.
+  - stafi sheh vetëm grupet e veta;
+  - paneli i Operatorit krijon institucionet dhe administratorët e tyre të parë dhe tregon për çdo
+    institucion vetëm numra (kurse, staf, studentë, studentë aktivë), kurrë të dhënat e njerëzve të tij;
+    llogaritë e Operatorit emërtohen te konfigurimi i strehimit, jo në bazën e të dhënave.
 - **Ndarja e institucioneve:** çdo pyetje në bazën e të dhënave kufizohet në një institucion. Këtë
   e zbatojnë çelësat e bazës së të dhënave dhe e provojnë testet automatike.
 - **Siguria e përmbajtjes:**

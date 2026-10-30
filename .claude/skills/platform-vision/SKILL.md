@@ -531,6 +531,14 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   their guide, and the footer to all. Phase 12 leaves the first class ready for a real room: devices
   prepared at home, every page accessible, quick on a cheap phone, and help for whoever comes next.
   Next: plan Phase 13; the owner re-imports the course and runs the dry run with FSHN.
+- **2026-10-31:** Phase 13 planned as the "Phase 13: A second institution" milestone, issues
+  #200–#203: the owner's console, institution branding, the institution admin's page, and sharing a
+  course with another institution.
+- **2026-10-31:** #200 done. The platform's owner creates an institution and its first admin at
+  `/platform`, prints the admin's slip, and sees every institution's counts (courses, staff, students,
+  active this week), never its people. Owners are named in a Worker secret, not the database, and to
+  anyone else the console answers as if it did not exist. The owner sets `PLATFORM_OWNERS` once
+  (README). Next: #201, institution branding.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
@@ -584,6 +592,8 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-26 | A graded trace table is never checked in the browser: rows are filled unchecked while its notebook is open, handed in, and scored by the server from the same shared code, with partial credit per right row. A table that checked each row would let everyone reach the answer by trying | Decided |
 | 2026-10-26 | A trace variant is generated from the student's id, the notebook and the cell, by shared code the browser and the server both run: no stored copy per student, the same graph every time, and the server can rebuild it to grade. First-try counts treat row k of every variant as one step, so the class's hardest rows still show | Decided |
 | 2026-10-27 | A kolokium runs on each student's own clock (start any time in a window, then fixed minutes, never past the deadline), not one shared start: a late or reconnecting student loses no time, and a room needs no synchronised "go". The server keeps the start time, so the time limit holds even if the page is reloaded or its clock is changed. Only the kolokium's lab is visible and AI help is off while it runs | Decided |
+| 2026-10-31 | Phase 13 is "A second institution", lean: what another faculty needs on day one (the owner's console, branding, an admin page, sharing a course). Billing, self-service sign-up and Google login wait for the pilot's results and a privacy decision on Google as an identity provider | Decided |
+| 2026-10-31 | Platform owners are named in a Worker secret, not in the database: no tenant's data or action can make one, and the console answers 404 to everyone else | Decided |
 | 2026-10-29 | Phase 12 is "The lab room" before SaaS: the January mini-pilot and the March semester run in a real room (one shared connection, lab PCs and cheap phones, every kind of student, pedagogs new to the platform). Self-service institutions, Google login and billing come once the pilot has shown the teaching, which the grant application needs first | Decided |
 | 2026-10-27 | A backup counts only once a restore of it has been checked. The restore drill runs on the owner's machine with their key (never in CI, which must not hold the key), after schema or backup changes and once a month | Decided |
 | 2026-10-27 | A hand-in delayed by an outage counts at the time the server receives it, never a time the browser reports: a browser's clock and requests can be changed, which would give extra minutes in a kolokium. The work is kept safe on the device instead, and the pedagog can move a deadline | Decided |

@@ -226,6 +226,19 @@ estimate gives the engine 3.2 MB where production sends 3.5 MB). First run, 2026
     | `submission.create` | | | | | ✓ |
 - **The UI may hide what a user can't do, but the API always enforces it.**
 
+## The platform owner (#200)
+
+- Owners are named by username in the Worker secret `PLATFORM_OWNERS` (comma-separated), never in the
+  database, so no tenant can become one (`src/api/auth/owner.ts`). Tests set `owner.test`, the e2e
+  server `e2e.staff`. `/api/me` says `owner: true` only to an owner.
+- `/api/platform/*` (`src/api/routes/platform.ts`) answers 404 `not_found` to anyone else, as a route
+  that does not exist. `GET /institutions`: every organization with counts made in SQL (courses;
+  distinct staff and students by membership role; students with activity in the last 7 days).
+  `POST /institutions`: the organization, its first admin (password hashed in the owner's browser)
+  and the admin's organization-wide membership in one batch; `slug_taken` or `username_taken` (409).
+- `/platform` (account menu → Platform) shows them and prints the admin's slip, as for students.
+  `npm run account:create` stays for a new environment or an emergency.
+
 ## Courses, groups and joining
 
 - **Staff** (#64, `src/api/routes/staff.ts`): staff with `course.manage` for the whole course list
