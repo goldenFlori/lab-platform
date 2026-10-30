@@ -60,14 +60,31 @@ export const Route = createFileRoute('/_authed/o/$org/courses/$courseId/labs/$la
     // From the Live Lab's QR code (#65): join the session at once.
     live: search.live === 1 || search.live === '1' ? 1 : undefined,
   }),
-  loader: async ({ context: { queryClient }, params: { org, courseId, labId } }) => {
+  loaderDeps: ({ search }) => ({ notebook: search.notebook }),
+  loader: async ({ context: { queryClient }, params: { org, courseId, labId }, deps }) => {
+    // The notebook's details and its rendering start with the rest, not after the page has rendered:
+    // one round trip less, and the largest download sooner, on a slow network (#193). Not awaited:
+    // a notebook the user may not open fails in its own place, as it would have.
+    const notebook = (notebookId: string) => {
+      const ref = { org, courseId, labId, notebookId };
+      void queryClient.prefetchQuery(notebookQuery(ref));
+      void queryClient.prefetchQuery(renderedQuery(ref));
+    };
+    if (deps.notebook) notebook(deps.notebook);
     try {
-      const [lab] = await Promise.all([
+      const [lab, , list] = await Promise.all([
         queryClient.ensureQueryData(labQuery(org, courseId, labId)),
         queryClient.ensureQueryData(courseQuery(org, courseId)),
         queryClient.ensureQueryData(notebooksQuery(org, courseId, labId)),
         queryClient.ensureQueryData(labsQuery(org, courseId)),
       ]);
+      // No notebook named: the one the page will show, as it chooses it.
+      if (!deps.notebook) {
+        const first = [...list.notebooks]
+          .sort((a, b) => KIND_ORDER[a.kind] - KIND_ORDER[b.kind] || a.position - b.position)
+          .find((nb) => nb.ready);
+        if (first) notebook(first.id);
+      }
       return { title: lab.title };
     } catch (error) {
       // Missing, hidden, or not ours to see: the same 404 page either way.

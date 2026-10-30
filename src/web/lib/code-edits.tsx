@@ -1,7 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { CodeCell } from '../../notebook/types';
-import { type CodeEdit, MAX_WORK_CELLS, type WorkSaved } from '../../shared/code-edits';
+import type { CodeEdit, WorkSaved } from '../../shared/code-edits';
+import { MAX_WORK_CELLS } from '../../shared/code-limits';
 import { api } from './api';
 import { useMe } from './auth';
 import { DRAFT_PREFIX, readDraft, writeDraft } from './drafts';

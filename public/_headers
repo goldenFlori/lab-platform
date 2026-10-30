@@ -6,6 +6,12 @@
 /pyodide/*
   Cache-Control: public, max-age=31536000, immutable
 
+# The build's files (#193): named by their content's hash, so a file under a name never changes. Kept
+# without asking again; a new build has new names. Without this every visit re-asked for each of them,
+# one round trip per wave of imports: 1.6 s on a slow network before the app could start.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
 # The service worker (#89): checked for a new build on every visit.
 /sw.js
   Cache-Control: no-cache

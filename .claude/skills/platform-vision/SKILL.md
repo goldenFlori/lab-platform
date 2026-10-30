@@ -517,6 +517,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   text colours too pale to read (success and warning text, accent on its tint, four colours of the
   code), controls whose names did not contain what they show (logo, language, account, the front
   page's graph), and wide tables now reachable by keyboard. Next: #193, slow devices and networks.
+- **2026-10-30:** #193 done. On a cheap phone in a crowded room (CPU four times slower, 2 Mbit/s,
+  300 ms latency) a lab is readable in 6.2 s the first time (was 8.3; about 3 s on production, which
+  compresses) and 1.4 s after (was 5.3), and a cell runs in under a second; tests hold budgets. The
+  app's files are now kept by the browser instead of re-asked for on every visit, the notebook starts
+  downloading with the lab, and Zod, which four value imports had pulled into the app, is out again
+  with a test to keep it out. Next: #194, help in the app.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and

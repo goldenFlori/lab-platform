@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { UserPlus, UserRoundCog, X } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import type { GroupView } from '../../shared/courses';
-import { STAFF_ROLES, type StaffRole } from '../../shared/staff';
+import { STAFF_ROLES, type StaffRole } from '../../shared/staff-roles';
 import { useT } from '../i18n';
 import { ApiError } from '../lib/api';
 import { staffQuery, useStaffChanges } from '../lib/staff';
