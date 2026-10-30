@@ -1083,6 +1083,10 @@ export const en: Messages = {
     anyVertex: 'v',
     loadFailed: 'The report did not load. Refresh the page and try again.',
   },
+  help: {
+    title: 'Help',
+    link: 'Help',
+  },
   ready: {
     pageTitle: 'Ready for the lab',
     title: 'Ready for the lab',

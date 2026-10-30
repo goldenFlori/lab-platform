@@ -5,6 +5,7 @@ import { ArrowLeft, FileUp, Printer, X } from 'lucide-react';
 import { type ChangeEvent, useEffect, useState } from 'react';
 import { parseNameList, usernameBase } from '../../../../../../../../../shared/student-names';
 import { CredentialSlips } from '../../../../../../../../components/CredentialSlips';
+import { HelpLink } from '../../../../../../../../components/HelpLink';
 import { t as messages, useT } from '../../../../../../../../i18n';
 import { ApiError } from '../../../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../../../lib/brand';
@@ -103,6 +104,7 @@ function ImportPage() {
       <p className="mt-1 text-muted">
         {courseTitle} · {groupName}
       </p>
+      <HelpLink guide="students" className="mt-2" />
 
       {phase.step === 'input' && (
         <div className="mt-8 max-w-2xl">

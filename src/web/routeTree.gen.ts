@@ -16,6 +16,8 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ReadyRouteImport } from './routes/ready'
 import { Route as AuthedCoursesRouteImport } from './routes/_authed/courses'
 import { Route as AuthedJoinRouteImport } from './routes/_authed/join'
+import { Route as HelpIndexRouteImport } from './routes/help/index'
+import { Route as HelpGuideRouteImport } from './routes/help/$guide'
 import { Route as VisualizationsIndexRouteImport } from './routes/visualizations/index'
 import { Route as VisualizationsVizIdRouteImport } from './routes/visualizations/$vizId'
 import { Route as AuthedAccountDataRouteImport } from './routes/_authed/account/data'
@@ -63,6 +65,16 @@ const AuthedJoinRoute = AuthedJoinRouteImport.update({
   id: '/join',
   path: '/join',
   getParentRoute: () => AuthedRoute,
+} as any)
+const HelpIndexRoute = HelpIndexRouteImport.update({
+  id: '/help/',
+  path: '/help/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpGuideRoute = HelpGuideRouteImport.update({
+  id: '/help/$guide',
+  path: '/help/$guide',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const VisualizationsIndexRoute = VisualizationsIndexRouteImport.update({
   id: '/visualizations/',
@@ -147,7 +159,9 @@ export interface FileRoutesByFullPath {
   '/ready': typeof ReadyRoute
   '/courses': typeof AuthedCoursesRoute
   '/join': typeof AuthedJoinRoute
+  '/help/$guide': typeof HelpGuideRoute
   '/visualizations/$vizId': typeof VisualizationsVizIdRoute
+  '/help/': typeof HelpIndexRoute
   '/visualizations/': typeof VisualizationsIndexRoute
   '/account/data': typeof AuthedAccountDataRoute
   '/o/$org/courses/$courseId/activity': typeof AuthedOOrgCoursesCourseIdActivityRoute
@@ -168,7 +182,9 @@ export interface FileRoutesByTo {
   '/ready': typeof ReadyRoute
   '/courses': typeof AuthedCoursesRoute
   '/join': typeof AuthedJoinRoute
+  '/help/$guide': typeof HelpGuideRoute
   '/visualizations/$vizId': typeof VisualizationsVizIdRoute
+  '/help': typeof HelpIndexRoute
   '/visualizations': typeof VisualizationsIndexRoute
   '/account/data': typeof AuthedAccountDataRoute
   '/o/$org/courses/$courseId/activity': typeof AuthedOOrgCoursesCourseIdActivityRoute
@@ -191,7 +207,9 @@ export interface FileRoutesById {
   '/ready': typeof ReadyRoute
   '/_authed/courses': typeof AuthedCoursesRoute
   '/_authed/join': typeof AuthedJoinRoute
+  '/help/$guide': typeof HelpGuideRoute
   '/visualizations/$vizId': typeof VisualizationsVizIdRoute
+  '/help/': typeof HelpIndexRoute
   '/visualizations/': typeof VisualizationsIndexRoute
   '/_authed/account/data': typeof AuthedAccountDataRoute
   '/_authed/o/$org/courses/$courseId/activity': typeof AuthedOOrgCoursesCourseIdActivityRoute
@@ -214,7 +232,9 @@ export interface FileRouteTypes {
     | '/ready'
     | '/courses'
     | '/join'
+    | '/help/$guide'
     | '/visualizations/$vizId'
+    | '/help/'
     | '/visualizations/'
     | '/account/data'
     | '/o/$org/courses/$courseId/activity'
@@ -235,7 +255,9 @@ export interface FileRouteTypes {
     | '/ready'
     | '/courses'
     | '/join'
+    | '/help/$guide'
     | '/visualizations/$vizId'
+    | '/help'
     | '/visualizations'
     | '/account/data'
     | '/o/$org/courses/$courseId/activity'
@@ -257,7 +279,9 @@ export interface FileRouteTypes {
     | '/ready'
     | '/_authed/courses'
     | '/_authed/join'
+    | '/help/$guide'
     | '/visualizations/$vizId'
+    | '/help/'
     | '/visualizations/'
     | '/_authed/account/data'
     | '/_authed/o/$org/courses/$courseId/activity'
@@ -278,7 +302,9 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PrivacyRoute: typeof PrivacyRoute
   ReadyRoute: typeof ReadyRoute
+  HelpGuideRoute: typeof HelpGuideRoute
   VisualizationsVizIdRoute: typeof VisualizationsVizIdRoute
+  HelpIndexRoute: typeof HelpIndexRoute
   VisualizationsIndexRoute: typeof VisualizationsIndexRoute
 }
 
@@ -332,6 +358,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/join'
       preLoaderRoute: typeof AuthedJoinRouteImport
       parentRoute: typeof AuthedRoute
+    }
+    '/help/': {
+      id: '/help/'
+      path: '/help'
+      fullPath: '/help/'
+      preLoaderRoute: typeof HelpIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help/$guide': {
+      id: '/help/$guide'
+      path: '/help/$guide'
+      fullPath: '/help/$guide'
+      preLoaderRoute: typeof HelpGuideRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/visualizations/': {
       id: '/visualizations/'
@@ -475,7 +515,9 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PrivacyRoute: PrivacyRoute,
   ReadyRoute: ReadyRoute,
+  HelpGuideRoute: HelpGuideRoute,
   VisualizationsVizIdRoute: VisualizationsVizIdRoute,
+  HelpIndexRoute: HelpIndexRoute,
   VisualizationsIndexRoute: VisualizationsIndexRoute,
 }
 export const routeTree = rootRouteImport

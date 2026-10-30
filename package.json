@@ -17,6 +17,7 @@
     "course:import": "node scripts/import-course.ts",
     "measure:class": "node scripts/measure-class.ts",
     "measure:room": "node scripts/measure-room.ts",
+    "help:screenshots": "node scripts/help-screenshots.ts",
     "errors": "node scripts/errors.ts",
     "usage": "node scripts/usage.ts",
     "backup:restore": "node scripts/restore-backup.ts",

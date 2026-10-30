@@ -9,6 +9,7 @@ import type { ExerciseGrading, StaffGrade } from '../../../../../../../../shared
 import { kolokiumEnd } from '../../../../../../../../shared/kolokium';
 import type { Embed } from '../../../../../../../../shared/notebooks';
 import type { KolokiumSetup, SubmissionList } from '../../../../../../../../shared/submissions';
+import { HelpLink } from '../../../../../../../components/HelpLink';
 import { AssessmentReport } from '../../../../../../../components/notebook/AssessmentReport';
 import { GradeChip, GradeGroupBar, GradeReview, GradingSetup } from '../../../../../../../components/notebook/Grading';
 import { t as messages, useT } from '../../../../../../../i18n';
@@ -89,6 +90,7 @@ function SubmissionsPage() {
       </Link>
       <h1 className="mt-4 text-3xl font-bold tracking-tight">{t.submissions.pageTitle}</h1>
       {current && <p className="mt-1 max-w-2xl text-muted">{t.submissions.lead(current.title)}</p>}
+      <HelpLink guide="grading" className="mt-2" />
 
       {ready.length > 1 && (
         <nav aria-label={t.lab.notebooks} className="mt-6 flex flex-wrap gap-2">

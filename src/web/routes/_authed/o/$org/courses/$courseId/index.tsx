@@ -26,6 +26,7 @@ import { CourseLabs } from '../../../../../../components/CourseLabs';
 import { CourseStaff } from '../../../../../../components/CourseStaff';
 import { SurveyForStaff, SurveyForStudent } from '../../../../../../components/CourseSurvey';
 import { GetReadyCard, GetReadyPrompt } from '../../../../../../components/GetReady';
+import { HelpLink } from '../../../../../../components/HelpLink';
 import { LearningPath } from '../../../../../../components/LearningPath';
 import { PresentJoinCode } from '../../../../../../components/PresentJoinCode';
 import { LANGUAGE_NAMES, t as messages, useT } from '../../../../../../i18n';
@@ -71,7 +72,10 @@ function CoursePage() {
             <h1 className="text-3xl font-bold tracking-tight">{course.title}</h1>
             {archived && <Chip variant="secondary">{t.course.archived}</Chip>}
           </div>
-          <p className="mt-1 text-muted">{t.course.academicYear(course.academicYear)}</p>
+          <p className="mt-1 flex flex-wrap items-center gap-x-4 text-muted">
+            {t.course.academicYear(course.academicYear)}
+            <HelpLink guide={isStaff ? 'course' : 'first-lab'} />
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {!isStaff && (
