@@ -234,7 +234,6 @@ export function LiveGraph() {
         })}
         {NODES.map((n) => {
           const current = n.id === frame.current;
-          const badge = frame.badge[n.id];
           return (
             // biome-ignore lint/a11y/useSemanticElements: an SVG vertex cannot be a <button>; it acts as one
             <g
@@ -289,26 +288,31 @@ export function LiveGraph() {
               >
                 {n.id}
               </text>
-              {badge !== undefined && (
-                <g className="pointer-events-none">
-                  <rect
-                    x={n.x + 12}
-                    y={n.y - 33}
-                    width={badge.length > 1 ? 26 : 20}
-                    height={18}
-                    rx={9}
-                    fill="var(--foreground)"
-                  />
-                  <text
-                    x={n.x + 12 + (badge.length > 1 ? 13 : 10)}
-                    y={n.y - 20}
-                    textAnchor="middle"
-                    className="fill-background font-mono text-[11px] font-semibold"
-                  >
-                    {badge}
-                  </text>
-                </g>
-              )}
+            </g>
+          );
+        })}
+        {/* The badges in a layer of their own above the vertices: each vertex button holds only its
+            letter, which names it (#192); the narration says what the badges show. */}
+        {NODES.map((n) => {
+          const badge = frame.badge[n.id];
+          return badge === undefined ? null : (
+            <g key={`badge-${n.id}`} className="pointer-events-none" data-badge-for={n.id}>
+              <rect
+                x={n.x + 12}
+                y={n.y - 33}
+                width={badge.length > 1 ? 26 : 20}
+                height={18}
+                rx={9}
+                fill="var(--foreground)"
+              />
+              <text
+                x={n.x + 12 + (badge.length > 1 ? 13 : 10)}
+                y={n.y - 20}
+                textAnchor="middle"
+                className="fill-background font-mono text-[11px] font-semibold"
+              >
+                {badge}
+              </text>
             </g>
           );
         })}

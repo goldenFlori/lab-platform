@@ -4,6 +4,7 @@ import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { ArrowLeft, BarChart3, BrainCircuit, FileBarChart, ShieldCheck } from 'lucide-react';
 import type { ActivityReport } from '../../../../../../../shared/activity';
 import type { EmbedUnderstanding } from '../../../../../../../shared/predictions';
+import { ScrollRegion } from '../../../../../../components/ScrollRegion';
 import { type Messages, t as messages, useT } from '../../../../../../i18n';
 import { activityQuery, understandingQuery } from '../../../../../../lib/activity';
 import { ApiError } from '../../../../../../lib/api';
@@ -181,7 +182,7 @@ function Report({ report, org, courseId }: { report: ActivityReport; org: string
         </div>
         <details className="group mt-6">
           <summary className="cursor-pointer text-sm font-medium text-accent">{t.activity.showTable}</summary>
-          <div className="mt-3 overflow-x-auto">
+          <ScrollRegion label={t.activity.perWeek} className="mt-3">
             <table className="w-full min-w-md text-left text-sm">
               <caption className="sr-only">{t.activity.perWeek}</caption>
               <thead className="text-xs text-muted">
@@ -221,7 +222,7 @@ function Report({ report, org, courseId }: { report: ActivityReport; org: string
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollRegion>
         </details>
       </div>
 
@@ -231,7 +232,7 @@ function Report({ report, org, courseId }: { report: ActivityReport; org: string
         {labs.length === 0 ? (
           <p className="mt-4 text-sm text-muted">{t.activity.noLabs}</p>
         ) : (
-          <div className="mt-4 overflow-x-auto">
+          <ScrollRegion label={t.activity.perLabCaption} className="mt-4">
             <table className="w-full min-w-md text-left text-sm">
               <caption className="sr-only">{t.activity.perLabCaption}</caption>
               <thead className="text-xs text-muted">
@@ -267,7 +268,7 @@ function Report({ report, org, courseId }: { report: ActivityReport; org: string
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollRegion>
         )}
       </div>
     </>

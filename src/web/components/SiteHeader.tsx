@@ -119,7 +119,7 @@ function LanguageToggle() {
       variant="ghost"
       className="gap-1.5 px-2"
       lang={other}
-      aria-label={`${t.header.language}: ${LANGUAGE_NAMES[other]}`}
+      aria-label={`${other.toUpperCase()} – ${t.header.language}: ${LANGUAGE_NAMES[other]}`}
       onPress={() => choose(other)}
     >
       <Languages className="size-[18px]" aria-hidden="true" />
@@ -139,11 +139,13 @@ function AccountMenu({ me }: { me: Me }) {
   return (
     <>
       <Dropdown>
-        <Button size="sm" variant="ghost" className="gap-2 px-1.5" aria-label={t.header.account(me.user.fullName)}>
+        {/* Named by what it shows, initials then the name (#192): on a phone the name is read but not
+            shown. The space keeps the two apart in the name; flex layout ignores it. */}
+        <Button size="sm" variant="ghost" className="gap-2 px-1.5">
           <span className="grid size-7 place-items-center rounded-full bg-accent-soft text-xs font-semibold text-accent">
             {initials(me.user.fullName)}
-          </span>
-          <span className="hidden max-w-40 truncate text-sm font-medium lg:inline">{me.user.fullName}</span>
+          </span>{' '}
+          <span className="sr-only max-w-40 truncate text-sm font-medium lg:not-sr-only">{me.user.fullName}</span>
         </Button>
         <Dropdown.Popover placement="bottom end" className="w-60">
           <div className="px-3 pt-3 pb-1">
@@ -217,7 +219,12 @@ export function SiteHeader() {
   return (
     <header className="glass sticky top-0 z-50 h-(--nav-h) border-b border-separator/80 print:hidden">
       <div className="container-page flex h-full items-center gap-3">
-        <Link to="/" className="group flex min-w-0 items-center gap-2.5 rounded-xl pr-2" aria-label={t.header.home}>
+        {/* The visible name first, as voice control users say it (#192). */}
+        <Link
+          to="/"
+          className="group flex min-w-0 items-center gap-2.5 rounded-xl pr-2"
+          aria-label={`${APP_NAME} – ${t.header.home}`}
+        >
           <Logo className="size-9 shrink-0 transition-transform duration-300 group-hover:rotate-[-6deg]" />
           <span className="truncate text-[0.95rem] font-semibold tracking-tight">{APP_NAME}</span>
         </Link>

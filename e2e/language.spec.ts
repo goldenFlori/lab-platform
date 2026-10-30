@@ -120,7 +120,7 @@ test("a student's choice goes with the account; a course's language serves those
 
   // Ana picks English from her account menu; on another device, signed in again, it is still English.
   const ana = await signIn(browser, chooser, isMobile);
-  await ana.getByRole('button', { name: /^Llogaria:/ }).click();
+  await ana.getByRole('button', { name: /^[A-ZËÇ]{1,2} / }).click();
   await ana.getByRole('menuitem', { name: 'English' }).click();
   await expect(ana.getByRole('heading', { name: 'My courses' })).toBeVisible();
   await expect.poll(async () => (await apiCall<Me>(ana, 'GET', '/me')).user.locale).toBe('en');

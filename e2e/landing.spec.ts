@@ -33,8 +33,8 @@ test('the live graph runs BFS, DFS and Dijkstra from the vertex a visitor taps',
   await expect(graph.getByText('Radha me prioritet')).toBeVisible();
   const j = graph.getByRole('button', { name: 'Nis nga kulmi J' });
   await j.click();
-  // Started from J: its distance stays 0 for the whole run.
-  await expect(j).toContainText('0');
+  // Started from J: its distance stays 0 for the whole run (its badge, drawn above the vertex).
+  await expect(graph.locator('[data-badge-for="J"]')).toContainText('0');
   await expect(graph.locator('p[aria-live="polite"]')).not.toBeEmpty();
   await graph.getByRole('button', { name: 'DFS' }).click();
   await expect(graph.getByText('Stiva (LIFO)')).toBeVisible();

@@ -118,7 +118,6 @@ export const sq = {
     menu: 'Menyja',
     search: 'Kërko',
     signIn: 'Hyr',
-    account: (name: string) => `Llogaria: ${name}`,
     accountMenu: 'Llogaria',
     signOut: 'Dil',
     language: 'Gjuha',

@@ -20,7 +20,7 @@ test('signs in, opens my courses, and signs out', async ({ page }) => {
   await signIn(page);
   await expect(page).toHaveURL('/courses');
   await expect(page.getByRole('heading', { level: 1, name: 'Kurset e mia' })).toBeVisible();
-  const account = page.getByRole('button', { name: `Llogaria: ${E2E_ACCOUNT.fullName}` });
+  const account = page.getByRole('button', { name: E2E_ACCOUNT.fullName });
   await expect(account).toBeVisible();
 
   const overflow = await page.evaluate(
