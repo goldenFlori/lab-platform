@@ -50,6 +50,7 @@ For the end-to-end tests, install the browser once with `npx playwright install 
 | `npm run measure:room` | What a student's device downloads, and a room of 120 over one connection |
 | `npm run errors` | Browser and server errors in production as they happen (needs `npx wrangler login`) |
 | `npm run usage` | Today's use of the free plan's daily limits (see Usage below) |
+| `npm run help:screenshots` | Retake the help guides' pictures from the real app |
 | `npm run backup:restore` | Prove the latest weekly backup restores (see Backups below) |
 
 ## Layout

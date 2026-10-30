@@ -641,6 +641,20 @@ visit is about 3 s faster.
   `src/web` and `src/viz` into `src/shared` and fails on any that reaches Zod.
 - Python starts while the student reads, so a cell runs at once with the engine cached (#191).
 
+## Help in the app (#194)
+
+- Thirteen guides (six for students, seven for staff) at `/help` and `/help/<id>`, public. Their text is
+  in `src/web/i18n/help.sq.ts` (the source) and `help.en.ts` (typed against it), loaded only by the help
+  pages through `useHelp()`. `**Bold**` is a button or a name, written exactly as the interface shows
+  it, so a guide must change with the label it names.
+- Pictures: `npm run help:screenshots` (`scripts/help-screenshots.ts`) runs the build on its own
+  database with the fixture course, signs in as a pedagog and a student in each language, and saves
+  JPEGs (1280×800, about 1 MB in all) to `public/help/<locale>/`. Retake them when a screen changes.
+- `HelpLink` ("Ndihmë") opens the guide for the screen it sits on: the lab's toolbar, the course, the
+  submissions, the student import; the footer links to all.
+- `test/scripts/help.test.ts` keeps the two languages in step (guides, steps, pictures) and checks every
+  picture exists; the help pages are in the accessibility audit.
+
 ## Accessibility (#192)
 
 Target: WCAG 2.2 level AA, which public institutions are asked for and which every student needs.

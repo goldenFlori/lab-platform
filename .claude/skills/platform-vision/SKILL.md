@@ -523,6 +523,14 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   app's files are now kept by the browser instead of re-asked for on every visit, the notebook starts
   downloading with the lab, and Zod, which four value imports had pulled into the app, is out again
   with a test to keep it out. Next: #194, help in the app.
+- **2026-10-31:** #194 done, and with it Phase 12. Help in the app, in Albanian and English: six
+  guides for students (the first lab, running and editing code, visualizations and trace tables,
+  handing in and the kolokium, My progress, getting the device ready) and seven for pedagogs (course
+  and groups, students and slips, labs and notebooks, Live Lab, grading, the kolokium, reports), each
+  naming the buttons as they show, with pictures taken from the real app by a script. Screens link to
+  their guide, and the footer to all. Phase 12 leaves the first class ready for a real room: devices
+  prepared at home, every page accessible, quick on a cheap phone, and help for whoever comes next.
+  Next: plan Phase 13; the owner re-imports the course and runs the dry run with FSHN.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
