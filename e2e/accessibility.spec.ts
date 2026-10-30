@@ -51,6 +51,8 @@ for (const scheme of ['light', 'dark'] as const) {
       ['sign in', '/login'],
       ['privacy', '/privacy'],
       ['get ready', '/ready'],
+      ['help', '/help'],
+      ['a guide', '/help/hand-in'],
       ['visualizations', '/visualizations'],
       ['a visualization', '/visualizations/labirinti'],
     ] as const) {
