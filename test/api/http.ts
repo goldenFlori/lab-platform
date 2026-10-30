@@ -36,9 +36,13 @@ export async function signIn(username: string) {
  * A signed-in account whose only role in the organization is `role`: organization-wide, or only
  * in the given course or group. Pass no role for someone with no membership there at all.
  */
-export async function account(seed: Seeded, role?: string, scope: { courseId?: string; groupId?: string } = {}) {
+export async function account(
+  seed: Seeded,
+  role?: string,
+  scope: { courseId?: string; groupId?: string } = {},
+  username = `${role ?? 'nobody'}.${crypto.randomUUID().slice(0, 8)}`,
+) {
   hash ??= hashPassword(PASSWORD);
-  const username = `${role ?? 'nobody'}.${crypto.randomUUID().slice(0, 8)}`;
   const scoped = Boolean(scope.courseId || scope.groupId);
   const user = await seed.tenant.users.create(
     { username, fullName: username, passwordHash: await hash },

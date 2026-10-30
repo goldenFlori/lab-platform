@@ -18,6 +18,8 @@ export type Me = {
   /** locale: the interface language the user chose, or null (#19). */
   user: { id: string; username: string; fullName: string; locale: Locale | null };
   organizations: { id: string; name: string; slug: string }[];
+  /** The platform's owner (#200), for the console's link; absent for everyone else. */
+  owner?: true;
 };
 
 export type ApiErrorCode =
@@ -28,6 +30,8 @@ export type ApiErrorCode =
   | 'forbidden'
   | 'not_found'
   | 'daily_limit'
+  | 'slug_taken'
+  | 'username_taken'
   | 'internal';
 
 export type ApiErrorBody = { error: ApiErrorCode };
