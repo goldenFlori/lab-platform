@@ -511,6 +511,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   dropped connection). Staff share it from the course page, as a link or a QR code for the projector;
   students see a reminder there until their device is ready. Python's packages from PyPI (plotly) are
   now kept on the device like the rest. Next: #192, the accessibility audit.
+- **2026-10-30:** #192 done. Twenty pages, for visitors, students and staff, pass the automated
+  WCAG 2.2 AA checks on desktop and phone, in the light and the dark theme, and the tests keep it
+  so; a lab works with the keyboard alone, from running a cell to handing in. The audit's fixes:
+  text colours too pale to read (success and warning text, accent on its tint, four colours of the
+  code), controls whose names did not contain what they show (logo, language, account, the front
+  page's graph), and wide tables now reachable by keyboard. Next: #193, slow devices and networks.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
