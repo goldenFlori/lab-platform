@@ -64,6 +64,13 @@
   --separator: oklch(0.925 0.009 255);
   --focus: var(--accent);
   --link: var(--accent);
+  /* WCAG AA for text (#192): accent text on its soft tint 4.7:1 (HeroUI's tint gave 4.2); success
+     and warning dark enough to be read as text (HeroUI's 2.2 and 2.0 on white), also on their tints. */
+  --accent-soft: color-mix(in oklab, var(--accent) 10%, var(--surface));
+  --success: oklch(0.5 0.13 150);
+  --success-foreground: oklch(0.99 0 0);
+  --warning: oklch(0.52 0.12 60);
+  --warning-foreground: oklch(0.99 0 0);
   --surface-shadow:
     0 1px 0 0 oklch(1 0 0 / 0.7) inset, 0 1px 2px 0 rgb(16 24 48 / 0.05), 0 8px 24px -10px rgb(16 24 64 / 0.12);
 
@@ -566,6 +573,20 @@ select:not([multiple]):not([size]) {
 .nb-shiki pre span {
   color: var(--shiki-light);
 }
+/* GitHub's light colours that fall below WCAG AA on the code background (#192), a shade darker in
+   the same hue: red 4.2 → 5.5, orange 3.2 → 6.0, green 4.3 → 5.6, comments 4.5 → 5.9. */
+.nb-shiki pre span[style*="--shiki-light:#D73A49" i] {
+  color: #bf2737;
+}
+.nb-shiki pre span[style*="--shiki-light:#E36209" i] {
+  color: #a24000;
+}
+.nb-shiki pre span[style*="--shiki-light:#22863A" i] {
+  color: #1c7231;
+}
+.nb-shiki pre span[style*="--shiki-light:#6A737D" i] {
+  color: #57606a;
+}
 .dark .nb-shiki pre,
 .dark .nb-shiki pre span {
   color: var(--shiki-dark);
@@ -582,13 +603,14 @@ select:not([multiple]):not([size]) {
   background: color-mix(in oklab, var(--state-reject) 12%, transparent);
 }
 
-/* The code editor (#49): GitHub's light and dark colours, as Shiki uses for the code it shows */
+/* The code editor (#49): GitHub's light and dark colours, as Shiki uses for the code it shows, with
+   the same darker shades where the light ones fall below WCAG AA (#192) */
 .nb-editor .cm-editor {
   color: #24292e;
 }
 .nb-editor .tok-keyword,
 .nb-editor .tok-operator {
-  color: #d73a49;
+  color: #bf2737;
 }
 .nb-editor .tok-string,
 .nb-editor .tok-string2 {
@@ -600,7 +622,7 @@ select:not([multiple]):not([size]) {
   color: #005cc5;
 }
 .nb-editor .tok-comment {
-  color: #6a737d;
+  color: #57606a;
 }
 .nb-editor .tok-variableName.tok-definition,
 .nb-editor .tok-className {
