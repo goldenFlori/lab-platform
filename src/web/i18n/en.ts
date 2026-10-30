@@ -117,7 +117,6 @@ export const en: Messages = {
     menu: 'Menu',
     search: 'Search',
     signIn: 'Sign in',
-    account: (name: string) => `Account: ${name}`,
     accountMenu: 'Account',
     signOut: 'Sign out',
     language: 'Language',

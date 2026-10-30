@@ -5,6 +5,7 @@ import { ArrowLeft, Printer, ShieldCheck } from 'lucide-react';
 import type { FirstTries, PilotCount, PilotReport } from '../../../../../../../shared/activity';
 import type { SurveyView } from '../../../../../../../shared/surveys';
 import { SurveyResultsView } from '../../../../../../components/CourseSurvey';
+import { ScrollRegion } from '../../../../../../components/ScrollRegion';
 import { type Messages, t as messages, useT } from '../../../../../../i18n';
 import { ApiError, api } from '../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../lib/brand';
@@ -222,7 +223,7 @@ function Learning({ data, t }: { data: PilotReport; t: Messages }) {
             />
           </dl>
           {u.topics.length > 0 && (
-            <div className="mt-4 overflow-x-auto">
+            <ScrollRegion label={L.topics} className="mt-4">
               <h3 className="text-sm font-semibold">{L.topics}</h3>
               <table className="mt-2 w-full min-w-md text-left text-sm">
                 <thead className="text-xs text-muted">
@@ -254,7 +255,7 @@ function Learning({ data, t }: { data: PilotReport; t: Messages }) {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </ScrollRegion>
           )}
           <h3 className="mt-4 text-sm font-semibold">{L.weeks}</h3>
           <ul className="mt-2 grid gap-1.5">

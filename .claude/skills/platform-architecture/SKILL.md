@@ -620,6 +620,32 @@ at `/o/:org/courses/:id/activity`, linked from the course page.
   - code runs;
   - deleting old activity (see open items in `platform-vision`).
 
+## Accessibility (#192)
+
+Target: WCAG 2.2 level AA, which public institutions are asked for and which every student needs.
+
+- **Checked by tests:** `e2e/accessibility.spec.ts` runs axe (`@axe-core/playwright`, tags `wcag2a`
+  to `wcag22aa`) on 20 pages (visitors, students and staff, including the lab page, submissions,
+  reports and the student import) on desktop and the 375 px phone, in the light and the dark theme.
+  Any violation fails the build, listed with the element and, for contrast, the ratio.
+- **Keyboard:** the same file walks a lab with the keyboard alone: Tab reaches a cell's Run and
+  Enter runs it, Enter opens the code editor, Escape then Tab leaves it (CodeMirror's
+  `indentWithTab` keeps Tab for indenting; no trap, 2.1.2), and handing in with its confirmation.
+- **Rules the first audit taught (2026-10-29):**
+  - Contrast 4.5:1 for text (1.4.3). HeroUI's success and warning are fills, too pale as text (2.2
+    and 2.0): `--success` and `--warning` are darker in the light theme, and `--accent-soft` is an
+    opaque 10% tint so accent text on it reaches 4.7. GitHub's light code colours below 4.5 on the
+    code background (red, orange, green, comments) are a shade darker in the same hue, in Shiki's
+    output (by their inline colour) and in the editor alike.
+  - A control's name contains its visible text, first (2.5.3, for voice control): the logo is
+    "Lab Platform – Kreu", the language button "EN – …", the account button is named by its content
+    (initials, a space, the name; the name is `sr-only` on phones). axe judges by what is visible,
+    so `aria-hidden` on visible text does not help: text that is not the name goes outside the
+    control (the live graph's badges are a layer of their own).
+  - A region that scrolls sideways must be reachable by keyboard (2.1.1): wide tables sit in
+    `ScrollRegion` (a named, focusable `section`). Code and output blocks rely on browsers making
+    scrollers focusable (Chrome, Firefox) and on touch.
+
 ## Design system (#128)
 
 - **Tokens** live in `src/web/styles.css`. The algorithm states (`--state-frontier`, `-current`,

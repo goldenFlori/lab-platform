@@ -10,6 +10,7 @@ import { useText } from '../../../viz/kit/text';
 import { useT } from '../../i18n';
 import { reportQuery } from '../../lib/grading';
 import type { NotebookRef } from '../../lib/notebooks';
+import { ScrollRegion } from '../ScrollRegion';
 
 /**
  * The assessment report (#170) under a notebook's submissions: per exercise and per trace table row,
@@ -99,7 +100,7 @@ function Exercises({ rows }: { rows: ExerciseReport[] }) {
   return (
     <div className="mt-5">
       <h3 className="text-base font-semibold">{t.assessment.exercises}</h3>
-      <div className="mt-2 overflow-x-auto">
+      <ScrollRegion label={t.assessment.exercises} className="mt-2">
         <table className="w-full min-w-md text-left text-sm">
           <thead className="text-xs text-muted">
             <tr className="border-b border-separator">
@@ -139,7 +140,7 @@ function Exercises({ rows }: { rows: ExerciseReport[] }) {
             })}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
     </div>
   );
 }
@@ -183,7 +184,7 @@ function TraceTable({
         <span className="text-sm font-normal text-muted">· {t.assessment.points(table.points)}</span>
       </h3>
       {table.variant && <p className="text-xs text-muted">{t.assessment.variant}</p>}
-      <div className="mt-2 overflow-x-auto">
+      <ScrollRegion label={table.title || t.assessment.table(n)} className="mt-2">
         <table className="w-full min-w-md text-left text-sm">
           <caption className="sr-only">{table.title || t.assessment.table(n)}</caption>
           <thead className="text-xs text-muted">
@@ -231,7 +232,7 @@ function TraceTable({
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
     </div>
   );
 }
