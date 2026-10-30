@@ -53,9 +53,14 @@ function RootLayout() {
         </main>
         <footer className="container-page print:hidden flex flex-wrap items-center justify-between gap-3 border-t border-border py-6 text-sm text-muted">
           <span>{APP_NAME}</span>
-          <Link to="/privacy" className="hover:text-foreground">
-            {t.footer.privacy}
-          </Link>
+          <span className="flex gap-4">
+            <Link to="/help" className="hover:text-foreground">
+              {t.help.link}
+            </Link>
+            <Link to="/privacy" className="hover:text-foreground">
+              {t.footer.privacy}
+            </Link>
+          </span>
         </footer>
       </AriaRouterProvider>
     </MotionProvider>

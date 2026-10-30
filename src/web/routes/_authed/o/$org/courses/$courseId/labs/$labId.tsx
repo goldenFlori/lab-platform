@@ -20,6 +20,7 @@ import type { LabView } from '../../../../../../../../shared/labs';
 import { ORIGINAL_FILE } from '../../../../../../../../shared/notebook-files';
 import type { Embed, NotebookKind, NotebookSummary } from '../../../../../../../../shared/notebooks';
 import { AiTools } from '../../../../../../../components/AiTools';
+import { HelpLink } from '../../../../../../../components/HelpLink';
 import { LabMoreMenu } from '../../../../../../../components/LabMoreMenu';
 import { LiveLab } from '../../../../../../../components/LiveLab';
 import { AssignmentsEditor } from '../../../../../../../components/notebook/AssignmentsEditor';
@@ -201,6 +202,7 @@ function LabPage() {
             {canManage && <AiTools org={org} courseId={courseId} />}
             {canManage && <LabMoreMenu canDelete={!!current} />}
             <LiveLab org={org} courseId={courseId} labId={labId} />
+            <HelpLink guide={labList.permissions.staff ? 'labs' : 'run-code'} className="ml-auto" />
           </div>
 
           {canManage && (

@@ -1087,6 +1087,10 @@ export const sq = {
     anyVertex: 'v',
     loadFailed: 'Raporti nuk u ngarkua. Rifreskoni faqen dhe provoni sërish.',
   },
+  help: {
+    title: 'Ndihmë',
+    link: 'Ndihmë',
+  },
   ready: {
     pageTitle: 'Gati për laboratorin',
     title: 'Gati për laboratorin',
