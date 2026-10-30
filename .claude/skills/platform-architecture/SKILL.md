@@ -620,6 +620,27 @@ at `/o/:org/courses/:id/activity`, linked from the course page.
   - code runs;
   - deleting old activity (see open items in `platform-vision`).
 
+## Slow devices and networks (#193)
+
+`e2e/performance.spec.ts` opens Lab 4 (with its figures) as a student with the CPU slowed four times
+and the network at 2 Mbit/s with 300 ms latency, and holds three budgets: the notebook readable on a
+first visit (12 s), again with the cache (3.5 s), and the first cell's output with Python cached (5 s).
+Measured 2026-10-30 on a laptop after #193: 6.2, 1.4 and 0.8 s (before: 8.3, 5.3 and 0.6). The local
+server does not compress; production's Brotli sends the app's 877 KB as 164 KB, so production's first
+visit is about 3 s faster.
+
+- **`/assets/*` is immutable** (`public/_headers`, a year): the files are named by their hash. Before,
+  `max-age=0, must-revalidate` made every visit re-ask for each of ~40 files, a round trip per wave
+  of imports (1.6 s at 300 ms latency before the app could start).
+- **The lab route's loader prefetches the notebook** (its details and `rendered.json`, the largest
+  download) with the lab's other queries, for `?notebook=` or the first finished notebook, instead of
+  after the page has rendered.
+- **No Zod in the app:** value imports from schema files had pulled Zod (87 KB) into the lab route.
+  Values the app needs live in schema-free files (`kolokium.ts`, `code-limits.ts`, `staff-roles.ts`,
+  like `exercise-limits.ts`), and `test/scripts/no-zod-in-app.test.ts` follows every value import of
+  `src/web` and `src/viz` into `src/shared` and fails on any that reaches Zod.
+- Python starts while the student reads, so a cell runs at once with the engine cached (#191).
+
 ## Accessibility (#192)
 
 Target: WCAG 2.2 level AA, which public institutions are asked for and which every student needs.
