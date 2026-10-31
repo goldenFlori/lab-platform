@@ -162,6 +162,13 @@
       "when": 1793127949283,
       "tag": "0022_membership_user_index",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "6",
+      "when": 1793457560418,
+      "tag": "0023_branding",
+      "breakpoints": true
     }
   ]
 }

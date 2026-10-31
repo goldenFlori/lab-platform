@@ -7,6 +7,7 @@ import type { AppEnv } from './env';
 import { handleError, notFound } from './errors';
 import { sameOrigin } from './middleware/same-origin';
 import { authRoutes, meRoutes } from './routes/auth';
+import { joinBrandingRoutes } from './routes/branding';
 import { clientErrorRoutes } from './routes/client-errors';
 import { joinRoutes } from './routes/join';
 import { orgRoutes } from './routes/orgs';
@@ -53,6 +54,7 @@ app.route('/auth', authRoutes);
 app.route('/me', meRoutes);
 app.route('/orgs', orgRoutes);
 app.route('/join', joinRoutes);
+app.route('/join', joinBrandingRoutes);
 app.route('/client-errors', clientErrorRoutes);
 app.route('/platform', platformRoutes);
 
