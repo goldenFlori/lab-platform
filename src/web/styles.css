@@ -103,6 +103,13 @@
   --viz-soft: oklch(0.55 0.2 258 / 0.12);
 }
 
+/* An institution's accent (#201), while one of its pages is open: light theme only, checked for WCAG AA
+   when chosen; the soft tint, focus and links follow it. */
+.light[data-org-accent],
+[data-theme="light"][data-org-accent] {
+  --accent: var(--org-accent);
+}
+
 :root.dark,
 :root[data-theme="dark"],
 .dark {

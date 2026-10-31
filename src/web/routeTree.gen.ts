@@ -22,6 +22,7 @@ import { Route as HelpGuideRouteImport } from './routes/help/$guide'
 import { Route as VisualizationsIndexRouteImport } from './routes/visualizations/index'
 import { Route as VisualizationsVizIdRouteImport } from './routes/visualizations/$vizId'
 import { Route as AuthedAccountDataRouteImport } from './routes/_authed/account/data'
+import { Route as AuthedOOrgAdminRouteImport } from './routes/_authed/o/$org/admin'
 import { Route as AuthedOOrgCoursesCourseIdIndexRouteImport } from './routes/_authed/o/$org/courses/$courseId/index'
 import { Route as AuthedOOrgCoursesCourseIdActivityRouteImport } from './routes/_authed/o/$org/courses/$courseId/activity'
 import { Route as AuthedOOrgCoursesCourseIdProgressRouteImport } from './routes/_authed/o/$org/courses/$courseId/progress'
@@ -95,6 +96,11 @@ const VisualizationsVizIdRoute = VisualizationsVizIdRouteImport.update({
 const AuthedAccountDataRoute = AuthedAccountDataRouteImport.update({
   id: '/account/data',
   path: '/account/data',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedOOrgAdminRoute = AuthedOOrgAdminRouteImport.update({
+  id: '/o/$org/admin',
+  path: '/o/$org/admin',
   getParentRoute: () => AuthedRoute,
 } as any)
 const AuthedOOrgCoursesCourseIdIndexRoute =
@@ -171,6 +177,7 @@ export interface FileRoutesByFullPath {
   '/help/': typeof HelpIndexRoute
   '/visualizations/': typeof VisualizationsIndexRoute
   '/account/data': typeof AuthedAccountDataRoute
+  '/o/$org/admin': typeof AuthedOOrgAdminRoute
   '/o/$org/courses/$courseId/activity': typeof AuthedOOrgCoursesCourseIdActivityRoute
   '/o/$org/courses/$courseId/progress': typeof AuthedOOrgCoursesCourseIdProgressRoute
   '/o/$org/courses/$courseId/report': typeof AuthedOOrgCoursesCourseIdReportRoute
@@ -195,6 +202,7 @@ export interface FileRoutesByTo {
   '/help': typeof HelpIndexRoute
   '/visualizations': typeof VisualizationsIndexRoute
   '/account/data': typeof AuthedAccountDataRoute
+  '/o/$org/admin': typeof AuthedOOrgAdminRoute
   '/o/$org/courses/$courseId/activity': typeof AuthedOOrgCoursesCourseIdActivityRoute
   '/o/$org/courses/$courseId/progress': typeof AuthedOOrgCoursesCourseIdProgressRoute
   '/o/$org/courses/$courseId/report': typeof AuthedOOrgCoursesCourseIdReportRoute
@@ -221,6 +229,7 @@ export interface FileRoutesById {
   '/help/': typeof HelpIndexRoute
   '/visualizations/': typeof VisualizationsIndexRoute
   '/_authed/account/data': typeof AuthedAccountDataRoute
+  '/_authed/o/$org/admin': typeof AuthedOOrgAdminRoute
   '/_authed/o/$org/courses/$courseId/activity': typeof AuthedOOrgCoursesCourseIdActivityRoute
   '/_authed/o/$org/courses/$courseId/progress': typeof AuthedOOrgCoursesCourseIdProgressRoute
   '/_authed/o/$org/courses/$courseId/report': typeof AuthedOOrgCoursesCourseIdReportRoute
@@ -247,6 +256,7 @@ export interface FileRouteTypes {
     | '/help/'
     | '/visualizations/'
     | '/account/data'
+    | '/o/$org/admin'
     | '/o/$org/courses/$courseId/activity'
     | '/o/$org/courses/$courseId/progress'
     | '/o/$org/courses/$courseId/report'
@@ -271,6 +281,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/visualizations'
     | '/account/data'
+    | '/o/$org/admin'
     | '/o/$org/courses/$courseId/activity'
     | '/o/$org/courses/$courseId/progress'
     | '/o/$org/courses/$courseId/report'
@@ -296,6 +307,7 @@ export interface FileRouteTypes {
     | '/help/'
     | '/visualizations/'
     | '/_authed/account/data'
+    | '/_authed/o/$org/admin'
     | '/_authed/o/$org/courses/$courseId/activity'
     | '/_authed/o/$org/courses/$courseId/progress'
     | '/_authed/o/$org/courses/$courseId/report'
@@ -413,6 +425,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedAccountDataRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/o/$org/admin': {
+      id: '/_authed/o/$org/admin'
+      path: '/o/$org/admin'
+      fullPath: '/o/$org/admin'
+      preLoaderRoute: typeof AuthedOOrgAdminRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/o/$org/courses/$courseId/': {
       id: '/_authed/o/$org/courses/$courseId/'
       path: '/o/$org/courses/$courseId'
@@ -491,6 +510,7 @@ interface AuthedRouteChildren {
   AuthedJoinRoute: typeof AuthedJoinRoute
   AuthedPlatformRoute: typeof AuthedPlatformRoute
   AuthedAccountDataRoute: typeof AuthedAccountDataRoute
+  AuthedOOrgAdminRoute: typeof AuthedOOrgAdminRoute
   AuthedOOrgCoursesCourseIdActivityRoute: typeof AuthedOOrgCoursesCourseIdActivityRoute
   AuthedOOrgCoursesCourseIdProgressRoute: typeof AuthedOOrgCoursesCourseIdProgressRoute
   AuthedOOrgCoursesCourseIdReportRoute: typeof AuthedOOrgCoursesCourseIdReportRoute
@@ -508,6 +528,7 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedJoinRoute: AuthedJoinRoute,
   AuthedPlatformRoute: AuthedPlatformRoute,
   AuthedAccountDataRoute: AuthedAccountDataRoute,
+  AuthedOOrgAdminRoute: AuthedOOrgAdminRoute,
   AuthedOOrgCoursesCourseIdActivityRoute:
     AuthedOOrgCoursesCourseIdActivityRoute,
   AuthedOOrgCoursesCourseIdProgressRoute:

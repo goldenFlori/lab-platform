@@ -2,7 +2,8 @@ import { createPortal } from 'react-dom';
 import { useT } from '../i18n';
 import type { Slip } from '../lib/students';
 
-type Props = { slips: Slip[]; courseTitle: string; groupName: string };
+/** `institution`: its name, printed first on each slip (#201). */
+type Props = { slips: Slip[]; courseTitle: string; groupName: string; institution?: string };
 
 /**
  * Credential slips: on screen as a preview, and a print-only copy at the top of the page, so the
@@ -30,7 +31,13 @@ export function CredentialSlips(props: Props) {
   );
 }
 
-function SlipCard({ slip, courseTitle, groupName, screen = false }: Props & { slip: Slip; screen?: boolean }) {
+function SlipCard({
+  slip,
+  courseTitle,
+  groupName,
+  institution,
+  screen = false,
+}: Props & { slip: Slip; screen?: boolean }) {
   const t = useT();
   return (
     <div
@@ -39,6 +46,7 @@ function SlipCard({ slip, courseTitle, groupName, screen = false }: Props & { sl
     >
       <p className={screen ? 'text-xs text-muted' : 'slip-meta'}>
         <span aria-hidden="true">✂ </span>
+        {institution ? `${institution} · ` : ''}
         {courseTitle} · {groupName}
       </p>
       <p className={screen ? 'mt-2 text-lg font-semibold' : 'slip-name'}>{slip.fullName}</p>

@@ -1,5 +1,5 @@
 import { Alert, AlertDialog, Button } from '@heroui/react';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { ArrowLeft, KeyRound, Printer, Upload, Users } from 'lucide-react';
 import type { GroupStudent } from '../../../../../../../../../shared/students';
@@ -7,6 +7,7 @@ import { CredentialSlips } from '../../../../../../../../components/CredentialSl
 import { t as messages, useT } from '../../../../../../../../i18n';
 import { ApiError } from '../../../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../../../lib/brand';
+import { brandingQuery } from '../../../../../../../../lib/branding';
 import { courseQuery } from '../../../../../../../../lib/courses';
 import { groupStudentsQuery, useResetPassword } from '../../../../../../../../lib/students';
 
@@ -31,6 +32,8 @@ export const Route = createFileRoute('/_authed/o/$org/courses/$courseId/groups/$
 
 function GroupStudentsPage() {
   const { org, courseId, groupId } = Route.useParams();
+  // The institution's name on the printed slips (#201).
+  const institution = useQuery(brandingQuery(org)).data?.name;
   const { courseTitle, groupName } = Route.useLoaderData();
   const { data: students } = useSuspenseQuery(groupStudentsQuery(org, courseId, groupId));
   const reset = useResetPassword(org, courseId, groupId);
@@ -68,7 +71,12 @@ function GroupStudentsPage() {
             </Button>
           </div>
           <div className="mt-4 max-w-md">
-            <CredentialSlips slips={[reset.data]} courseTitle={courseTitle} groupName={groupName} />
+            <CredentialSlips
+              slips={[reset.data]}
+              courseTitle={courseTitle}
+              groupName={groupName}
+              institution={institution}
+            />
           </div>
         </div>
       )}

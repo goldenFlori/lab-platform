@@ -51,6 +51,8 @@ export type OrganizationExport = {
   version: 1;
   exportedAt: string;
   organization: { id: string; name: string; slug: string };
+  /** Its look (#201): the accent, and the logo as base64; absent in exports made before. */
+  branding?: { accent: string | null; logo: { type: string; base64: string } | null };
   tables: Record<ExportPart, Record<string, unknown>[]>;
   /** Each notebook's original .ipynb, by notebook id. */
   notebookFiles: Record<string, unknown>;
