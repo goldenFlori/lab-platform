@@ -4,14 +4,18 @@ import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { ArrowLeft, Check, CircleAlert, ImageUp, Trash2 } from 'lucide-react';
 import { type ChangeEvent, type FormEvent, useState } from 'react';
 import { accentContrast, isLogoType, LOGO_BYTES } from '../../../../../shared/branding';
+import { DeletionRequests } from '../../../../components/DeletionRequests';
+import { OrgPeopleSection, OrgSettingsSection } from '../../../../components/OrgAdmin';
+import { OrganizationExport } from '../../../../components/OrganizationExport';
 import { t as messages, useT } from '../../../../i18n';
 import { ApiError } from '../../../../lib/api';
+import { useMe } from '../../../../lib/auth';
 import { APP_NAME } from '../../../../lib/brand';
 import { brandingQuery, useBrandingChanges } from '../../../../lib/branding';
 import { orgAccessQuery } from '../../../../lib/courses';
 
-// The institution admin's page (#201, #202): for those with org.manage, starting with its look (name,
-// accent, logo). Anyone else meets the page that does not exist, as the API answers them.
+// The institution admin's page (#201, #202), for those with org.manage: its people and their roles, its
+// language and AI policy, its look (name, accent, logo), and its data (deletion requests, the export). Anyone else meets the page that does not exist, as the API answers them.
 
 export const Route = createFileRoute('/_authed/o/$org/admin')({
   loader: async ({ context: { queryClient }, params: { org } }) => {
@@ -27,13 +31,23 @@ function OrgAdminPage() {
   const { org } = Route.useParams();
   const t = useT();
   const { data: branding } = useSuspenseQuery(brandingQuery(org));
+  const organization = useMe()?.organizations.find((o) => o.slug === org);
   return (
     <section className="container-page py-10">
       <Link to="/courses" className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground">
         <ArrowLeft className="size-4" aria-hidden="true" /> {t.courses.title}
       </Link>
       <h1 className="mt-4 text-3xl font-bold tracking-tight">{t.orgAdmin.title(branding.name)}</h1>
+      <OrgPeopleSection org={org} institution={branding.name} />
+      <OrgSettingsSection org={org} />
       <BrandingSection org={org} />
+      <section aria-labelledby="org-data" className="mt-10">
+        <h2 id="org-data" className="text-lg font-semibold tracking-tight">
+          {t.orgData.title}
+        </h2>
+        <DeletionRequests org={org} />
+        {organization && <OrganizationExport organization={organization} />}
+      </section>
     </section>
   );
 }

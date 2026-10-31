@@ -6,6 +6,7 @@ import { DEFAULT_LOCALE, type Locale } from '../../shared/locale';
 import { setLocale, storedLocale, storeLocale } from '../i18n';
 import { api } from './api';
 import { meQuery, useMe } from './auth';
+import { brandingQuery } from './branding';
 import { courseQuery } from './courses';
 
 // Which language the interface speaks (#19): the user's own choice (kept with the account, or on
@@ -20,7 +21,10 @@ export function useLocaleSync() {
   const courseId = params?.courseId;
   // Already in the cache: the course's own pages load it before they show.
   const course = useQuery({ ...courseQuery(org ?? '', courseId ?? ''), enabled: Boolean(me && org && courseId) });
-  const wanted: Locale = me?.user.locale ?? storedLocale() ?? course.data?.course.locale ?? DEFAULT_LOCALE;
+  // Then the institution's language (#202), on its pages.
+  const branding = useQuery({ ...brandingQuery(org ?? ''), enabled: Boolean(me && org) });
+  const wanted: Locale =
+    me?.user.locale ?? storedLocale() ?? course.data?.course.locale ?? branding.data?.locale ?? DEFAULT_LOCALE;
 
   useEffect(() => {
     // Page titles are made by the routes; make them again in the new language.
