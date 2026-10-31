@@ -21,7 +21,7 @@ test("the admin downloads the institution's data as one file", async ({ browser,
     stored: toStored(await renderNotebook(NOTEBOOK)),
   });
 
-  await staff.goto('/courses');
+  await staff.goto('/o/e2e/admin');
   const download = staff.waitForEvent('download');
   await staff.getByTestId('org-export').getByRole('button', { name: 'Shkarko (JSON)' }).click();
   const file = await download;
