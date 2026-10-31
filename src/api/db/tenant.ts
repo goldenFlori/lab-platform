@@ -222,6 +222,64 @@ function tenantUsers(db: Db, orgId: string) {
   };
 }
 
+/**
+ * The institution's people for its admin (#202): a page at a time by username, with their role across
+ * the institution and how many courses or groups they teach in or study in. Counts in SQL.
+ */
+function tenantPeople(db: Db, orgId: string) {
+  const PAGE = 50;
+  return {
+    async page(query: string, after: string) {
+      const like = `%${query.toLowerCase().replace(/[%_\\]/g, '')}%`;
+      const rows = await db.all<{
+        id: string;
+        username: string;
+        fullName: string;
+        orgRole: string | null;
+        teaches: number;
+        studies: number;
+      }>(sql`
+        SELECT u.id, u.username, u.full_name AS fullName,
+          (SELECT m.role FROM memberships m WHERE m.org_id = ${orgId} AND m.user_id = u.id
+             AND m.course_id IS NULL AND m.group_id IS NULL LIMIT 1) AS orgRole,
+          (SELECT COUNT(*) FROM memberships m WHERE m.org_id = ${orgId} AND m.user_id = u.id
+             AND (m.course_id IS NOT NULL OR m.group_id IS NOT NULL) AND m.role <> 'student') AS teaches,
+          (SELECT COUNT(*) FROM memberships m WHERE m.org_id = ${orgId} AND m.user_id = u.id
+             AND m.group_id IS NOT NULL AND m.role = 'student') AS studies
+        FROM users u
+        WHERE u.id IN (SELECT user_id FROM memberships WHERE org_id = ${orgId})
+          AND u.username > ${after}
+          AND (lower(u.full_name) LIKE ${like} OR u.username LIKE ${like})
+        ORDER BY u.username
+        LIMIT ${PAGE + 1}`);
+      return { people: rows.slice(0, PAGE), next: rows.length > PAGE ? (rows[PAGE - 1]?.username ?? null) : null };
+    },
+
+    /** Whether a username is taken anywhere on the platform (usernames are global). */
+    async usernameTaken(username: string) {
+      const [row] = await db.select({ id: users.id }).from(users).where(eq(users.username, username)).limit(1);
+      return !!row;
+    },
+
+    /** The person's membership across the whole institution, if any. */
+    async orgMembership(userId: string) {
+      const [row] = await db
+        .select({ id: memberships.id, role: memberships.role })
+        .from(memberships)
+        .where(
+          and(
+            eq(memberships.orgId, orgId),
+            eq(memberships.userId, userId),
+            isNull(memberships.courseId),
+            isNull(memberships.groupId),
+          ),
+        )
+        .limit(1);
+      return row;
+    },
+  };
+}
+
 /** Memberships can only be given to users who already belong to this organization. */
 function tenantMemberships(db: Db, orgId: string, members: ReturnType<typeof tenantUsers>) {
   const base = tenantTable(db, orgId, memberships);
@@ -2228,16 +2286,29 @@ function tenantSurveys(db: Db, orgId: string) {
   };
 }
 
-/** The organization's own branding (#201): its name, accent and logo. */
+/** The organization's own branding (#201) and settings (#202): name, accent, logo, language, AI. */
 function tenantBranding(db: Db, orgId: string) {
   const own = eq(organizations.id, orgId);
   return {
     async get() {
       const [row] = await db
-        .select({ name: organizations.name, accent: organizations.accent, logoVersion: organizations.logoVersion })
+        .select({
+          name: organizations.name,
+          accent: organizations.accent,
+          logoVersion: organizations.logoVersion,
+          locale: organizations.locale,
+          aiAllowed: organizations.aiAllowed,
+        })
         .from(organizations)
         .where(own);
       return row;
+    },
+    /** Its language and AI policy; AI not allowed turns it off in every course at once. */
+    async setSettings(values: { locale: 'sq' | 'en' | null; aiAllowed: boolean }) {
+      await db.batch([
+        db.update(organizations).set(values).where(own),
+        ...(values.aiAllowed ? [] : [db.update(courses).set({ aiEnabled: false }).where(eq(courses.orgId, orgId))]),
+      ]);
     },
     async set(values: { name: string; accent: string | null }) {
       await db.update(organizations).set(values).where(own);
@@ -2264,6 +2335,7 @@ export function forTenant(db: Db, orgId: string) {
   return {
     orgId,
     branding: tenantBranding(db, orgId),
+    people: tenantPeople(db, orgId),
     users: members,
     memberships: tenantMemberships(db, orgId, members),
     courseTemplates: tenantTable(db, orgId, courseTemplates),

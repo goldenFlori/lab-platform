@@ -52,6 +52,10 @@ export const organizations = sqliteTable('organizations', {
   logo: bytes('logo'),
   logoType: text('logo_type'),
   logoVersion: integer('logo_version'),
+  /** Its language (#202), for people who chose none, outside a course that has its own. */
+  locale: text('locale', { enum: ['sq', 'en'] }),
+  /** Whether its courses may turn AI on (#202); off turns it off in every course. */
+  aiAllowed: integer('ai_allowed', { mode: 'boolean' }).notNull().default(true),
 });
 
 /**

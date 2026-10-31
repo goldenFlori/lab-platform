@@ -30,12 +30,20 @@ function logoResponse(logo: { data: Uint8Array; type: string }) {
 }
 
 const view = (
-  row: { name: string; accent: string | null; logoVersion: number | null },
+  row: {
+    name: string;
+    accent: string | null;
+    logoVersion: number | null;
+    locale: 'sq' | 'en' | null;
+    aiAllowed: boolean;
+  },
   logoPath: string,
 ): Branding => ({
   name: row.name,
   accent: row.accent,
   logo: row.logoVersion ? `${logoPath}?v=${row.logoVersion}` : null,
+  locale: row.locale,
+  aiAllowed: row.aiAllowed,
 });
 
 export const orgBrandingRoutes = new Hono<TenantEnv>()

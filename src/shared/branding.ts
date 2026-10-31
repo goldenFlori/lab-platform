@@ -1,8 +1,17 @@
 // An institution's branding (#201): its name, an accent colour and a logo. No Zod and no imports: the
 // app checks a colour as it is chosen with the same rule the API enforces.
 
-/** What members see, and the sign-in page reached from a join code. `logo` is a URL, or null. */
-export type Branding = { name: string; accent: string | null; logo: string | null };
+/**
+ * What members see, and the sign-in page reached from a join code. `logo` is a URL, or null; `locale`
+ * and `aiAllowed` are the institution's settings (#202).
+ */
+export type Branding = {
+  name: string;
+  accent: string | null;
+  logo: string | null;
+  locale: 'sq' | 'en' | null;
+  aiAllowed: boolean;
+};
 
 /** A logo's largest size, and the image types it may be. */
 export const LOGO_BYTES = 100_000;

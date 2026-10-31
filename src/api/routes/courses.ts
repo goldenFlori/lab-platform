@@ -104,6 +104,8 @@ export const courseRoutes = new Hono<TenantEnv>()
     if (!c.var.access.can('course.manage', { courseId: course.id })) return forbidden(c);
     const { ai, ...changes } = c.req.valid('json');
     if (ai !== undefined && !c.var.access.can('ai.configure', { courseId: course.id })) return forbidden(c);
+    // The institution may not allow AI at all (#202).
+    if (ai && !(await c.var.tenant.branding.get())?.aiAllowed) return c.json({ error: 'ai_not_allowed' }, 409);
     const updated = await c.var.tenant.courses.update(course.id, {
       ...changes,
       ...(ai === undefined ? {} : { aiEnabled: ai }),

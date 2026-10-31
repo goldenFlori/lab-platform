@@ -9,6 +9,7 @@ import { orgBrandingRoutes } from './branding';
 import { forbidden } from './course-context';
 import { courseRoutes } from './courses';
 import { storedFileResponse } from './notebooks';
+import { orgAdminRoutes } from './org-admin';
 
 // Everything about one organization lives under /api/orgs/:org, where :org is its slug.
 export const orgRoutes = new Hono<TenantEnv>()
@@ -18,6 +19,7 @@ export const orgRoutes = new Hono<TenantEnv>()
   )
   .route('/:org/courses', courseRoutes)
   .route('/:org', orgBrandingRoutes)
+  .route('/:org/admin', orgAdminRoutes)
   // Users' requests to delete their data (#100), for the institution's admins.
   .get('/:org/deletion-requests', async (c) => {
     if (!c.var.access.can('org.manage')) return forbidden(c);

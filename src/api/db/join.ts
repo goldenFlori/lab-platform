@@ -46,6 +46,8 @@ export async function brandingByJoinCode(db: Db, code: string) {
       logo: organizations.logo,
       logoType: organizations.logoType,
       logoVersion: organizations.logoVersion,
+      locale: organizations.locale,
+      aiAllowed: organizations.aiAllowed,
     })
     .from(groups)
     .innerJoin(courses, and(eq(courses.id, groups.courseId), eq(courses.orgId, groups.orgId)))
