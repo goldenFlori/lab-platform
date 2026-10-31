@@ -34,8 +34,9 @@ otherwise. In that case the Operator tells the Institution before processing, un
 forbids it (Article 26(3)(a)).
 
 2.2. The instructions are this agreement and the settings the Institution chooses in the platform:
-which accounts exist, who holds which role in which course or group, which labs are open, and
-whether AI features are on for each course. Each such setting is an instruction.
+which accounts exist, who holds which role in the Institution or in which course or group, which
+labs are open, whether the Institution allows AI features, and whether they are on for each course.
+Each such setting is an instruction.
 
 2.3. The Operator tells the Institution immediately if, in its opinion, an instruction breaks the
 Law (Article 26(3)(f)).
@@ -86,7 +87,8 @@ the lab text, or a staff member's question) goes to Cloudflare Workers AI. Cloud
 offer an EU restriction for Workers AI, so such a request may be processed outside the EU.
 Cloudflare, Inc. is certified under the EU–US Data Privacy Framework. Decision No. 1 lists the
 United States as adequate for companies under that framework. An AI request never contains a
-name, a username or an email address. The AI is off unless staff switch it on for a course.
+name, a username or an email address. The AI is off unless staff switch it on for a course, and
+the Institution's admin can forbid it for all its courses, which switches it off wherever it is on.
 
 6.4. **Backups.** The weekly backup is encrypted with the Operator's key before it leaves
 Cloudflare. It is kept at GitHub, Inc. (United States) for 90 days, and GitHub holds only the

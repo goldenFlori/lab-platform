@@ -44,10 +44,10 @@ test('an institution looks like itself to its members and on its join links', as
   // Yellow under white text cannot be read: refused before saving.
   await page.getByLabel('Ngjyra', { exact: true }).fill('#ffcc00');
   await expect(page.getByTestId('accent-verdict')).toContainText('Lexohet keq');
-  await expect(page.getByRole('button', { name: 'Ruaj' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Ruaj', exact: true })).toBeDisabled();
   await page.getByLabel('Ngjyra', { exact: true }).fill('#7a1f3d');
   await expect(page.getByTestId('accent-verdict')).toContainText('Lexohet mirë');
-  await page.getByRole('button', { name: 'Ruaj' }).click();
+  await page.getByRole('button', { name: 'Ruaj', exact: true }).click();
   await expect(page.getByRole('status')).toHaveText('U ruajt.');
   await page.locator('input[type="file"]').setInputFiles({ name: 'logo.png', mimeType: 'image/png', buffer: PNG });
   await expect(page.getByRole('main').getByRole('img', { name: 'Logoja e Fakulteti i Markës' })).toBeVisible();

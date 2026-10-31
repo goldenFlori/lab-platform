@@ -1,5 +1,5 @@
 import { AlertDialog, Button, Chip, FieldError, Form, Input, Label, Switch, TextField } from '@heroui/react';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import {
   Archive,
@@ -32,6 +32,7 @@ import { PresentJoinCode } from '../../../../../../components/PresentJoinCode';
 import { LANGUAGE_NAMES, t as messages, useT } from '../../../../../../i18n';
 import { ApiError } from '../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../lib/brand';
+import { brandingQuery } from '../../../../../../lib/branding';
 import { courseQuery, useCourseChanges } from '../../../../../../lib/courses';
 
 export const Route = createFileRoute('/_authed/o/$org/courses/$courseId/')({
@@ -57,6 +58,8 @@ function CoursePage() {
   const changes = useCourseChanges(org, courseId);
   const navigate = Route.useNavigate();
   const isStaff = permissions.manage || groups.some((g) => g.permissions.manageStudents);
+  // The institution may not allow AI in its courses (#202).
+  const branding = useQuery(brandingQuery(org));
   const archived = course.archivedAt !== null;
   const t = useT();
 
@@ -165,7 +168,7 @@ function CoursePage() {
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Switch
             isSelected={course.ai}
-            isDisabled={changes.setAi.isPending}
+            isDisabled={changes.setAi.isPending || branding.data?.aiAllowed === false}
             onChange={(on) => changes.setAi.mutate(on)}
             aria-describedby="course-ai-help"
             className="flex-row items-center gap-2"
@@ -178,7 +181,7 @@ function CoursePage() {
             </Switch.Content>
           </Switch>
           <span id="course-ai-help" className="text-xs text-muted">
-            {t.course.aiHelp}
+            {branding.data?.aiAllowed === false ? t.orgSettings.aiNotAllowed : t.course.aiHelp}
           </span>
         </div>
       )}

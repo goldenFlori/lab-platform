@@ -31,6 +31,8 @@ export type ApiErrorCode =
   | 'not_found'
   | 'daily_limit'
   | 'slug_taken'
+  | 'own_account'
+  | 'ai_not_allowed'
   | 'username_taken'
   | 'internal';
 

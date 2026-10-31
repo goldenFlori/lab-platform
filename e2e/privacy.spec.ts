@@ -52,7 +52,7 @@ test('a student downloads their data and asks for its deletion; the admin handle
   await expect(form).toContainText('Kërkesa u dërgua.');
   await student.context().close();
 
-  await staff.goto('/courses');
+  await staff.goto('/o/e2e/admin');
   const requests = staff.getByTestId('deletion-requests');
   const open = requests.getByRole('listitem').filter({ hasText: 'Testim e2e' }).filter({ hasText: 'Kërkuar më' });
   await expect(open).toContainText(E2E_ACCOUNT.fullName);
@@ -74,7 +74,7 @@ test('the admin erases the data of a student who asked, and the account goes wit
   const student = await signIn(browser, account, isMobile);
   await apiCall(student, 'POST', '/me/deletion-request', { note: 'Largohem nga fakulteti.' });
 
-  await staff.goto('/courses');
+  await staff.goto('/o/e2e/admin');
   const request = staff.getByTestId('deletion-requests').getByRole('listitem').filter({ hasText: fullName });
   await request.getByRole('button', { name: 'Fshi të dhënat' }).click();
   const dialog = staff.getByRole('alertdialog');

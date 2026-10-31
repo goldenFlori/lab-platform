@@ -35,8 +35,9 @@ Operatori. Në atë rast Operatori e njofton Institucionin para përpunimit, pë
 ndalon (neni 26, pika 3, shkronja "a").
 
 2.2. Udhëzimet janë kjo marrëveshje dhe zgjedhjet që Institucioni bën në platformë: cilat llogari
-ekzistojnë, kush ka cilin rol në cilin kurs ose grup, cilët laboratorë janë të hapur dhe nëse
-veçoritë e AI-së janë të ndezura për çdo kurs. Çdo zgjedhje e tillë është udhëzim.
+ekzistojnë, kush ka cilin rol në Institucion ose në cilin kurs ose grup, cilët laboratorë janë të
+hapur, nëse Institucioni i lejon veçoritë e AI-së dhe nëse ato janë të ndezura për çdo kurs. Çdo
+zgjedhje e tillë është udhëzim.
 
 2.3. Operatori e njofton menjëherë Institucionin nëse, sipas tij, një udhëzim shkel Ligjin
 (neni 26, pika 3, shkronja "f").
@@ -90,7 +91,8 @@ AI. Cloudflare nuk ofron kufizim në BE për Workers AI, ndaj kërkesa mund të 
 BE-së. Cloudflare, Inc. është e certifikuar sipas Kuadrit të Privatësisë së të Dhënave BE–SHBA, dhe
 Vendimi nr. 1 i rendit Shtetet e Bashkuara si të mjaftueshme për shoqëritë në këtë kuadër. Një
 kërkesë AI nuk përmban kurrë emër, emër përdoruesi ose adresë email-i. AI-ja është e fikur derisa
-stafi ta ndezë për një kurs.
+stafi ta ndezë për një kurs, dhe administratori i Institucionit mund ta ndalojë për të gjitha kurset
+e tij, gjë që e fik kudo ku është e ndezur.
 
 6.4. **Kopjet rezervë.** Kopja rezervë javore enkriptohet me çelësin e Operatorit para se të dalë
 nga Cloudflare. Ruhet te GitHub, Inc. (Shtetet e Bashkuara) për 90 ditë, dhe GitHub mban vetëm

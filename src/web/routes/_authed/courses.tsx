@@ -6,8 +6,6 @@ import { type FormEvent, useState } from 'react';
 import type { Me } from '../../../shared/auth';
 import type { CourseSummary } from '../../../shared/courses';
 import { isLocale, LOCALES } from '../../../shared/locale';
-import { DeletionRequests } from '../../components/DeletionRequests';
-import { OrganizationExport } from '../../components/OrganizationExport';
 import { LANGUAGE_NAMES, t as messages, useT } from '../../i18n';
 import { useMe } from '../../lib/auth';
 import { APP_NAME } from '../../lib/brand';
@@ -63,8 +61,6 @@ function CoursesPage() {
                 <Building2 className="size-4" aria-hidden="true" /> {t.orgAdmin.link}
               </Link>
             )}
-            {admin && <DeletionRequests org={section.org.slug} />}
-            {admin && <OrganizationExport organization={section.org} />}
           </div>
         ))
       )}

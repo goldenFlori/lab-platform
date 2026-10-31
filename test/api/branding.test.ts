@@ -22,7 +22,13 @@ async function setup() {
 describe('institution branding', () => {
   it('is set by the admins, with a readable accent, and read by every member', async () => {
     const { admin, pedagog, student, branding } = await setup();
-    expect(await branding(student)).toEqual({ name: expect.any(String), accent: null, logo: null });
+    expect(await branding(student)).toEqual({
+      name: expect.any(String),
+      accent: null,
+      logo: null,
+      locale: null,
+      aiAllowed: true,
+    });
     const set = (who: typeof admin, body: unknown) => who.call('/orgs/fshn/branding', { method: 'PUT', body });
     expect((await set(admin, { name: 'Fakulteti i Shkencave', accent: '#7a1f3d' })).status).toBe(200);
     expect(await branding(student)).toMatchObject({ name: 'Fakulteti i Shkencave', accent: '#7a1f3d' });
@@ -60,7 +66,7 @@ describe('institution branding', () => {
     ).json()) as { joinCode: string };
     const visitor = caller();
     const view = (await (await visitor(`/join/${group.joinCode}/branding`)).json()) as Branding;
-    expect(view).toEqual({ name: 'FSHN', accent: '#7a1f3d', logo: expect.stringMatching(/^\/api\/join\//) });
+    expect(view).toMatchObject({ name: 'FSHN', accent: '#7a1f3d', logo: expect.stringMatching(/^\/api\/join\//) });
     expect((await visitor((view.logo as string).replace('/api', ''))).status).toBe(200);
     expect((await visitor('/join/ZZZZZZZZ/branding')).status).toBe(404);
   });

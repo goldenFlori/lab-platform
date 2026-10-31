@@ -169,6 +169,13 @@
       "when": 1793457560418,
       "tag": "0023_branding",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "6",
+      "when": 1793462340931,
+      "tag": "0024_org_settings",
+      "breakpoints": true
     }
   ]
 }
