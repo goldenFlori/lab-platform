@@ -545,6 +545,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   the sign-in page; slips print its name; its export carries them. A colour too pale for white text
   or for text on white is refused (WCAG AA), and a logo, even an SVG, is served so it cannot run
   code. Next: #202, the rest of the admin's page.
+- **2026-10-31:** #202 done. An institution's admin runs it from one page: its people with their roles
+  (search, a new staff account with a printed slip, a role across the institution given, changed or
+  taken away, never their own), its language for whoever chose none, whether its courses may use AI
+  (off turns it off everywhere), its look, and its data (deletion requests and the export, moved from
+  the courses page). A second faculty no longer needs the owner to add its pedagogs. Next: #203,
+  sharing a course with another institution.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and

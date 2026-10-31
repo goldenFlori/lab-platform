@@ -255,6 +255,23 @@ estimate gives the engine 3.2 MB where production sends 3.5 MB). First run, 2026
   for it); the slips print its name; `/o/:org/admin` is its admin's page (#202 extends it); the
   institution's export carries the accent and the logo.
 
+## The institution admin's page (#202)
+
+`/o/:org/admin`, for those with `org.manage` (`src/api/routes/org-admin.ts`, under
+`/api/orgs/:org/admin`, 403 to other members):
+- **People:** a page of 50 by username with search (`tenant.people.page`), each with their role across
+  the institution and counts of where they teach and study (SQL subqueries). `POST /people` makes a
+  staff account with an institution role (admin, coordinator, pedagog; password hashed in the
+  admin's browser, slip printed); `PUT /people/:id/role` gives, changes or takes away that role,
+  never one's own (`own_account`): only an admin acts, so an institution keeps at least that admin.
+  Someone whose only membership was that role leaves the institution; the account stays.
+- **Settings:** `organizations.locale` (the language for people who chose none, outside courses with
+  their own: user → device → course → institution → Albanian) and `ai_allowed`; off turns AI off in
+  every course in the same batch, and a course's switch then answers `ai_not_allowed`. Both come to
+  members with the branding.
+- **Data:** the deletion requests and the export moved here from the courses page.
+- Institution admins do not see inside courses (no `lab.view`): courses are their pedagogs'.
+
 ## Courses, groups and joining
 
 - **Staff** (#64, `src/api/routes/staff.ts`): staff with `course.manage` for the whole course list
