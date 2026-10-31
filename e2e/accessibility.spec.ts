@@ -92,6 +92,7 @@ for (const scheme of ['light', 'dark'] as const) {
       ['student import', `${coursePage}/groups/${group.id}/import`],
       ['my data', '/account/data'],
       ['platform', '/platform'],
+      ['institution', '/o/e2e/admin'],
     ] as const) {
       await staff.goto(path);
       await audit(staff, `${name}, ${scheme}`);

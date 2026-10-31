@@ -1,7 +1,7 @@
 import { Alert, Button, Chip, FieldError, Form, Input, Label, TextField } from '@heroui/react';
 import { useQueries } from '@tanstack/react-query';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { GraduationCap, KeyRound, Plus } from 'lucide-react';
+import { Building2, GraduationCap, KeyRound, Plus } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import type { Me } from '../../../shared/auth';
 import type { CourseSummary } from '../../../shared/courses';
@@ -54,6 +54,15 @@ function CoursesPage() {
         sections.map(({ admin, ...section }) => (
           <div key={section.org.id}>
             <OrganizationCourses {...section} showName={sections.length > 1} />
+            {admin && (
+              <Link
+                to="/o/$org/admin"
+                params={{ org: section.org.slug }}
+                className="button button--secondary button--sm mt-4 gap-2"
+              >
+                <Building2 className="size-4" aria-hidden="true" /> {t.orgAdmin.link}
+              </Link>
+            )}
             {admin && <DeletionRequests org={section.org.slug} />}
             {admin && <OrganizationExport organization={section.org} />}
           </div>

@@ -239,6 +239,22 @@ estimate gives the engine 3.2 MB where production sends 3.5 MB). First run, 2026
 - `/platform` (account menu → Platform) shows them and prints the admin's slip, as for students.
   `npm run account:create` stays for a new environment or an emergency.
 
+## Institution branding (#201)
+
+- `organizations` holds `accent` (#rrggbb), `logo` (bytes, at most 100 KB: PNG, JPEG, WebP or SVG),
+  `logo_type` and `logo_version` (a timestamp that names the logo's URL, so it is cached for good).
+- `src/shared/branding.ts` (no Zod) has the rule both sides use: an accent must give white text on it,
+  itself as text on white, and itself on its 10% tint at least 4.5:1 (`accentIssue`).
+- Members read `GET /api/orgs/:org/branding` and `/logo`; admins (`org.manage`) `PUT /branding`,
+  `PUT`/`DELETE /logo` (raw body, type checked, 413 past the size). The logo is served `nosniff` with
+  a sandboxing CSP, so an SVG cannot run code. The sign-in page reached from a join link reads
+  `GET /api/join/:code/branding` and `/logo`: the code is the invitation; a code that joins nothing
+  is a 404, so no institution is revealed without one.
+- The app: on an institution's pages the header shows its logo and name and `data-org-accent` puts
+  its accent in place of the platform's, in the light theme only (the dark theme's accent is made
+  for it); the slips print its name; `/o/:org/admin` is its admin's page (#202 extends it); the
+  institution's export carries the accent and the logo.
+
 ## Courses, groups and joining
 
 - **Staff** (#64, `src/api/routes/staff.ts`): staff with `course.manage` for the whole course list
@@ -342,7 +358,7 @@ sessions(id = sha256(token), user_id, expires_at, last_seen_at, user_agent?)
 Planned:
 
 ```
-organizations + branding, settings
+organizations + branding (#201: accent, logo), settings
 org_domains(org_id, domain, kind: staff|student, verified_at)
 join codes on groups (#10)
 notebooks(id, org_id, lab_id, kind: main|extra|solution, title, position, original_name, sha256, ready_at)  -- built (#14)

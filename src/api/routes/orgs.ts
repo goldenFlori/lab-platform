@@ -5,6 +5,7 @@ import { ORIGINAL_FILE } from '../../shared/notebook-files';
 import { type ExportPage, isExportPart } from '../../shared/org-export';
 import { type TenantEnv, tenantAccess } from '../auth/access';
 import { NotFoundError } from '../db/tenant';
+import { orgBrandingRoutes } from './branding';
 import { forbidden } from './course-context';
 import { courseRoutes } from './courses';
 import { storedFileResponse } from './notebooks';
@@ -16,6 +17,7 @@ export const orgRoutes = new Hono<TenantEnv>()
     c.json({ organization: c.get('organization'), capabilities: c.get('access').summary() } satisfies AccessSummary),
   )
   .route('/:org/courses', courseRoutes)
+  .route('/:org', orgBrandingRoutes)
   // Users' requests to delete their data (#100), for the institution's admins.
   .get('/:org/deletion-requests', async (c) => {
     if (!c.var.access.can('org.manage')) return forbidden(c);

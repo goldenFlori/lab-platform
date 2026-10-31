@@ -539,6 +539,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   active this week), never its people. Owners are named in a Worker secret, not the database, and to
   anyone else the console answers as if it did not exist. The owner sets `PLATFORM_OWNERS` once
   (README). Next: #201, institution branding.
+- **2026-11-01:** #201 done. An institution's admin sets its name, a colour and a logo on its new
+  page (`/o/<slug>/admin`, linked from the courses page). Its members see the logo and name in the
+  header and its colour on buttons and links; whoever arrives from one of its join links sees them on
+  the sign-in page; slips print its name; its export carries them. A colour too pale for white text
+  or for text on white is refused (WCAG AA), and a logo, even an SVG, is served so it cannot run
+  code. Next: #202, the rest of the admin's page.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and

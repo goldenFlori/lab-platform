@@ -1,5 +1,5 @@
 import { Alert, Button, ProgressBar } from '@heroui/react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { ArrowLeft, FileUp, Printer, X } from 'lucide-react';
 import { type ChangeEvent, useEffect, useState } from 'react';
@@ -9,6 +9,7 @@ import { HelpLink } from '../../../../../../../../components/HelpLink';
 import { t as messages, useT } from '../../../../../../../../i18n';
 import { ApiError } from '../../../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../../../lib/brand';
+import { brandingQuery } from '../../../../../../../../lib/branding';
 import { courseQuery } from '../../../../../../../../lib/courses';
 import { importStudents, namesFromFile, type Slip } from '../../../../../../../../lib/students';
 
@@ -34,6 +35,8 @@ type Phase = { step: 'input' } | { step: 'preview' } | { step: 'importing'; done
 
 function ImportPage() {
   const { org, courseId, groupId } = Route.useParams();
+  // The institution's name on the printed slips (#201).
+  const institution = useQuery(brandingQuery(org)).data?.name;
   const { courseTitle, groupName } = Route.useLoaderData();
   const [text, setText] = useState('');
   // Each name gets an id, so the same name twice stays two rows.
@@ -218,7 +221,7 @@ function ImportPage() {
             )}
           </div>
           <div className="mt-8">
-            <CredentialSlips slips={slips} courseTitle={courseTitle} groupName={groupName} />
+            <CredentialSlips slips={slips} courseTitle={courseTitle} groupName={groupName} institution={institution} />
           </div>
         </div>
       )}

@@ -53,6 +53,7 @@ import {
   liveSessions,
   memberships,
   notebooks,
+  organizations,
   predictionResults,
   searchSections,
   sessions,
@@ -2227,10 +2228,42 @@ function tenantSurveys(db: Db, orgId: string) {
   };
 }
 
+/** The organization's own branding (#201): its name, accent and logo. */
+function tenantBranding(db: Db, orgId: string) {
+  const own = eq(organizations.id, orgId);
+  return {
+    async get() {
+      const [row] = await db
+        .select({ name: organizations.name, accent: organizations.accent, logoVersion: organizations.logoVersion })
+        .from(organizations)
+        .where(own);
+      return row;
+    },
+    async set(values: { name: string; accent: string | null }) {
+      await db.update(organizations).set(values).where(own);
+    },
+    async logo() {
+      const [row] = await db
+        .select({ logo: organizations.logo, type: organizations.logoType })
+        .from(organizations)
+        .where(own);
+      return row?.logo && row.type ? { data: row.logo, type: row.type } : null;
+    },
+    /** A new logo, or none; its version changes either way, so caches let the old one go. */
+    async setLogo(logo: { data: Uint8Array; type: string } | null) {
+      await db
+        .update(organizations)
+        .set({ logo: logo?.data ?? null, logoType: logo?.type ?? null, logoVersion: logo ? Date.now() : null })
+        .where(own);
+    },
+  };
+}
+
 export function forTenant(db: Db, orgId: string) {
   const members = tenantUsers(db, orgId);
   return {
     orgId,
+    branding: tenantBranding(db, orgId),
     users: members,
     memberships: tenantMemberships(db, orgId, members),
     courseTemplates: tenantTable(db, orgId, courseTemplates),

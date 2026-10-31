@@ -1,3 +1,4 @@
+import type { Branding } from '../../shared/branding';
 import {
   EXPORT_FORMAT,
   EXPORT_PARTS,
@@ -50,8 +51,24 @@ export async function exportOrganization(
     version: 1,
     exportedAt: new Date().toISOString(),
     organization,
+    branding: await brandingOf(organization.slug, signal),
     tables,
     notebookFiles,
+  };
+}
+
+/** The institution's accent and logo (#201), the logo as base64 so the file holds it whole. */
+async function brandingOf(slug: string, signal?: AbortSignal): Promise<OrganizationExport['branding']> {
+  const branding = await api<Branding>(`/orgs/${encodeURIComponent(slug)}/branding`);
+  if (!branding.logo) return { accent: branding.accent, logo: null };
+  const res = await fetch(branding.logo, { credentials: 'same-origin', signal });
+  if (!res.ok) throw new Error(`Logo: ${res.status}`);
+  const bytes = new Uint8Array(await res.arrayBuffer());
+  let binary = '';
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return {
+    accent: branding.accent,
+    logo: { type: res.headers.get('Content-Type') ?? 'application/octet-stream', base64: btoa(binary) },
   };
 }
 

@@ -46,6 +46,12 @@ export const organizations = sqliteTable('organizations', {
   name: text('name').notNull(),
   slug: text('slug').notNull().unique(),
   createdAt: createdAt(),
+  /** Branding (#201): an accent colour (#rrggbb) for the light theme, readable by WCAG AA. */
+  accent: text('accent'),
+  /** Its logo, at most LOGO_BYTES, of an allowed image type; logoVersion changes with it. */
+  logo: bytes('logo'),
+  logoType: text('logo_type'),
+  logoVersion: integer('logo_version'),
 });
 
 /**

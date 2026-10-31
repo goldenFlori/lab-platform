@@ -1,4 +1,5 @@
 import { Button, Dropdown, Kbd, Label, Modal } from '@heroui/react';
+import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
 import {
   Building2,
@@ -18,6 +19,7 @@ import { LOCALES } from '../../shared/locale';
 import { LANGUAGE_NAMES, useLocale, useT } from '../i18n';
 import { useLogout, useMe } from '../lib/auth';
 import { APP_NAME } from '../lib/brand';
+import { brandingQuery, useOrgAccent } from '../lib/branding';
 import { install, useInstall } from '../lib/install';
 import { useChooseLocale } from '../lib/locale';
 import { Logo } from './Logo';
@@ -236,6 +238,7 @@ export function SiteHeader() {
           <Logo className="size-9 shrink-0 transition-transform duration-300 group-hover:rotate-[-6deg]" />
           <span className="truncate text-[0.95rem] font-semibold tracking-tight">{APP_NAME}</span>
         </Link>
+        <OrgBrand />
 
         <nav className="ml-auto hidden items-center gap-1 md:flex" aria-label={t.header.mainNav}>
           {links.map((link) => (
@@ -282,5 +285,31 @@ export function SiteHeader() {
         </div>
       </div>
     </header>
+  );
+}
+
+/**
+ * On an institution's pages, its logo and name beside the platform's, and its accent (#201). Read only
+ * where the address names the institution, by its members (the route already checked).
+ */
+function OrgBrand() {
+  const org = useRouterState({
+    select: (state) => state.matches.find((m) => 'org' in m.params)?.params as { org?: string } | undefined,
+  })?.org;
+  const branding = useQuery({ ...brandingQuery(org ?? ''), enabled: !!org });
+  const t = useT();
+  useOrgAccent(org ? branding.data?.accent : null);
+  if (!org || !branding.data) return null;
+  return (
+    <span className="hidden min-w-0 items-center gap-2 border-l border-separator pl-3 sm:flex" data-testid="org-brand">
+      {branding.data.logo && (
+        <img
+          src={branding.data.logo}
+          alt={t.branding.logoAlt(branding.data.name)}
+          className="h-7 max-w-24 shrink-0 object-contain"
+        />
+      )}
+      <span className="truncate text-sm text-muted">{branding.data.name}</span>
+    </span>
   );
 }

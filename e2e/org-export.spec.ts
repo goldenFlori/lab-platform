@@ -28,6 +28,8 @@ test("the admin downloads the institution's data as one file", async ({ browser,
   expect(file.suggestedFilename()).toMatch(/^e2e-\d{4}-\d{2}-\d{2}\.json$/);
   const data = JSON.parse(await readFile((await file.path()) ?? '', 'utf8')) as OrganizationExport;
   expect(data.organization.slug).toBe('e2e');
+  // Its look comes along (#201); the e2e institution has neither accent nor logo.
+  expect(data.branding).toEqual({ accent: null, logo: null });
   expect(data.tables.courses.map((c) => c.id)).toContain(course.id);
   expect(data.tables.people.map((p) => p.username)).toContain(E2E_STAFF.username);
   expect(data.notebookFiles[nb.id]).toMatchObject({ cells: [{ cell_type: 'markdown' }] });

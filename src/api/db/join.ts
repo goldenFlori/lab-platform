@@ -33,3 +33,24 @@ export async function addStudent(db: Db, values: { orgId: string; groupId: strin
     .values({ ...values, id: uuidv7(), role: 'student' })
     .onConflictDoNothing();
 }
+
+/**
+ * The branding of the institution a join code belongs to (#201), for the sign-in page that code leads
+ * to: the code is the invitation, so it may show whose. Nothing for a code that joins nothing.
+ */
+export async function brandingByJoinCode(db: Db, code: string) {
+  const [row] = await db
+    .select({
+      name: organizations.name,
+      accent: organizations.accent,
+      logo: organizations.logo,
+      logoType: organizations.logoType,
+      logoVersion: organizations.logoVersion,
+    })
+    .from(groups)
+    .innerJoin(courses, and(eq(courses.id, groups.courseId), eq(courses.orgId, groups.orgId)))
+    .innerJoin(organizations, eq(organizations.id, groups.orgId))
+    .where(and(eq(groups.joinCode, code), isNull(courses.archivedAt)))
+    .limit(1);
+  return row;
+}
