@@ -247,7 +247,10 @@ Students' unsubmitted code stays private to them and is not in it.
   - capabilities per role, checked by the server on every request, for the course or group
     concerned;
   - students see only their own work;
-  - staff see their own groups only.
+  - staff see their own groups only;
+  - the Operator's console creates institutions and their first administrators and shows each
+    institution's counts only (courses, staff, students, active students), never its people's data;
+    the Operator's accounts are named in the hosting configuration, not in the database.
 - **Separation of institutions:** every query is scoped to one institution, enforced by the
   database's keys and proven by automated tests.
 - **Content safety:**

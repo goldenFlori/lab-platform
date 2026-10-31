@@ -10,6 +10,7 @@ import { authRoutes, meRoutes } from './routes/auth';
 import { clientErrorRoutes } from './routes/client-errors';
 import { joinRoutes } from './routes/join';
 import { orgRoutes } from './routes/orgs';
+import { platformRoutes } from './routes/platform';
 
 export { LiveSession } from './live/session';
 
@@ -53,6 +54,7 @@ app.route('/me', meRoutes);
 app.route('/orgs', orgRoutes);
 app.route('/join', joinRoutes);
 app.route('/client-errors', clientErrorRoutes);
+app.route('/platform', platformRoutes);
 
 export default {
   fetch: app.fetch,

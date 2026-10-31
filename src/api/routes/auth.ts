@@ -4,6 +4,7 @@ import { loginInput, type Me, updateMeInput } from '../../shared/auth';
 import { deletionRequestInput, type MyData } from '../../shared/my-data';
 import { hashPassword, needsRehash, verifyPassword } from '../../shared/password';
 import { LOGIN_WINDOW_SECONDS, MAX_FAILURES_PER_IP, MAX_FAILURES_PER_USERNAME, windowCutoff } from '../auth/limits';
+import { isOwner } from '../auth/owner';
 import { endSession, requireUser, startSession } from '../auth/session';
 import { createDb, type Db } from '../db';
 import {
@@ -20,10 +21,11 @@ import {
 import { forTenant } from '../db/tenant';
 import type { AppEnv } from '../env';
 
-async function meOf(db: Db, user: SessionUser): Promise<Me> {
+async function meOf(db: Db, user: SessionUser, env: unknown): Promise<Me> {
   return {
     user: { id: user.id, username: user.username, fullName: user.fullName, locale: user.locale },
     organizations: await organizationsOf(db, user.id),
+    ...(isOwner(env, user) ? { owner: true as const } : {}),
   };
 }
 
@@ -68,7 +70,7 @@ export const authRoutes = new Hono<AppEnv>()
       await setPasswordHash(db, account.id, await hashPassword(password));
     }
     await startSession(c, account.id);
-    return c.json(await meOf(db, account));
+    return c.json(await meOf(db, account, c.env));
   })
   .post('/logout', async (c) => {
     await endSession(c);
@@ -78,7 +80,7 @@ export const authRoutes = new Hono<AppEnv>()
 export const meRoutes = new Hono<AppEnv>()
   .get('/', requireUser, async (c) => {
     const user = c.get('user') as SessionUser;
-    return c.json(await meOf(createDb(c.env.DB), user));
+    return c.json(await meOf(createDb(c.env.DB), user, c.env));
   })
   // The user's own settings: today the interface language (#19).
   .patch('/', requireUser, zValidator('json', updateMeInput, invalidRequest), async (c) => {
@@ -86,7 +88,7 @@ export const meRoutes = new Hono<AppEnv>()
     const { locale } = c.req.valid('json');
     const db = createDb(c.env.DB);
     await setLocale(db, user.id, locale);
-    return c.json(await meOf(db, { ...user, locale }));
+    return c.json(await meOf(db, { ...user, locale }, c.env));
   })
   // Everything stored about the user, from every organization they belong to, as one file (#100).
   .get('/data', requireUser, async (c) => {

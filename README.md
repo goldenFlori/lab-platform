@@ -76,6 +76,14 @@ npm run account:create -- --org-slug fshn --org-name "FSHN" \
 
 Leave out `--remote` to create it in the local database for `npm run dev`.
 
+**In the app (#200):** the platform's owners create institutions and their first admins at `/platform`
+(account menu → Platform), and see every institution's counts. Owners are named by username in a Worker
+secret, never in the database. Set it once:
+
+```bash
+npx wrangler secret put PLATFORM_OWNERS   # e.g. florjan.mema; several separated by commas
+```
+
 ## Course content
 
 A course site in the course repository's format (`site/content/course.mjs`, its notebooks and the
