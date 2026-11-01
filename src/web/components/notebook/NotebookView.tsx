@@ -5,6 +5,7 @@ import type { StoredNotebook } from '../../../notebook/stored';
 import type { MarkdownCell, SectionKind } from '../../../notebook/types';
 import type { Embed } from '../../../shared/notebooks';
 import { tracePoints } from '../../../shared/trace-grading';
+import { seedCellOf } from '../../../shared/trace-problem';
 import { isVisualizerId } from '../../../shared/visualizers';
 import { type Messages, useT } from '../../i18n';
 import { useExercises } from '../../lib/exercises';
@@ -64,7 +65,7 @@ export function NotebookView({
           <ResultsProvider notebookRef={notebookRef} cell={embed.cell}>
             <LearnerProvider
               notebookRef={notebookRef}
-              cell={embed.cell}
+              cell={seedCellOf(embed.props, embed.cell)}
               variant={embed.viz === 'tabela-gjurmimit' && !!embed.props?.variant}
             >
               {embed.viz === 'tabela-gjurmimit' && tracePoints(embed.props) > 0 ? (

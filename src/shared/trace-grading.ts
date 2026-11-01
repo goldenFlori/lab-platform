@@ -1,6 +1,13 @@
 import { firstWrong, PLAIN_WORDS, traceIds, traceOf } from './trace';
 import { isTracePresetId, TRACE_PRESETS } from './trace-presets';
-import { isTraceProblem, type TraceProblem, variantIssue, variantProblem, variantSeed } from './trace-problem';
+import {
+  isTraceProblem,
+  seedCellOf,
+  type TraceProblem,
+  variantIssue,
+  variantProblem,
+  variantSeed,
+} from './trace-problem';
 
 // Grading a handed-in trace table on the server (#168): the problem the student had (the course's,
 // the pedagog's, or their own variant), its expected table rebuilt from the same code the browser
@@ -22,7 +29,7 @@ export function traceProblemFor(
   at: { userId: string; notebookId: string; cell: number },
 ): TraceProblem {
   if (variantIssue(props?.variant) === null) {
-    return variantProblem(props?.variant as never, variantSeed(at.userId, at.notebookId, at.cell));
+    return variantProblem(props?.variant as never, variantSeed(at.userId, at.notebookId, seedCellOf(props, at.cell)));
   }
   if (isTraceProblem(props?.problem)) return props.problem;
   return TRACE_PRESETS[isTracePresetId(props?.preset) ? props.preset : 'lab07-dijkstra'];

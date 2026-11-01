@@ -31,6 +31,7 @@ import { ExercisesEditor } from '../../../../../../../components/notebook/Exerci
 import { KolokiumCard } from '../../../../../../../components/notebook/KolokiumCard';
 import { NotebookTranslate } from '../../../../../../../components/notebook/NotebookTranslate';
 import { NotebookUpload } from '../../../../../../../components/notebook/NotebookUpload';
+import { NotebookVersion } from '../../../../../../../components/notebook/NotebookVersion';
 import { embedAnchor, NotebookView } from '../../../../../../../components/notebook/NotebookView';
 import { PythonBar } from '../../../../../../../components/notebook/RunControls';
 import { SubmissionBar } from '../../../../../../../components/notebook/SubmissionBar';
@@ -64,28 +65,32 @@ export const Route = createFileRoute('/_authed/o/$org/courses/$courseId/labs/$la
   loaderDeps: ({ search }) => ({ notebook: search.notebook }),
   loader: async ({ context: { queryClient }, params: { org, courseId, labId }, deps }) => {
     // The notebook's details and its rendering start with the rest, not after the page has rendered:
-    // one round trip less, and the largest download sooner, on a slow network (#193). Not awaited:
-    // a notebook the user may not open fails in its own place, as it would have.
-    const notebook = (notebookId: string) => {
-      const ref = { org, courseId, labId, notebookId };
-      void queryClient.prefetchQuery(notebookQuery(ref));
-      void queryClient.prefetchQuery(renderedQuery(ref));
-    };
-    if (deps.notebook) notebook(deps.notebook);
+    // the largest download sooner, on a slow network (#193). The rendering waits only for the list,
+    // which names its version (#208). Not awaited: a notebook the user may not open fails in its own
+    // place, as it would have.
+    const ref = (notebookId: string) => ({ org, courseId, labId, notebookId });
+    if (deps.notebook) void queryClient.prefetchQuery(notebookQuery(ref(deps.notebook)));
+    const listed = queryClient.ensureQueryData(notebooksQuery(org, courseId, labId));
+    void listed
+      .then(({ notebooks }) => {
+        // The one named, or the one the page will show, as it chooses it.
+        const nb = deps.notebook
+          ? notebooks.find((n) => n.id === deps.notebook)
+          : [...notebooks]
+              .sort((a, b) => KIND_ORDER[a.kind] - KIND_ORDER[b.kind] || a.position - b.position)
+              .find((n) => n.ready);
+        if (!nb) return;
+        if (!deps.notebook) void queryClient.prefetchQuery(notebookQuery(ref(nb.id)));
+        void queryClient.prefetchQuery(renderedQuery(ref(nb.id), nb.version));
+      })
+      .catch(() => undefined);
     try {
-      const [lab, , list] = await Promise.all([
+      const [lab] = await Promise.all([
         queryClient.ensureQueryData(labQuery(org, courseId, labId)),
         queryClient.ensureQueryData(courseQuery(org, courseId)),
-        queryClient.ensureQueryData(notebooksQuery(org, courseId, labId)),
+        listed,
         queryClient.ensureQueryData(labsQuery(org, courseId)),
       ]);
-      // No notebook named: the one the page will show, as it chooses it.
-      if (!deps.notebook) {
-        const first = [...list.notebooks]
-          .sort((a, b) => KIND_ORDER[a.kind] - KIND_ORDER[b.kind] || a.position - b.position)
-          .find((nb) => nb.ready);
-        if (first) notebook(first.id);
-      }
       return { title: lab.title };
     } catch (error) {
       // Missing, hidden, or not ours to see: the same 404 page either way.
@@ -121,6 +126,9 @@ function LabPage() {
   const current = notebooks.find((nb) => nb.id === chosen) ?? notebooks.find((nb) => nb.ready) ?? notebooks[0];
   const ref: NotebookRef | null = current ? { org, courseId, labId, notebookId: current.id } : null;
   const detail = useQuery({ ...notebookQuery(ref ?? { org, courseId, labId, notebookId: '' }), enabled: !!ref });
+  const versionAt = detail.data?.versionAt ?? null;
+  const changedCells = detail.data?.changedCells;
+  const changed = useMemo(() => ({ at: versionAt, cells: changedCells ?? [] }), [versionAt, changedCells]);
   const firstEmbed = detail.data?.embeds[0];
 
   return (
@@ -176,7 +184,11 @@ function LabPage() {
           <div className="mt-7 flex flex-wrap items-center gap-2.5" data-testid="lab-toolbar">
             {ref && current?.ready && (
               <>
-                <a href={notebookFileUrl(ref, ORIGINAL_FILE)} download className="button button--primary gap-2">
+                <a
+                  href={notebookFileUrl(ref, ORIGINAL_FILE, current.version)}
+                  download
+                  className="button button--primary gap-2"
+                >
                   <Download className="size-4" aria-hidden="true" /> {t.lab.download}
                 </a>
                 <Link
@@ -200,7 +212,7 @@ function LabPage() {
               </>
             )}
             {canManage && <AiTools org={org} courseId={courseId} />}
-            {canManage && <LabMoreMenu canDelete={!!current} />}
+            {canManage && <LabMoreMenu canDelete={!!current} canReplace={!!current?.ready && !!detail.data} />}
             <LiveLab org={org} courseId={courseId} labId={labId} />
             <HelpLink guide={labList.permissions.staff ? 'labs' : 'run-code'} className="ml-auto" />
           </div>
@@ -216,6 +228,14 @@ function LabPage() {
                   await navigate({ search: { notebook: nb.id } });
                 }}
               />
+              {current?.ready && detail.data && (
+                <NotebookVersion
+                  key={`version-${current.id}`}
+                  base={changes.base}
+                  notebook={detail.data}
+                  onDone={(nb) => void changes.uploaded(nb)}
+                />
+              )}
               {current?.ready && (
                 <NotebookTranslate
                   key={current.id}
@@ -286,6 +306,8 @@ function LabPage() {
         ) : (
           <NotebookSection
             notebookRef={ref}
+            version={current.version}
+            changed={changed}
             embeds={detail.data?.embeds}
             exercises={detail.data?.exercises}
             embedsFailed={detail.isError}
@@ -350,6 +372,8 @@ function NotebookTab({ nb, current }: { nb: NotebookSummary; current: boolean })
 
 function NotebookSection({
   notebookRef,
+  version,
+  changed,
   embeds,
   exercises,
   embedsFailed,
@@ -358,6 +382,10 @@ function NotebookSection({
   submissions,
 }: {
   notebookRef: NotebookRef;
+  /** The notebook's version, for its files' addresses (#208). */
+  version: string;
+  /** When its last new version came, and the cells that changed (#208). */
+  changed: { at: string | null; cells: number[] };
   embeds: Embed[] | undefined;
   exercises: Exercise[] | undefined;
   embedsFailed: boolean;
@@ -374,7 +402,7 @@ function NotebookSection({
   /** Handing in work (#52): staff open it per group; students hand in. */
   submissions: { staff: { groups: GroupView[]; canPublish: boolean } | null };
 }) {
-  const rendered = useQuery(renderedQuery(notebookRef));
+  const rendered = useQuery(renderedQuery(notebookRef, version));
   const reported = useRef<string | null>(null);
   const used = (event: SyntheticEvent) => {
     if (!onVisualizationUsed || reported.current === notebookRef.notebookId) return;
@@ -452,7 +480,13 @@ function NotebookSection({
           </div>
         )}
         <ExercisesProvider notebookRef={notebookRef} exercises={exercises}>
-          <CodeEditsProvider notebookRef={notebookRef} originals={originals}>
+          <CodeEditsProvider
+            key={version}
+            notebookRef={notebookRef}
+            notebookVersion={version}
+            changed={changed}
+            originals={originals}
+          >
             <EditablePython notebookId={notebookRef.notebookId} notebook={rendered.data}>
               {!submissions.staff && <SubmissionBar notebookRef={notebookRef} />}
               <EditsBar />
@@ -461,7 +495,7 @@ function NotebookSection({
                 id={notebookRef.notebookId}
                 notebook={rendered.data}
                 embeds={embeds}
-                fileUrl={(name) => notebookFileUrl(notebookRef, name)}
+                fileUrl={(name) => notebookFileUrl(notebookRef, name, version)}
               />
             </EditablePython>
           </CodeEditsProvider>

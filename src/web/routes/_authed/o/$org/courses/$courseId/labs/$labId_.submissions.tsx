@@ -73,7 +73,7 @@ function SubmissionsPage() {
     },
   });
   const detail = useQuery({ ...notebookQuery(ref), enabled: !!current });
-  const rendered = useQuery({ ...renderedQuery(ref), enabled: !!current });
+  const rendered = useQuery({ ...renderedQuery(ref, current?.version ?? ''), enabled: !!current });
   // Staff who grade get the points and hidden tests; others are refused, and do not grade here.
   const setup = useQuery({ ...gradingSetupQuery(ref), enabled: !!current });
   const forbidden = submissions.error instanceof ApiError && submissions.error.status === 403;

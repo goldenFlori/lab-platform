@@ -73,9 +73,13 @@ export function NotebookTranslate({
     setError(null);
     let ipynb: Ipynb;
     try {
-      const res = await fetch(`/api${base}/${encodeURIComponent(notebook.id)}/files/${ORIGINAL_FILE}`, {
-        credentials: 'same-origin',
-      });
+      // Its version in the address, so the browser never hands back an older one (#208).
+      const res = await fetch(
+        `/api${base}/${encodeURIComponent(notebook.id)}/files/${ORIGINAL_FILE}?v=${notebook.version}`,
+        {
+          credentials: 'same-origin',
+        },
+      );
       if (!res.ok) throw new Error(String(res.status));
       ipynb = (await res.json()) as Ipynb;
     } catch {

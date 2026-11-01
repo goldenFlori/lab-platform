@@ -191,6 +191,9 @@ export const help: HelpText = {
           shot: 'lab-staff',
         },
         {
+          text: "To correct a notebook during the term, choose **Upload a new version** there and **Compare**: you see what changed and what goes. Students' work follows its cell; don't delete the notebook to upload it again, which deletes their work too.",
+        },
+        {
           text: 'In **Visualizations in this notebook**, choose where each shows. A trace table can have your own problem, a variant for each student, and points.',
         },
         {

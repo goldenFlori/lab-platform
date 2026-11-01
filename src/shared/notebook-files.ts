@@ -8,3 +8,6 @@ export const RENDERED_FILE = 'rendered.json';
 
 /** Largest file accepted in one request (stored in chunks; Workers accept 100 MB bodies). */
 export const MAX_FILE_BYTES = 10 * 1024 * 1024;
+
+/** Files of a new version (#208) wait under this prefix until it is put in place. */
+export const STAGED_PREFIX = 'next.';

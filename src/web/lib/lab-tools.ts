@@ -2,10 +2,10 @@ import { useEffect, useRef } from 'react';
 
 // The lab header's menus open tools that live elsewhere on the page: the "AI" menu (#98) the
 // copilot's variants, the translation panel and the Live Lab's quick question; the "More" menu
-// (#130) the upload, translation and deletion of notebooks. Each tool listens for its name, so
+// (#130) the upload, a new version (#208), translation and deletion of notebooks. Each tool listens for its name, so
 // the menus need no wiring through the page.
 
-export type LabTool = 'variant' | 'translate' | 'quiz' | 'upload' | 'delete';
+export type LabTool = 'variant' | 'translate' | 'quiz' | 'upload' | 'version' | 'delete';
 
 const EVENT = 'lab-tool';
 

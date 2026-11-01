@@ -18,6 +18,7 @@ export function LearnerProvider({
   children,
 }: {
   notebookRef: NotebookRef;
+  /** The cell the seeds come from (`seedCellOf`). */
   cell: number;
   variant: boolean;
   children: ReactNode;

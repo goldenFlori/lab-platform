@@ -71,16 +71,16 @@ function Presenter() {
   const ref: NotebookRef = { org, courseId, labId, notebookId: current?.id ?? '' };
 
   const detail = useQuery({ ...notebookQuery(ref), enabled: !!current });
-  const rendered = useQuery({ ...renderedQuery(ref), enabled: !!current });
+  const rendered = useQuery({ ...renderedQuery(ref, current?.version ?? ''), enabled: !!current });
   // A solution notebook of this lab made from this notebook, if this user may see one.
   const solutionNotebooks = ready.filter((nb) => nb.kind === 'solution' && nb.id !== current?.id);
   const candidates = useQueries({
-    queries: solutionNotebooks.map((nb) => renderedQuery({ ...ref, notebookId: nb.id })),
+    queries: solutionNotebooks.map((nb) => renderedQuery({ ...ref, notebookId: nb.id }, nb.version)),
   });
   const notebook = rendered.data;
   const match = notebook
     ? solutionNotebooks
-        .map((nb, i) => ({ id: nb.id, data: candidates[i]?.data }))
+        .map((nb, i) => ({ id: nb.id, version: nb.version, data: candidates[i]?.data }))
         .find((candidate) => candidate.data !== undefined && isSolutionOf(candidate.data, notebook))
     : undefined;
   const solution = match?.data;
@@ -263,7 +263,9 @@ function Presenter() {
 
   // The solution's images and figures are its own files.
   const fileUrl = (name: string) =>
-    notebookFileUrl(showSolution && match ? { ...ref, notebookId: match.id } : ref, name);
+    showSolution && match
+      ? notebookFileUrl({ ...ref, notebookId: match.id }, name, match.version)
+      : notebookFileUrl(ref, name, current?.version ?? '');
 
   return (
     <PythonScope value={python}>

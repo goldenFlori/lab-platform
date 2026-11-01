@@ -123,6 +123,13 @@ export function variantIssue(value: unknown): 'shape' | 'nodes' | 'direction' | 
 /** The same seed for the same student, notebook and cell, wherever it is computed. */
 export const variantSeed = (userId: string, notebookId: string, cell: number) => `${userId}|${notebookId}|${cell}`;
 
+/**
+ * The cell a variant's seeds come from: where the table was when its students' graphs were first
+ * made. A new version of the notebook can move the table (#208), and pins its old cell as `seedCell`.
+ */
+export const seedCellOf = (props: Record<string, unknown> | null | undefined, cell: number) =>
+  typeof props?.seedCell === 'number' && Number.isInteger(props.seedCell) ? props.seedCell : cell;
+
 /** A deterministic random number generator from a string (FNV-1a, then mulberry32). */
 function randomFrom(seed: string) {
   let h = 0x811c9dc5;

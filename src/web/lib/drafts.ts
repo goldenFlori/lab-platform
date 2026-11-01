@@ -4,7 +4,13 @@
 /** A device copy older than this is from another time and is dropped. */
 const DRAFT_DAYS = 7;
 
-export type Draft = { code: Record<string, string>; traces: Record<string, Record<string, string>[]>; at: number };
+export type Draft = {
+  code: Record<string, string>;
+  traces: Record<string, Record<string, string>[]>;
+  at: number;
+  /** The notebook's version it was typed on (#208); absent in copies made before versions. */
+  version?: string;
+};
 
 export const DRAFT_PREFIX = 'lab-work:';
 

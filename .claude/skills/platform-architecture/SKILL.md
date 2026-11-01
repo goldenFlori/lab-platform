@@ -296,6 +296,33 @@ estimate gives the engine 3.2 MB where production sends 3.5 MB). First run, 2026
   date (`copiesOf`), nothing else. The full course is about 8 MB of files, so each copy costs that
   much of the database's 500 MB free size.
 
+## A new version of a notebook (#208)
+
+Staff put a corrected .ipynb in place of a notebook from the lab's "More" menu; the notebook keeps its
+id, so students' work stays. Deleting and uploading again would delete it all (cascade).
+- **Matching** (`src/notebook/versions.ts`, in the browser): cells by place in the .ipynb (srcIndex).
+  Identical cells first, in order (a longest common subsequence); between two of them, the rest are
+  paired by type the same way and count as changed; the remainder is added or removed. Staff see the
+  counts, each removed cell that holds work (students, from `GET …/cells/work`), a visualization or an
+  exercise, and confirm.
+- **Putting it in place:** the files go up as `next.<name>` (never served), then `POST …/version`
+  runs one batch: the staged files replace the old ones, and every table kept by cell (embeds, code
+  edits, exercises, completions, trace answers, first tries, grading, AI questions) moves to its new
+  number. Rows move through negative numbers first, so no unique key meets itself; rows in a removed
+  cell go, except AI questions. Hand-ins' code, solved cells and trace rows, and grades' results, are
+  renumbered inside their JSON; scores stay. A variant trace table gets `seedCell` (its old cell), so
+  every student keeps their graph (`seedCellOf`).
+- **Versions in addresses:** a notebook's version is the first 12 hex characters of its .ipynb's
+  SHA-256. `rendered.json` and the original are fetched with `?v=<version>`, since browsers keep files
+  an hour; the lab page starts the rendering once the notebook list names it.
+- **Students mid-edit:** every save names the page's version. The notebook keeps the previous version
+  and its cell map, so a save from a page still showing it is renumbered; one from older is refused
+  (`stale_version`, 409). The answer names the version now, and the page loads it. A device copy
+  (#178) records its version and is sent under it, apart from the page. A student whose edited cell
+  changed sees a note (`versionAt`, `changedCells`).
+- **Left as they are:** live actions in flight on a page showing the old version (a check passed, a
+  first try) are recorded under the old cell number.
+
 ## Courses, groups and joining
 
 - **Staff** (#64, `src/api/routes/staff.ts`): staff with `course.manage` for the whole course list

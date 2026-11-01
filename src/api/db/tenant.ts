@@ -28,7 +28,7 @@ import type { ExportPage, ExportPart } from '../../shared/org-export';
 import type { PredictionInput } from '../../shared/predictions';
 import { roleExists } from './access';
 import { uuidv7 } from './ids';
-import type { Db } from './index';
+import { batchRaw, type Db } from './index';
 import {
   aiQuestions,
   aiUsage,
@@ -424,6 +424,23 @@ function tenantLabAccess(db: Db, orgId: string) {
   };
 }
 
+/**
+ * Tables that keep something per cell of a notebook (#208), renumbered with a new version. Their
+ * rows in a cell that is gone go with it. (AI questions are renumbered but kept.)
+ */
+/** A notebook's version, as the app sees it: the first characters of its file's SHA-256. */
+export const VERSION_LENGTH = 12;
+
+const CELL_TABLES = [
+  'embeds',
+  'code_edits',
+  'exercises',
+  'exercise_completions',
+  'trace_answers',
+  'prediction_results',
+  'exercise_grading',
+] as const;
+
 /** Bytes per stored chunk: well under D1's 2 MB per value. */
 export const CHUNK_BYTES = 512 * 1024;
 
@@ -493,6 +510,104 @@ function tenantNotebooks(db: Db, orgId: string) {
         .from(files)
         .where(and(eq(files.orgId, orgId), eq(files.notebookId, notebookId)));
       return rows.map((row) => row.name);
+    },
+
+    /**
+     * How many students have work in each cell (#208): saved code, trace answers, exercises solved,
+     * first tries, and code or trace rows handed in. For staff deciding on a new version.
+     */
+    async workByCell(notebookId: string) {
+      const where = (
+        t: typeof codeEdits | typeof traceAnswers | typeof exerciseCompletions | typeof predictionResults,
+      ) => and(eq(t.orgId, orgId), eq(t.notebookId, notebookId));
+      const handedIn = (column: 'code' | 'traces') =>
+        db.all<{ cell: number; userId: string }>(sql`
+          SELECT DISTINCT json_extract(e.value, '$.cell') AS cell, s.user_id AS userId
+          FROM submissions s, json_each(s.${sql.raw(column)}) e
+          WHERE s.org_id = ${orgId} AND s.notebook_id = ${notebookId}`);
+      const lists = await Promise.all([
+        db.selectDistinct({ cell: codeEdits.cell, userId: codeEdits.userId }).from(codeEdits).where(where(codeEdits)),
+        db
+          .selectDistinct({ cell: traceAnswers.cell, userId: traceAnswers.userId })
+          .from(traceAnswers)
+          .where(where(traceAnswers)),
+        db
+          .selectDistinct({ cell: exerciseCompletions.cell, userId: exerciseCompletions.userId })
+          .from(exerciseCompletions)
+          .where(where(exerciseCompletions)),
+        db
+          .selectDistinct({ cell: predictionResults.cell, userId: predictionResults.userId })
+          .from(predictionResults)
+          .where(where(predictionResults)),
+        handedIn('code'),
+        handedIn('traces'),
+      ]);
+      const students = new Map<number, Set<string>>();
+      for (const { cell, userId } of lists.flat()) {
+        const set = students.get(cell) ?? new Set<string>();
+        set.add(userId);
+        students.set(cell, set);
+      }
+      return [...students].map(([cell, set]) => ({ cell, students: set.size })).sort((a, b) => a.cell - b.cell);
+    },
+
+    /**
+     * Puts a new version in place of the notebook (#208), in one batch: the files staged under
+     * `next.` replace the old ones, and everything kept by cell follows `map` ([old, new] pairs).
+     * What was in a cell with no new place goes, except AI questions, which keep their own copy of
+     * the code. A variant trace table keeps the cell its students' graphs were made from (seedCell).
+     */
+    async newVersion(
+      notebookId: string,
+      version: { map: [number, number][]; changed: number[]; originalName: string; sha256: string },
+    ) {
+      const map = JSON.stringify(version.map);
+      const mine = () => sql`org_id = ${orgId} AND notebook_id = ${notebookId}`;
+      const ofTable = (table: string) => sql.raw(table);
+      // Each cell moves to its negative place first, so no two rows meet on the way (unique keys).
+      const moved = (table: string) => sql`
+        UPDATE ${ofTable(table)} SET cell = -1 - (
+          SELECT json_extract(m.value, '$[1]') FROM json_each(${map}) m WHERE json_extract(m.value, '$[0]') = cell)
+        WHERE ${mine()} AND cell IN (SELECT json_extract(value, '$[0]') FROM json_each(${map}))`;
+      const settled = (table: string) =>
+        sql`UPDATE ${ofTable(table)} SET cell = -1 - cell WHERE ${mine()} AND cell < 0`;
+      const dropped = (table: string) => sql`DELETE FROM ${ofTable(table)} WHERE ${mine()} AND cell >= 0`;
+      // A JSON list of {cell, …} objects, with each cell's new number; those without one go.
+      const remapped = (column: string) => sql`(
+        SELECT json_group_array(json(json_set(e.value, '$.cell', json_extract(m.value, '$[1]'))))
+        FROM json_each(${sql.raw(column)}) e
+        JOIN json_each(${map}) m ON json_extract(m.value, '$[0]') = json_extract(e.value, '$.cell'))`;
+
+      const statements = [
+        sql`UPDATE embeds SET props = json_set(coalesce(props, '{}'), '$.seedCell', cell)
+            WHERE ${mine()} AND json_extract(props, '$.variant') IS NOT NULL
+              AND json_extract(props, '$.seedCell') IS NULL`,
+        ...CELL_TABLES.flatMap((table) => [moved(table), dropped(table), settled(table)]),
+        moved('ai_questions'),
+        settled('ai_questions'),
+        sql`UPDATE submissions SET code = ${remapped('code')}, traces = ${remapped('traces')},
+            solved = (SELECT json_group_array(json_extract(m.value, '$[1]')) FROM json_each(solved) e
+                      JOIN json_each(${map}) m ON json_extract(m.value, '$[0]') = e.value)
+            WHERE ${mine()}`,
+        sql`UPDATE grades SET results = ${remapped('results')}, traces = ${remapped('traces')}
+            WHERE ${mine()}`,
+        sql`DELETE FROM files WHERE ${mine()} AND name NOT LIKE 'next.%'`,
+        sql`UPDATE files SET name = substr(name, 6) WHERE ${mine()} AND name LIKE 'next.%'`,
+        db
+          .update(notebooks)
+          .set({
+            originalName: version.originalName,
+            // SQLite reads the old row on the right-hand side: the version being replaced.
+            previousVersion: sql`substr(${notebooks.sha256}, 1, ${VERSION_LENGTH})`,
+            cellMap: version.map,
+            sha256: version.sha256,
+            versionAt: new Date(),
+            changedCells: version.changed,
+          })
+          .where(and(eq(notebooks.orgId, orgId), eq(notebooks.id, notebookId)))
+          .toSQL(),
+      ];
+      await batchRaw(db, statements);
     },
 
     /** The ready and unfinished notebooks of these labs, in each lab's order. */

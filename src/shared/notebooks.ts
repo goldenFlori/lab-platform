@@ -10,7 +10,7 @@ import { isVisualizerId } from './visualizers';
 export const NOTEBOOK_KINDS = ['main', 'extra', 'solution'] as const;
 export type NotebookKind = (typeof NOTEBOOK_KINDS)[number];
 
-export { MAX_FILE_BYTES, ORIGINAL_FILE, RENDERED_FILE } from './notebook-files';
+export { MAX_FILE_BYTES, ORIGINAL_FILE, RENDERED_FILE, STAGED_PREFIX } from './notebook-files';
 
 export const FILE_NAME = /^[A-Za-z0-9][\w.-]{0,99}$/;
 
@@ -20,6 +20,27 @@ export const createNotebookInput = z.object({
   originalName: z.string().trim().min(1).max(200),
   sha256: z.string().regex(/^[0-9a-f]{64}$/),
 });
+
+const cellNumber = z.number().int().min(0).max(10_000);
+
+/**
+ * A new version in place of a notebook (#208): its files are staged first (`next.` + name), then
+ * this moves everything kept by cell to its new number. Each old and each new cell appears once.
+ */
+export const newVersionInput = z.object({
+  map: z
+    .array(z.tuple([cellNumber, cellNumber]))
+    .max(10_000)
+    .refine((pairs) => new Set(pairs.map(([o]) => o)).size === pairs.length, 'An old cell twice')
+    .refine((pairs) => new Set(pairs.map(([, n]) => n)).size === pairs.length, 'A new cell twice'),
+  /** The new numbers of the cells whose content changed, for students' notes. */
+  changed: z.array(cellNumber).max(10_000),
+  originalName: z.string().trim().min(1).max(200),
+  sha256: z.string().regex(/^[0-9a-f]{64}$/),
+});
+
+/** How many students have work in a cell (#208). */
+export type CellWork = { cell: number; students: number };
 
 export const embedsInput = z.object({
   embeds: z
@@ -60,6 +81,14 @@ export type NotebookSummary = {
   originalName: string;
   /** Staff also see notebooks whose upload has not finished (false). */
   ready: boolean;
+  /** Changes with each new version (#208): file addresses carry it, so no browser keeps an old one. */
+  version: string;
 };
 
-export type NotebookDetail = NotebookSummary & { embeds: Embed[]; exercises: Exercise[] };
+export type NotebookDetail = NotebookSummary & {
+  embeds: Embed[];
+  exercises: Exercise[];
+  /** The last new version (#208): when, and the cells that changed then. */
+  versionAt: string | null;
+  changedCells: number[];
+};
