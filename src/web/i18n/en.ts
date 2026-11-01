@@ -680,7 +680,7 @@ export const en: Messages = {
   },
   privacy: {
     title: 'Privacy',
-    updated: 'Updated on 27 October 2026',
+    updated: 'Updated on 1 November 2026',
     intro:
       "This page says what data Lab Platform keeps, why, where, for how long and who sees it. Your institution (a faculty, say) decides about its students' data; the platform processes it on its behalf.",
     sections: [
@@ -692,6 +692,7 @@ export const en: Messages = {
           'The code you change in notebooks, so you find it on any device. Staff do not see it until you hand it in.',
           'The exercises you solve, the work you hand in, and your grades.',
           'Your first answer to the decisions of the visualizations ("Predict") and to the rows of trace tables: whether it was right and what it was. Practice, not a grade; staff see it only as counts, from five students up.',
+          "Which of the pedagog's hints you revealed for an exercise, and on which day. Staff see them only as counts, from five students up.",
           'Activity as counts: at most one record a day for each lab and kind (opened, downloaded, tried a visualization, solved an exercise, ran its code, took part in a Live Lab).',
           '"Explain the error" questions with the AI\'s answer, and how many AI requests you make a day.',
           'One sign-in cookie, which keeps you signed in, and the browser’s name for each sign-in.',
@@ -729,7 +730,7 @@ export const en: Messages = {
         items: [
           `Sign-in: ends after ${RETENTION.sessionDays} days without use.`,
           `"Explain my error" questions with their answers: ${RETENTION.aiQuestionDays} days.`,
-          `Daily activity (labs opened, code runs, Live Labs), first answers to predictions and trace tables, AI use counts and Live Lab history: ${RETENTION.activityYears} years.`,
+          `Daily activity (labs opened, code runs, Live Labs), first answers to predictions and trace tables, hints revealed, AI use counts and Live Lab history: ${RETENTION.activityYears} years.`,
           `A deletion request, once handled: ${RETENTION.handledRequestYears} year.`,
           `Error reports: ${RETENTION.errorLogDays} days, at Cloudflare.`,
           'Code, submissions, grades and the rest: as long as the course exists. When the institution deletes a course, its data goes with it.',
@@ -1431,6 +1432,15 @@ export const en: Messages = {
     publish: 'Put the new version in place',
     publishing: 'Putting the new version in place…',
     failed: 'The new version was not put in place. Please try again.',
+  },
+  hints: {
+    hint: (n: number) => `Hint ${n}`,
+    show: (n: number, of: number) => `Show hint ${n} of ${of}`,
+    students: (counts: number[]) => `Students who saw them: ${counts.map((c, i) => `${i + 1}: ${c}`).join(' · ')}`,
+    failed: 'The hint did not show. Hints are closed during a kolokium.',
+    editor: 'Hints (up to 3, from gentle to nearly the answer)',
+    editorLabel: (hint: number, exercise: number) => `Hint ${hint} of exercise ${exercise}`,
+    editorHint: (n: number) => `Hint ${n}`,
   },
   edits: {
     edit: 'Edit the code',

@@ -6,6 +6,7 @@ import {
   ClipboardCheck,
   Code2,
   Copy,
+  Lightbulb,
   MonitorSmartphone,
   Pencil,
   RotateCcw,
@@ -135,6 +136,7 @@ export function CodeCell({
           </span>
         </div>
         {!presenting && <ExerciseStrip cell={cell} />}
+        {!presenting && <ExerciseHints cell={cell} />}
         {editorOpen ? (
           <>
             <Suspense fallback={code}>
@@ -246,6 +248,62 @@ function ExerciseStrip({ cell }: { cell: Cell }) {
           {challenged ? t.live.stopChallenge : t.live.startChallenge}
         </button>
       )}
+    </div>
+  );
+}
+
+/**
+ * Hints the pedagog wrote for the exercise (#215): revealed one at a time, each staying shown; for
+ * staff, how many students revealed each.
+ */
+function ExerciseHints({ cell }: { cell: Cell }) {
+  const t = useT();
+  const exercises = useExercises();
+  const [pending, setPending] = useState(false);
+  const [failed, setFailed] = useState(false);
+  if (!exercises?.of(cell)) return null;
+  const { count, shown, students } = exercises.hints(cell);
+  if (count === 0) return null;
+  const next = shown.length + 1;
+  const reveal = async () => {
+    setPending(true);
+    setFailed(false);
+    try {
+      await exercises.reveal(cell);
+    } catch {
+      setFailed(true);
+    } finally {
+      setPending(false);
+    }
+  };
+  return (
+    <div className="grid gap-1.5 border-b border-[var(--code-border)] px-4 py-2 text-sm" data-testid="hints">
+      {shown.map((h) => (
+        <p key={h.hint} className="flex gap-2">
+          <Lightbulb className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden="true" />
+          <span className="whitespace-pre-wrap">
+            <span className="font-medium">{t.hints.hint(h.hint)}:</span> {h.text}
+          </span>
+        </p>
+      ))}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+        {next <= count && (
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => void reveal()}
+            className="flex items-center gap-1.5 rounded-lg px-2 py-1 font-medium text-accent hover:bg-default disabled:opacity-60"
+          >
+            <Lightbulb className="size-3.5 text-warning" aria-hidden="true" /> {t.hints.show(next, count)}
+          </button>
+        )}
+        {students && <span className="text-muted">{t.hints.students(students)}</span>}
+        {failed && (
+          <span role="alert" className="text-danger">
+            {t.hints.failed}
+          </span>
+        )}
+      </div>
     </div>
   );
 }

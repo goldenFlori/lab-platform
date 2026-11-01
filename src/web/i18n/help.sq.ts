@@ -79,7 +79,7 @@ export const help = {
           text: 'Kur kodi ndalet me gabim, rreshti shënohet me të kuqe. Nëse pedagogu e ka ndezur AI-në, **Shpjego gabimin** jep një udhëzim në shqip, jo zgjidhjen.',
         },
         {
-          text: 'Te një ushtrim, kontrolli shfaqet sapo ekzekutohet qeliza: ✓, ose ✗ me rastin që dështoi.',
+          text: 'Te një ushtrim, kontrolli shfaqet sapo ekzekutohet qeliza: ✓, ose ✗ me rastin që dështoi. Nëse pedagogu ka shkruar udhëzime, **Shfaq udhëzimin** i hap një nga një.',
         },
         { text: 'Kodi që nuk mbaron ndalet me **Ndalo**.' },
       ],
@@ -235,7 +235,7 @@ export const help = {
           text: 'Te **Vizualizimet në këtë fletore** zgjidhni ku shfaqet secili. Një tabelë gjurmimi mund të ketë problemin tuaj, një variant për çdo student, dhe pikë.',
         },
         {
-          text: 'Te **Ushtrimet në këtë fletore** shihni ushtrimet që u gjetën vetë dhe shtoni të tjera me një test të dukshëm.',
+          text: 'Te **Ushtrimet në këtë fletore** shihni ushtrimet që u gjetën vetë dhe shtoni të tjera me një test të dukshëm. Secili ka deri në tre udhëzime që studentët i hapin një nga një; ju shihni sa i hapën.',
         },
         {
           text: '**Prezanto** e hap fletoren në ekran të plotë, hap pas hapi, me kodin që e ekzekutoni para klasës.',
