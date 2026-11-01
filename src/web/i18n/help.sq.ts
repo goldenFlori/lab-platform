@@ -174,7 +174,7 @@ export const help = {
       summary: 'Kursi i vitit, grupet me kodet e regjistrimit dhe stafi.',
       steps: [
         {
-          text: 'Te **Kurset e mia** shtypni **Kurs i ri**. Me **Kopjo laboratorët nga** merrni laboratorët e vitit të kaluar.',
+          text: 'Te **Kurset e mia** shtypni **Kurs i ri**. Me **Kopjo kursin nga** merrni gjithë kursin e vitit të kaluar: laboratorët, fletoret, vizualizimet, ushtrimet dhe zgjidhjet, pa studentët dhe punën e tyre.',
         },
         {
           text: 'Shtoni grupet. Çdo grup ka një **Kod regjistrimi**: **Shfaq në ekran** e tregon me kod QR për projektorin, **Kod i ri** e zëvendëson.',

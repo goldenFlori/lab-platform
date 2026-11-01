@@ -168,7 +168,9 @@ export const en: Messages = {
     titleMissing: 'Enter the course title.',
     yearLabel: 'Academic year',
     yearFormat: 'Write it as 2026/27.',
-    copyFrom: 'Copy the labs from',
+    copyFrom: 'Copy the course from',
+    copyHelp:
+      'Its labs, notebooks, visualizations, exercises and solutions (if you can see them). Not its groups, students or their work; the labs arrive hidden.',
     copyNothing: 'No course: start empty',
     language: 'Course language',
     languageDefault: 'Albanian (default)',

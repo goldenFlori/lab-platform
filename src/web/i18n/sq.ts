@@ -169,7 +169,9 @@ export const sq = {
     titleMissing: 'Shkruani titullin e kursit.',
     yearLabel: 'Viti akademik',
     yearFormat: 'Shkruajeni si 2026/27.',
-    copyFrom: 'Kopjo laboratorët nga',
+    copyFrom: 'Kopjo kursin nga',
+    copyHelp:
+      'Laboratorët, fletoret, vizualizimet, ushtrimet dhe zgjidhjet (nëse i shihni). Jo grupet, studentët apo puna e tyre; laboratorët vijnë të fshehur.',
     copyNothing: 'Asnjë kurs: fillo bosh',
     language: 'Gjuha e kursit',
     languageDefault: 'Shqip (e parazgjedhur)',
