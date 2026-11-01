@@ -300,41 +300,18 @@ function tenantMemberships(db: Db, orgId: string, members: ReturnType<typeof ten
   };
 }
 
-/** Courses, plus creating one together with its first pedagog and, when copying, last year's labs. */
+/** Courses, plus creating one together with its first pedagog. (A copy of another is `copyCourse`.) */
 function tenantCourses(db: Db, orgId: string) {
   const base = tenantTable(db, orgId, courses);
   return {
     ...base,
-    async createFor(creatorId: string, values: { title: string; academicYear: string }, copyFromId?: string) {
-      const source = copyFromId ? await base.get(copyFromId) : undefined;
-      if (copyFromId && !source) throw new NotFoundError('Course not found');
-      const sourceLabs = source
-        ? await db
-            .select()
-            .from(labs)
-            .where(and(eq(labs.orgId, orgId), eq(labs.courseId, source.id)))
-            .orderBy(asc(labs.position))
-        : [];
-
+    async createFor(creatorId: string, values: { title: string; academicYear: string; locale?: 'sq' | 'en' | null }) {
       const id = uuidv7();
-      const course = db.insert(courses).values({ ...values, id, orgId, templateId: source?.templateId ?? null });
-      const creator = db
-        .insert(memberships)
-        .values({ id: uuidv7(), orgId, userId: creatorId, courseId: id, role: 'pedagog' });
-      const copiedLabs = sourceLabs.map(({ n, title, week, summary, position }) => ({
-        id: uuidv7(),
-        orgId,
-        courseId: id,
-        n,
-        title,
-        week,
-        summary,
-        position,
-      }));
-      // One batch: the course, its pedagog and its labs exist together or not at all.
-      if (copiedLabs.length > 0) await db.batch([course, creator, db.insert(labs).values(copiedLabs)]);
-      else await db.batch([course, creator]);
-
+      // One batch: the course and its pedagog exist together or not at all.
+      await db.batch([
+        db.insert(courses).values({ ...values, id, orgId }),
+        db.insert(memberships).values({ id: uuidv7(), orgId, userId: creatorId, courseId: id, role: 'pedagog' }),
+      ]);
       const created = await base.get(id);
       if (!created) throw new Error('The new course could not be read back');
       return created;

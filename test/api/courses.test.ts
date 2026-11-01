@@ -40,34 +40,83 @@ describe('creating courses', () => {
     expect(bad.status).toBe(400);
   });
 
-  it("copies last year's labs and template, but not its groups or visibility", async () => {
+  it("starts a new term from last year's whole course, but not its groups, people, visibility or work (#210)", async () => {
     const { seed, orgPath } = await setup();
-    await seed.tenant.labs.create({ courseId: seed.course.id, n: 2, title: 'Pemët', position: 2 });
-    const pedagog = await account(seed, 'pedagog', { courseId: seed.course.id });
-    const res = await pedagog.call(`${orgPath}/courses`, {
-      method: 'POST',
-      body: { title: 'SDA 2027/28', academicYear: '2027/28', copyFromCourseId: seed.course.id },
+    const { tenant, notebook, lab } = seed;
+    await tenant.labs.create({ courseId: seed.course.id, n: 2, title: 'Pemët', position: 2 });
+    await tenant.notebooks.putFile(notebook.id, 'notebook.ipynb', {
+      mime: 'application/json',
+      encoding: 'identity',
+      data: new TextEncoder().encode('{"cells":[]}'),
     });
+    await tenant.exercises.set(notebook.id, [{ cell: 3, title: 'BFS', test: 'assert bfs() == 1' }]);
+    await tenant.grading.setSetup(notebook.id, [{ cell: 3, points: 5, hiddenTest: 'assert bfs() == 2' }]);
+    await tenant.notebooks.create({
+      labId: lab.id,
+      kind: 'solution',
+      title: 'Zgjidhjet',
+      position: 2,
+      originalName: 'zgjidhjet.ipynb',
+      sha256: '1'.repeat(64),
+      readyAt: new Date(),
+    });
+    const student = await account(seed, 'student', { groupId: seed.group.id });
+    await tenant.codeEdits.save({ notebookId: notebook.id, userId: student.user.id, cell: 3, code: 'x' });
+
+    const pedagog = await account(seed, 'pedagog', { courseId: seed.course.id });
+    const body = { title: 'SDA 2027/28', academicYear: '2027/28', copyFromCourseId: seed.course.id };
+    const res = await pedagog.call(`${orgPath}/courses`, { method: 'POST', body });
     expect(res.status).toBe(403); // a course-level pedagog cannot create courses
 
     const coordinator = await account(seed, 'coordinator');
     const copy = await json<CourseSummary>(
-      await coordinator.call(`${orgPath}/courses`, {
-        method: 'POST',
-        body: { title: 'SDA 2027/28', academicYear: '2027/28', copyFromCourseId: seed.course.id },
-      }),
+      await coordinator.call(`${orgPath}/courses`, { method: 'POST', body: { ...body, locale: 'en' } }),
     );
-    const copied = await seed.tenant.courses.get(copy.id);
-    expect(copied?.templateId).toBe(seed.template.id);
-    const labs = (await seed.tenant.labs.list())
-      .filter((l) => l.courseId === copy.id)
-      .sort((a, b) => a.position - b.position);
+    expect(copy).toMatchObject({ locale: 'en', copiedFrom: { title: 'SDA 2026/27', institution: 'Org fshn' } });
+    expect((await tenant.courses.get(copy.id))?.templateId).toBe(seed.template.id);
+    const labs = await tenant.labs.ofCourse(copy.id);
     expect(labs.map((l) => [l.n, l.title])).toEqual([
       [1, 'Grafet'],
       [2, 'Pemët'],
     ]);
-    expect(await seed.tenant.groups.ofCourse(copy.id)).toEqual([]);
-    expect((await seed.tenant.labAccess.list()).filter((a) => labs.some((l) => l.id === a.labId))).toEqual([]);
+    const notebooks = await tenant.notebooks.ofLab(labs[0]?.id as string);
+    expect(notebooks.map((n) => n.kind)).toEqual(['main', 'solution']);
+    const main = notebooks[0]?.id as string;
+    expect(new TextDecoder().decode((await tenant.notebooks.getFile(main, 'notebook.ipynb'))?.data)).toBe(
+      '{"cells":[]}',
+    );
+    expect(await tenant.notebooks.embedsOf(main)).toMatchObject([{ cell: 2, viz: 'grafet' }]);
+    expect(await tenant.exercises.of(main)).toMatchObject([{ cell: 3, title: 'BFS' }]);
+    expect(await tenant.grading.setupOf(main)).toMatchObject([{ cell: 3, points: 5 }]);
+    // Nothing of last year's people: no groups, no visibility, no student's code, only the creator.
+    expect(await tenant.groups.ofCourse(copy.id)).toEqual([]);
+    expect(await tenant.labAccess.ofCourse(copy.id)).toEqual([]);
+    expect(await tenant.codeEdits.ofUser(main, student.user.id)).toEqual([]);
+    const members = (await tenant.memberships.list()).filter((m) => m.courseId === copy.id);
+    expect(members.map((m) => [m.userId, m.role])).toEqual([[coordinator.user.id, 'pedagog']]);
+  });
+
+  it('leaves the solutions out for a creator who may not see them', async () => {
+    const { seed, admin, orgPath } = await setup();
+    await seed.tenant.notebooks.create({
+      labId: seed.lab.id,
+      kind: 'solution',
+      title: 'Zgjidhjet',
+      position: 2,
+      originalName: 'zgjidhjet.ipynb',
+      sha256: '1'.repeat(64),
+      readyAt: new Date(),
+    });
+    // An admin who is also a student of the course sees it, but not its solutions.
+    await seed.tenant.memberships.create({ userId: admin.user.id, groupId: seed.group.id, role: 'student' });
+    const copy = await json<CourseSummary>(
+      await admin.call(`${orgPath}/courses`, {
+        method: 'POST',
+        body: { title: 'Kopja', academicYear: '2027/28', copyFromCourseId: seed.course.id },
+      }),
+    );
+    const [lab] = await seed.tenant.labs.ofCourse(copy.id);
+    expect((await seed.tenant.notebooks.ofLab(lab?.id as string)).map((n) => n.kind)).toEqual(['main']);
   });
 
   it('refuses to copy a course the creator cannot see', async () => {
