@@ -587,6 +587,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   tim"): the .ipynb with their code in its cells, to keep and to open in Jupyter or Colab after the
   course. Staff who review download a student's hand-in the same way. Made in the browser from the
   original and the code. Next: #215, hints written by the pedagog.
+- **2026-11-01:** #215 done. Staff write up to three hints for an exercise, from gentle to nearly the
+  answer, in the exercises editor. Students open them one at a time under the exercise, and they stay
+  open; never during a kolokium. Staff see how many students opened each, from five students up. Help
+  in the pedagog's own words, without AI or its cost. The privacy page and the agreement list the
+  hints a student opened, kept two years like first tries. Next: #216, a demo institution.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
