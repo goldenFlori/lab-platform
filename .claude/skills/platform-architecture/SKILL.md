@@ -542,8 +542,8 @@ Built in #8: `src/api/auth/`, data access in `src/api/db/auth.ts`, routes in
     follow the theme. KaTeX's styles and fonts load with the lab page.
   - Solution notebooks are served only with `solution.view`, or after `solutions_from`.
   - Not yet: folding saved outputs as a spoiler. The course site did this for one homework
-    notebook, whose saved chart gives the answer away. Nor replacing a notebook with a new
-    version while keeping its visualizations: today it is deleted and uploaded again.
+    notebook, whose saved chart gives the answer away. (A new version in place of a notebook is
+    #208, below.)
 - **Embeds** (cell → visualization + props) are stored as data: `embeds`, one per cell, from
   the 13 ids in `src/shared/visualizers.ts`, replaced as a whole with
   `PUT …/notebooks/:id/embeds`.
@@ -568,13 +568,15 @@ Built in #8: `src/api/auth/`, data access in `src/api/db/auth.ts`, routes in
     site) gives each lab its own `.ipynb` of whole cells (`laborator-05-laboratori-6.ipynb`).
     Each range starts at a heading that opens its cell. The embeds are renumbered for the part,
     and a rule above the part's first heading is dropped, as on the site.
-  - **Re-running:**
-    - a lab is matched by its number and its imported notebooks by file name;
-    - if any of a lab's notebooks changed (file, title, kind or order), they are all uploaded
-      again in order;
-    - otherwise only differing embeds are written;
-    - notebooks added in the app are left alone;
-    - visibility is never touched.
+  - **Re-running** (#209): it plans first, only reading, then writes.
+    - A lab is matched by its number and its imported notebooks by file name.
+    - A notebook whose original differs gets a new version in place (#208): same id, students' work
+      moved with its cells. A new one is uploaded after the rest. Title, kind and order changes in
+      the course repo are not carried over (no in-place rename yet).
+    - If a new version would remove a cell where students have work, `ImportBlocked` stops it
+      before any write and lists lab, file, cell and how many students; `--allow-loss` goes ahead.
+    - Embeds are written when they differ, keeping a variant's pinned `seedCell`.
+    - Notebooks added in the app are left alone; visibility is never touched.
   - The Node scripts run TypeScript as is, so `src/notebook/index.ts` imports its modules with
     `.ts` extensions.
   - `test/notebook/fixtures/course.json` is the site's labs and homework, written by the snapshot

@@ -568,6 +568,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   student's graph; a student whose edited cell changed is told. A page still showing the old version
   saves into the right cells and then loads the new one. Next: #209, the course import updating in
   place.
+- **2026-11-01:** #209 done. Re-running `npm run course:import` during the term no longer deletes
+  students' work: a changed notebook gets a new version in place, with their code, answers, hand-ins
+  and grades moved with their cells, and the report says how each changed. If a cell where students
+  have work would be gone, the import stops before changing anything and lists those cells, unless
+  `--allow-loss` is given. The course can now be re-imported safely once the pilot starts. Next:
+  #210, a new term from the whole course.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
