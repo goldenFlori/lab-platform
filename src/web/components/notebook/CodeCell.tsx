@@ -7,6 +7,7 @@ import {
   Code2,
   Copy,
   Lightbulb,
+  MessageSquare,
   MonitorSmartphone,
   Pencil,
   RotateCcw,
@@ -18,6 +19,7 @@ import type { CodeCell as Cell } from '../../../notebook/types';
 import { useT } from '../../i18n';
 import { useCodeEdits } from '../../lib/code-edits';
 import { useExercises } from '../../lib/exercises';
+import { useGradeComment } from '../../lib/grade-comments';
 import { useLive } from '../../lib/live-context';
 import { sanitize } from '../../lib/sanitize';
 import { usePython } from '../../python/PythonProvider';
@@ -176,8 +178,24 @@ export function CodeCell({
         ) : (
           code
         )}
+        {!presenting && <GradeComment cell={cell} />}
       </div>
       {!presenting && <Outputs cell={cell} fileUrl={fileUrl} />}
+    </div>
+  );
+}
+
+/** The pedagog's comment on the student's code in this cell, once the grade is released (#220). */
+function GradeComment({ cell }: { cell: Cell }) {
+  const t = useT();
+  const comment = useGradeComment(cell.srcIndex);
+  if (!comment) return null;
+  return (
+    <div className="flex gap-2 border-t border-[var(--code-border)] px-4 py-2.5 text-sm" data-testid="grade-comment">
+      <MessageSquare className="mt-0.5 size-4 shrink-0 text-accent" aria-hidden="true" />
+      <p className="whitespace-pre-wrap">
+        <span className="font-medium">{t.comments.fromPedagog}:</span> {comment}
+      </p>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { Alert, AlertDialog, Button } from '@heroui/react';
-import { Gauge, Megaphone, Play } from 'lucide-react';
+import { Gauge, Megaphone, MessageSquare, Play } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import type { StoredNotebook } from '../../../notebook/stored';
 import { MAX_TEST } from '../../../shared/exercise-limits';
@@ -298,6 +298,100 @@ export function GradeReview({
         {message && (
           <span role="status" className="text-sm text-muted">
             {message}
+          </span>
+        )}
+      </div>
+    </form>
+  );
+}
+
+/**
+ * The pedagog's comment beside one cell of a student's hand-in (#220): written, changed or removed
+ * here, kept with the grade, and shown to the student with it once released.
+ */
+export function CellCommentEditor({
+  notebookRef,
+  group,
+  grade,
+  cell,
+}: {
+  notebookRef: NotebookRef;
+  group: string;
+  grade: StaffGrade;
+  cell: number;
+}) {
+  const t = useT();
+  const changes = useGradingChanges(notebookRef, group);
+  const current = grade.comments.find((c) => c.cell === cell)?.text ?? '';
+  const [editing, setEditing] = useState(false);
+  const [text, setText] = useState(current);
+  const [failed, setFailed] = useState(false);
+
+  async function save(next: string) {
+    setFailed(false);
+    const others = grade.comments.filter((c) => c.cell !== cell);
+    const comments = next.trim() ? [...others, { cell, text: next.trim() }].sort((a, b) => a.cell - b.cell) : others;
+    try {
+      await changes.review.mutateAsync({ userId: grade.userId, comments });
+      setEditing(false);
+    } catch {
+      setFailed(true);
+    }
+  }
+
+  if (!editing) {
+    return (
+      <div className="flex flex-wrap items-start gap-2 border-t border-[var(--code-border)] px-3 py-2 text-sm">
+        {current && (
+          <p className="min-w-0 flex-1 basis-64 whitespace-pre-wrap" data-testid="cell-comment">
+            <MessageSquare className="mr-1.5 inline size-3.5 text-accent" aria-hidden="true" />
+            {current}
+          </p>
+        )}
+        <Button
+          size="sm"
+          variant="ghost"
+          onPress={() => {
+            setText(current);
+            setEditing(true);
+          }}
+        >
+          {current ? t.comments.edit : t.comments.add}
+        </Button>
+      </div>
+    );
+  }
+  return (
+    <form
+      className="grid gap-2 border-t border-[var(--code-border)] px-3 py-2"
+      onSubmit={(e) => {
+        e.preventDefault();
+        void save(text);
+      }}
+    >
+      <textarea
+        value={text}
+        rows={3}
+        maxLength={2000}
+        aria-label={t.comments.label}
+        onChange={(e) => setText(e.target.value)}
+        className="rounded-xl border border-border bg-surface px-3 py-2 text-sm"
+      />
+      <div className="flex flex-wrap items-center gap-2">
+        <Button type="submit" size="sm" variant="primary" isPending={changes.review.isPending}>
+          {t.comments.save}
+        </Button>
+        {current && (
+          <Button size="sm" variant="ghost" onPress={() => void save('')}>
+            {t.comments.remove}
+          </Button>
+        )}
+        <Button size="sm" variant="ghost" onPress={() => setEditing(false)}>
+          {t.common.cancel}
+        </Button>
+        {failed && (
+          <span role="alert" className="text-xs text-danger">
+            {t.comments.failed}
           </span>
         )}
       </div>

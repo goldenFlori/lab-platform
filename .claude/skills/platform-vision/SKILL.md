@@ -599,6 +599,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   cannot create accounts, upload, delete or share. Phase 15 leaves students keeping their work as
   .ipynb, pedagogs' own hints, and a demo for the grant video and other faculties. Next: the owner sets
   the demo up once (README, "Demo institution"); then plan Phase 16.
+- **2026-11-02:** Phase 16 planned as the "Phase 16: Feedback that teaches" milestone, issues
+  #220–#222: comments on a hand-in cell by cell, saved comments given in one click, and attendance for
+  a lab hour.
+- **2026-11-02:** #220 done. When grading, the pedagog writes a comment beside a cell of a student's
+  handed-in code. Released with the grade, the student reads it under that cell on the lab page, with
+  the count in My progress; feedback where the mistake is. Next: #221, saved comments.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
@@ -658,6 +664,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-11-01 | Phase 14 is "Changes without lost work" before the January pilot: fixing a lab by deleting and uploading it again deletes every student's code, hand-ins and grades for it, and so did re-running the course import. A notebook gets new versions in place instead, its cells matched by content and order, with staff shown what a removed cell takes with it before they confirm | Decided |
 | 2026-11-01 | Phase 15 is "Take it home, show it": students keep their work as .ipynb (open formats out, not only in), pedagogs give hints in their own words without AI's cost, and a demo institution with made-up data lets a grant jury or another faculty try the platform without ever seeing a real student | Decided |
 | 2026-11-01 | The demo is a real institution rebuilt nightly from a template course, entered through two shared password-less accounts limited to an allowlist of actions, rather than a separate fake app or per-visitor accounts: it shows the actual product, costs a few hundred rows a night, and no visitor can bring a real person's data in or break it for the next | Decided |
+| 2026-11-02 | Phase 16 is "Feedback that teaches": a grade with one note says little; a comment beside the line that went wrong teaches, and saved comments make it quick enough to give thirty students. Attendance joins it because the pilot's lab teachers keep it on paper every week | Decided |
 | 2026-10-29 | Phase 12 is "The lab room" before SaaS: the January mini-pilot and the March semester run in a real room (one shared connection, lab PCs and cheap phones, every kind of student, pedagogs new to the platform). Self-service institutions, Google login and billing come once the pilot has shown the teaching, which the grant application needs first | Decided |
 | 2026-10-27 | A backup counts only once a restore of it has been checked. The restore drill runs on the owner's machine with their key (never in CI, which must not hold the key), after schema or backup changes and once a month | Decided |
 | 2026-10-27 | A hand-in delayed by an outage counts at the time the server receives it, never a time the browser reports: a browser's clock and requests can be changed, which would give extra minutes in a kolokium. The work is kept safe on the device instead, and the pedagog can move a deadline | Decided |

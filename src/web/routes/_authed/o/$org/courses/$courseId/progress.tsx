@@ -1,6 +1,16 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
-import { ArrowLeft, BrainCircuit, CircleCheck, Clock, Lightbulb, Repeat, Send, Star } from 'lucide-react';
+import {
+  ArrowLeft,
+  BrainCircuit,
+  CircleCheck,
+  Clock,
+  Lightbulb,
+  MessageSquare,
+  Repeat,
+  Send,
+  Star,
+} from 'lucide-react';
 import type { TopicResult } from '../../../../../../../shared/predictions';
 import type { LabProgress, NotebookProgress } from '../../../../../../../shared/progress';
 import { RichText } from '../../../../../../../viz/kit/RichText';
@@ -229,6 +239,13 @@ function NotebookRow({ nb }: { nb: NotebookProgress }) {
           </span>
         )}
         {nb.grade?.feedback && <span className="text-muted sm:max-w-64">{nb.grade.feedback}</span>}
+        {/* Comments beside the code (#220): read under their cells on the lab page. */}
+        {nb.grade && nb.grade.comments.length > 0 && (
+          <span className="text-accent" data-testid="progress-comments">
+            <MessageSquare className="mr-1 inline size-3.5" aria-hidden="true" />
+            {t.comments.count(nb.grade.comments.length)}
+          </span>
+        )}
       </div>
     </li>
   );

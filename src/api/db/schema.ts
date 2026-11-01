@@ -823,6 +823,8 @@ export const grades = sqliteTable(
       .default(sql`'[]'`),
     score: integer('score'),
     feedback: text('feedback'),
+    /** The pedagog's comments beside cells of the student's code (#220), released with the grade. */
+    comments: text('comments', { mode: 'json' }).$type<{ cell: number; text: string }[]>(),
     gradedAt: integer('graded_at', { mode: 'timestamp' }).notNull(),
     releasedAt: integer('released_at', { mode: 'timestamp' }),
   },

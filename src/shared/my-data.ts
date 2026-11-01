@@ -36,7 +36,15 @@ export type OrganizationData = {
     at: When;
   }[];
   /** Only released grades: drafts are the staff's until they release them. */
-  grades: { notebook: string; score: number; maxScore: number; feedback: string | null; releasedAt: When }[];
+  grades: {
+    notebook: string;
+    score: number;
+    maxScore: number;
+    feedback: string | null;
+    /** The pedagog's comments beside cells of their code (#220). */
+    comments: { cell: number; text: string }[] | null;
+    releasedAt: When;
+  }[];
   aiQuestions: { notebook: string; cell: number; code: string; error: string; answer: string; at: When }[];
   aiUse: { course: string; day: string; requests: number }[];
   deletionRequests: { note: string | null; at: When; handledAt: When | null }[];

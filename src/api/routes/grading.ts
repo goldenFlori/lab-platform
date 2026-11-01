@@ -55,6 +55,7 @@ const staffGrade = (row: {
   traces: TraceScore[];
   score: number | null;
   feedback: string | null;
+  comments: { cell: number; text: string }[] | null;
   gradedAt: Date;
   releasedAt: Date | null;
 }): StaffGrade => ({
@@ -65,6 +66,7 @@ const staffGrade = (row: {
   traces: row.traces,
   score: row.score,
   feedback: row.feedback,
+  comments: row.comments ?? [],
   gradedAt: row.gradedAt.toISOString(),
   releasedAt: row.releasedAt?.toISOString() ?? null,
 });

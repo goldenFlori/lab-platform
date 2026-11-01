@@ -2,7 +2,7 @@ import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query
 import type { StoredNotebook } from '../../notebook/stored';
 import type { AssessmentReport } from '../../shared/assessment-report';
 import type { Exercise } from '../../shared/exercises';
-import type { ExerciseGrading, StaffGrade } from '../../shared/grading';
+import type { CellComment, ExerciseGrading, StaffGrade } from '../../shared/grading';
 import { api } from './api';
 import { type NotebookRef, notebookQuery, notebooksPath } from './notebooks';
 
@@ -42,11 +42,16 @@ export function useGradingChanges(ref: NotebookRef, group: string) {
       onSuccess: (data) => queryClient.setQueryData(gradingSetupQuery(ref).queryKey, data),
     }),
     review: useMutation({
-      mutationFn: ({ userId, score, feedback }: { userId: string; score: number | null; feedback: string | null }) =>
-        api<StaffGrade>(`${base(ref)}/grades/${encodeURIComponent(userId)}`, {
-          method: 'PATCH',
-          body: { score, feedback },
-        }),
+      // Only what is sent changes: the score and feedback, or the comments by cell (#220).
+      mutationFn: ({
+        userId,
+        ...change
+      }: {
+        userId: string;
+        score?: number | null;
+        feedback?: string | null;
+        comments?: CellComment[];
+      }) => api<StaffGrade>(`${base(ref)}/grades/${encodeURIComponent(userId)}`, { method: 'PATCH', body: change }),
       onSuccess: refreshGrades,
     }),
     release: useMutation({

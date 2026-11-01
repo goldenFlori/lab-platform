@@ -62,10 +62,24 @@ export async function deadlineFor(c: Context<TenantEnv>, ctx: LabContext, notebo
 /** A grade as its student sees it: only once released. */
 const released = (
   row:
-    | { autoScore: number; maxScore: number; score: number | null; feedback: string | null; releasedAt: Date | null }
+    | {
+        autoScore: number;
+        maxScore: number;
+        score: number | null;
+        feedback: string | null;
+        comments: { cell: number; text: string }[] | null;
+        releasedAt: Date | null;
+      }
     | undefined,
 ): MyGrade | null =>
-  row?.releasedAt ? { score: row.score ?? row.autoScore, maxScore: row.maxScore, feedback: row.feedback } : null;
+  row?.releasedAt
+    ? {
+        score: row.score ?? row.autoScore,
+        maxScore: row.maxScore,
+        feedback: row.feedback,
+        comments: row.comments ?? [],
+      }
+    : null;
 
 export const submissionRoutes = new Hono<TenantEnv>()
   // The groups' deadlines, for staff who may open it or review it.

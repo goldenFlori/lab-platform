@@ -71,11 +71,32 @@ describe('grades', () => {
       body: { score: 3, feedback: 'Shumë mirë.' },
     });
     expect(((await review.json()) as StaffGrade).score).toBe(3);
+    // A comment beside a cell (#220), sent alone: the score and feedback stay.
+    const commented = await pedagog.call(`${nbPath}/grades/${ana.user.id}`, {
+      method: 'PATCH',
+      body: { comments: [{ cell: 3, text: 'Kujdes me rastin bosh.' }] },
+    });
+    expect(await commented.json()).toMatchObject({ score: 3, feedback: 'Shumë mirë.' });
+    const twice = await pedagog.call(`${nbPath}/grades/${ana.user.id}`, {
+      method: 'PATCH',
+      body: {
+        comments: [
+          { cell: 3, text: 'a' },
+          { cell: 3, text: 'b' },
+        ],
+      },
+    });
+    expect(twice.status).toBe(400);
     await pedagog.call(`${nbPath}/grades/${ana.user.id}`, { method: 'PUT', body: { ...RUN, autoScore: 1 } });
     expect((await pedagog.call(`${nbPath}/grades/release?group=${seed.group.id}`, { method: 'POST' })).status).toBe(
       204,
     );
-    expect(await grade(ana)).toEqual({ score: 3, maxScore: 3, feedback: 'Shumë mirë.' });
+    expect(await grade(ana)).toEqual({
+      score: 3,
+      maxScore: 3,
+      feedback: 'Shumë mirë.',
+      comments: [{ cell: 3, text: 'Kujdes me rastin bosh.' }],
+    });
     expect(await grade(besa)).toBeNull();
     const list = (await (await pedagog.call(`${nbPath}/grades?group=${seed.group.id}`)).json()) as {
       grades: StaffGrade[];

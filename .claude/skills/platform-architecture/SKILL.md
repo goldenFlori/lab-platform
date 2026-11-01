@@ -363,6 +363,14 @@ hand-in's code ("Shkarko si .ipynb"). No server work, and no new data leaves the
   deletions, shares or deletion requests come from a visitor. A banner tells them it is a shared demo
   rebuilt nightly, and not to type anything personal; the privacy page says so too.
 
+## Comments on a hand-in (#220)
+
+`grades.comments` ([{cell, text}], one per cell): written beside the student's handed-in cells on the
+submissions page (`CellCommentEditor`), saved with `PATCH …/grades/:userId`, which now changes only the
+parts sent (score, feedback, comments). Released with the grade: the student reads them under those
+cells on the lab page (`GradeCommentsProvider`, from the hand-in bar's request) and their count in My
+progress. A new version renumbers them (#208); they are in My data and the export with the grade.
+
 ## Courses, groups and joining
 
 - **Staff** (#64, `src/api/routes/staff.ts`): staff with `course.manage` for the whole course list

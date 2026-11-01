@@ -12,7 +12,13 @@ import type { Embed } from '../../../../../../../../shared/notebooks';
 import type { KolokiumSetup, SubmissionList } from '../../../../../../../../shared/submissions';
 import { HelpLink } from '../../../../../../../components/HelpLink';
 import { AssessmentReport } from '../../../../../../../components/notebook/AssessmentReport';
-import { GradeChip, GradeGroupBar, GradeReview, GradingSetup } from '../../../../../../../components/notebook/Grading';
+import {
+  CellCommentEditor,
+  GradeChip,
+  GradeGroupBar,
+  GradeReview,
+  GradingSetup,
+} from '../../../../../../../components/notebook/Grading';
 import { t as messages, useT } from '../../../../../../../i18n';
 import { ApiError } from '../../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../../lib/brand';
@@ -383,7 +389,15 @@ function Student({
       {open && grading?.grade && (
         <GradeReview notebookRef={notebookRef} group={grading.group} grade={grading.grade} exercises={exercises} />
       )}
-      {open && <SubmittedCode userId={student.id} notebookRef={notebookRef} notebook={notebook} original={original} />}
+      {open && (
+        <SubmittedCode
+          userId={student.id}
+          notebookRef={notebookRef}
+          notebook={notebook}
+          original={original}
+          grading={grading}
+        />
+      )}
     </li>
   );
 }
@@ -418,11 +432,14 @@ function SubmittedCode({
   notebookRef,
   notebook,
   original,
+  grading,
 }: {
   userId: string;
   notebookRef: NotebookRef;
   notebook: StoredNotebook | undefined;
   original: { url: string; name: string } | null;
+  /** Staff who grade, once it is graded: comments beside the cells (#220). */
+  grading: { group: string; grade: StaffGrade | undefined } | null;
 }) {
   const t = useT();
   const [failed, setFailed] = useState(false);
@@ -479,6 +496,14 @@ function SubmittedCode({
               {t.submissions.cell(numbers.get(cell.cell) ?? cell.cell + 1)}
             </figcaption>
             <pre className="overflow-x-auto px-3 py-2 font-mono text-[0.8rem] leading-relaxed">{cell.code}</pre>
+            {grading?.grade && (
+              <CellCommentEditor
+                notebookRef={notebookRef}
+                group={grading.group}
+                grade={grading.grade}
+                cell={cell.cell}
+              />
+            )}
           </figure>
         ))
       )}
