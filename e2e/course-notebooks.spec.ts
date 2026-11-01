@@ -1,8 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { expect, type Page, test } from '@playwright/test';
-import { type ImportReport, importCourse } from '../scripts/course-import/apply';
+import { ImportBlocked, type ImportReport, importCourse } from '../scripts/course-import/apply';
 import { type PlannedLab, planCourse, type SiteCourse } from '../scripts/course-import/plan';
+import { renderNotebook } from '../src/notebook';
 import { detectExercises } from '../src/notebook/exercises';
+import { toStored } from '../src/notebook/stored';
 import type { GroupView } from '../src/shared/courses';
 import type { NotebookSummary } from '../src/shared/notebooks';
 import { E2E_ACCOUNT, E2E_STAFF } from './account';
@@ -144,3 +146,79 @@ for (const lab of site.labs) {
     }
   });
 }
+
+// #209: the course repo changes during the term. Importing again puts a new version in place of a
+// changed notebook, so a student's saved code stays, moved with its cell; and if a cell with their work
+// would be gone, the import stops before changing anything, unless the loss is allowed.
+test('importing a changed notebook keeps students’ work, and stops before deleting any', async ({
+  browser,
+  isMobile,
+}) => {
+  const imported = report.labs.find(({ lab }) => lab.n === 10);
+  const plan = planned.find((lab) => lab.n === 10);
+  const main = imported?.notebooks.find((nb) => nb.kind === 'main');
+  const want = plan?.notebooks.find((nb) => nb.kind === 'main');
+  if (!imported || !plan || !main || !want) throw new Error('Lab 10 was not imported');
+  const path = `/orgs/e2e/courses/${report.course.id}/labs/${imported.lab.id}/notebooks/${main.id}`;
+  const cell = want.stored.cells.find((c) => c.type === 'code' && !c.interactive)?.srcIndex ?? -1;
+
+  // The student (in the group that test 2 opened Lab 10 for) saves their own code.
+  const student = await signIn(browser, E2E_ACCOUNT, isMobile);
+  await apiCall(student, 'PUT', `${path}/work`, {
+    code: [{ cell, code: 'print("kodi im")' }],
+    traces: [],
+    version: main.version,
+  });
+
+  // The course repo: a note at the top, and that cell corrected; its embeds move down by one.
+  type Cells = { cells: { cell_type: string; source: string | string[] }[] };
+  const source = (c: Cells['cells'][number]) => (Array.isArray(c.source) ? c.source.join('') : c.source);
+  const edit = async (change: (cells: Cells['cells']) => void, shift: number) => {
+    const nb = JSON.parse(want.raw) as Cells;
+    change(nb.cells);
+    const raw = JSON.stringify(nb);
+    const assets = new Map<string, Uint8Array>();
+    const stored = toStored(await renderNotebook(raw, { assets }));
+    const embeds = want.embeds.map((e) => ({ ...e, cell: e.cell >= 1 ? e.cell + shift : e.cell }));
+    const notebooks = plan.notebooks.map((n) => (n === want ? { ...n, raw, stored, assets, embeds } : n));
+    return planned.map((lab) => (lab === plan ? { ...lab, notebooks } : lab));
+  };
+  const v2 = await edit((cells) => {
+    cells[cell] = { ...cells[cell], source: `${source(cells[cell] as Cells['cells'][number])}\n# korrigjuar` } as never;
+    cells.splice(1, 0, { cell_type: 'markdown', source: 'Shënim i ri.' } as never);
+  }, 1);
+  const run = (labs: PlannedLab[], allowLoss = false) =>
+    importCourse(pageApi(staff), {
+      org: 'e2e',
+      title: report.course.title,
+      academicYear: '2026/27',
+      labs,
+      allowLoss,
+    });
+  const again = await run(v2);
+  const lab10 = again.labs.find(({ lab }) => lab.n === 10);
+  expect(lab10?.versions).toEqual([{ originalName: want.originalName, changed: 1, added: 1, removed: 0 }]);
+  expect(lab10?.notebooks.map((nb) => nb.id)).toEqual(imported.notebooks.map((nb) => nb.id));
+  const edits = async () =>
+    (await apiCall<{ edits: { cell: number; code: string }[] }>(student, 'GET', `${path}/edits`)).edits;
+  const moved = cell >= 1 ? cell + 1 : cell;
+  expect((await edits()).map((e) => [e.cell, e.code])).toEqual([[moved, 'print("kodi im")']]);
+
+  // A version without that cell: the import stops, and nothing changes.
+  const v3 = await edit((cells) => cells.splice(cell, 1), 0);
+  const versionNow = async () =>
+    (await apiCall<{ notebooks: NotebookSummary[] }>(staff, 'GET', path.replace(/\/[^/]+$/, ''))).notebooks.find(
+      (nb) => nb.id === main.id,
+    )?.version;
+  const before = await versionNow();
+  const blocked = await run(v3).catch((error: unknown) => error);
+  expect(blocked).toBeInstanceOf(ImportBlocked);
+  expect((blocked as ImportBlocked).losses).toMatchObject([{ lab: 10, notebook: want.originalName, students: 1 }]);
+  expect(await versionNow()).toBe(before);
+
+  // Allowed, it goes ahead, and that work goes with the cell.
+  await run(v3, true);
+  expect(await versionNow()).not.toBe(before);
+  expect(await edits()).toEqual([]);
+  await student.context().close();
+});
