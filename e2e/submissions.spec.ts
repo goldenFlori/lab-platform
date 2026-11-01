@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { expect, type Page, test } from '@playwright/test';
 import { renderNotebook } from '../src/notebook';
 import { toStored } from '../src/notebook/stored';
@@ -84,6 +85,14 @@ test('students hand in their work until the deadline; staff list it per group', 
   await row.getByRole('button', { name: `Shiko dorëzimin e ${E2E_ACCOUNT.fullName}` }).click();
   await expect(row.getByText('def shuma(a, b): return a + b')).toBeVisible();
   await expect(row.getByText('Qeliza 1')).toBeVisible();
+  // The hand-in as an .ipynb (#214), the student's code in its cell.
+  const [download] = await Promise.all([
+    staff.waitForEvent('download'),
+    row.getByRole('button', { name: 'Shkarko si .ipynb' }).click(),
+  ]);
+  expect(download.suggestedFilename()).toMatch(new RegExp(`\\(${E2E_ACCOUNT.fullName}\\)\\.ipynb$`));
+  const handedIn = await readFile((await download.path()) as string, 'utf8');
+  expect(handedIn).toContain('def shuma(a, b): return a + b');
 
   const overflow = await staff.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,

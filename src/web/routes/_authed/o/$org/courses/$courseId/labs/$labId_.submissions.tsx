@@ -7,6 +7,7 @@ import type { StoredNotebook } from '../../../../../../../../notebook/stored';
 import type { Exercise } from '../../../../../../../../shared/exercises';
 import type { ExerciseGrading, StaffGrade } from '../../../../../../../../shared/grading';
 import { kolokiumEnd } from '../../../../../../../../shared/kolokium';
+import { ORIGINAL_FILE } from '../../../../../../../../shared/notebook-files';
 import type { Embed } from '../../../../../../../../shared/notebooks';
 import type { KolokiumSetup, SubmissionList } from '../../../../../../../../shared/submissions';
 import { HelpLink } from '../../../../../../../components/HelpLink';
@@ -16,9 +17,16 @@ import { t as messages, useT } from '../../../../../../../i18n';
 import { ApiError } from '../../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../../lib/brand';
 import { downloadCsv, fileSlug } from '../../../../../../../lib/csv';
+import { downloadWithCode } from '../../../../../../../lib/download';
 import { gradesQuery, gradingSetupQuery } from '../../../../../../../lib/grading';
 import { formatMoment, formatTime, labQuery } from '../../../../../../../lib/labs';
-import { type NotebookRef, notebookQuery, notebooksQuery, renderedQuery } from '../../../../../../../lib/notebooks';
+import {
+  type NotebookRef,
+  notebookFileUrl,
+  notebookQuery,
+  notebooksQuery,
+  renderedQuery,
+} from '../../../../../../../lib/notebooks';
 import { submissionDetailQuery, submissionListQuery } from '../../../../../../../lib/submissions';
 
 // What a lab's students handed in (#52), for staff who review their groups: one group at a time,
@@ -135,6 +143,9 @@ function SubmissionsPage() {
           notebook={rendered.data}
           setup={setup.data?.exercises ?? null}
           title={current?.title ?? ''}
+          original={
+            current ? { url: notebookFileUrl(ref, ORIGINAL_FILE, current.version), name: current.originalName } : null
+          }
         />
       )}
     </section>
@@ -177,6 +188,7 @@ function Group({
   notebook,
   setup,
   title,
+  original,
 }: {
   data: SubmissionList;
   notebookRef: NotebookRef;
@@ -186,6 +198,8 @@ function Group({
   /** Points and hidden tests, for staff who grade (#53); null for staff who do not. */
   setup: ExerciseGrading[] | null;
   title: string;
+  /** The notebook's original, for a hand-in as an .ipynb (#214). */
+  original: { url: string; name: string } | null;
 }) {
   const t = useT();
   const grades = useQuery({ ...gradesQuery(notebookRef, data.group ?? ''), enabled: setup !== null && !!data.group });
@@ -294,6 +308,7 @@ function Group({
                 notebook={notebook}
                 kolokium={shown?.kolokium && shown.dueAt ? { ...shown.kolokium, dueAt: shown.dueAt } : null}
                 grading={setup && data.group ? { group: data.group, grade: gradeOf.get(student.id) } : null}
+                original={original}
               />
             ))}
           </ul>
@@ -311,6 +326,7 @@ function Student({
   notebook,
   kolokium,
   grading,
+  original,
 }: {
   student: SubmissionList['students'][number];
   notebookRef: NotebookRef;
@@ -319,6 +335,7 @@ function Student({
   /** The group's kolokium (#169), to say who started and who is still working. */
   kolokium: (KolokiumSetup & { dueAt: string }) | null;
   grading: { group: string; grade: StaffGrade | undefined } | null;
+  original: { url: string; name: string } | null;
 }) {
   const t = useT();
   const [open, setOpen] = useState(false);
@@ -366,7 +383,7 @@ function Student({
       {open && grading?.grade && (
         <GradeReview notebookRef={notebookRef} group={grading.group} grade={grading.grade} exercises={exercises} />
       )}
-      {open && <SubmittedCode userId={student.id} notebookRef={notebookRef} notebook={notebook} />}
+      {open && <SubmittedCode userId={student.id} notebookRef={notebookRef} notebook={notebook} original={original} />}
     </li>
   );
 }
@@ -400,12 +417,15 @@ function SubmittedCode({
   userId,
   notebookRef,
   notebook,
+  original,
 }: {
   userId: string;
   notebookRef: NotebookRef;
   notebook: StoredNotebook | undefined;
+  original: { url: string; name: string } | null;
 }) {
   const t = useT();
+  const [failed, setFailed] = useState(false);
   const query = useQuery(submissionDetailQuery(notebookRef, userId));
   const numbers = useMemo(() => {
     const map = new Map<number, number>();
@@ -422,9 +442,31 @@ function SubmittedCode({
       </p>
     );
   }
-  const { code } = query.data;
+  const { code, fullName } = query.data;
+  // The hand-in as an .ipynb (#214): the notebook with the student's code in its cells.
+  const download = async () => {
+    if (!original) return;
+    setFailed(false);
+    try {
+      await downloadWithCode(original, new Map(code.map((c) => [c.cell, c.code])), fullName);
+    } catch {
+      setFailed(true);
+    }
+  };
   return (
-    <section aria-label={t.submissions.detailTitle(query.data.fullName)} className="mt-3 grid gap-3">
+    <section aria-label={t.submissions.detailTitle(fullName)} className="mt-3 grid gap-3">
+      {original && (
+        <div className="flex flex-wrap items-center gap-2">
+          <Button size="sm" variant="secondary" onPress={() => void download()}>
+            <Download className="size-4" /> {t.submissions.downloadIpynb}
+          </Button>
+          {failed && (
+            <span role="alert" className="text-xs text-danger">
+              {t.edits.downloadFailed}
+            </span>
+          )}
+        </div>
+      )}
       {code.length === 0 ? (
         <p className="text-sm text-muted">{t.submissions.unchanged}</p>
       ) : (

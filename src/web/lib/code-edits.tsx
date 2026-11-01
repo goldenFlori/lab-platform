@@ -35,6 +35,8 @@ type CodeEditsValue = {
   edited: (cell: CodeCell) => boolean;
   /** The original changed in a new version after the user saved their own (#208). */
   outdated: (cell: CodeCell) => boolean;
+  /** The user's own code, by cell, where it differs from the original (#214). */
+  ownCode: () => Map<number, string>;
   change: (cell: CodeCell, code: string) => void;
   reset: (cell: CodeCell) => void;
   resetAll: () => void;
@@ -337,6 +339,7 @@ export function CodeEditsProvider({
         void api(path, { method: 'DELETE' }).catch(() => setSaving('failed'));
       },
       count: [...edits].filter(([cell, code]) => code !== originals.get(cell)).length,
+      ownCode: () => new Map([...edits].filter(([cell, code]) => code !== originals.get(cell))),
       saving,
       version,
       ready: loaded || query.isError,

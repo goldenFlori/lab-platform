@@ -323,6 +323,14 @@ id, so students' work stays. Deleting and uploading again would delete it all (c
 - **Left as they are:** live actions in flight on a page showing the old version (a check passed, a
   first try) are recorded under the old cell number.
 
+## A notebook with one's own code (#214)
+
+`src/notebook/with-code.ts` puts code into an .ipynb by cell (srcIndex), clearing those cells'
+outputs and execution counts, which belong to the original code; nothing else changes. The browser
+does it, from the original fetched with its version and the code it already has: a student's own
+edits ("Shkarko versionin tim" in the edits bar, unsaved ones included) and, for staff who review, a
+hand-in's code ("Shkarko si .ipynb"). No server work, and no new data leaves the platform.
+
 ## Courses, groups and joining
 
 - **Staff** (#64, `src/api/routes/staff.ts`): staff with `course.manage` for the whole course list

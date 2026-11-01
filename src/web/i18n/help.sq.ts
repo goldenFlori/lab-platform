@@ -73,7 +73,7 @@ export const help = {
           shot: 'run-output',
         },
         {
-          text: 'Shtypni **Ndrysho kodin** dhe shkruani. Kodi juaj ruhet vetë në llogari dhe e gjeni në çdo pajisje; **Rikthe kodin origjinal** e kthen qelizën siç ishte.',
+          text: 'Shtypni **Ndrysho kodin** dhe shkruani. Kodi juaj ruhet vetë në llogari dhe e gjeni në çdo pajisje; **Rikthe kodin origjinal** e kthen qelizën siç ishte. **Shkarko versionin tim** jep fletoren me kodin tuaj, për ta hapur në Jupyter ose Colab.',
         },
         {
           text: 'Kur kodi ndalet me gabim, rreshti shënohet me të kuqe. Nëse pedagogu e ka ndezur AI-në, **Shpjego gabimin** jep një udhëzim në shqip, jo zgjidhjen.',
