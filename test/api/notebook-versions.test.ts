@@ -60,6 +60,11 @@ async function setup() {
     autoScore: 5,
     maxScore: 5,
     results: [{ cell: 3, status: 'passed' }],
+    // A comment on a cell that moves, and on one that goes (#220).
+    comments: [
+      { cell: 3, text: 'Mirë.' },
+      { cell: 5, text: 'Kjo qelizë ikën.' },
+    ],
     gradedAt: new Date(),
   });
   // The new version: a cell inserted before 2, so 2 → 3 and 3 → 4; cell 5 is gone, 3 changed.
@@ -110,7 +115,11 @@ describe('a new version of a notebook', () => {
     const [handIn] = await db.select().from(submissions).where(eq(submissions.notebookId, notebook.id));
     expect(handIn).toMatchObject({ code: [{ cell: 4, code: '# 3' }], solved: [4], traces: [] });
     const [grade] = await db.select().from(grades).where(eq(grades.userId, userId));
-    expect(grade).toMatchObject({ results: [{ cell: 4, status: 'passed' }], autoScore: 5 });
+    expect(grade).toMatchObject({
+      results: [{ cell: 4, status: 'passed' }],
+      comments: [{ cell: 4, text: 'Mirë.' }],
+      autoScore: 5,
+    });
 
     // The new files are the notebook's now; nothing stays staged.
     const original = await tenant.notebooks.getFile(notebook.id, 'notebook.ipynb');

@@ -568,7 +568,8 @@ function tenantNotebooks(db: Db, orgId: string) {
             solved = (SELECT json_group_array(json_extract(m.value, '$[1]')) FROM json_each(solved) e
                       JOIN json_each(${map}) m ON json_extract(m.value, '$[0]') = e.value)
             WHERE ${mine()}`,
-        sql`UPDATE grades SET results = ${remapped('results')}, traces = ${remapped('traces')}
+        sql`UPDATE grades SET results = ${remapped('results')}, traces = ${remapped('traces')},
+            comments = CASE WHEN comments IS NULL THEN NULL ELSE ${remapped('comments')} END
             WHERE ${mine()}`,
         sql`DELETE FROM files WHERE ${mine()} AND name NOT LIKE 'next.%'`,
         sql`UPDATE files SET name = substr(name, 6) WHERE ${mine()} AND name LIKE 'next.%'`,
@@ -1639,12 +1640,15 @@ function tenantGrading(db: Db, orgId: string) {
     },
 
     /** The pedagog's score and feedback for a graded submission; false when it has no grade yet. */
-    async review(notebookId: string, userId: string, change: { score: number | null; feedback: string | null }) {
-      const updated = await db
-        .update(grades)
-        .set(change)
-        .where(gradeOf(notebookId, userId))
-        .returning({ id: grades.id });
+    async review(
+      notebookId: string,
+      userId: string,
+      change: { score?: number | null; feedback?: string | null; comments?: { cell: number; text: string }[] },
+    ) {
+      // Only what was sent changes; nothing sent changes nothing, but still says whether there is a grade.
+      const set = Object.fromEntries(Object.entries(change).filter(([, v]) => v !== undefined));
+      if (Object.keys(set).length === 0) return (await this.of(notebookId, userId)) !== undefined;
+      const updated = await db.update(grades).set(set).where(gradeOf(notebookId, userId)).returning({ id: grades.id });
       return updated.length > 0;
     },
 
@@ -1982,6 +1986,7 @@ function tenantProgress(db: Db, orgId: string) {
             maxScore: grades.maxScore,
             score: grades.score,
             feedback: grades.feedback,
+            comments: grades.comments,
           })
           .from(grades)
           .where(
@@ -2087,6 +2092,7 @@ function tenantPersonal(db: Db, orgId: string) {
               score: grades.score,
               maxScore: grades.maxScore,
               feedback: grades.feedback,
+              comments: grades.comments,
               releasedAt: grades.releasedAt,
             })
             .from(grades)

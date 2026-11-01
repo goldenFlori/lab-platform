@@ -50,7 +50,12 @@ export const progressRoutes = new Hono<TenantEnv>().get('/', async (c) => {
             dueAt: deadline ? new Date(deadline * 1000).toISOString() : null,
             submittedAt: handed.get(nb.id)?.toISOString() ?? null,
             grade: grade
-              ? { score: grade.score ?? grade.autoScore, maxScore: grade.maxScore, feedback: grade.feedback }
+              ? {
+                  score: grade.score ?? grade.autoScore,
+                  maxScore: grade.maxScore,
+                  feedback: grade.feedback,
+                  comments: grade.comments ?? [],
+                }
               : null,
           };
         }),

@@ -31,10 +31,21 @@ export const gradeRunInput = z.object({
   results: z.array(z.object({ cell: z.number().int().min(0).max(10_000), status })).max(100),
 });
 
-/** The pedagog's adjustment: a score in place of the run's (null for the run's), and feedback. */
+/** A comment beside a cell of the student's code (#220). */
+export type CellComment = { cell: number; text: string };
+
+/**
+ * The pedagog's adjustment: a score in place of the run's (null for the run's), feedback, and comments
+ * by cell (#220). Each part is changed only when sent.
+ */
 export const gradeReviewInput = z.object({
-  score: z.number().int().min(0).max(100_000).nullable(),
-  feedback: z.string().trim().max(4000).nullable(),
+  score: z.number().int().min(0).max(100_000).nullable().optional(),
+  feedback: z.string().trim().max(4000).nullable().optional(),
+  comments: z
+    .array(z.object({ cell: z.number().int().min(0).max(10_000), text: z.string().trim().min(1).max(2000) }))
+    .max(100)
+    .refine((list) => new Set(list.map((c) => c.cell)).size === list.length, 'One comment per cell')
+    .optional(),
 });
 
 export type GradeResult = { cell: number; status: CheckStatus };
@@ -49,12 +60,13 @@ export type StaffGrade = {
   traces: TraceScore[];
   score: number | null;
   feedback: string | null;
+  comments: CellComment[];
   gradedAt: string;
   releasedAt: string | null;
 };
 
 /** A released grade as its student sees it. */
-export type MyGrade = { score: number; maxScore: number; feedback: string | null };
+export type MyGrade = { score: number; maxScore: number; feedback: string | null; comments: CellComment[] };
 
 /**
  * A course's released grades (#114) for the groups the user grades, so the pedagog can take them to
