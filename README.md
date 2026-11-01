@@ -108,6 +108,23 @@ npm run course:import -- --from ~/Desktop/discrete-structures-algorithms-course 
 - Labs stay hidden until you open them. Solutions are for staff, and for students from the date
   set on each lab.
 
+## Demo institution
+
+Visitors try the platform from the front page ("Provo si student" / "Provo si pedagog"), without an
+account, in an institution with the address `demo`. Once:
+
+1. In the owner's console (`/platform`), create the institution with the address `demo`, and on its
+   admin page switch AI off.
+2. Import its template course with the admin's account:
+   `npm run course:import -- --from … --org demo --year 2026/27 --username <its admin>`.
+3. In the console, press **Rivendos demon tani**.
+
+Every night at 02:30 UTC it is rebuilt from that course (the institution's oldest): a fresh copy with
+its labs open, made-up classmates with some work and a released grade, and two shared accounts
+(`demo.studenti`, `demo.pedagog`) without passwords. They can run and save code, hand in, open labs and
+grade, but not create accounts, upload, delete or share. Without a `demo` institution, the front page
+offers nothing to try.
+
 ## Deploy
 
 Merging to `main` deploys automatically. Once every check passes, GitHub Actions applies the
