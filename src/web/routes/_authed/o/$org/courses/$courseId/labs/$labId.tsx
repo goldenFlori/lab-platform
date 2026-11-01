@@ -307,6 +307,7 @@ function LabPage() {
           <NotebookSection
             notebookRef={ref}
             version={current.version}
+            originalName={current.originalName}
             changed={changed}
             embeds={detail.data?.embeds}
             exercises={detail.data?.exercises}
@@ -373,6 +374,7 @@ function NotebookTab({ nb, current }: { nb: NotebookSummary; current: boolean })
 function NotebookSection({
   notebookRef,
   version,
+  originalName,
   changed,
   embeds,
   exercises,
@@ -384,6 +386,8 @@ function NotebookSection({
   notebookRef: NotebookRef;
   /** The notebook's version, for its files' addresses (#208). */
   version: string;
+  /** The uploaded file's name, for a download of the student's own version (#214). */
+  originalName: string;
   /** When its last new version came, and the cells that changed (#208). */
   changed: { at: string | null; cells: number[] };
   embeds: Embed[] | undefined;
@@ -403,6 +407,10 @@ function NotebookSection({
   submissions: { staff: { groups: GroupView[]; canPublish: boolean } | null };
 }) {
   const rendered = useQuery(renderedQuery(notebookRef, version));
+  const original = useMemo(
+    () => ({ url: notebookFileUrl(notebookRef, ORIGINAL_FILE, version), name: originalName }),
+    [notebookRef, version, originalName],
+  );
   const reported = useRef<string | null>(null);
   const used = (event: SyntheticEvent) => {
     if (!onVisualizationUsed || reported.current === notebookRef.notebookId) return;
@@ -489,7 +497,7 @@ function NotebookSection({
           >
             <EditablePython notebookId={notebookRef.notebookId} notebook={rendered.data}>
               {!submissions.staff && <SubmissionBar notebookRef={notebookRef} />}
-              <EditsBar />
+              <EditsBar original={original} />
               <PythonBar />
               <NotebookView
                 id={notebookRef.notebookId}

@@ -1050,6 +1050,7 @@ export const sq = {
     read: (name: string) => `Shiko dorëzimin e ${name}`,
     noStudents: 'Ky grup nuk ka ende studentë.',
     detailTitle: (name: string) => `Dorëzimi i ${name}`,
+    downloadIpynb: 'Shkarko si .ipynb',
     unchanged: 'Studenti nuk ndryshoi asnjë qelizë: dorëzoi kodin e fletores.',
     cell: (n: number) => `Qeliza ${n}`,
     solvedOf: (n: number, of: number) => `${n} nga ${of} ushtrime të zgjidhura`,
@@ -1445,6 +1446,9 @@ export const sq = {
     edited: 'E ndryshuar',
     reset: 'Rikthe kodin origjinal',
     original: 'Shiko kodin origjinal',
+    download: 'Shkarko versionin tim',
+    downloadFailed: 'Shkarkimi dështoi. Provoni përsëri.',
+    myVersion: 'versioni im',
     originalChanged:
       'Origjinali i kësaj qelize ndryshoi pasi e ndryshuat. Shihni origjinalin më poshtë, ose riktheni atë.',
     count: (n: number) => `Keni ndryshuar ${n} ${n === 1 ? 'qelizë' : 'qeliza'}`,

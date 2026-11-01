@@ -49,7 +49,7 @@ export const help: HelpText = {
           shot: 'run-output',
         },
         {
-          text: 'Press **Edit the code** and type. Your code is saved to your account by itself and follows you to any device; **Restore the original code** puts the cell back as it was.',
+          text: 'Press **Edit the code** and type. Your code is saved to your account by itself and follows you to any device; **Restore the original code** puts the cell back as it was. **Download my version** gives you the notebook with your code, to open in Jupyter or Colab.',
         },
         {
           text: 'When the code stops with an error, its line is marked in red. If your pedagog turned AI on, **Explain the error** gives a hint, not the solution.',
