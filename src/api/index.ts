@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { cleanUpExpired, session } from './auth/session';
 import { createDb, isDatabaseReachable } from './db';
+import { resetDemo } from './db/demo';
 import { meterD1 } from './db/meter';
 import { applyRetention } from './db/platform';
 import type { AppEnv } from './env';
@@ -9,6 +10,7 @@ import { sameOrigin } from './middleware/same-origin';
 import { authRoutes, meRoutes } from './routes/auth';
 import { joinBrandingRoutes } from './routes/branding';
 import { clientErrorRoutes } from './routes/client-errors';
+import { demoGuard, demoRoutes } from './routes/demo';
 import { joinRoutes } from './routes/join';
 import { orgRoutes } from './routes/orgs';
 import { platformRoutes } from './routes/platform';
@@ -45,6 +47,8 @@ app.use(async (c, next) => {
 });
 app.use(sameOrigin);
 app.use(session);
+// The demo's shared accounts change only what trying the platform needs (#216).
+app.use(demoGuard);
 
 app.get('/health', async (c) => {
   const database = (await isDatabaseReachable(createDb(c.env.DB))) ? 'ok' : 'unavailable';
@@ -59,6 +63,7 @@ app.route('/join', joinBrandingRoutes);
 app.route('/client-errors', clientErrorRoutes);
 app.route('/platform', platformRoutes);
 app.route('/shares', shareRoutes);
+app.route('/demo', demoRoutes);
 
 export default {
   fetch: app.fetch,
@@ -66,5 +71,7 @@ export default {
   async scheduled(_controller, env, ctx) {
     ctx.waitUntil(cleanUpExpired(env));
     ctx.waitUntil(applyRetention(createDb(env.DB)));
+    // The demo institution starts the day fresh (#216).
+    ctx.waitUntil(resetDemo(createDb(env.DB)));
   },
 } satisfies ExportedHandler<Env>;

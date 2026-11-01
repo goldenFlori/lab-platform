@@ -3,6 +3,7 @@ import { Hono } from 'hono';
 import { type Institution, newInstitutionInput } from '../../shared/platform';
 import { isOwner } from '../auth/owner';
 import { createDb } from '../db';
+import { resetDemo } from '../db/demo';
 import { createInstitutionWithAdmin, institutionsWithCounts, TakenError } from '../db/platform';
 import type { AppEnv } from '../env';
 import { notFound } from '../errors';
@@ -33,4 +34,10 @@ export const platformRoutes = new Hono<AppEnv>()
       if (error instanceof TakenError) return c.json({ error: `${error.what}_taken` }, 409);
       throw error;
     }
+  })
+
+  // The demo institution rebuilt now (#216), as every night: after importing its template course.
+  .post('/demo/reset', async (c) => {
+    const reset = await resetDemo(createDb(c.env.DB));
+    return reset ? c.json(reset) : c.json({ error: 'not_found' }, 404);
   });

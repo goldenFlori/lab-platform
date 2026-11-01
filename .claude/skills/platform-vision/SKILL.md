@@ -592,6 +592,13 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   open; never during a kolokium. Staff see how many students opened each, from five students up. Help
   in the pedagog's own words, without AI or its cost. The privacy page and the agreement list the
   hints a student opened, kept two years like first tries. Next: #216, a demo institution.
+- **2026-11-01:** #216 done, and with it Phase 15. Anyone tries the platform from the front page,
+  without an account, as a student or a pedagog, in a demo institution: a real course with its labs,
+  visualizations and exercises, and made-up classmates with work and a released grade for the
+  reports. It is rebuilt every night, holds no real person's data, has AI off, and its shared accounts
+  cannot create accounts, upload, delete or share. Phase 15 leaves students keeping their work as
+  .ipynb, pedagogs' own hints, and a demo for the grant video and other faculties. Next: the owner sets
+  the demo up once (README, "Demo institution"); then plan Phase 16.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
@@ -650,6 +657,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-11-01 | A course is shared as an independent copy, by a secret link only staff who may create courses can open, not as a live link to the original nor in a public catalogue: each institution owns and changes its course, nothing breaks when the author edits or deletes theirs, and no listing of other institutions' courses is needed yet. Solutions go only when the author says so. The shared library can list shares later | Decided |
 | 2026-11-01 | Phase 14 is "Changes without lost work" before the January pilot: fixing a lab by deleting and uploading it again deletes every student's code, hand-ins and grades for it, and so did re-running the course import. A notebook gets new versions in place instead, its cells matched by content and order, with staff shown what a removed cell takes with it before they confirm | Decided |
 | 2026-11-01 | Phase 15 is "Take it home, show it": students keep their work as .ipynb (open formats out, not only in), pedagogs give hints in their own words without AI's cost, and a demo institution with made-up data lets a grant jury or another faculty try the platform without ever seeing a real student | Decided |
+| 2026-11-01 | The demo is a real institution rebuilt nightly from a template course, entered through two shared password-less accounts limited to an allowlist of actions, rather than a separate fake app or per-visitor accounts: it shows the actual product, costs a few hundred rows a night, and no visitor can bring a real person's data in or break it for the next | Decided |
 | 2026-10-29 | Phase 12 is "The lab room" before SaaS: the January mini-pilot and the March semester run in a real room (one shared connection, lab PCs and cheap phones, every kind of student, pedagogs new to the platform). Self-service institutions, Google login and billing come once the pilot has shown the teaching, which the grant application needs first | Decided |
 | 2026-10-27 | A backup counts only once a restore of it has been checked. The restore drill runs on the owner's machine with their key (never in CI, which must not hold the key), after schema or backup changes and once a month | Decided |
 | 2026-10-27 | A hand-in delayed by an outage counts at the time the server receives it, never a time the browser reports: a browser's clock and requests can be changed, which would give extra minutes in a kolokium. The work is kept safe on the device instead, and the pedagog can move a deadline | Decided |

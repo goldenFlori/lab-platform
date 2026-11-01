@@ -344,6 +344,25 @@ hand-in's code ("Shkarko si .ipynb"). No server work, and no new data leaves the
   erased with the person, in "My data" and the institution's export, deleted after two years; the
   privacy page and the agreement list them. A copied course keeps its hints.
 
+## The demo institution (#216)
+
+- It exists when an institution with the slug `demo` does (`src/shared/demo.ts`); only the owner makes
+  one. Its oldest course is the template, imported by the owner.
+- `resetDemo` (`src/api/db/demo.ts`), every night with the cron and on the owner's
+  `POST /api/platform/demo/reset`: deletes the other courses (visitors' work goes with them), the demo
+  accounts' memberships and sessions; copies the template (`copyCourse`, solutions included) with
+  `demo.pedagog` as pedagog; adds "Grupi A" with `demo.studenti` and eleven made-up classmates (algorithm
+  words as surnames), every lab open, and their activity, solved exercises, a hand-in and a released
+  grade. Accounts are made once without passwords; a username someone in another institution has is
+  left out. Rows go as one `INSERT … SELECT` from JSON per table (about 30 statements in all).
+- `POST /api/demo/:role` signs a visitor in to the shared account (no password) and names the course;
+  `GET /api/demo` says whether there is one. The front page offers it to visitors not signed in.
+- `demoGuard` (after `session`): the two shared accounts may change only an allowlist (saving work,
+  exercises, hints, visualizations, handing in, kolokium, opening labs, Live Labs, grading, the
+  language, signing out); anything else answers 403 `demo_read_only`. So no accounts, uploads,
+  deletions, shares or deletion requests come from a visitor. A banner tells them it is a shared demo
+  rebuilt nightly, and not to type anything personal; the privacy page says so too.
+
 ## Courses, groups and joining
 
 - **Staff** (#64, `src/api/routes/staff.ts`): staff with `course.manage` for the whole course list

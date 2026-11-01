@@ -42,3 +42,12 @@ export function useCreateInstitution() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: institutionsQuery.queryKey }),
   });
 }
+
+/** Rebuilds the demo institution now (#216), as the nightly job does. */
+export function useResetDemo() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => api<{ courseId: string }>('/platform/demo/reset', { method: 'POST' }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: institutionsQuery.queryKey }),
+  });
+}

@@ -10,7 +10,7 @@ import { t as messages, useT } from '../../i18n';
 import { ApiError } from '../../lib/api';
 import { APP_NAME } from '../../lib/brand';
 import { formatMoment } from '../../lib/labs';
-import { institutionsQuery, slugOf, useCreateInstitution } from '../../lib/platform';
+import { institutionsQuery, slugOf, useCreateInstitution, useResetDemo } from '../../lib/platform';
 import type { Slip } from '../../lib/students';
 
 // The platform owner's console (#200): every institution with its counts, and a new institution with
@@ -28,6 +28,7 @@ function PlatformPage() {
   const t = useT();
   const query = useQuery(institutionsQuery);
   const create = useCreateInstitution();
+  const resetDemo = useResetDemo();
   const [name, setName] = useState('');
   const [slug, setSlug] = useState<string | null>(null);
   const [fullName, setFullName] = useState('');
@@ -128,6 +129,23 @@ function PlatformPage() {
           </table>
         </ScrollRegion>
       )}
+
+      {/* The demo institution (#216): rebuilt every night, or now after importing its template course. */}
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <Button size="sm" variant="secondary" isPending={resetDemo.isPending} onPress={() => resetDemo.mutate()}>
+          {t.demo.reset}
+        </Button>
+        {resetDemo.isSuccess && (
+          <span role="status" className="text-sm text-success">
+            {t.demo.resetDone}
+          </span>
+        )}
+        {resetDemo.isError && (
+          <span role="alert" className="text-sm text-danger">
+            {t.demo.resetMissing}
+          </span>
+        )}
+      </div>
 
       <form
         onSubmit={(e) => void submit(e)}
