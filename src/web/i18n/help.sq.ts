@@ -187,6 +187,9 @@ export const help = {
           text: 'Te **Stafi i kursit** shtoni pedagogë dhe asistentë, për gjithë kursin ose për një grup.',
         },
         {
+          text: 'Te **Ndaje me institucione të tjera** krijoni një lidhje që stafi i një institucioni tjetër e përdor për ta kopjuar kursin si të vetin, me zgjidhjet vetëm nëse i përfshini. Studentët dhe puna e tyre nuk shkojnë kurrë, dhe ju shihni kush e ka kopjuar.',
+        },
+        {
           text: 'Para orës së parë ndani me studentët lidhjen te **Para orës së parë**, që pajisjet të përgatiten në shtëpi.',
         },
       ],

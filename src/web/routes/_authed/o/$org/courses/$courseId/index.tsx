@@ -23,6 +23,7 @@ import { isLocale, LOCALES } from '../../../../../../../shared/locale';
 import { AiQuestions } from '../../../../../../components/AiQuestions';
 import { CourseGradesCsv } from '../../../../../../components/CourseGradesCsv';
 import { CourseLabs } from '../../../../../../components/CourseLabs';
+import { CourseShare } from '../../../../../../components/CourseShare';
 import { CourseStaff } from '../../../../../../components/CourseStaff';
 import { SurveyForStaff, SurveyForStudent } from '../../../../../../components/CourseSurvey';
 import { GetReadyCard, GetReadyPrompt } from '../../../../../../components/GetReady';
@@ -79,6 +80,11 @@ function CoursePage() {
             {t.course.academicYear(course.academicYear)}
             <HelpLink guide={isStaff ? 'course' : 'first-lab'} />
           </p>
+          {isStaff && course.copiedFrom && (
+            <p className="mt-1 text-sm text-muted">
+              {t.sharing.copiedFrom(course.copiedFrom.title, course.copiedFrom.institution)}
+            </p>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {!isStaff && (
@@ -205,6 +211,8 @@ function CoursePage() {
       {isStaff && <SurveyForStaff org={org} courseId={courseId} canManage={permissions.manage} />}
 
       {permissions.manage && <CourseStaff org={org} courseId={courseId} groups={groups} />}
+
+      {permissions.manage && <CourseShare org={org} courseId={courseId} canShareSolutions={permissions.solutions} />}
     </section>
   );
 }
