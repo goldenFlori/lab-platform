@@ -107,6 +107,13 @@ export const courses = sqliteTable(
     locale: text('locale', { enum: ['sq', 'en'] }),
     /** AI features (#84), off until staff who may configure AI switch them on. */
     aiEnabled: integer('ai_enabled', { mode: 'boolean' }).notNull().default(false),
+    /**
+     * Where a course copied from another one's share came from (#203): its id, to show the author
+     * the copies, and its title and institution as they were then, which stay if the original goes.
+     */
+    copiedFromCourseId: text('copied_from_course_id'),
+    copiedFromTitle: text('copied_from_title'),
+    copiedFromInstitution: text('copied_from_institution'),
     createdAt: createdAt(),
   },
   (t) => [
@@ -120,6 +127,34 @@ export const courses = sqliteTable(
     }),
     index('courses_org_idx').on(t.orgId),
     index('courses_template_idx').on(t.templateId, t.orgId),
+    index('courses_copied_from_idx').on(t.copiedFromCourseId),
+  ],
+);
+
+/**
+ * A course shared with other institutions (#203): the token in its link, and whether its solutions
+ * go with it. One per course; stopping the share deletes the row, so the link stops working. The
+ * token is unique across the platform, like a join code: the token alone finds the course. It is
+ * long and random, since it is pasted rather than typed.
+ */
+export const courseShares = sqliteTable(
+  'course_shares',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    courseId: text('course_id').notNull(),
+    token: text('token').notNull().unique(),
+    solutions: integer('solutions', { mode: 'boolean' }).notNull().default(false),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    unique('course_shares_id_org_unique').on(t.id, t.orgId),
+    uniqueIndex('course_shares_course_unique').on(t.orgId, t.courseId),
+    foreignKey({
+      name: 'course_shares_course_fk',
+      columns: [t.courseId, t.orgId],
+      foreignColumns: [courses.id, courses.orgId],
+    }).onDelete('cascade'),
   ],
 );
 
