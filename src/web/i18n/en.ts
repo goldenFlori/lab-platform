@@ -1405,6 +1405,30 @@ export const en: Messages = {
     reactions: 'Reactions',
     react: (emoji: string) => `React with ${emoji}`,
   },
+  notebookVersion: {
+    open: 'Upload a new version',
+    title: (title: string) => `New version of “${title}”`,
+    help: "Upload the corrected .ipynb in place of this notebook. Students' work, visualizations and exercises follow their cells, and nothing changes until you confirm.",
+    compare: 'Compare',
+    comparing: 'Comparing the versions…',
+    same: 'This version is the same as the one in place.',
+    summary: (same: number, changed: number, added: number, removed: number) =>
+      `${same} cells the same, ${changed} changed, ${added} new, ${removed} removed.`,
+    lost: 'These cells are not in the new version, and what is in them goes:',
+    code: 'code',
+    text: 'text',
+    students: (n: number) => (n === 1 ? "1 student's work" : `${n} students' work`),
+    embed: (title: string) => `the visualization “${title}”`,
+    exercise: (title: string) => `the exercise “${title}”`,
+    kept: (n: number) =>
+      n === 1
+        ? "1 changed cell holds students' code: they keep it, and are told the original changed."
+        : `${n} changed cells hold students' code: they keep it, and are told the original changed.`,
+    handedIn: 'Hand-ins and grades stay; code handed in for a removed cell goes with it.',
+    publish: 'Put the new version in place',
+    publishing: 'Putting the new version in place…',
+    failed: 'The new version was not put in place. Please try again.',
+  },
   edits: {
     edit: 'Edit the code',
     editLabel: (n: number) => `Edit the code of cell ${n}`,
@@ -1412,6 +1436,7 @@ export const en: Messages = {
     edited: 'Edited',
     reset: 'Restore the original code',
     original: 'See the original code',
+    originalChanged: 'The original of this cell changed after you edited it. See the original below, or put it back.',
     count: (n: number) => `You have changed ${n} ${n === 1 ? 'cell' : 'cells'}`,
     saved: 'Saved to your account',
     pending: 'Saving shortly',

@@ -157,10 +157,12 @@ export default function TraceProblemBuilder({
     startVariant ? { variant: startVariant } : problem ? { problem } : null,
   );
   const [points, setPoints] = useState(tracePoints(value) ? String(tracePoints(value)) : '');
+  // A table moved by a new version keeps the cell its students' graphs come from (#208).
+  const pinned = typeof value?.seedCell === 'number' ? { seedCell: value.seedCell } : {};
   const emit = (next: { problem: TraceProblem } | { variant: TraceVariant } | null, p = points) => {
     if (!next) return;
     const n = Number(p);
-    onChange(Number.isInteger(n) && n > 0 && n <= 1000 ? { ...next, points: n } : next);
+    onChange(Number.isInteger(n) && n > 0 && n <= 1000 ? { ...next, ...pinned, points: n } : { ...next, ...pinned });
   };
   return (
     <div className="grid gap-3">

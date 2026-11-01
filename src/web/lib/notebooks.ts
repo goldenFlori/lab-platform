@@ -22,20 +22,24 @@ export const notebookQuery = ({ org, courseId, labId, notebookId }: NotebookRef)
     queryFn: () => api<NotebookDetail>(`${notebooksPath(org, courseId, labId)}/${encodeURIComponent(notebookId)}`),
   });
 
-/** A file of a notebook, read with the signed-in user's session (images, figures, the original). */
-export const notebookFileUrl = ({ org, courseId, labId, notebookId }: NotebookRef, name: string) =>
-  `/api${notebooksPath(org, courseId, labId)}/${encodeURIComponent(notebookId)}/files/${encodeURIComponent(name)}`;
+/**
+ * A file of a notebook, read with the signed-in user's session (images, figures, the original). The
+ * notebook's version (#208) goes in the address: the browser keeps files for an hour, and a new version
+ * replaces the original and the rendering under the same names.
+ */
+export const notebookFileUrl = ({ org, courseId, labId, notebookId }: NotebookRef, name: string, version: string) =>
+  `/api${notebooksPath(org, courseId, labId)}/${encodeURIComponent(notebookId)}/files/${encodeURIComponent(name)}?v=${encodeURIComponent(version)}`;
 
-export const renderedQuery = (ref: NotebookRef) =>
+export const renderedQuery = (ref: NotebookRef, version: string) =>
   queryOptions({
-    queryKey: [...notebookQuery(ref).queryKey, RENDERED_FILE],
+    queryKey: [...notebookQuery(ref).queryKey, RENDERED_FILE, version],
     queryFn: async () => {
       // Stored gzipped; the browser unpacks it on arrival.
-      const res = await fetch(notebookFileUrl(ref, RENDERED_FILE), { credentials: 'same-origin' });
+      const res = await fetch(notebookFileUrl(ref, RENDERED_FILE, version), { credentials: 'same-origin' });
       if (!res.ok) throw new Error(`rendered notebook: ${res.status}`);
       return (await res.json()) as StoredNotebook;
     },
-    // A rendering changes only when the notebook is uploaded again, which gives it a new id.
+    // A rendering changes only with a new version, which is a new key.
     staleTime: Number.POSITIVE_INFINITY,
   });
 

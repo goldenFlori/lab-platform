@@ -1412,6 +1412,30 @@ export const sq = {
     reactions: 'Reagimet',
     react: (emoji: string) => `Reago me ${emoji}`,
   },
+  notebookVersion: {
+    open: 'Ngarko një version të ri',
+    title: (title: string) => `Version i ri i «${title}»`,
+    help: 'Ngarkoni .ipynb-në e korrigjuar në vend të kësaj fletoreje. Puna e studentëve, vizualizimet dhe ushtrimet ndjekin qelizat e tyre, dhe asgjë nuk ndryshon para se ta konfirmoni.',
+    compare: 'Krahaso',
+    comparing: 'Po krahasohen versionet…',
+    same: 'Ky version është i njëjtë me atë që është në vend.',
+    summary: (same: number, changed: number, added: number, removed: number) =>
+      `${same} qeliza njësoj, ${changed} të ndryshuara, ${added} të reja, ${removed} të hequra.`,
+    lost: 'Këto qeliza nuk janë në versionin e ri, dhe ç’ka në to largohet:',
+    code: 'kod',
+    text: 'tekst',
+    students: (n: number) => (n === 1 ? 'puna e 1 studenti' : `puna e ${n} studentëve`),
+    embed: (title: string) => `vizualizimi «${title}»`,
+    exercise: (title: string) => `ushtrimi «${title}»`,
+    kept: (n: number) =>
+      n === 1
+        ? 'Në 1 qelizë që ndryshoi ka kod studentësh: e mbajnë, dhe u shfaqet që origjinali ndryshoi.'
+        : `Në ${n} qeliza që ndryshuan ka kod studentësh: e mbajnë, dhe u shfaqet që origjinali ndryshoi.`,
+    handedIn: 'Dorëzimet dhe notat mbeten; kodi i dorëzuar në një qelizë të hequr largohet bashkë me të.',
+    publish: 'Vendos versionin e ri',
+    publishing: 'Po vendoset versioni i ri…',
+    failed: 'Versioni i ri nuk u vendos. Provoni përsëri.',
+  },
   edits: {
     edit: 'Ndrysho kodin',
     editLabel: (n: number) => `Ndrysho kodin e qelizës ${n}`,
@@ -1419,6 +1443,8 @@ export const sq = {
     edited: 'E ndryshuar',
     reset: 'Rikthe kodin origjinal',
     original: 'Shiko kodin origjinal',
+    originalChanged:
+      'Origjinali i kësaj qelize ndryshoi pasi e ndryshuat. Shihni origjinalin më poshtë, ose riktheni atë.',
     count: (n: number) => `Keni ndryshuar ${n} ${n === 1 ? 'qelizë' : 'qeliza'}`,
     saved: 'U ruajt në llogarinë tuaj',
     pending: 'Ruhet pas pak',

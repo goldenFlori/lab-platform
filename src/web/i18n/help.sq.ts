@@ -229,6 +229,9 @@ export const help = {
           shot: 'lab-staff',
         },
         {
+          text: 'Për të korrigjuar një fletore gjatë semestrit, po aty zgjidhni **Ngarko një version të ri** dhe **Krahaso**: shihni çfarë ndryshoi dhe çfarë largohet. Puna e studentëve ndjek qelizën e saj; mos e fshini fletoren për ta ngarkuar sërish, se kështu fshihet edhe puna e tyre.',
+        },
+        {
           text: 'Te **Vizualizimet në këtë fletore** zgjidhni ku shfaqet secili. Një tabelë gjurmimi mund të ketë problemin tuaj, një variant për çdo student, dhe pikë.',
         },
         {

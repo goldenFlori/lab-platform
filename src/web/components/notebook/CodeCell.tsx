@@ -147,6 +147,11 @@ export function CodeCell({
                 errorLine={failedLine}
               />
             </Suspense>
+            {edited && edits.outdated(cell) && (
+              <p className="border-t border-[var(--code-border)] px-4 py-2 text-xs text-warning" role="note">
+                {t.edits.originalChanged}
+              </p>
+            )}
             {edited && (
               <details className="group border-t border-[var(--code-border)]">
                 <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-2 text-xs text-muted select-none hover:text-foreground [&::-webkit-details-marker]:hidden">

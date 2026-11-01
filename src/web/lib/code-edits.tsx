@@ -3,10 +3,10 @@ import { createContext, type ReactNode, useCallback, useContext, useEffect, useM
 import type { CodeCell } from '../../notebook/types';
 import type { CodeEdit, WorkSaved } from '../../shared/code-edits';
 import { MAX_WORK_CELLS } from '../../shared/code-limits';
-import { api } from './api';
+import { ApiError, api } from './api';
 import { useMe } from './auth';
 import { DRAFT_PREFIX, readDraft, writeDraft } from './drafts';
-import { type NotebookRef, notebookQuery, notebooksPath } from './notebooks';
+import { type NotebookRef, notebookQuery, notebooksPath, notebooksQuery } from './notebooks';
 import { reportService, serviceOf } from './service';
 
 // A student's own version of a notebook's code (#49): what they typed shows and runs instead of the
@@ -21,6 +21,11 @@ import { reportService, serviceOf } from './service';
 // On the device (#178): what waits is also kept in this browser's storage until it is saved, so a
 // reload, a crash or a day's limit loses nothing; the next visit saves it. It is the user's own work,
 // under their id, and goes when saved or when anyone signs out here (lab computers are shared).
+//
+// Versions (#208): every save names the notebook's version on the page. Staff may put a new version in
+// place meanwhile; the server then moves the work to its cells' new places (or refuses work from an
+// older version), and the page loads the new version. A device copy from another version is sent on
+// its own, under its version, and not mixed into the page.
 
 export type SaveState = 'saved' | 'pending' | 'saving' | 'failed';
 
@@ -28,6 +33,8 @@ type CodeEditsValue = {
   /** The code to show and run: the user's own, or the original. */
   code: (cell: CodeCell) => string;
   edited: (cell: CodeCell) => boolean;
+  /** The original changed in a new version after the user saved their own (#208). */
+  outdated: (cell: CodeCell) => boolean;
   change: (cell: CodeCell, code: string) => void;
   reset: (cell: CodeCell) => void;
   resetAll: () => void;
@@ -72,10 +79,16 @@ export const codeEditsQuery = (ref: NotebookRef) => ({
 
 export function CodeEditsProvider({
   notebookRef,
+  notebookVersion,
+  changed,
   originals,
   children,
 }: {
   notebookRef: NotebookRef;
+  /** The version the page shows (#208). */
+  notebookVersion: string;
+  /** When the last new version came, and the cells it changed (#208). */
+  changed: { at: string | null; cells: number[] };
   /** The original code of each code cell, by its cell number. */
   originals: ReadonlyMap<number, string>;
   children: ReactNode;
@@ -93,8 +106,11 @@ export function CodeEditsProvider({
   const queryClient = useQueryClient();
   const userId = useMe()?.user.id;
   const draftKey = userId ? `${DRAFT_PREFIX}${userId}:${notebookRef.notebookId}` : null;
-  // What this device kept of the last visit, read once.
-  const [draft] = useState(() => (draftKey ? readDraft(draftKey) : null));
+  // What this device kept of the last visit, read once; a copy typed on another version waits apart.
+  const [stored] = useState(() => (draftKey ? readDraft(draftKey) : null));
+  const sameVersion = !stored?.version || stored.version === notebookVersion;
+  const draft = sameVersion ? stored : null;
+  const olderDraft = sameVersion ? null : stored;
   const path = editsPath(notebookRef);
   const workPath = `${notebooksPath(notebookRef.org, notebookRef.courseId, notebookRef.labId)}/${encodeURIComponent(notebookRef.notebookId)}/work`;
 
@@ -109,10 +125,40 @@ export function CodeEditsProvider({
             code: Object.fromEntries(pending.current),
             traces: Object.fromEntries(traces.current),
             at: Date.now(),
+            version: notebookVersion,
           }
         : null,
     );
-  }, [draftKey]);
+  }, [draftKey, notebookVersion]);
+
+  /** Another version is in place (#208): load it, with the work as the server now keeps it. */
+  const reloadNotebook = useCallback(() => {
+    const { org, courseId, labId } = notebookRef;
+    void queryClient.invalidateQueries({ queryKey: notebooksQuery(org, courseId, labId).queryKey, exact: true });
+    void queryClient.invalidateQueries({ queryKey: notebookQuery(notebookRef).queryKey, exact: true });
+    void queryClient.invalidateQueries({ queryKey: codeEditsQuery(notebookRef).queryKey });
+  }, [notebookRef, queryClient]);
+
+  // A device copy typed on an earlier version goes on its own, named by that version, so the server
+  // puts it in the right cells; it is dropped once the server has answered.
+  useEffect(() => {
+    if (!olderDraft || !draftKey) return;
+    api<WorkSaved>(workPath, {
+      method: 'PUT',
+      body: {
+        code: Object.entries(olderDraft.code).map(([cell, code]) => ({ cell: Number(cell), code })),
+        traces: Object.entries(olderDraft.traces).map(([cell, rows]) => ({ cell: Number(cell), rows })),
+        version: olderDraft.version,
+      },
+    })
+      .then(() => true)
+      .catch((error: unknown) => error instanceof ApiError && error.code === 'stale_version')
+      .then((answered) => {
+        if (!answered) return;
+        if (pending.current.size === 0 && traces.current.size === 0) writeDraft(draftKey, null);
+        reloadNotebook();
+      });
+  }, [olderDraft, draftKey, workPath, reloadNotebook]);
 
   // The saved edits, once loaded for this notebook; anything typed before they arrived stays on top,
   // and over both, what this device kept unsaved last time (#178), which is queued again.
@@ -140,6 +186,7 @@ export function CodeEditsProvider({
         // The original code again means the saved copy goes.
         code: code.map(([cell, text]) => ({ cell, code: text === originals.get(cell) ? null : text })),
         traces: rows.map(([cell, r]) => ({ cell, rows: r })),
+        version: notebookVersion,
       });
       let res: Response;
       try {
@@ -155,15 +202,21 @@ export function CodeEditsProvider({
         return 'failed';
       }
       reportService(res);
+      if (res.status === 409) {
+        // Typed on a version two or more behind (#208): it has no known place. The new one loads.
+        reloadNotebook();
+        return 'ok';
+      }
       if (!res.ok) return serviceOf(res) === 'limit' ? 'limit' : 'failed';
       // A table whose notebook closed meanwhile cannot be kept: show it as it now is.
-      const { refused } = (await res.json()) as WorkSaved;
-      for (const cell of refused) {
+      const saved = (await res.json()) as WorkSaved;
+      for (const cell of saved.refused) {
         void queryClient.invalidateQueries({ queryKey: ['trace-answers', notebookRef.notebookId, cell] });
       }
+      if (saved.version !== notebookVersion) reloadNotebook();
       return 'ok';
     },
-    [originals, workPath, queryClient, notebookRef.notebookId],
+    [originals, workPath, queryClient, notebookRef.notebookId, notebookVersion, reloadNotebook],
   );
 
   const flush = useCallback(
@@ -252,6 +305,11 @@ export function CodeEditsProvider({
         const code = own(cell);
         return code !== undefined && code !== cell.raw;
       },
+      outdated: (cell) => {
+        if (!changed.at || !changed.cells.includes(cell.srcIndex)) return false;
+        const saved = query.data?.edits.find((e) => e.cell === cell.srcIndex);
+        return saved !== undefined && saved.updatedAt < changed.at;
+      },
       change(cell, code) {
         setEdits((map) => new Map(map).set(cell.srcIndex, code));
         pending.current.set(cell.srcIndex, code);
@@ -284,7 +342,7 @@ export function CodeEditsProvider({
       ready: loaded || query.isError,
       flush: () => flush(),
     };
-  }, [edits, flush, schedule, draft, originals, path, saving, version, loaded, query.isError]);
+  }, [edits, flush, schedule, draft, originals, path, saving, version, loaded, query.isError, query.data, changed]);
 
   return <CodeEditsContext.Provider value={value}>{children}</CodeEditsContext.Provider>;
 }
