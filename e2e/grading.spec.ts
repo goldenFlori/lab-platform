@@ -67,6 +67,14 @@ test('a pedagog grades a group in one batch, releases, and the student sees the 
   await expect(grade).toContainText('2/2');
   await expect(grade).toContainText('Pa publikuar');
 
+  // A comment beside the student's cell (#220).
+  const row = staff.getByTestId('submission-row').filter({ hasText: E2E_ACCOUNT.fullName });
+  await row.getByRole('button', { name: `Shiko dorëzimin e ${E2E_ACCOUNT.fullName}` }).click();
+  await row.getByRole('button', { name: 'Shto koment' }).click();
+  await row.getByLabel('Komenti për këtë qelizë').fill('Shumë mirë; provoje edhe me numra negativë.');
+  await row.getByRole('button', { name: 'Ruaj komentin' }).click();
+  await expect(row.getByTestId('cell-comment')).toContainText('provoje edhe me numra negativë');
+
   await staff.getByRole('button', { name: 'Publiko notat' }).click();
   await staff.getByRole('alertdialog').getByRole('button', { name: 'Publiko notat' }).click();
   await expect(grade).toContainText('Publikuar');
@@ -81,6 +89,7 @@ test('a pedagog grades a group in one batch, releases, and the student sees the 
 
   await student.goto(pageUrl);
   await expect(student.getByTestId('my-grade')).toContainText('Nota juaj: 2/2');
+  await expect(student.getByTestId('grade-comment')).toContainText('provoje edhe me numra negativë');
   await student.context().close();
   await staff.context().close();
 });
