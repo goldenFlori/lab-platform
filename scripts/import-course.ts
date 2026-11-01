@@ -8,14 +8,16 @@
 //
 // Without --url it imports into `npm run dev` (http://localhost:5173). The password is asked for,
 // or read from LAB_PASSWORD. --dry-run only shows what would be imported. Running it again updates
-// what changed. Labs stay hidden until the pedagog opens them; solutions are for staff only.
+// what changed: a changed notebook gets a new version in place, so students keep their work (#209).
+// If a cell with students' work would be gone, it stops before changing anything and says where;
+// --allow-loss goes ahead. Labs stay hidden until the pedagog opens them; solutions are for staff only.
 
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
-import { type Api, importCourse } from './course-import/apply.ts';
+import { type Api, ImportBlocked, importCourse } from './course-import/apply.ts';
 import { planCourse, type SiteCourse } from './course-import/plan.ts';
 
 const { values: args } = parseArgs({
@@ -27,6 +29,7 @@ const { values: args } = parseArgs({
     username: { type: 'string' },
     url: { type: 'string', default: 'http://localhost:5173' },
     'dry-run': { type: 'boolean', default: false },
+    'allow-loss': { type: 'boolean', default: false },
   },
 });
 
@@ -102,15 +105,33 @@ const api: Api = (method, path, body, headers = {}) => {
 };
 
 try {
-  const report = await importCourse(api, { org, title, academicYear: year, labs });
+  const report = await importCourse(api, { org, title, academicYear: year, labs, allowLoss: args['allow-loss'] });
   console.log(`\n${report.created ? 'Created' : 'Found'} the course "${title}" ${year}.`);
-  for (const { lab, change, notebooks } of report.labs) {
+  for (const { lab, change, notebooks, versions } of report.labs) {
     console.log(`✔ Laboratori ${lab.n}: ${change}, ${notebooks.length} notebook${notebooks.length === 1 ? '' : 's'}`);
+    for (const v of versions) {
+      console.log(
+        `    new version of ${v.originalName}: ${v.changed} cells changed, ${v.added} added, ${v.removed} removed`,
+      );
+    }
   }
   console.log(
     `\nLabs stay hidden until you open them: ${base}/o/${org}/courses/${report.course.id}\n` +
       'Solutions are shown to staff only, and to students from the date set on each lab.',
   );
+} catch (error) {
+  if (!(error instanceof ImportBlocked)) throw error;
+  console.error(`\n✖ ${error.message}:`);
+  for (const loss of error.losses) {
+    const who = `${loss.students} student${loss.students === 1 ? '' : 's'}`;
+    console.error(
+      `    Laboratori ${loss.lab}, ${loss.notebook}, cell ${loss.cell} «${loss.firstLine.slice(0, 60)}»: ${who}`,
+    );
+  }
+  console.error(
+    '\nKeep those cells in the course repo (changing them is fine), or run again with --allow-loss to delete that work.',
+  );
+  process.exitCode = 1;
 } finally {
   await api('POST', '/auth/logout');
 }
