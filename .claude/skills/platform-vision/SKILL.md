@@ -556,7 +556,8 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   a new course of their own: labs, notebooks with their files, visualizations and exercises, and the
   solutions only if the author includes them. Never students, groups, work or grades; labs arrive
   hidden and AI off. The copy is independent, it says where it came from, and the author sees which
-  institutions copied it. Stopping the share kills the link and leaves the copies.
+  institutions copied it. Stopping the share kills the link and leaves the copies. The slow-phone
+  timing test now runs alone after the other end-to-end tests: beside them on CI it measured their load.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and

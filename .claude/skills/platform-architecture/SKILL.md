@@ -698,6 +698,9 @@ first visit (12 s), again with the cache (3.5 s), and the first cell's output wi
 Measured 2026-10-30 on a laptop after #193: 6.2, 1.4 and 0.8 s (before: 8.3, 5.3 and 0.6). The local
 server does not compress; production's Brotli sends the app's 877 KB as 164 KB, so production's first
 visit is about 3 s faster.
+It runs alone, in the `performance` Playwright project after `desktop` and `mobile`: beside other
+tests on CI's few cores it measured their load (the cached reload rose from 1.8 to 5.4 s as heavy specs
+were added, while a laptop still measured 1.4 s on 2026-11-01). Run it with `--project performance`.
 
 - **`/assets/*` is immutable** (`public/_headers`, a year): the files are named by their hash. Before,
   `max-age=0, must-revalidate` made every visit re-ask for each of ~40 files, a round trip per wave
