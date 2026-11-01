@@ -75,7 +75,9 @@ for (const scheme of ['light', 'dark'] as const) {
       embeds: [{ cell: 3, viz: 'labirinti', props: null }],
     });
     await apiCall(staff, 'PUT', `${labPath}/notebooks/${nb.id}/exercises`, {
-      exercises: [{ cell: 2, title: 'Shuma', test: 'assert shuma(1, 2) == 3' }],
+      exercises: [
+        { cell: 2, title: 'Shuma', test: 'assert shuma(1, 2) == 3', hints: ['Mblidhi të dy.', 'return a + b'] },
+      ],
     });
     await apiCall(staff, 'PUT', `${labPath}/notebooks/${nb.id}/assignments/${group.id}`, {
       dueAt: new Date(Date.now() + 3_600_000).toISOString(),
@@ -102,6 +104,8 @@ for (const scheme of ['light', 'dark'] as const) {
     const student = await signIn(browser, E2E_ACCOUNT, isMobile);
     await student.emulateMedia({ colorScheme: scheme });
     await apiCall(student, 'POST', '/join', { code: group.joinCode });
+    // A hint revealed and one still to reveal (#215), so both are audited.
+    await apiCall(student, 'POST', `${labPath}/notebooks/${nb.id}/exercises/2/hints/1`);
     for (const [name, path] of [
       ['course (student)', coursePage],
       ['lab (student)', `${pageUrl}?notebook=${nb.id}`],
