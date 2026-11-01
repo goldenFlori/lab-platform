@@ -272,6 +272,30 @@ estimate gives the engine 3.2 MB where production sends 3.5 MB). First run, 2026
 - **Data:** the deletion requests and the export moved here from the courses page.
 - Institution admins do not see inside courses (no `lab.view`): courses are their pedagogs'.
 
+## Sharing a course (#203)
+
+- **The link:** staff with `course.manage` share a course from its page (`PUT /api/orgs/:org/courses/:id/share`).
+  `course_shares` holds one row per course: a 128-bit hex token, unique across the platform like a
+  join code, and `solutions`, which only someone with `solution.view` may turn on. Stopping deletes
+  the row, so the link dies; copies stay. Tokens are invitations: never exported.
+- **Who may open it:** `GET /api/shares/:token` answers only users with an institution-wide role that
+  has `course.create`; anyone else, like a wrong token, gets 404, so a link that reaches a student
+  shows nothing. `POST /api/orgs/:org/courses/from-share` needs `course.create` there.
+- **The copy** (`src/api/db/sharing.ts`, cross-tenant by design like `join.ts`): one D1 batch of about
+  ten `INSERT … SELECT` statements, so the files' bytes never pass through the Worker and the count
+  stays fixed. Old lab and notebook ids map to new ones through one JSON parameter each
+  (`json_each`); rows under a notebook get UUIDv7 ids made in SQL; chunks find their new file by
+  notebook and name. Each statement starts from its map (`CROSS JOIN` fixes the order), so it reads
+  only the course's rows by index. Sent with `db.$client.batch`: Drizzle 0.45 cannot bind raw SQL
+  in a batch.
+- **What goes:** labs, ready notebooks with their files, embeds, exercises and search index; with
+  `solutions`, also solution notebooks and `exercise_grading` (points and hidden tests). Never groups,
+  visibility, memberships, work, grades or AI settings: labs arrive hidden and AI off.
+- **Where it came from:** `courses.copied_from_course_id`, plus the title and institution as they
+  were, which survive the original's deletion. The author sees the copies' institution, year and
+  date (`copiesOf`), nothing else. The full course is about 8 MB of files, so each copy costs that
+  much of the database's 500 MB free size.
+
 ## Courses, groups and joining
 
 - **Staff** (#64, `src/api/routes/staff.ts`): staff with `course.manage` for the whole course list
@@ -674,6 +698,9 @@ first visit (12 s), again with the cache (3.5 s), and the first cell's output wi
 Measured 2026-10-30 on a laptop after #193: 6.2, 1.4 and 0.8 s (before: 8.3, 5.3 and 0.6). The local
 server does not compress; production's Brotli sends the app's 877 KB as 164 KB, so production's first
 visit is about 3 s faster.
+It runs alone, in the `performance` Playwright project after `desktop` and `mobile`: beside other
+tests on CI's few cores it measured their load (the cached reload rose from 1.8 to 5.4 s as heavy specs
+were added, while a laptop still measured 1.4 s on 2026-11-01). Run it with `--project performance`.
 
 - **`/assets/*` is immutable** (`public/_headers`, a year): the files are named by their hash. Before,
   `max-age=0, must-revalidate` made every visit re-ask for each of ~40 files, a round trip per wave

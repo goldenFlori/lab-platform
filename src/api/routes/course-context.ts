@@ -14,6 +14,8 @@ type Course = {
   archivedAt: Date | null;
   locale: Locale | null;
   aiEnabled: boolean;
+  copiedFromTitle: string | null;
+  copiedFromInstitution: string | null;
 };
 
 export const summary = (course: Course): CourseSummary => ({
@@ -23,6 +25,10 @@ export const summary = (course: Course): CourseSummary => ({
   archivedAt: course.archivedAt?.toISOString() ?? null,
   locale: course.locale,
   ai: course.aiEnabled,
+  copiedFrom:
+    course.copiedFromTitle === null
+      ? null
+      : { title: course.copiedFromTitle, institution: course.copiedFromInstitution ?? '' },
 });
 
 /** Staff of the course, or a student of one of its groups. */

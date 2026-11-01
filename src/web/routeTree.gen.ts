@@ -22,6 +22,7 @@ import { Route as HelpGuideRouteImport } from './routes/help/$guide'
 import { Route as VisualizationsIndexRouteImport } from './routes/visualizations/index'
 import { Route as VisualizationsVizIdRouteImport } from './routes/visualizations/$vizId'
 import { Route as AuthedAccountDataRouteImport } from './routes/_authed/account/data'
+import { Route as AuthedShareTokenRouteImport } from './routes/_authed/share/$token'
 import { Route as AuthedOOrgAdminRouteImport } from './routes/_authed/o/$org/admin'
 import { Route as AuthedOOrgCoursesCourseIdIndexRouteImport } from './routes/_authed/o/$org/courses/$courseId/index'
 import { Route as AuthedOOrgCoursesCourseIdActivityRouteImport } from './routes/_authed/o/$org/courses/$courseId/activity'
@@ -96,6 +97,11 @@ const VisualizationsVizIdRoute = VisualizationsVizIdRouteImport.update({
 const AuthedAccountDataRoute = AuthedAccountDataRouteImport.update({
   id: '/account/data',
   path: '/account/data',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedShareTokenRoute = AuthedShareTokenRouteImport.update({
+  id: '/share/$token',
+  path: '/share/$token',
   getParentRoute: () => AuthedRoute,
 } as any)
 const AuthedOOrgAdminRoute = AuthedOOrgAdminRouteImport.update({
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/help/': typeof HelpIndexRoute
   '/visualizations/': typeof VisualizationsIndexRoute
   '/account/data': typeof AuthedAccountDataRoute
+  '/share/$token': typeof AuthedShareTokenRoute
   '/o/$org/admin': typeof AuthedOOrgAdminRoute
   '/o/$org/courses/$courseId/activity': typeof AuthedOOrgCoursesCourseIdActivityRoute
   '/o/$org/courses/$courseId/progress': typeof AuthedOOrgCoursesCourseIdProgressRoute
@@ -202,6 +209,7 @@ export interface FileRoutesByTo {
   '/help': typeof HelpIndexRoute
   '/visualizations': typeof VisualizationsIndexRoute
   '/account/data': typeof AuthedAccountDataRoute
+  '/share/$token': typeof AuthedShareTokenRoute
   '/o/$org/admin': typeof AuthedOOrgAdminRoute
   '/o/$org/courses/$courseId/activity': typeof AuthedOOrgCoursesCourseIdActivityRoute
   '/o/$org/courses/$courseId/progress': typeof AuthedOOrgCoursesCourseIdProgressRoute
@@ -229,6 +237,7 @@ export interface FileRoutesById {
   '/help/': typeof HelpIndexRoute
   '/visualizations/': typeof VisualizationsIndexRoute
   '/_authed/account/data': typeof AuthedAccountDataRoute
+  '/_authed/share/$token': typeof AuthedShareTokenRoute
   '/_authed/o/$org/admin': typeof AuthedOOrgAdminRoute
   '/_authed/o/$org/courses/$courseId/activity': typeof AuthedOOrgCoursesCourseIdActivityRoute
   '/_authed/o/$org/courses/$courseId/progress': typeof AuthedOOrgCoursesCourseIdProgressRoute
@@ -256,6 +265,7 @@ export interface FileRouteTypes {
     | '/help/'
     | '/visualizations/'
     | '/account/data'
+    | '/share/$token'
     | '/o/$org/admin'
     | '/o/$org/courses/$courseId/activity'
     | '/o/$org/courses/$courseId/progress'
@@ -281,6 +291,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/visualizations'
     | '/account/data'
+    | '/share/$token'
     | '/o/$org/admin'
     | '/o/$org/courses/$courseId/activity'
     | '/o/$org/courses/$courseId/progress'
@@ -307,6 +318,7 @@ export interface FileRouteTypes {
     | '/help/'
     | '/visualizations/'
     | '/_authed/account/data'
+    | '/_authed/share/$token'
     | '/_authed/o/$org/admin'
     | '/_authed/o/$org/courses/$courseId/activity'
     | '/_authed/o/$org/courses/$courseId/progress'
@@ -425,6 +437,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedAccountDataRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/share/$token': {
+      id: '/_authed/share/$token'
+      path: '/share/$token'
+      fullPath: '/share/$token'
+      preLoaderRoute: typeof AuthedShareTokenRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/o/$org/admin': {
       id: '/_authed/o/$org/admin'
       path: '/o/$org/admin'
@@ -510,6 +529,7 @@ interface AuthedRouteChildren {
   AuthedJoinRoute: typeof AuthedJoinRoute
   AuthedPlatformRoute: typeof AuthedPlatformRoute
   AuthedAccountDataRoute: typeof AuthedAccountDataRoute
+  AuthedShareTokenRoute: typeof AuthedShareTokenRoute
   AuthedOOrgAdminRoute: typeof AuthedOOrgAdminRoute
   AuthedOOrgCoursesCourseIdActivityRoute: typeof AuthedOOrgCoursesCourseIdActivityRoute
   AuthedOOrgCoursesCourseIdProgressRoute: typeof AuthedOOrgCoursesCourseIdProgressRoute
@@ -528,6 +548,7 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedJoinRoute: AuthedJoinRoute,
   AuthedPlatformRoute: AuthedPlatformRoute,
   AuthedAccountDataRoute: AuthedAccountDataRoute,
+  AuthedShareTokenRoute: AuthedShareTokenRoute,
   AuthedOOrgAdminRoute: AuthedOOrgAdminRoute,
   AuthedOOrgCoursesCourseIdActivityRoute:
     AuthedOOrgCoursesCourseIdActivityRoute,

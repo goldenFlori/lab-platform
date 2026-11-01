@@ -551,6 +551,13 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   (off turns it off everywhere), its look, and its data (deletion requests and the export, moved from
   the courses page). A second faculty no longer needs the owner to add its pedagogs. Next: #203,
   sharing a course with another institution.
+- **2026-11-01:** #203 done, and with it Phase 13. A course's pedagog or coordinator shares it with a
+  link; staff who may create courses in another institution open it, see its labs, and copy it into
+  a new course of their own: labs, notebooks with their files, visualizations and exercises, and the
+  solutions only if the author includes them. Never students, groups, work or grades; labs arrive
+  hidden and AI off. The copy is independent, it says where it came from, and the author sees which
+  institutions copied it. Stopping the share kills the link and leaves the copies. The slow-phone
+  timing test now runs alone after the other end-to-end tests: beside them on CI it measured their load.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
@@ -606,6 +613,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-27 | A kolokium runs on each student's own clock (start any time in a window, then fixed minutes, never past the deadline), not one shared start: a late or reconnecting student loses no time, and a room needs no synchronised "go". The server keeps the start time, so the time limit holds even if the page is reloaded or its clock is changed. Only the kolokium's lab is visible and AI help is off while it runs | Decided |
 | 2026-10-31 | Phase 13 is "A second institution", lean: what another faculty needs on day one (the owner's console, branding, an admin page, sharing a course). Billing, self-service sign-up and Google login wait for the pilot's results and a privacy decision on Google as an identity provider | Decided |
 | 2026-10-31 | Platform owners are named in a Worker secret, not in the database: no tenant's data or action can make one, and the console answers 404 to everyone else | Decided |
+| 2026-11-01 | A course is shared as an independent copy, by a secret link only staff who may create courses can open, not as a live link to the original nor in a public catalogue: each institution owns and changes its course, nothing breaks when the author edits or deletes theirs, and no listing of other institutions' courses is needed yet. Solutions go only when the author says so. The shared library can list shares later | Decided |
 | 2026-10-29 | Phase 12 is "The lab room" before SaaS: the January mini-pilot and the March semester run in a real room (one shared connection, lab PCs and cheap phones, every kind of student, pedagogs new to the platform). Self-service institutions, Google login and billing come once the pilot has shown the teaching, which the grant application needs first | Decided |
 | 2026-10-27 | A backup counts only once a restore of it has been checked. The restore drill runs on the owner's machine with their key (never in CI, which must not hold the key), after schema or backup changes and once a month | Decided |
 | 2026-10-27 | A hand-in delayed by an outage counts at the time the server receives it, never a time the browser reports: a browser's clock and requests can be changed, which would give extra minutes in a kolokium. The work is kept safe on the device instead, and the pedagog can move a deadline | Decided |

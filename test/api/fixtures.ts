@@ -5,7 +5,7 @@ import { forTenant } from '../../src/api/db/tenant';
 
 /**
  * An organization with one of everything: a pedagog, a template, a course, a group, a lab with its
- * access rule, and a ready notebook with one embed.
+ * access rule, a ready notebook with one embed, and the course's share link.
  */
 export async function seedOrganization(slug: string) {
   const db = createDb(env.DB);
@@ -35,7 +35,9 @@ export async function seedOrganization(slug: string) {
   });
   await tenant.notebooks.setEmbeds(notebook.id, [{ cell: 2, viz: 'grafet', title: 'Grafi', props: null }]);
 
-  return { db, org, tenant, user, template, course, group, lab, labAccess, membership, notebook };
+  const courseShare = await tenant.shares.set(course.id, false);
+
+  return { db, org, tenant, user, template, course, group, lab, labAccess, membership, notebook, courseShare };
 }
 
 export type Seeded = Awaited<ReturnType<typeof seedOrganization>>;

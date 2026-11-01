@@ -12,6 +12,7 @@ import { clientErrorRoutes } from './routes/client-errors';
 import { joinRoutes } from './routes/join';
 import { orgRoutes } from './routes/orgs';
 import { platformRoutes } from './routes/platform';
+import { shareRoutes } from './routes/sharing';
 
 export { LiveSession } from './live/session';
 
@@ -57,6 +58,7 @@ app.route('/join', joinRoutes);
 app.route('/join', joinBrandingRoutes);
 app.route('/client-errors', clientErrorRoutes);
 app.route('/platform', platformRoutes);
+app.route('/shares', shareRoutes);
 
 export default {
   fetch: app.fetch,

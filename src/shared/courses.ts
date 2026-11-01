@@ -4,8 +4,9 @@ import { LOCALES, type Locale } from './locale';
 // Request and response shapes for courses, groups and joining (#10).
 
 const title = z.string().trim().min(1).max(120);
+export const courseTitle = title;
 /** For example "2026/27". */
-const academicYear = z
+export const academicYear = z
   .string()
   .trim()
   .regex(/^\d{4}\/\d{2}$/);
@@ -47,6 +48,8 @@ export type CourseSummary = {
   locale: Locale | null;
   /** AI features are on (#84). */
   ai: boolean;
+  /** The course it was copied from through a share (#203), as it was then. */
+  copiedFrom: { title: string; institution: string } | null;
 };
 
 export type GroupView = {
@@ -63,7 +66,8 @@ export type CourseDetail = {
   /** analytics: may see the course's activity, for the whole course or some of its groups (#18). */
   /** configureAi: may switch the course's AI features on and off (#84). */
   /** grades: grades some of its groups, so may download their released grades (#114). */
-  permissions: { manage: boolean; analytics: boolean; configureAi: boolean; grades: boolean };
+  /** solutions: sees the course's solutions, so may share them with it (#203). */
+  permissions: { manage: boolean; analytics: boolean; configureAi: boolean; grades: boolean; solutions: boolean };
 };
 
 export type JoinResult = {

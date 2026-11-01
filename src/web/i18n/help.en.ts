@@ -153,6 +153,9 @@ export const help: HelpText = {
         },
         { text: 'In **Course staff**, add pedagogs and assistants, for the whole course or one group.' },
         {
+          text: 'In **Share with other institutions**, create a link that staff of another institution use to copy the course as their own, with the solutions only if you include them. Students and their work never go, and you see who copied it.',
+        },
+        {
           text: 'Before the first class, share the link in **Before the first class** with your students, so devices get ready at home.',
         },
       ],

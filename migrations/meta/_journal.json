@@ -176,6 +176,13 @@
       "when": 1793462340931,
       "tag": "0024_org_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "6",
+      "when": 1793472839139,
+      "tag": "0025_course_shares",
+      "breakpoints": true
     }
   ]
 }

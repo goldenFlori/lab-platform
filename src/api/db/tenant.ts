@@ -34,6 +34,7 @@ import {
   aiUsage,
   assignments,
   codeEdits,
+  courseShares,
   courses,
   courseTemplates,
   deletionRequests,
@@ -65,6 +66,7 @@ import {
   traceAnswers,
   users,
 } from './schema';
+import { newShareToken } from './sharing';
 
 // The tenant-scoped data layer. Route handlers reach tenant-owned data only through forTenant(),
 // which adds the organization to every query. Another organization's rows look like rows that do
@@ -93,6 +95,7 @@ async function assertRole(db: Db, role: string) {
 type TenantTable =
   | typeof courseTemplates
   | typeof courses
+  | typeof courseShares
   | typeof groups
   | typeof labs
   | typeof labAccess
@@ -335,6 +338,29 @@ function tenantCourses(db: Db, orgId: string) {
       const created = await base.get(id);
       if (!created) throw new Error('The new course could not be read back');
       return created;
+    },
+  };
+}
+
+/** A course's share with other institutions (#203): at most one per course. */
+function tenantShares(db: Db, orgId: string) {
+  const base = tenantTable(db, orgId, courseShares);
+  return {
+    ...base,
+    async ofCourse(courseId: string) {
+      const [share] = await base.list(eq(courseShares.courseId, courseId));
+      return share;
+    },
+    /** Shares the course, or changes whether its solutions go with it; the link stays the same. */
+    async set(courseId: string, solutions: boolean) {
+      const share = await this.ofCourse(courseId);
+      if (share) return (await base.update(share.id, { solutions })) ?? share;
+      return base.create({ courseId, solutions, token: newShareToken() });
+    },
+    /** Stops sharing: the link stops working; copies already made stay. */
+    async stop(courseId: string) {
+      const share = await this.ofCourse(courseId);
+      if (share) await base.remove(share.id);
     },
   };
 }
@@ -2340,6 +2366,7 @@ export function forTenant(db: Db, orgId: string) {
     memberships: tenantMemberships(db, orgId, members),
     courseTemplates: tenantTable(db, orgId, courseTemplates),
     courses: tenantCourses(db, orgId),
+    shares: tenantShares(db, orgId),
     groups: tenantGroups(db, orgId),
     labs: tenantLabs(db, orgId),
     labAccess: tenantLabAccess(db, orgId),

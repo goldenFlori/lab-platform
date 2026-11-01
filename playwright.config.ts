@@ -4,6 +4,8 @@ import { E2E_ACCOUNT, E2E_STAFF, E2E_STATE } from './e2e/account';
 // End-to-end tests against the production build, served by the Workers runtime (vite preview),
 // with their own database: migrated from scratch, with a student and a staff account.
 const port = 4173;
+/** Specs that measure time (#193). */
+const TIMED = /performance\.spec\.ts/;
 
 const server = [
   `rm -rf ${E2E_STATE}`,
@@ -23,9 +25,17 @@ export default defineConfig({
   // The service worker (#89) only in the specs about it (pwa.spec.ts), so it never answers for the server.
   use: { baseURL: `http://localhost:${port}`, trace: 'on-first-retry', serviceWorkers: 'block' },
   projects: [
-    { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
+    { name: 'desktop', testIgnore: TIMED, use: { ...devices['Desktop Chrome'] } },
     // The narrowest phone we support.
-    { name: 'mobile', use: { ...devices['Pixel 5'], viewport: { width: 375, height: 812 } } },
+    { name: 'mobile', testIgnore: TIMED, use: { ...devices['Pixel 5'], viewport: { width: 375, height: 812 } } },
+    // Timed alone, once the rest is done: beside other tests on CI's few cores, it measured their load
+    // (the cached reload went from 1.8 s to 5.4 s as heavy specs were added, the app unchanged).
+    {
+      name: 'performance',
+      testMatch: TIMED,
+      dependencies: ['desktop', 'mobile'],
+      use: { ...devices['Desktop Chrome'] },
+    },
   ],
   webServer: {
     command: server,

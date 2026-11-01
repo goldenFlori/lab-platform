@@ -8,8 +8,11 @@ import {
   updateCourseInput,
 } from '../../shared/courses';
 import { generateJoinCode } from '../../shared/join-code';
+import { type CourseShareView, copyShareInput, shareInput } from '../../shared/sharing';
 import { type GroupStudent, importStudentsInput, resetPasswordInput } from '../../shared/students';
 import type { TenantEnv } from '../auth/access';
+import { createDb } from '../db';
+import { copiesOf, copySharedCourse, findShare } from '../db/sharing';
 import { NotFoundError } from '../db/tenant';
 import { courseActivityRoutes, pilotReportRoutes, understandingRoutes } from './activity';
 import { aiRoutes } from './ai';
@@ -66,6 +69,24 @@ export const courseRoutes = new Hono<TenantEnv>()
     return c.json(summary(course), 201);
   })
 
+  // A copy of a course another institution shares (#203), as a new course here with its creator as
+  // pedagog. The share's token is the author's permission; course.create here is the copier's.
+  .post('/from-share', zValidator('json', copyShareInput, invalidRequest), async (c) => {
+    if (!c.var.access.can('course.create')) return forbidden(c);
+    const { token, ...values } = c.req.valid('json');
+    const db = createDb(c.env.DB);
+    const share = await findShare(db, token);
+    if (!share) throw new NotFoundError();
+    const id = await copySharedCourse(db, share, {
+      ...values,
+      orgId: c.var.organization.id,
+      creatorId: c.var.user?.id as string,
+    });
+    const course = await c.var.tenant.courses.get(id);
+    if (!course) throw new Error('The copied course could not be read back');
+    return c.json(summary(course), 201);
+  })
+
   .get('/:courseId', async (c) => {
     const { access } = c.var;
     const { course, groups } = await visibleCourse(c);
@@ -95,6 +116,7 @@ export const courseRoutes = new Hono<TenantEnv>()
           course.id,
           groups.map((g) => g.id),
         ),
+        solutions: access.can('solution.view', { courseId: course.id }),
       },
     } satisfies CourseDetail);
   })
@@ -135,6 +157,29 @@ export const courseRoutes = new Hono<TenantEnv>()
     if (!c.var.access.can('course.manage', { courseId: course.id })) return forbidden(c);
     const updated = await c.var.tenant.courses.update(course.id, { archivedAt: null });
     return c.json(summary(updated ?? course));
+  })
+
+  // Sharing the course with other institutions (#203): its link, and the institutions that copied it.
+  .get('/:courseId/share', async (c) => {
+    const { course } = await visibleCourse(c);
+    if (!c.var.access.can('course.manage', { courseId: course.id })) return forbidden(c);
+    return c.json(await shareView(c.env.DB, course.id, await c.var.tenant.shares.ofCourse(course.id)));
+  })
+
+  // Solutions go with the copy only if the one sharing may see them.
+  .put('/:courseId/share', zValidator('json', shareInput, invalidRequest), async (c) => {
+    const { course } = await visibleCourse(c);
+    if (!c.var.access.can('course.manage', { courseId: course.id })) return forbidden(c);
+    const { solutions } = c.req.valid('json');
+    if (solutions && !c.var.access.can('solution.view', { courseId: course.id })) return forbidden(c);
+    return c.json(await shareView(c.env.DB, course.id, await c.var.tenant.shares.set(course.id, solutions)));
+  })
+
+  .delete('/:courseId/share', async (c) => {
+    const { course } = await visibleCourse(c);
+    if (!c.var.access.can('course.manage', { courseId: course.id })) return forbidden(c);
+    await c.var.tenant.shares.stop(course.id);
+    return c.body(null, 204);
   })
 
   .post('/:courseId/groups', zValidator('json', groupInput, invalidRequest), async (c) => {
@@ -216,3 +261,15 @@ export const courseRoutes = new Hono<TenantEnv>()
   .route('/:courseId/review', reviewRoutes)
   .route('/:courseId/report', pilotReportRoutes)
   .route('/:courseId/survey', surveyRoutes);
+
+async function shareView(
+  binding: D1Database,
+  courseId: string,
+  share: { token: string; solutions: boolean } | undefined,
+): Promise<CourseShareView> {
+  const copies = await copiesOf(createDb(binding), courseId);
+  return {
+    share: share ? { token: share.token, solutions: share.solutions } : null,
+    copies: copies.map((copy) => ({ ...copy, copiedAt: copy.copiedAt.toISOString() })),
+  };
+}

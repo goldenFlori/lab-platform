@@ -3,7 +3,8 @@
 // plan's CPU and D1 limits. No imports: the app uses it without Zod.
 //
 // Left out on purpose: password hashes and sessions (secrets), students' unsubmitted code edits
-// (private to them, #49), join codes (invitations), and what is derived (search index, renderings).
+// (private to them, #49), join codes and share links (invitations), and what is derived (search index,
+// renderings).
 
 export const EXPORT_PARTS = [
   'people',

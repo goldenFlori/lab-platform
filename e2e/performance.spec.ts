@@ -37,8 +37,7 @@ async function seconds(ready: () => Promise<unknown>) {
   return (Date.now() - start) / 1000;
 }
 
-test('a lab is readable and runs in time on a slow phone and network', async ({ browser, isMobile }) => {
-  test.skip(isMobile, 'the phone is emulated here, on the desktop project');
+test('a lab is readable and runs in time on a slow phone and network', async ({ browser }) => {
   test.setTimeout(300_000);
   const staff = await signIn(browser, E2E_STAFF, false);
   const { group, labPath, pageUrl } = await courseWithLab(staff, 'Speed e2e', { open: true });
