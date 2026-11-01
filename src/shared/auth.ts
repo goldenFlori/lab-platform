@@ -35,6 +35,7 @@ export type ApiErrorCode =
   | 'ai_not_allowed'
   | 'username_taken'
   | 'stale_version'
+  | 'demo_read_only'
   | 'internal';
 
 export type ApiErrorBody = { error: ApiErrorCode };
