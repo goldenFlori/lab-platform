@@ -272,6 +272,30 @@ estimate gives the engine 3.2 MB where production sends 3.5 MB). First run, 2026
 - **Data:** the deletion requests and the export moved here from the courses page.
 - Institution admins do not see inside courses (no `lab.view`): courses are their pedagogs'.
 
+## Sharing a course (#203)
+
+- **The link:** staff with `course.manage` share a course from its page (`PUT /api/orgs/:org/courses/:id/share`).
+  `course_shares` holds one row per course: a 128-bit hex token, unique across the platform like a
+  join code, and `solutions`, which only someone with `solution.view` may turn on. Stopping deletes
+  the row, so the link dies; copies stay. Tokens are invitations: never exported.
+- **Who may open it:** `GET /api/shares/:token` answers only users with an institution-wide role that
+  has `course.create`; anyone else, like a wrong token, gets 404, so a link that reaches a student
+  shows nothing. `POST /api/orgs/:org/courses/from-share` needs `course.create` there.
+- **The copy** (`src/api/db/sharing.ts`, cross-tenant by design like `join.ts`): one D1 batch of about
+  ten `INSERT … SELECT` statements, so the files' bytes never pass through the Worker and the count
+  stays fixed. Old lab and notebook ids map to new ones through one JSON parameter each
+  (`json_each`); rows under a notebook get UUIDv7 ids made in SQL; chunks find their new file by
+  notebook and name. Each statement starts from its map (`CROSS JOIN` fixes the order), so it reads
+  only the course's rows by index. Sent with `db.$client.batch`: Drizzle 0.45 cannot bind raw SQL
+  in a batch.
+- **What goes:** labs, ready notebooks with their files, embeds, exercises and search index; with
+  `solutions`, also solution notebooks and `exercise_grading` (points and hidden tests). Never groups,
+  visibility, memberships, work, grades or AI settings: labs arrive hidden and AI off.
+- **Where it came from:** `courses.copied_from_course_id`, plus the title and institution as they
+  were, which survive the original's deletion. The author sees the copies' institution, year and
+  date (`copiesOf`), nothing else. The full course is about 8 MB of files, so each copy costs that
+  much of the database's 500 MB free size.
+
 ## Courses, groups and joining
 
 - **Staff** (#64, `src/api/routes/staff.ts`): staff with `course.manage` for the whole course list
