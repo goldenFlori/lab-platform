@@ -4,6 +4,7 @@ import { explainInput } from '../../shared/ai';
 import { type CodeEdit, codeEditInput, type WorkSaved, workInput } from '../../shared/code-edits';
 import { type ExerciseProgress, exercisesInput } from '../../shared/exercises';
 import {
+  type CellWork,
   createNotebookInput,
   type Embed,
   embedsInput,
@@ -11,8 +12,10 @@ import {
   MAX_FILE_BYTES,
   type NotebookDetail,
   type NotebookSummary,
+  newVersionInput,
   ORIGINAL_FILE,
   RENDERED_FILE,
+  STAGED_PREFIX,
 } from '../../shared/notebooks';
 import { predictionInput } from '../../shared/predictions';
 import { searchSectionsInput } from '../../shared/search';
@@ -21,7 +24,7 @@ import { tracePoints } from '../../shared/trace-grading';
 import { streamAi } from '../ai/gateway';
 import { explainMessages } from '../ai/purposes';
 import type { TenantEnv } from '../auth/access';
-import { NotFoundError, type StoredFile } from '../db/tenant';
+import { NotFoundError, type StoredFile, VERSION_LENGTH } from '../db/tenant';
 import { recordActivity, today } from './activity';
 import { forbidden, invalidRequest } from './course-context';
 import { gradingRoutes } from './grading';
@@ -49,7 +52,12 @@ type Notebook = {
   title: string;
   position: number;
   originalName: string;
+  sha256: string;
   readyAt: Date | null;
+  versionAt: Date | null;
+  changedCells: number[] | null;
+  previousVersion: string | null;
+  cellMap: [number, number][] | null;
 };
 /** Types a file may be served as; anything else is refused at upload. */
 const SAFE_TYPES = new Set([
@@ -68,6 +76,7 @@ const summary = (nb: Notebook): NotebookSummary => ({
   position: nb.position,
   originalName: nb.originalName,
   ready: nb.readyAt !== null,
+  version: nb.sha256.slice(0, VERSION_LENGTH),
 });
 
 const canManage = (c: Context<TenantEnv>, ctx: LabContext) =>
@@ -80,6 +89,8 @@ async function detail(c: Context<TenantEnv>, nb: Notebook): Promise<NotebookDeta
   ]);
   return {
     ...summary(nb),
+    versionAt: nb.versionAt?.toISOString() ?? null,
+    changedCells: nb.changedCells ?? [],
     exercises,
     embeds: embeds
       .sort((a, b) => a.cell - b.cell)
@@ -160,8 +171,31 @@ export const notebookRoutes = new Hono<TenantEnv>()
     return c.json(await detail(c, ready ?? nb));
   })
 
+  // A new version in place of the notebook (#208). First, how many students have work in each cell,
+  // so staff see what a cell with no place in the new version would take with it.
+  .get('/:notebookId/cells/work', async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    if (!canManage(c, ctx)) return forbidden(c);
+    return c.json({ cells: (await c.var.tenant.notebooks.workByCell(nb.id)) satisfies CellWork[] });
+  })
+
+  // Then, its files staged under `next.`, everything kept by cell moves to its new number at once.
+  .post('/:notebookId/version', zValidator('json', newVersionInput, invalidRequest), async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    if (!canManage(c, ctx)) return forbidden(c);
+    const names = await c.var.tenant.notebooks.fileNames(nb.id);
+    if (!names.includes(STAGED_PREFIX + ORIGINAL_FILE) || !names.includes(STAGED_PREFIX + RENDERED_FILE)) {
+      return c.json({ error: 'invalid_request' }, 409);
+    }
+    await c.var.tenant.notebooks.newVersion(nb.id, c.req.valid('json'));
+    const updated = await c.var.tenant.notebooks.get(nb.id);
+    return c.json(await detail(c, updated ?? nb));
+  })
+
   .get('/:notebookId/files/:name', async (c) => {
     const { ctx, lab, nb } = await notebookInUrl(c);
+    // A staged version is not the notebook yet.
+    if (c.req.param('name').startsWith(STAGED_PREFIX)) throw new NotFoundError();
     const file = await c.var.tenant.notebooks.getFile(nb.id, c.req.param('name'));
     if (!file) throw new NotFoundError();
     // The original .ipynb, downloaded to work on it (#18).
@@ -236,7 +270,19 @@ export const notebookRoutes = new Hono<TenantEnv>()
   // submission. Tables it may not keep are named in `refused`; the code is saved all the same.
   .put('/:notebookId/work', zValidator('json', workInput, invalidRequest), async (c) => {
     const { ctx, nb } = await notebookInUrl(c);
-    const { code, traces } = c.req.valid('json');
+    const current = nb.sha256.slice(0, VERSION_LENGTH);
+    let { code, traces } = c.req.valid('json');
+    const { version } = c.req.valid('json');
+    // Work typed on a page that still shows the version before (#208) goes to its cells' new places;
+    // work from anything older has no known place, and is refused rather than put in the wrong cell.
+    if (version && version !== current) {
+      if (version !== nb.previousVersion || !nb.cellMap) return c.json({ error: 'stale_version' }, 409);
+      const to = new Map(nb.cellMap);
+      const moved = <T extends { cell: number }>(list: T[]) =>
+        list.flatMap((item) => (to.has(item.cell) ? [{ ...item, cell: to.get(item.cell) as number }] : []));
+      code = moved(code);
+      traces = moved(traces);
+    }
     let kept = traces;
     if (traces.length) {
       const [embeds, deadline] = await Promise.all([
@@ -257,6 +303,7 @@ export const notebookRoutes = new Hono<TenantEnv>()
     return c.json({
       savedAt: savedAt.toISOString(),
       refused: traces.filter((t) => !kept.includes(t)).map((t) => t.cell),
+      version: current,
     } satisfies WorkSaved);
   })
 

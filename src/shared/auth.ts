@@ -34,6 +34,7 @@ export type ApiErrorCode =
   | 'own_account'
   | 'ai_not_allowed'
   | 'username_taken'
+  | 'stale_version'
   | 'internal';
 
 export type ApiErrorBody = { error: ApiErrorCode };

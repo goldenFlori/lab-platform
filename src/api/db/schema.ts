@@ -348,6 +348,12 @@ export const notebooks = sqliteTable(
     sha256: text('sha256').notNull(),
     /** Set once all its files are uploaded; until then nobody but staff sees it. */
     readyAt: integer('ready_at', { mode: 'timestamp' }),
+    /** When staff last uploaded a new version in its place (#208), and which of its cells changed then. */
+    versionAt: integer('version_at', { mode: 'timestamp' }),
+    changedCells: text('changed_cells', { mode: 'json' }).$type<number[]>(),
+    /** The version before that, and how its cells map to this one's: a save from a page still showing it lands in the right cell. */
+    previousVersion: text('previous_version'),
+    cellMap: text('cell_map', { mode: 'json' }).$type<[number, number][]>(),
     createdAt: createdAt(),
   },
   (t) => [

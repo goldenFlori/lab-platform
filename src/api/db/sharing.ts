@@ -1,7 +1,7 @@
-import { and, asc, eq, isNotNull, ne, type SQL, sql } from 'drizzle-orm';
+import { and, asc, eq, isNotNull, ne, sql } from 'drizzle-orm';
 import type { SharePreview } from '../../shared/sharing';
 import { uuidv7 } from './ids';
-import type { Db } from './index';
+import { batchRaw, type Db } from './index';
 import { courseShares, courses, labs, memberships, notebooks, organizations } from './schema';
 
 // Copying a shared course into another institution (#203). The share's token is the author's
@@ -120,11 +120,10 @@ export async function copySharedCourse(
     || substr('89AB', 1 + abs(random() % 4), 1) || substr(hex(randomblob(2)), 2) || '-' || hex(randomblob(6)))`;
   const mapOf = (json: string) =>
     sql`(SELECT json_extract(value, '$.o') AS o, json_extract(value, '$.n') AS n FROM json_each(${json}))`;
-  const raw = (query: SQL) => db.run(query).getQuery();
   const lm = mapOf(labMap);
   const nm = mapOf(notebookMap);
 
-  const statements: { sql: string; params: unknown[] }[] = [
+  const statements: Parameters<typeof batchRaw>[1] = [
     db
       .insert(courses)
       .values({
@@ -143,49 +142,48 @@ export async function copySharedCourse(
       .toSQL(),
     // Each statement starts from its id map (CROSS JOIN keeps that order in SQLite) and finds the
     // source rows by index, so it reads only the shared course's rows.
-    raw(sql`
+    sql`
       INSERT INTO labs (id, org_id, course_id, n, title, week, summary, position)
       SELECT m.n, ${dst}, ${courseId}, l.n, l.title, l.week, l.summary, l.position
-      FROM ${lm} m CROSS JOIN labs l ON l.id = m.o AND l.org_id = ${src}`),
-    raw(sql`
+      FROM ${lm} m CROSS JOIN labs l ON l.id = m.o AND l.org_id = ${src}`,
+    sql`
       INSERT INTO notebooks (id, org_id, lab_id, kind, title, position, original_name, sha256, ready_at)
       SELECT m.n, ${dst}, lab.n, nb.kind, nb.title, nb.position, nb.original_name, nb.sha256, nb.ready_at
       FROM ${nm} m CROSS JOIN notebooks nb ON nb.id = m.o AND nb.org_id = ${src}
-      JOIN ${lm} lab ON lab.o = nb.lab_id`),
-    raw(sql`
+      JOIN ${lm} lab ON lab.o = nb.lab_id`,
+    sql`
       INSERT INTO files (id, org_id, notebook_id, name, mime, encoding, size, chunk_count)
       SELECT ${newId}, ${dst}, m.n, f.name, f.mime, f.encoding, f.size, f.chunk_count
-      FROM ${nm} m CROSS JOIN files f ON f.org_id = ${src} AND f.notebook_id = m.o`),
+      FROM ${nm} m CROSS JOIN files f ON f.org_id = ${src} AND f.notebook_id = m.o`,
     // Each chunk finds its new file by the new notebook and the file's name, unique within it.
-    raw(sql`
+    sql`
       INSERT INTO file_chunks (org_id, file_id, n, data)
       SELECT ${dst}, nf.id, c.n, c.data
       FROM ${nm} m
       CROSS JOIN files f ON f.org_id = ${src} AND f.notebook_id = m.o
       CROSS JOIN files nf ON nf.org_id = ${dst} AND nf.notebook_id = m.n AND nf.name = f.name
-      CROSS JOIN file_chunks c ON c.org_id = ${src} AND c.file_id = f.id`),
-    raw(sql`
+      CROSS JOIN file_chunks c ON c.org_id = ${src} AND c.file_id = f.id`,
+    sql`
       INSERT INTO embeds (id, org_id, notebook_id, cell, viz, title, props)
       SELECT ${newId}, ${dst}, m.n, e.cell, e.viz, e.title, e.props
-      FROM ${nm} m CROSS JOIN embeds e ON e.org_id = ${src} AND e.notebook_id = m.o`),
-    raw(sql`
+      FROM ${nm} m CROSS JOIN embeds e ON e.org_id = ${src} AND e.notebook_id = m.o`,
+    sql`
       INSERT INTO exercises (id, org_id, notebook_id, cell, title, test, ai_mode)
       SELECT ${newId}, ${dst}, m.n, x.cell, x.title, x.test, x.ai_mode
-      FROM ${nm} m CROSS JOIN exercises x ON x.org_id = ${src} AND x.notebook_id = m.o`),
-    raw(sql`
+      FROM ${nm} m CROSS JOIN exercises x ON x.org_id = ${src} AND x.notebook_id = m.o`,
+    sql`
       INSERT INTO search_sections (id, org_id, notebook_id, position, anchor, title, text, keywords)
       SELECT ${newId}, ${dst}, m.n, s.position, s.anchor, s.title, s.text, s.keywords
-      FROM ${nm} m CROSS JOIN search_sections s ON s.org_id = ${src} AND s.notebook_id = m.o`),
+      FROM ${nm} m CROSS JOIN search_sections s ON s.org_id = ${src} AND s.notebook_id = m.o`,
   ];
   // Points and hidden tests tell how an exercise is graded, which is as good as its solution.
   if (share.solutions)
     statements.push(
-      raw(sql`
+      sql`
     INSERT INTO exercise_grading (id, org_id, notebook_id, cell, points, hidden_test)
     SELECT ${newId}, ${dst}, m.n, g.cell, g.points, g.hidden_test
-    FROM ${nm} m CROSS JOIN exercise_grading g ON g.org_id = ${src} AND g.notebook_id = m.o`),
+    FROM ${nm} m CROSS JOIN exercise_grading g ON g.org_id = ${src} AND g.notebook_id = m.o`,
     );
-  // Straight to D1: Drizzle's batch cannot bind the parameters of raw SQL (0.45).
-  await db.$client.batch(statements.map((q) => db.$client.prepare(q.sql).bind(...q.params)));
+  await batchRaw(db, statements);
   return courseId;
 }
