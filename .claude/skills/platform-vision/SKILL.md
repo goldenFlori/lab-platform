@@ -574,6 +574,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   have work would be gone, the import stops before changing anything and lists those cells, unless
   `--allow-loss` is given. The course can now be re-imported safely once the pilot starts. Next:
   #210, a new term from the whole course.
+- **2026-11-01:** #210 done, and with it Phase 14. "Copy the course from" starts a new term from the
+  whole of last year's course: labs, notebooks with their files, visualizations, exercises, and the
+  solutions with their grading for staff who see them, through the same copy as sharing. Never its
+  groups, students, visibility or work; the new course says which one it came from. Phase 14 leaves
+  the course changeable through the term without losing a student's work, and a new term one step
+  away. Next: plan Phase 15; the owner re-imports the course and runs the dry run with FSHN.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
@@ -598,7 +604,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-10-07 | Weekly backups are encrypted with the owner's key before leaving Cloudflare; GitHub keeps only ciphertext, for 90 days | Decided |
 | 2026-10-08 | Capabilities of the built-in roles (matrix in platform-architecture): the admin runs the institution, not courses; teaching staff get course rights where they are assigned; students view labs and submit | Decided |
 | 2026-10-08 | A join code is an invitation: any signed-in user with it becomes a student of that group (even from another institution); staff can replace it or switch joining off; archived courses refuse it | Decided |
-| 2026-10-08 | Whoever creates a course becomes its pedagog; "copy from last year" brings the labs, not the groups, members or visibility | Decided |
+| 2026-10-08 | Whoever creates a course becomes its pedagog; "copy from last year" brings the labs, not the groups, members or visibility | Decided; since 2026-11-01 (#210) it brings the whole course staff made (notebooks, visualizations, exercises, and solutions for those who see them), still never people, visibility or work |
 | 2026-10-10 | Labs are hidden until opened, for the course or per group (a group's own setting wins), optionally scheduled; students see solutions only from a set date; staff see every lab to prepare | Decided |
 | 2026-10-08 | Imported students' passwords are made in the pedagog's browser: 12 lowercase letters and digits (easy on a phone), shown once and printed on slips, never stored or exported in plain text | Decided |
 | 2026-10-10 | The 13 visualizations are platform content, open to everyone at `/visualizations`: they hold no tenant data, are already public on the course site, and show what the product does | Decided |

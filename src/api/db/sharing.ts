@@ -87,16 +87,17 @@ export async function copiesOf(db: Db, courseId: string) {
 }
 
 /**
- * Copies the shared course into a new course of `orgId`, with `creatorId` as its pedagog, in one
- * batch: all of it or nothing. The rows are copied inside the database (INSERT … SELECT), so the
- * files' bytes never pass through the Worker and the statement count stays fixed however large the
- * course is. Old ids map to new ones through JSON parameters; the rows under a notebook get new ids
- * made by SQL, in the same UUIDv7 form as the rest.
+ * Copies a course into a new course of `into.orgId`, with `creatorId` as its pedagog, in one batch:
+ * all of it or nothing. The source is a share (#203) or, within one institution, the course a new
+ * term starts from (#210), which also keeps its template. The rows are copied inside the database
+ * (INSERT … SELECT), so the files' bytes never pass through the Worker and the statement count stays
+ * fixed however large the course is. Old ids map to new ones through JSON parameters; the rows under a
+ * notebook get new ids made by SQL, in the same UUIDv7 form as the rest.
  */
-export async function copySharedCourse(
+export async function copyCourse(
   db: Db,
-  share: Share,
-  into: { orgId: string; creatorId: string; title: string; academicYear: string },
+  share: Share & { templateId?: string | null },
+  into: { orgId: string; creatorId: string; title: string; academicYear: string; locale?: 'sq' | 'en' | null },
 ) {
   const [sourceLabs, sourceNotebooks] = await db.batch([
     db
@@ -131,6 +132,9 @@ export async function copySharedCourse(
         orgId: dst,
         title: into.title,
         academicYear: into.academicYear,
+        locale: into.locale ?? null,
+        // A template is an institution's own: a new term keeps it, a copy elsewhere starts without.
+        templateId: share.orgId === into.orgId ? (share.templateId ?? null) : null,
         copiedFromCourseId: share.courseId,
         copiedFromTitle: share.title,
         copiedFromInstitution: share.institution,

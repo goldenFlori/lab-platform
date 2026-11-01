@@ -203,6 +203,7 @@ function NewCourseForm({ org, courses, onCancel }: { org: string; courses: Cours
         <select
           id="copy-from"
           name="copyFrom"
+          aria-describedby="copy-from-help"
           className="h-10 rounded-xl border border-border bg-surface px-3 text-sm"
           defaultValue=""
         >
@@ -213,6 +214,9 @@ function NewCourseForm({ org, courses, onCancel }: { org: string; courses: Cours
             </option>
           ))}
         </select>
+        <span id="copy-from-help" className="text-xs text-muted">
+          {t.courses.copyHelp}
+        </span>
       </div>
       <div className="grid gap-1">
         <label htmlFor="course-locale" className="text-sm font-medium">

@@ -12,7 +12,7 @@ import { type CourseShareView, copyShareInput, shareInput } from '../../shared/s
 import { type GroupStudent, importStudentsInput, resetPasswordInput } from '../../shared/students';
 import type { TenantEnv } from '../auth/access';
 import { createDb } from '../db';
-import { copiesOf, copySharedCourse, findShare } from '../db/sharing';
+import { copiesOf, copyCourse, findShare } from '../db/sharing';
 import { NotFoundError } from '../db/tenant';
 import { courseActivityRoutes, pilotReportRoutes, understandingRoutes } from './activity';
 import { aiRoutes } from './ai';
@@ -52,20 +52,37 @@ export const courseRoutes = new Hono<TenantEnv>()
     const { tenant, access } = c.var;
     if (!access.can('course.create')) return forbidden(c);
     const { copyFromCourseId, ...values } = c.req.valid('json');
-    if (copyFromCourseId) {
-      const source = await tenant.courses.get(copyFromCourseId);
-      const groups = source ? await tenant.groups.ofCourse(source.id) : [];
-      if (
-        !source ||
-        !seesCourse(
-          access,
-          source.id,
-          groups.map((g) => g.id),
-        )
+    const creatorId = c.var.user?.id as string;
+    if (!copyFromCourseId) return c.json(summary(await tenant.courses.createFor(creatorId, values)), 201);
+
+    // A new term from a course of this institution (#210): everything staff made in it, solutions and
+    // grading too if the creator may see them; never its groups, people, visibility or work.
+    const source = await tenant.courses.get(copyFromCourseId);
+    const groups = source ? await tenant.groups.ofCourse(source.id) : [];
+    if (
+      !source ||
+      !seesCourse(
+        access,
+        source.id,
+        groups.map((g) => g.id),
       )
-        throw new NotFoundError();
-    }
-    const course = await tenant.courses.createFor(c.var.user?.id as string, values, copyFromCourseId);
+    )
+      throw new NotFoundError();
+    const id = await copyCourse(
+      createDb(c.env.DB),
+      {
+        orgId: c.var.organization.id,
+        courseId: source.id,
+        title: source.title,
+        academicYear: source.academicYear,
+        institution: c.var.organization.name,
+        solutions: access.can('solution.view', { courseId: source.id }),
+        templateId: source.templateId,
+      },
+      { ...values, orgId: c.var.organization.id, creatorId },
+    );
+    const course = await tenant.courses.get(id);
+    if (!course) throw new Error('The copied course could not be read back');
     return c.json(summary(course), 201);
   })
 
@@ -77,7 +94,7 @@ export const courseRoutes = new Hono<TenantEnv>()
     const db = createDb(c.env.DB);
     const share = await findShare(db, token);
     if (!share) throw new NotFoundError();
-    const id = await copySharedCourse(db, share, {
+    const id = await copyCourse(db, share, {
       ...values,
       orgId: c.var.organization.id,
       creatorId: c.var.user?.id as string,

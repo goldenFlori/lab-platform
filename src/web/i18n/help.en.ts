@@ -143,7 +143,9 @@ export const help: HelpText = {
       title: 'The course and its groups',
       summary: 'This year’s course, groups with their join codes, and the staff.',
       steps: [
-        { text: 'In **My courses**, press **New course**. **Copy the labs from** brings last year’s labs.' },
+        {
+          text: 'In **My courses**, press **New course**. **Copy the course from** brings all of last year’s course: labs, notebooks, visualizations, exercises and solutions, without its students or their work.',
+        },
         {
           text: 'Add the groups. Each has a **Join code**: **Show on screen** shows it with a QR code for the projector, **New code** replaces it.',
           shot: 'course-staff',
