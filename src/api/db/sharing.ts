@@ -172,8 +172,8 @@ export async function copyCourse(
       SELECT ${newId}, ${dst}, m.n, e.cell, e.viz, e.title, e.props
       FROM ${nm} m CROSS JOIN embeds e ON e.org_id = ${src} AND e.notebook_id = m.o`,
     sql`
-      INSERT INTO exercises (id, org_id, notebook_id, cell, title, test, ai_mode)
-      SELECT ${newId}, ${dst}, m.n, x.cell, x.title, x.test, x.ai_mode
+      INSERT INTO exercises (id, org_id, notebook_id, cell, title, test, ai_mode, hints)
+      SELECT ${newId}, ${dst}, m.n, x.cell, x.title, x.test, x.ai_mode, x.hints
       FROM ${nm} m CROSS JOIN exercises x ON x.org_id = ${src} AND x.notebook_id = m.o`,
     sql`
       INSERT INTO search_sections (id, org_id, notebook_id, position, anchor, title, text, keywords)

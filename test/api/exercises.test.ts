@@ -108,12 +108,19 @@ describe('completed exercises', () => {
         { cell: 7, students: 1 },
       ],
       students: 3,
+      // Fewer than five students: no hint counts (#215).
+      hints: null,
     });
     // A pedagog of group B counts only group B.
-    expect(await progress(pedagogB)).toEqual({ done: [], counts: [{ cell: 4, students: 1 }], students: 1 });
+    expect(await progress(pedagogB)).toEqual({
+      done: [],
+      counts: [{ cell: 4, students: 1 }],
+      students: 1,
+      hints: null,
+    });
     // Assistants and students see no counts.
     expect((await progress(assistant)).counts).toBeNull();
-    expect(await progress(ana)).toEqual({ done: [4, 7], counts: null, students: null });
+    expect(await progress(ana)).toEqual({ done: [4, 7], counts: null, students: null, hints: null });
   });
 
   it('count only exercises the notebook still has', async () => {

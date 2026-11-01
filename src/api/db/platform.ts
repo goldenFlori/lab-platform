@@ -7,6 +7,7 @@ import {
   aiQuestions,
   aiUsage,
   deletionRequests,
+  hintReveals,
   labActivity,
   liveSessions,
   memberships,
@@ -112,6 +113,7 @@ export async function applyRetention(db: Db, now = new Date(), batch = RETENTION
     deleteSome(db, aiQuestions, lt(aiQuestions.createdAt, before(RETENTION.aiQuestionDays)), batch),
     deleteSome(db, labActivity, lt(labActivity.day, dayBefore(activity)), batch),
     deleteSome(db, predictionResults, lt(predictionResults.day, dayBefore(activity)), batch),
+    deleteSome(db, hintReveals, lt(hintReveals.day, dayBefore(activity)), batch),
     deleteSome(db, aiUsage, lt(aiUsage.day, dayBefore(activity)), batch),
     deleteSome(
       db,

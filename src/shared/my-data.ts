@@ -26,6 +26,8 @@ export type OrganizationData = {
     correct: boolean;
     day: string;
   }[];
+  /** Hints written by staff that the user revealed (#215). */
+  hintsRevealed: { notebook: string; cell: number; hint: number; day: string }[];
   submissions: {
     notebook: string;
     code: { cell: number; code: string }[];

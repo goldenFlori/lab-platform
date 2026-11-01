@@ -10,3 +10,7 @@ export const MAX_EXERCISES = 100;
  */
 export const AI_MODES = ['off', 'hints', 'full'] as const;
 export type AiMode = (typeof AI_MODES)[number];
+
+/** Hints staff may write for one exercise (#215), and how long each may be. */
+export const MAX_HINTS = 3;
+export const MAX_HINT = 600;

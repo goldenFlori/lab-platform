@@ -23,6 +23,7 @@ export const EXPORT_PARTS = [
   'grades',
   'exerciseCompletions',
   'predictionResults',
+  'hintReveals',
   'kolokiumStarts',
   'labActivity',
   'aiUsage',
