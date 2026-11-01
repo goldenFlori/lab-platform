@@ -336,8 +336,11 @@ Built in #10, under `/api/orgs/:org/courses` (`src/api/routes/courses.ts`).
 - **Seeing a course:** staff of the course (`lab.view` or `course.manage` in it) or a student of
   one of its groups. Everyone else gets 404, as for a course that does not exist.
 - **Creating** needs `course.create`, and the creator becomes the course's pedagog.
-  `copyFromCourseId` copies last year's labs and template, but not its groups, members or
-  visibility. The course, its pedagog and its labs are written in one batch.
+  `copyFromCourseId` starts a new term from a course the creator can see (#210), through the same
+  `copyCourse` as sharing (#203): labs, ready notebooks with their files, embeds, exercises and
+  search, and solutions with grading if the creator has `solution.view` there; its template too.
+  Never groups, members, visibility or work. It records where it came from (`copiedFrom…`), and
+  everything is written in one batch.
 - **Groups** (`course.manage`) each get a join code: 8 characters from an alphabet without
   look-alikes, shown as `XXXX-XXXX` (`src/shared/join-code.ts`).
   - Whoever may manage the group's students sees the code. They can replace it, which kills
