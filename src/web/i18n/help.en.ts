@@ -54,7 +54,9 @@ export const help: HelpText = {
         {
           text: 'When the code stops with an error, its line is marked in red. If your pedagog turned AI on, **Explain the error** gives a hint, not the solution.',
         },
-        { text: 'In an exercise, the check shows as soon as the cell runs: ✓, or ✗ with the case that failed.' },
+        {
+          text: 'In an exercise, the check shows as soon as the cell runs: ✓, or ✗ with the case that failed. If your pedagog wrote hints, **Show hint** opens them one at a time.',
+        },
         { text: 'Code that does not finish stops with **Stop**.' },
       ],
     },
@@ -199,7 +201,7 @@ export const help: HelpText = {
           text: 'In **Visualizations in this notebook**, choose where each shows. A trace table can have your own problem, a variant for each student, and points.',
         },
         {
-          text: 'In **Exercises in this notebook**, see the exercises found by themselves and add others with a visible test.',
+          text: 'In **Exercises in this notebook**, see the exercises found by themselves and add others with a visible test. Each has up to three hints that students open one at a time; you see how many did.',
         },
         {
           text: '**Present** opens the notebook fullscreen, step by step, with the code you run before the class.',

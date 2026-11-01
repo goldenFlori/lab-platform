@@ -682,7 +682,7 @@ export const sq = {
   } satisfies Record<PredictionTopic, string>,
   privacy: {
     title: 'Privatësia',
-    updated: 'Përditësuar më 27 tetor 2026',
+    updated: 'Përditësuar më 1 nëntor 2026',
     intro:
       'Kjo faqe tregon cilat të dhëna ruan Lab Platform, pse, ku, për sa kohë dhe kush i sheh. Institucioni juaj (p.sh. fakulteti) vendos për të dhënat e studentëve të tij; platforma i përpunon në emër të tij.',
     sections: [
@@ -694,6 +694,7 @@ export const sq = {
           'Kodin që ndryshoni në fletore, që ta gjeni në çdo pajisje. Stafi nuk e sheh derisa ta dorëzoni.',
           'Ushtrimet që zgjidhni, punën që dorëzoni dhe notat.',
           'Përgjigjen e parë që jepni te vendimet e vizualizimeve ("Parashiko") dhe te rreshtat e tabelave të gjurmimit: nëse ishte e saktë dhe cila ishte. Është ushtrim, jo notë; stafi e sheh vetëm si numra, nga pesë studentë e lart.',
+          'Cilat udhëzime të pedagogut shfaqët te një ushtrim, dhe ditën. Stafi i sheh vetëm si numra, nga pesë studentë e lart.',
           'Aktivitetin si numra: të shumtën një shënim në ditë për çdo laborator dhe lloj (e hapët, e shkarkuat, provuat një vizualizim, zgjidhët një ushtrim, ekzekutuat kodin, morët pjesë në një Live Lab).',
           'Pyetjet "Shpjego gabimin" me përgjigjen e AI-së, dhe sa kërkesa me AI bëni në ditë.',
           'Një cookie për hyrjen, që ju mban të identifikuar, dhe emrin e shfletuesit për çdo hyrje.',
@@ -731,7 +732,7 @@ export const sq = {
         items: [
           `Hyrja: mbaron pas ${RETENTION.sessionDays} ditësh pa përdorim.`,
           `Pyetjet "Shpjego gabimin" me përgjigjet: ${RETENTION.aiQuestionDays} ditë.`,
-          `Aktiviteti ditor (laboratorët e hapur, ekzekutimet, Live Lab), përgjigjet e para te parashikimet dhe tabelat, numërimet e AI dhe historia e Live Lab: ${RETENTION.activityYears} vjet.`,
+          `Aktiviteti ditor (laboratorët e hapur, ekzekutimet, Live Lab), përgjigjet e para te parashikimet dhe tabelat, udhëzimet e shfaqura, numërimet e AI dhe historia e Live Lab: ${RETENTION.activityYears} vjet.`,
           `Një kërkesë për fshirje, pasi trajtohet: ${RETENTION.handledRequestYears} vit.`,
           `Raportet e gabimeve: ${RETENTION.errorLogDays} ditë, te Cloudflare.`,
           'Kodi, dorëzimet, notat dhe pjesa tjetër: sa kohë ekziston kursi. Kur institucioni fshin një kurs, fshihen edhe të dhënat e tij.',
@@ -1438,6 +1439,15 @@ export const sq = {
     publish: 'Vendos versionin e ri',
     publishing: 'Po vendoset versioni i ri…',
     failed: 'Versioni i ri nuk u vendos. Provoni përsëri.',
+  },
+  hints: {
+    hint: (n: number) => `Udhëzimi ${n}`,
+    show: (n: number, of: number) => `Shfaq udhëzimin ${n} nga ${of}`,
+    students: (counts: number[]) => `Studentët që i panë: ${counts.map((c, i) => `${i + 1}: ${c}`).join(' · ')}`,
+    failed: 'Udhëzimi nuk u shfaq. Gjatë një kolokiumi udhëzimet janë të mbyllura.',
+    editor: 'Udhëzime (deri në 3, nga më i lehti te pothuajse përgjigjja)',
+    editorLabel: (hint: number, exercise: number) => `Udhëzimi ${hint} i ushtrimit ${exercise}`,
+    editorHint: (n: number) => `Udhëzimi ${n}`,
   },
   edits: {
     edit: 'Ndrysho kodin',

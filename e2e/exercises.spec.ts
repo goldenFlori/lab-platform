@@ -66,7 +66,10 @@ test('a student solves exercises and sees them checked; the pedagog sees how man
   const choice = await cell.locator('option', { hasText: 'Ushtrimi 2 — Prodhimi' }).getAttribute('value');
   await cell.selectOption(choice ?? '');
   await second.getByLabel('Titulli', { exact: true }).fill('Ushtrimi 2 — Prodhimi');
-  await second.locator('textarea').fill('assert prodhimi(2, 3) == 6, "prodhimi(2, 3) duhet të japë 6"');
+  await second.locator('textarea').first().fill('assert prodhimi(2, 3) == 6, "prodhimi(2, 3) duhet të japë 6"');
+  // Two hints of the pedagog's own (#215).
+  await second.getByLabel('Udhëzimi 1 i ushtrimit 2').fill('Prodhimi është a herë b.');
+  await second.getByLabel('Udhëzimi 2 i ushtrimit 2').fill('Përdor operatorin *.');
   await form.getByRole('button', { name: 'Ruaj ushtrimet' }).click();
   await expect(form.getByText('Ushtrimet u ruajtën.')).toBeVisible();
   await expect(staff.getByTestId('exercise')).toHaveCount(2);
@@ -75,6 +78,16 @@ test('a student solves exercises and sees them checked; the pedagog sees how man
   await apiCall(student, 'POST', '/join', { code: group.joinCode });
   await student.goto(pageUrl);
   await expect(student.getByTestId('exercise')).toHaveCount(2);
+
+  // The hints open one at a time and stay open.
+  const hints = student.getByTestId('hints');
+  await expect(hints).toHaveCount(1);
+  await hints.getByRole('button', { name: 'Shfaq udhëzimin 1 nga 2' }).click();
+  await expect(hints).toContainText('Prodhimi është a herë b.');
+  await expect(hints).not.toContainText('Përdor operatorin');
+  await hints.getByRole('button', { name: 'Shfaq udhëzimin 2 nga 2' }).click();
+  await expect(hints).toContainText('Përdor operatorin *.');
+  await expect(hints.getByRole('button')).toHaveCount(0);
 
   // The check before the cells above ran: what is missing, and a way to run them.
   await run(student, 3);

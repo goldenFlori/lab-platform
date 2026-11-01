@@ -547,6 +547,8 @@ export const exercises = sqliteTable(
     aiMode: text('ai_mode', { enum: ['off', 'hints', 'full'] })
       .notNull()
       .default('hints'),
+    /** Hints staff wrote (#215), from gentle to nearly the answer; students reveal them in order. */
+    hints: text('hints', { mode: 'json' }).$type<string[]>(),
   },
   (t) => [
     foreignKey({
@@ -618,6 +620,37 @@ export const traceAnswers = sqliteTable(
  * or a trace table's row, right or not and what they picked. Kept once; later tries change nothing.
  * Practice, not grading: staff read it only as counts. Gone with the notebook or the user.
  */
+/**
+ * A hint a student revealed (#215): once per student, exercise and hint, on the day they did. Shown to
+ * them again on every visit, and to staff only as counts. Kept as long as activity, like first tries.
+ */
+export const hintReveals = sqliteTable(
+  'hint_reveals',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    notebookId: text('notebook_id').notNull(),
+    /** The exercise's cell in the notebook. */
+    cell: integer('cell').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    /** 1, 2 or 3. */
+    hint: integer('hint').notNull(),
+    /** YYYY-MM-DD in the institution's time zone. */
+    day: text('day').notNull(),
+  },
+  (t) => [
+    foreignKey({
+      name: 'hint_reveals_notebook_fk',
+      columns: [t.notebookId, t.orgId],
+      foreignColumns: [notebooks.id, notebooks.orgId],
+    }).onDelete('cascade'),
+    uniqueIndex('hint_reveals_unique').on(t.orgId, t.notebookId, t.cell, t.userId, t.hint),
+    index('hint_reveals_day_idx').on(t.day),
+  ],
+);
+
 export const predictionResults = sqliteTable(
   'prediction_results',
   {

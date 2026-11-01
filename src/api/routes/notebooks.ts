@@ -2,7 +2,7 @@ import { zValidator } from '@hono/zod-validator';
 import { type Context, Hono } from 'hono';
 import { explainInput } from '../../shared/ai';
 import { type CodeEdit, codeEditInput, type WorkSaved, workInput } from '../../shared/code-edits';
-import { type ExerciseProgress, exercisesInput } from '../../shared/exercises';
+import { type ExerciseProgress, exercisesInput, type RevealedHint } from '../../shared/exercises';
 import {
   type CellWork,
   createNotebookInput,
@@ -82,7 +82,8 @@ const summary = (nb: Notebook): NotebookSummary => ({
 const canManage = (c: Context<TenantEnv>, ctx: LabContext) =>
   c.var.access.can('course.manage', { courseId: ctx.course.id });
 
-async function detail(c: Context<TenantEnv>, nb: Notebook): Promise<NotebookDetail> {
+/** A notebook with its embeds and exercises. A student gets how many hints each has, never their text (#215). */
+async function detail(c: Context<TenantEnv>, nb: Notebook, staff = true): Promise<NotebookDetail> {
   const [embeds, exercises] = await Promise.all([
     c.var.tenant.notebooks.embedsOf(nb.id),
     c.var.tenant.exercises.of(nb.id),
@@ -91,7 +92,9 @@ async function detail(c: Context<TenantEnv>, nb: Notebook): Promise<NotebookDeta
     ...summary(nb),
     versionAt: nb.versionAt?.toISOString() ?? null,
     changedCells: nb.changedCells ?? [],
-    exercises,
+    exercises: staff
+      ? exercises
+      : exercises.map(({ hints, ...exercise }) => (hints ? { ...exercise, hintCount: hints.length } : exercise)),
     embeds: embeds
       .sort((a, b) => a.cell - b.cell)
       .map((e): Embed => ({ cell: e.cell, viz: e.viz, title: e.title, props: e.props })),
@@ -143,7 +146,7 @@ export const notebookRoutes = new Hono<TenantEnv>()
   .get('/:notebookId', async (c) => {
     const { ctx, lab, nb } = await notebookInUrl(c);
     recordActivity(c, ctx, lab.id, 'view');
-    return c.json(await detail(c, nb));
+    return c.json(await detail(c, nb, ctx.staff));
   })
 
   .put('/:notebookId/files/:name', async (c) => {
@@ -343,7 +346,43 @@ export const notebookRoutes = new Hono<TenantEnv>()
       done,
       counts: counted?.counts ?? null,
       students: counted?.students ?? null,
+      hints: counted?.hints ?? null,
     } satisfies ExerciseProgress);
+  })
+
+  // Hints staff wrote (#215): those the user revealed in this notebook, with their text as it is now.
+  .get('/:notebookId/hints', async (c) => {
+    const { nb } = await notebookInUrl(c);
+    const [revealed, exercises] = await Promise.all([
+      c.var.tenant.exercises.revealedBy(nb.id, c.var.user?.id as string),
+      c.var.tenant.exercises.of(nb.id),
+    ]);
+    const hints = revealed.flatMap(({ cell, hint }) => {
+      const text = exercises.find((e) => e.cell === cell)?.hints?.[hint - 1];
+      return text ? [{ cell, hint, text }] : [];
+    });
+    return c.json({ hints } satisfies { hints: RevealedHint[] });
+  })
+
+  // A hint revealed, in order: the first, then the next. Never while a kolokium runs for the student's
+  // group, which is an exam (#169). Kept once for students, counted for staff; staff are not counted.
+  .post('/:notebookId/exercises/:cell/hints/:hint', async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    const cell = cellParam(c.req.param('cell'));
+    const hint = Number(c.req.param('hint'));
+    if (cell === null || !Number.isInteger(hint) || hint < 1) return c.json({ error: 'invalid_request' }, 400);
+    const text = (await c.var.tenant.exercises.of(nb.id)).find((e) => e.cell === cell)?.hints?.[hint - 1];
+    if (!text) throw new NotFoundError();
+    if (!ctx.staff) {
+      if (runningKolokia(ctx).length) return c.json({ error: 'forbidden' }, 403);
+      const userId = c.var.user?.id as string;
+      if (hint > 1) {
+        const seen = await c.var.tenant.exercises.revealedBy(nb.id, userId);
+        if (!seen.some((r) => r.cell === cell && r.hint === hint - 1)) return c.json({ error: 'invalid_request' }, 409);
+      }
+      await c.var.tenant.exercises.reveal({ notebookId: nb.id, cell, userId, hint, day: today() });
+    }
+    return c.json({ cell, hint, text } satisfies RevealedHint);
   })
 
   // A student's check passed in their browser: kept once, and counted in the course's activity.

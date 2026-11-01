@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import { AI_MODES, type AiMode, MAX_EXERCISES, MAX_TEST } from './exercise-limits';
+import { AI_MODES, type AiMode, MAX_EXERCISES, MAX_HINT, MAX_HINTS, MAX_TEST } from './exercise-limits';
 
 // A notebook's exercises (#51): which cells check a student's work, and how. The app imports only
 // types from this file; its limits are in exercise-limits.ts.
 
-export { AI_MODES, MAX_EXERCISES, MAX_TEST };
+export { AI_MODES, MAX_EXERCISES, MAX_HINT, MAX_HINTS, MAX_TEST };
 
 /**
  * One exercise: running `cell` checks it. With no `test`, the cell itself calls
@@ -12,7 +12,15 @@ export { AI_MODES, MAX_EXERCISES, MAX_TEST };
  * runs right after the cell, in the same namespace. `ai`: what "Explain my error" may say on it
  * (#86); the server always sends it, and leaving it out when saving means hints.
  */
-export type Exercise = { cell: number; title: string; test: string | null; ai?: AiMode };
+export type Exercise = {
+  cell: number;
+  title: string;
+  test: string | null;
+  ai?: AiMode;
+  /** Hints staff wrote (#215): to staff in full; students get only how many, and reveal each. */
+  hints?: string[];
+  hintCount?: number;
+};
 
 export const exercisesInput = z.object({
   exercises: z
@@ -22,6 +30,7 @@ export const exercisesInput = z.object({
         title: z.string().trim().min(1).max(160),
         test: z.string().max(MAX_TEST).nullable(),
         ai: z.enum(AI_MODES).optional(),
+        hints: z.array(z.string().trim().min(1).max(MAX_HINT)).max(MAX_HINTS).optional(),
       }),
     )
     .max(MAX_EXERCISES)
@@ -40,4 +49,9 @@ export type ExerciseProgress = {
   counts: { cell: number; students: number }[] | null;
   /** Students in the groups counted. */
   students: number | null;
+  /** How many of them revealed each hint (#215); only from five students up, so no one stands out. */
+  hints: { cell: number; hint: number; students: number }[] | null;
 };
+
+/** A hint the user revealed (#215), with its text as staff wrote it now. */
+export type RevealedHint = { cell: number; hint: number; text: string };

@@ -3,7 +3,7 @@ import { ClipboardCheck, Plus, ScanSearch, Trash2 } from 'lucide-react';
 import { type FormEvent, useMemo, useRef, useState } from 'react';
 import { detectExercises } from '../../../notebook/exercises';
 import type { StoredNotebook } from '../../../notebook/stored';
-import { AI_MODES, type AiMode, MAX_EXERCISES, MAX_TEST } from '../../../shared/exercise-limits';
+import { AI_MODES, type AiMode, MAX_EXERCISES, MAX_HINT, MAX_HINTS, MAX_TEST } from '../../../shared/exercise-limits';
 import type { Exercise } from '../../../shared/exercises';
 import { type Messages, useT } from '../../i18n';
 import { revealSoon, useLabTool } from '../../lib/lab-tools';
@@ -13,7 +13,9 @@ import { VariantMaker, type VariantTarget } from './VariantMaker';
 // Staff choose a notebook's exercises (#51): the cell whose run checks each one, its title, and a
 // visible test where the cell does not check itself with kontrollo(…).
 
-type Row = { key: string; cell: string; title: string; test: string; ai: AiMode };
+type Row = { key: string; cell: string; title: string; test: string; ai: AiMode; hints: string[] };
+
+const emptyHints = () => Array.from({ length: MAX_HINTS }, () => '');
 
 const toRows = (exercises: Exercise[]): Row[] =>
   exercises.map((e) => ({
@@ -22,6 +24,7 @@ const toRows = (exercises: Exercise[]): Row[] =>
     title: e.title,
     test: e.test ?? '',
     ai: e.ai ?? 'hints',
+    hints: emptyHints().map((empty, i) => e.hints?.[i] ?? empty),
   }));
 
 function parseRows(t: Messages, rows: Row[]): Exercise[] | string {
@@ -33,6 +36,8 @@ function parseRows(t: Messages, rows: Row[]): Exercise[] | string {
       title: row.title.trim(),
       test: row.test.trim() ? row.test : null,
       ai: row.ai,
+      // Hints in order, without gaps (#215).
+      hints: row.hints.map((h) => h.trim()).filter(Boolean),
     });
   }
   if (new Set(exercises.map((e) => e.cell)).size !== exercises.length) return t.exercises.oneEach;
@@ -69,8 +74,14 @@ export function ExercisesEditor({
   });
   const [status, setStatus] = useState<{ tone: 'danger' | 'success'; text: string } | null>(null);
 
-  const change = (key: string, field: keyof Row, value: string) =>
+  const change = (key: string, field: Exclude<keyof Row, 'hints'>, value: string) =>
     setRows((list) => list.map((row) => (row.key === key ? { ...row, [field]: value } : row)));
+  const changeHint = (key: string, index: number, value: string) =>
+    setRows((list) =>
+      list.map((row) =>
+        row.key === key ? { ...row, hints: row.hints.map((h, i) => (i === index ? value : h)) } : row,
+      ),
+    );
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -174,6 +185,22 @@ export function ExercisesEditor({
                       ))}
                     </select>
                   </label>
+                  <fieldset className="grid min-w-0 gap-2 text-sm sm:col-span-2">
+                    <legend className="mb-1 font-medium">{t.hints.editor}</legend>
+                    {row.hints.map((hint, h) => (
+                      <textarea
+                        // biome-ignore lint/suspicious/noArrayIndexKey: the three hint fields are fixed and ordered
+                        key={h}
+                        value={hint}
+                        rows={2}
+                        maxLength={MAX_HINT}
+                        aria-label={t.hints.editorLabel(h + 1, i + 1)}
+                        placeholder={t.hints.editorHint(h + 1)}
+                        onChange={(e) => changeHint(row.key, h, e.target.value)}
+                        className={`${field} py-2`}
+                      />
+                    ))}
+                  </fieldset>
                   <div className="sm:col-span-2">
                     <Button
                       size="sm"
@@ -193,7 +220,10 @@ export function ExercisesEditor({
                 size="sm"
                 variant="secondary"
                 onPress={() =>
-                  setRows((list) => [...list, { key: crypto.randomUUID(), cell: '', title: '', test: '', ai: 'hints' }])
+                  setRows((list) => [
+                    ...list,
+                    { key: crypto.randomUUID(), cell: '', title: '', test: '', ai: 'hints', hints: emptyHints() },
+                  ])
                 }
               >
                 <Plus className="size-4" /> {t.exercises.add}

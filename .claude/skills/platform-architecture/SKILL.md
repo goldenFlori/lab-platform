@@ -331,6 +331,19 @@ does it, from the original fetched with its version and the code it already has:
 edits ("Shkarko versionin tim" in the edits bar, unsaved ones included) and, for staff who review, a
 hand-in's code ("Shkarko si .ipynb"). No server work, and no new data leaves the platform.
 
+## Hints written by the pedagog (#215)
+
+- `exercises.hints` (JSON, up to 3 of 600 characters), edited with the exercise. Staff get the text
+  with the notebook; students only `hintCount`, so a hint never reaches a student unrevealed.
+- `POST …/exercises/:cell/hints/:n` reveals one, in order (409 out of order), and refuses students
+  while a kolokium runs for their group (403), like AI help. A student's reveal is kept once in
+  `hint_reveals` (per student, exercise, hint and day); staff are not recorded. `GET …/hints` gives
+  the user's revealed hints with their current text.
+- Staff with analytics get per-hint counts with the exercise progress, only when five or more
+  students are counted. Reveals follow first tries everywhere: renumbered with a new version,
+  erased with the person, in "My data" and the institution's export, deleted after two years; the
+  privacy page and the agreement list them. A copied course keeps its hints.
+
 ## Courses, groups and joining
 
 - **Staff** (#64, `src/api/routes/staff.ts`): staff with `course.manage` for the whole course list

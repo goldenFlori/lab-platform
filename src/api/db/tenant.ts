@@ -22,7 +22,7 @@ import {
 import type { SQLiteColumn, SQLiteTable } from 'drizzle-orm/sqlite-core';
 import type { ActivityKind } from '../../shared/activity';
 import type { AiQuestion } from '../../shared/ai';
-import type { AiMode } from '../../shared/exercise-limits';
+import type { Exercise } from '../../shared/exercises';
 import type { DeletionRequestView, ErasureView, OrganizationData, PersonGrade } from '../../shared/my-data';
 import type { ExportPage, ExportPart } from '../../shared/org-export';
 import type { PredictionInput } from '../../shared/predictions';
@@ -47,6 +47,7 @@ import {
   files,
   grades,
   groups,
+  hintReveals,
   kolokiumStarts,
   labAccess,
   labActivity,
@@ -416,6 +417,7 @@ const CELL_TABLES = [
   'trace_answers',
   'prediction_results',
   'exercise_grading',
+  'hint_reveals',
 ] as const;
 
 /** Bytes per stored chunk: well under D1's 2 MB per value. */
@@ -1217,19 +1219,27 @@ function tenantActivity(db: Db, orgId: string) {
 function tenantExercises(db: Db, orgId: string) {
   const ofNotebook = (notebookId: string) => and(eq(exercises.orgId, orgId), eq(exercises.notebookId, notebookId));
   return {
-    of(notebookId: string) {
-      return db
-        .select({ cell: exercises.cell, title: exercises.title, test: exercises.test, ai: exercises.aiMode })
+    async of(notebookId: string): Promise<Exercise[]> {
+      const rows = await db
+        .select({
+          cell: exercises.cell,
+          title: exercises.title,
+          test: exercises.test,
+          ai: exercises.aiMode,
+          hints: exercises.hints,
+        })
         .from(exercises)
         .where(ofNotebook(notebookId))
         .orderBy(asc(exercises.cell));
+      return rows.map(({ hints, ...exercise }) => (hints?.length ? { ...exercise, hints } : exercise));
     },
 
     /** Replaces all exercises of the notebook at once: at most 100, 11 statements. */
-    async set(notebookId: string, list: { cell: number; title: string; test: string | null; ai?: AiMode }[]) {
-      const rows = list.map(({ ai, ...exercise }) => ({
+    async set(notebookId: string, list: Exercise[]) {
+      const rows = list.map(({ ai, hints, hintCount: _, ...exercise }) => ({
         ...exercise,
         aiMode: ai ?? 'hints',
+        hints: hints?.length ? hints : null,
         id: uuidv7(),
         orgId,
         notebookId,
@@ -1240,6 +1250,27 @@ function tenantExercises(db: Db, orgId: string) {
           ...inChunks(rows).map((chunk) => db.insert(exercises).values(chunk)),
         ]),
       );
+    },
+
+    /** Records that a student revealed a hint (#215); revealing it again changes nothing. */
+    async reveal(row: { notebookId: string; cell: number; userId: string; hint: number; day: string }) {
+      await rethrowMissingParent(
+        db
+          .insert(hintReveals)
+          .values({ ...row, id: uuidv7(), orgId })
+          .onConflictDoNothing(),
+      );
+    },
+
+    /** The hints the user revealed in the notebook, by cell and number. */
+    async revealedBy(notebookId: string, userId: string) {
+      return db
+        .select({ cell: hintReveals.cell, hint: hintReveals.hint })
+        .from(hintReveals)
+        .where(
+          and(eq(hintReveals.orgId, orgId), eq(hintReveals.notebookId, notebookId), eq(hintReveals.userId, userId)),
+        )
+        .orderBy(asc(hintReveals.cell), asc(hintReveals.hint));
     },
 
     /** Records that the user completed it; completing it again changes nothing. */
@@ -1303,7 +1334,28 @@ function tenantExercises(db: Db, orgId: string) {
           .groupBy(exerciseCompletions.cell)
           .orderBy(asc(exerciseCompletions.cell)),
       ]);
-      return { students: enrolled[0]?.n ?? 0, counts: rows };
+      const enrolledCount = enrolled[0]?.n ?? 0;
+      // Who needed which hint is more personal than who solved what: only from five students up.
+      const hints =
+        enrolledCount >= 5
+          ? await db
+              .select({
+                cell: hintReveals.cell,
+                hint: hintReveals.hint,
+                students: countDistinct(hintReveals.userId),
+              })
+              .from(hintReveals)
+              .where(
+                and(
+                  eq(hintReveals.orgId, orgId),
+                  eq(hintReveals.notebookId, notebookId),
+                  inArray(hintReveals.userId, students),
+                ),
+              )
+              .groupBy(hintReveals.cell, hintReveals.hint)
+              .orderBy(asc(hintReveals.cell), asc(hintReveals.hint))
+          : null;
+      return { students: enrolledCount, counts: rows, hints };
     },
   };
 }
@@ -1953,7 +2005,7 @@ function tenantPersonal(db: Db, orgId: string) {
   return {
     async export(userId: string): Promise<Omit<OrganizationData, 'organization'>> {
       const nb = (column: SQLiteColumn) => and(eq(notebooks.id, column), eq(notebooks.orgId, orgId));
-      const [member, opened, edits, traced, started, solved, predicted, handed, graded, asked, used, requests] =
+      const [member, opened, edits, traced, started, solved, predicted, hinted, handed, graded, asked, used, requests] =
         await db.batch([
           db
             .select({ role: memberships.role, course: courses.title, group: groups.name, since: memberships.createdAt })
@@ -2012,6 +2064,12 @@ function tenantPersonal(db: Db, orgId: string) {
             .where(and(eq(predictionResults.orgId, orgId), eq(predictionResults.userId, userId)))
             .orderBy(asc(predictionResults.day)),
           db
+            .select({ notebook: notebooks.title, cell: hintReveals.cell, hint: hintReveals.hint, day: hintReveals.day })
+            .from(hintReveals)
+            .innerJoin(notebooks, nb(hintReveals.notebookId))
+            .where(and(eq(hintReveals.orgId, orgId), eq(hintReveals.userId, userId)))
+            .orderBy(asc(hintReveals.day)),
+          db
             .select({
               notebook: notebooks.title,
               code: submissions.code,
@@ -2068,6 +2126,7 @@ function tenantPersonal(db: Db, orgId: string) {
         kolokiumStarts: started.map((k) => ({ ...k, startedAt: iso(k.startedAt) })),
         exercisesSolved: solved.map((s) => ({ ...s, at: iso(s.at) })),
         firstTries: predicted,
+        hintsRevealed: hinted,
         submissions: handed.map((s) => ({ ...s, at: iso(s.at) })),
         grades: graded.map(({ autoScore, score, releasedAt, ...g }) => ({
           ...g,
@@ -2172,6 +2231,7 @@ function tenantPersonal(db: Db, orgId: string) {
         db
           .delete(predictionResults)
           .where(and(eq(predictionResults.orgId, orgId), eq(predictionResults.userId, userId))),
+        db.delete(hintReveals).where(and(eq(hintReveals.orgId, orgId), eq(hintReveals.userId, userId))),
         db.delete(submissions).where(and(eq(submissions.orgId, orgId), eq(submissions.userId, userId))),
         db.delete(grades).where(and(eq(grades.orgId, orgId), eq(grades.userId, userId))),
         db.delete(liveSessions).where(and(eq(liveSessions.orgId, orgId), eq(liveSessions.hostId, userId))),
@@ -2252,6 +2312,7 @@ const EXPORTABLE: Record<Exclude<ExportPart, 'people'>, Exportable> = {
   grades: { table: grades, orgId: grades.orgId, id: grades.id },
   exerciseCompletions: { table: exerciseCompletions, orgId: exerciseCompletions.orgId, id: exerciseCompletions.id },
   predictionResults: { table: predictionResults, orgId: predictionResults.orgId, id: predictionResults.id },
+  hintReveals: { table: hintReveals, orgId: hintReveals.orgId, id: hintReveals.id },
   kolokiumStarts: { table: kolokiumStarts, orgId: kolokiumStarts.orgId, id: kolokiumStarts.id },
   labActivity: { table: labActivity, orgId: labActivity.orgId, id: labActivity.id },
   aiUsage: { table: aiUsage, orgId: aiUsage.orgId },
