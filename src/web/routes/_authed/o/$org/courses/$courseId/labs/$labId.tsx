@@ -44,6 +44,7 @@ import { APP_NAME } from '../../../../../../../lib/brand';
 import { CodeEditsProvider, useCodeEdits } from '../../../../../../../lib/code-edits';
 import { courseQuery } from '../../../../../../../lib/courses';
 import { ExercisesProvider, useExercises } from '../../../../../../../lib/exercises';
+import { GradeCommentsProvider } from '../../../../../../../lib/grade-comments';
 import { labQuery, labsQuery } from '../../../../../../../lib/labs';
 import { LiveProvider, useLive } from '../../../../../../../lib/live-context';
 import {
@@ -488,25 +489,27 @@ function NotebookSection({
           </div>
         )}
         <ExercisesProvider notebookRef={notebookRef} exercises={exercises}>
-          <CodeEditsProvider
-            key={version}
-            notebookRef={notebookRef}
-            notebookVersion={version}
-            changed={changed}
-            originals={originals}
-          >
-            <EditablePython notebookId={notebookRef.notebookId} notebook={rendered.data}>
-              {!submissions.staff && <SubmissionBar notebookRef={notebookRef} />}
-              <EditsBar original={original} />
-              <PythonBar />
-              <NotebookView
-                id={notebookRef.notebookId}
-                notebook={rendered.data}
-                embeds={embeds}
-                fileUrl={(name) => notebookFileUrl(notebookRef, name, version)}
-              />
-            </EditablePython>
-          </CodeEditsProvider>
+          <GradeCommentsProvider notebookRef={notebookRef} enabled={!submissions.staff}>
+            <CodeEditsProvider
+              key={version}
+              notebookRef={notebookRef}
+              notebookVersion={version}
+              changed={changed}
+              originals={originals}
+            >
+              <EditablePython notebookId={notebookRef.notebookId} notebook={rendered.data}>
+                {!submissions.staff && <SubmissionBar notebookRef={notebookRef} />}
+                <EditsBar original={original} />
+                <PythonBar />
+                <NotebookView
+                  id={notebookRef.notebookId}
+                  notebook={rendered.data}
+                  embeds={embeds}
+                  fileUrl={(name) => notebookFileUrl(notebookRef, name, version)}
+                />
+              </EditablePython>
+            </CodeEditsProvider>
+          </GradeCommentsProvider>
         </ExercisesProvider>
       </article>
       <aside className="hidden lg:block">

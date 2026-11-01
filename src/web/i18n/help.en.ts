@@ -98,7 +98,7 @@ export const help: HelpText = {
           text: 'If the internet drops, your work stays on the device and is saved by itself when it is back. Keep the page open: handing in is tried again by itself.',
         },
         {
-          text: 'When your pedagog releases the grades, yours and its comment show above the notebook and in **My progress**.',
+          text: 'When your pedagog releases the grades, yours and its comment show above the notebook and in **My progress**, and comments on your code under the cells they are about.',
         },
       ],
     },
@@ -244,7 +244,7 @@ export const help: HelpText = {
           text: 'Press **Grade** for the group: each submission runs on your computer, and the server grades the trace tables.',
         },
         {
-          text: 'Change a grade or add a comment, then **Release the grades**. **Download grades (CSV)** gives them for the records.',
+          text: 'Change a grade or add a comment; on the handed-in code, **Add a comment** writes beside a cell. Then **Release the grades**. **Download grades (CSV)** gives them for the records.',
         },
       ],
     },

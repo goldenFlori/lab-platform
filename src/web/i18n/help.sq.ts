@@ -124,7 +124,7 @@ export const help = {
           text: 'Nëse bie interneti, puna mbetet në pajisje dhe ruhet vetë kur kthehet. Mbajeni faqen hapur: dorëzimi provohet sërish vetë.',
         },
         {
-          text: 'Kur pedagogu publikon notat, nota dhe komenti shfaqen sipër fletores dhe te **Progresi im**.',
+          text: 'Kur pedagogu publikon notat, nota dhe komenti shfaqen sipër fletores dhe te **Progresi im**, dhe komentet për kodin tuaj nën qelizat ku i shkroi.',
         },
       ],
     },
@@ -280,7 +280,7 @@ export const help = {
           text: 'Shtypni **Vlerëso** për grupin: çdo dorëzim ekzekutohet në kompjuterin tuaj, dhe serveri vlerëson tabelat e gjurmimit.',
         },
         {
-          text: 'Ndryshoni një notë ose shtoni koment, pastaj **Publiko notat**. **Shkarko notat (CSV)** i jep për regjistrin.',
+          text: 'Ndryshoni një notë ose shtoni koment; te kodi i dorëzuar, **Shto koment** shkruan pranë një qelize. Pastaj **Publiko notat**. **Shkarko notat (CSV)** i jep për regjistrin.',
         },
       ],
     },
