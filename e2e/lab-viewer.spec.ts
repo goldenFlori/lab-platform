@@ -109,7 +109,7 @@ test('a student reads a course notebook with its outputs, figures and visualizat
   await expect(student.getByText(/Vizualizimet në këtë fletore/)).toHaveCount(0);
   await expect(student.getByRole('link', { name: 'Shkarko fletoren' })).toHaveAttribute(
     'href',
-    `/api${labPath}/notebooks/${main.id}/files/notebook.ipynb`,
+    `/api${labPath}/notebooks/${main.id}/files/notebook.ipynb?v=${main.version}`,
   );
 
   // The notebook's sections, in the reading column and (on wide screens) the table of contents.
