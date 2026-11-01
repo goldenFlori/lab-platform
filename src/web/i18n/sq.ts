@@ -737,6 +737,7 @@ export const sq = {
           `Raportet e gabimeve: ${RETENTION.errorLogDays} ditë, te Cloudflare.`,
           'Kodi, dorëzimet, notat dhe pjesa tjetër: sa kohë ekziston kursi. Kur institucioni fshin një kurs, fshihen edhe të dhënat e tij.',
           'Çdo natë platforma fshin vetë atë që ka kaluar afatin.',
+          'Institucioni demo, që provohet pa llogari, rifillon çdo natë: çfarë shkruhet aty fshihet atëherë, dhe deri atëherë e shohin edhe vizitorët e tjerë.',
         ],
       },
       {
@@ -1448,6 +1449,18 @@ export const sq = {
     editor: 'Udhëzime (deri në 3, nga më i lehti te pothuajse përgjigjja)',
     editorLabel: (hint: number, exercise: number) => `Udhëzimi ${hint} i ushtrimit ${exercise}`,
     editorHint: (n: number) => `Udhëzimi ${n}`,
+  },
+  demo: {
+    title: 'Provojeni vetë',
+    lead: 'Hyni në një institucion demo, pa llogari: një kurs i vërtetë me laboratorë, vizualizime dhe ushtrime, dhe shokë klase të sajuar me punën e tyre. Rifillon çdo natë.',
+    asStudent: 'Provo si student',
+    asPedagog: 'Provo si pedagog',
+    failed: 'Demoja nuk u hap. Provoni përsëri pas pak.',
+    banner:
+      'Jeni në demo: një llogari e përbashkët që rifillon çdo natë, ku të tjerët shohin çfarë bëni. Mos shkruani të dhëna personale. Llogaritë, ngarkimet dhe fshirjet janë të mbyllura këtu.',
+    reset: 'Rivendos demon tani',
+    resetDone: 'Demoja u rivendos.',
+    resetMissing: 'Nuk ka ende institucion "demo" me një kurs shabllon.',
   },
   edits: {
     edit: 'Ndrysho kodin',

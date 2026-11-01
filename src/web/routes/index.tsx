@@ -1,11 +1,15 @@
+import { Button } from '@heroui/react';
+import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import {
   ArrowRight,
   Building2,
   Code2,
+  GraduationCap,
   Lightbulb,
   LogIn,
   Mail,
+  Presentation,
   Radio,
   ShieldCheck,
   SlidersHorizontal,
@@ -18,6 +22,7 @@ import { VizEmbed } from '../components/VizEmbed';
 import { useT } from '../i18n';
 import { useMe } from '../lib/auth';
 import { CONTACT_EMAIL, DEMO_VIDEO } from '../lib/brand';
+import { demoStatusQuery, useTryDemo } from '../lib/demo';
 
 // The public front page (#103): what the platform does, for a visitor, an institution or a grant
 // reviewer, in a minute. A real visualization plays in place of a screenshot; the demo video shows
@@ -103,6 +108,7 @@ function HomePage() {
         <Link to="/visualizations" className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-accent">
           <Waypoints className="size-4" /> {t.home.allVisualizations} <ArrowRight className="size-4" />
         </Link>
+        {!me && <TryIt />}
       </section>
 
       <section className="container-page py-12" aria-labelledby="features-title">
@@ -147,6 +153,41 @@ function HomePage() {
         </div>
       </section>
     </>
+  );
+}
+
+/** The demo institution (#216), when there is one: try it as a student or a pedagog, no account needed. */
+function TryIt() {
+  const t = useT();
+  const status = useQuery(demoStatusQuery);
+  const tryDemo = useTryDemo();
+  if (!status.data?.enabled) return null;
+  return (
+    <div className="mt-8 rounded-3xl border border-border bg-surface p-5 shadow-surface sm:p-7" data-testid="try-demo">
+      <h3 className="text-lg font-semibold tracking-tight">{t.demo.title}</h3>
+      <p className="mt-1 max-w-2xl text-sm text-muted">{t.demo.lead}</p>
+      <div className="mt-4 flex flex-wrap gap-3">
+        <Button
+          variant="primary"
+          isPending={tryDemo.isPending && tryDemo.variables === 'student'}
+          onPress={() => tryDemo.mutate('student')}
+        >
+          <GraduationCap className="size-4" /> {t.demo.asStudent}
+        </Button>
+        <Button
+          variant="secondary"
+          isPending={tryDemo.isPending && tryDemo.variables === 'pedagog'}
+          onPress={() => tryDemo.mutate('pedagog')}
+        >
+          <Presentation className="size-4" /> {t.demo.asPedagog}
+        </Button>
+      </div>
+      {tryDemo.isError && (
+        <p role="alert" className="mt-3 text-sm text-danger">
+          {t.demo.failed}
+        </p>
+      )}
+    </div>
   );
 }
 

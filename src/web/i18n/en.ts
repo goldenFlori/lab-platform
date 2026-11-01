@@ -735,6 +735,7 @@ export const en: Messages = {
           `Error reports: ${RETENTION.errorLogDays} days, at Cloudflare.`,
           'Code, submissions, grades and the rest: as long as the course exists. When the institution deletes a course, its data goes with it.',
           'Every night the platform deletes on its own what has passed its period.',
+          'The demo institution, tried without an account, starts afresh every night: what is typed there is deleted then, and until then other visitors see it too.',
         ],
       },
       {
@@ -1441,6 +1442,18 @@ export const en: Messages = {
     editor: 'Hints (up to 3, from gentle to nearly the answer)',
     editorLabel: (hint: number, exercise: number) => `Hint ${hint} of exercise ${exercise}`,
     editorHint: (n: number) => `Hint ${n}`,
+  },
+  demo: {
+    title: 'Try it yourself',
+    lead: 'Enter a demo institution, no account needed: a real course with labs, visualizations and exercises, and made-up classmates with their work. It starts afresh every night.',
+    asStudent: 'Try as a student',
+    asPedagog: 'Try as a pedagog',
+    failed: 'The demo did not open. Please try again shortly.',
+    banner:
+      'You are in the demo: a shared account that starts afresh every night, where others see what you do. Do not type anything personal. Accounts, uploads and deletions are closed here.',
+    reset: 'Reset the demo now',
+    resetDone: 'The demo was reset.',
+    resetMissing: 'There is no "demo" institution with a template course yet.',
   },
   edits: {
     edit: 'Edit the code',

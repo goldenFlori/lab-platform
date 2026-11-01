@@ -8,6 +8,7 @@ import {
   useRouter,
   useRouterState,
 } from '@tanstack/react-router';
+import { DemoBanner } from '../components/DemoBanner';
 import { NotFoundPage } from '../components/NotFoundPage';
 import { ServiceBanner } from '../components/ServiceBanner';
 import { SiteHeader } from '../components/SiteHeader';
@@ -46,6 +47,7 @@ function RootLayout() {
         </a>
         <SiteHeader />
         <ServiceBanner />
+        <DemoBanner />
         <main id="main">
           <PageEnter id={pathname}>
             <Outlet />
