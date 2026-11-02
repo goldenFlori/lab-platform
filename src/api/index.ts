@@ -1,12 +1,11 @@
 import { Hono } from 'hono';
-import { cleanUpExpired, session } from './auth/session';
+import { session } from './auth/session';
 import { createDb, isDatabaseReachable } from './db';
-import { resetDemo } from './db/demo';
 import { meterD1 } from './db/meter';
-import { applyRetention } from './db/platform';
 import type { AppEnv } from './env';
 import { handleError, notFound } from './errors';
 import { sameOrigin } from './middleware/same-origin';
+import { runNightly } from './nightly';
 import { authRoutes, meRoutes } from './routes/auth';
 import { joinBrandingRoutes } from './routes/branding';
 import { clientErrorRoutes } from './routes/client-errors';
@@ -69,9 +68,6 @@ export default {
   fetch: app.fetch,
   // Daily (see triggers in wrangler.jsonc).
   async scheduled(_controller, env, ctx) {
-    ctx.waitUntil(cleanUpExpired(env));
-    ctx.waitUntil(applyRetention(createDb(env.DB)));
-    // The demo institution starts the day fresh (#216).
-    ctx.waitUntil(resetDemo(createDb(env.DB)));
+    ctx.waitUntil(runNightly(env));
   },
 } satisfies ExportedHandler<Env>;

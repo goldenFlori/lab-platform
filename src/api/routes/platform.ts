@@ -1,10 +1,10 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import { type Institution, newInstitutionInput } from '../../shared/platform';
+import { type Institution, type JobRun, newInstitutionInput } from '../../shared/platform';
 import { isOwner } from '../auth/owner';
 import { createDb } from '../db';
 import { resetDemo } from '../db/demo';
-import { createInstitutionWithAdmin, institutionsWithCounts, TakenError } from '../db/platform';
+import { createInstitutionWithAdmin, institutionsWithCounts, lastJobRuns, TakenError } from '../db/platform';
 import type { AppEnv } from '../env';
 import { notFound } from '../errors';
 
@@ -34,6 +34,19 @@ export const platformRoutes = new Hono<AppEnv>()
       if (error instanceof TakenError) return c.json({ error: `${error.what}_taken` }, 409);
       throw error;
     }
+  })
+
+  // The nightly job's last runs (#228), newest first.
+  .get('/jobs', async (c) => {
+    const runs = await lastJobRuns(createDb(c.env.DB));
+    return c.json({
+      runs: runs.map((r) => ({
+        startedAt: r.startedAt.toISOString(),
+        finishedAt: r.finishedAt.toISOString(),
+        ok: r.ok,
+        steps: r.steps,
+      })),
+    } satisfies { runs: JobRun[] });
   })
 
   // The demo institution rebuilt now (#216), as every night: after importing its template course.

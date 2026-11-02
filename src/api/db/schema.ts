@@ -40,6 +40,19 @@ const orgId = () =>
     .notNull()
     .references(() => organizations.id, { onDelete: 'cascade' });
 
+/**
+ * One run of the nightly job (#228): when, whether every step went well, and what each did. The
+ * platform's own, in no organization; the owner's console reads the last ones. Only the last 30 stay.
+ */
+export const jobRuns = sqliteTable('job_runs', {
+  id: text('id').primaryKey(),
+  job: text('job').notNull(),
+  startedAt: integer('started_at', { mode: 'timestamp' }).notNull(),
+  finishedAt: integer('finished_at', { mode: 'timestamp' }).notNull(),
+  ok: integer('ok', { mode: 'boolean' }).notNull(),
+  steps: text('steps', { mode: 'json' }).$type<Record<string, string>>().notNull(),
+});
+
 /** A tenant: a university, faculty or school. Every tenant-owned row points here. */
 export const organizations = sqliteTable('organizations', {
   id: text('id').primaryKey(),

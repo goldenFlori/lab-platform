@@ -1,4 +1,4 @@
-import { and, inArray, isNotNull, lt, type SQL, sql } from 'drizzle-orm';
+import { and, desc, inArray, isNotNull, lt, type SQL, sql } from 'drizzle-orm';
 import type { SQLiteTable } from 'drizzle-orm/sqlite-core';
 import { daysOf, RETENTION } from '../../shared/retention';
 import { uuidv7 } from './ids';
@@ -8,6 +8,7 @@ import {
   aiUsage,
   deletionRequests,
   hintReveals,
+  jobRuns,
   labActivity,
   liveSessions,
   memberships,
@@ -37,12 +38,16 @@ export async function institutionsWithCounts(db: Db, now = new Date()) {
     slug: string;
     createdAt: number;
     courses: number;
+    labs: number;
+    notebooks: number;
     staff: number;
     students: number;
     activeThisWeek: number;
   }>(sql`
     SELECT o.id, o.name, o.slug, o.created_at AS createdAt,
       (SELECT COUNT(*) FROM courses c WHERE c.org_id = o.id) AS courses,
+      (SELECT COUNT(*) FROM labs l WHERE l.org_id = o.id) AS labs,
+      (SELECT COUNT(*) FROM notebooks n WHERE n.org_id = o.id AND n.ready_at IS NOT NULL) AS notebooks,
       (SELECT COUNT(DISTINCT m.user_id) FROM memberships m WHERE m.org_id = o.id AND m.role <> 'student') AS staff,
       (SELECT COUNT(DISTINCT m.user_id) FROM memberships m WHERE m.org_id = o.id AND m.role = 'student') AS students,
       (SELECT COUNT(DISTINCT a.user_id) FROM lab_activity a WHERE a.org_id = o.id AND a.day >= ${weekAgo}) AS activeThisWeek
@@ -105,11 +110,11 @@ function deleteSome(db: Db, table: SQLiteTable, where: SQL | undefined, batch: n
  * The retention schedule (#116), run by the daily cron in every organization: what has passed its
  * period in RETENTION is deleted. Sessions and sign-in counters expire in auth (cleanUpExpired).
  */
-export async function applyRetention(db: Db, now = new Date(), batch = RETENTION_BATCH) {
+export async function applyRetention(db: Db, now = new Date(), batch = RETENTION_BATCH): Promise<number> {
   const before = (days: number) => new Date(now.getTime() - days * DAY_MS);
   const dayBefore = (days: number) => before(days).toISOString().slice(0, 10);
   const activity = daysOf(RETENTION.activityYears);
-  await db.batch([
+  const results = await db.batch([
     deleteSome(db, aiQuestions, lt(aiQuestions.createdAt, before(RETENTION.aiQuestionDays)), batch),
     deleteSome(db, labActivity, lt(labActivity.day, dayBefore(activity)), batch),
     deleteSome(db, predictionResults, lt(predictionResults.day, dayBefore(activity)), batch),
@@ -131,4 +136,35 @@ export async function applyRetention(db: Db, now = new Date(), batch = RETENTION
       batch,
     ),
   ]);
+  // How many rows went, for the nightly job's record (#228).
+  return results.reduce((n, r) => n + ((r as unknown as D1Result).meta?.changes ?? 0), 0);
+}
+
+/** Runs of the nightly job kept for the owner (#228). */
+const JOB_RUNS_KEPT = 30;
+
+export async function recordJobRun(
+  db: Db,
+  run: { job: string; startedAt: Date; finishedAt: Date; ok: boolean; steps: Record<string, string> },
+) {
+  await db.batch([
+    db.insert(jobRuns).values({ id: uuidv7(), ...run }),
+    db
+      .delete(jobRuns)
+      .where(
+        inArray(
+          jobRuns.id,
+          db
+            .select({ id: jobRuns.id })
+            .from(jobRuns)
+            .orderBy(desc(jobRuns.startedAt))
+            .limit(1_000_000)
+            .offset(JOB_RUNS_KEPT),
+        ),
+      ),
+  ]);
+}
+
+export async function lastJobRuns(db: Db, limit = 7) {
+  return db.select().from(jobRuns).orderBy(desc(jobRuns.startedAt)).limit(limit);
 }
