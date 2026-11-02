@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ipynbNamed, withCode } from '../../src/notebook/with-code';
+import { ipynbNamed, sourceOf, withCode, withSource } from '../../src/notebook/with-code';
 
 // #214: a student's notebook with their own code, as an .ipynb that Jupyter and Colab open.
 
@@ -50,5 +50,20 @@ describe('a notebook with my code', () => {
   it('names the file after the original', () => {
     expect(ipynbNamed('laborator-01.ipynb', 'versioni im')).toBe('laborator-01 (versioni im).ipynb');
     expect(ipynbNamed('lab.ipynb', 'Ana/Hoxha')).toBe('lab (AnaHoxha).ipynb');
+  });
+
+  it('changes one cell for a fix made in the browser (#232), and reads a cell back', () => {
+    expect(sourceOf(raw, 1)).toBe('x = 1\nprint(x)');
+    const nb = JSON.parse(withSource(raw, 1, 'x = 2\nprint(x)'));
+    expect(nb.cells[1]).toEqual({
+      cell_type: 'code',
+      source: ['x = 2\n', 'print(x)'],
+      outputs: [],
+      execution_count: null,
+    });
+    const text = JSON.parse(withSource(raw, 0, '# Laboratori'));
+    expect(text.cells[0]).toEqual({ cell_type: 'markdown', source: ['# Laboratori'] });
+    expect(text.cells[1].execution_count).toBe(3);
+    expect(() => withSource(raw, 9, 'x')).toThrow(RangeError);
   });
 });

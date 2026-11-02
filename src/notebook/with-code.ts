@@ -19,6 +19,28 @@ export function withCode(raw: string, code: ReadonlyMap<number, string>): string
   return `${JSON.stringify(nb, null, 1)}\n`;
 }
 
+/** The source of one cell of the .ipynb `raw` (#232), as Jupyter keeps it; empty past the end. */
+export function sourceOf(raw: string, index: number): string {
+  const cell = (JSON.parse(raw) as { cells?: Cell[] }).cells?.[index];
+  return Array.isArray(cell?.source) ? cell.source.join('') : (cell?.source ?? '');
+}
+
+/**
+ * The .ipynb `raw` with one cell's source replaced (#232). A code cell loses its outputs and execution
+ * count, which belong to the old code; a text cell keeps everything else.
+ */
+export function withSource(raw: string, index: number, text: string): string {
+  const nb = JSON.parse(raw) as { cells?: Cell[] };
+  const cell = nb.cells?.[index];
+  if (!cell) throw new RangeError(`No cell ${index}`);
+  cell.source = text.split(/(?<=\n)/);
+  if (cell.cell_type === 'code') {
+    cell.outputs = [];
+    cell.execution_count = null;
+  }
+  return `${JSON.stringify(nb, null, 1)}\n`;
+}
+
 /** "laborator-01.ipynb" and a label → "laborator-01 (label).ipynb". */
 export const ipynbNamed = (originalName: string, label: string) =>
   `${originalName.replace(/\.ipynb$/i, '')} (${label.replace(/[\\/:*?"<>|]/g, '')}).ipynb`;
