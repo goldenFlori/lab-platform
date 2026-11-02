@@ -1,7 +1,7 @@
 import { Alert, Button } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, notFound } from '@tanstack/react-router';
-import { Building2, Printer } from 'lucide-react';
+import { Building2, MoonStar, Printer } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { usernameBase } from '../../../shared/student-names';
 import { CredentialSlips } from '../../components/CredentialSlips';
@@ -10,7 +10,7 @@ import { t as messages, useT } from '../../i18n';
 import { ApiError } from '../../lib/api';
 import { APP_NAME } from '../../lib/brand';
 import { formatMoment } from '../../lib/labs';
-import { institutionsQuery, slugOf, useCreateInstitution, useResetDemo } from '../../lib/platform';
+import { institutionsQuery, jobRunsQuery, slugOf, useCreateInstitution, useResetDemo } from '../../lib/platform';
 import type { Slip } from '../../lib/students';
 
 // The platform owner's console (#200): every institution with its counts, and a new institution with
@@ -73,6 +73,7 @@ function PlatformPage() {
         <Building2 className="size-7 text-accent" aria-hidden="true" /> {t.platform.title}
       </h1>
       <p className="mt-1 max-w-2xl text-muted">{t.platform.lead}</p>
+      <NightlyJob />
 
       {query.isError ? (
         <Alert status="danger" className="mt-6">
@@ -99,6 +100,12 @@ function PlatformPage() {
                   {t.platform.courses}
                 </th>
                 <th scope="col" className="py-2 pr-4 font-medium">
+                  {t.platform.labs}
+                </th>
+                <th scope="col" className="py-2 pr-4 font-medium">
+                  {t.platform.notebooks}
+                </th>
+                <th scope="col" className="py-2 pr-4 font-medium">
                   {t.platform.staff}
                 </th>
                 <th scope="col" className="py-2 pr-4 font-medium">
@@ -119,6 +126,8 @@ function PlatformPage() {
                     {i.name} <span className="font-normal text-muted">/o/{i.slug}</span>
                   </th>
                   <td className="py-2 pr-4 tabular-nums">{i.courses}</td>
+                  <td className="py-2 pr-4 tabular-nums">{i.labs}</td>
+                  <td className="py-2 pr-4 tabular-nums">{i.notebooks}</td>
                   <td className="py-2 pr-4 tabular-nums">{i.staff}</td>
                   <td className="py-2 pr-4 tabular-nums">{i.students}</td>
                   <td className="py-2 pr-4 tabular-nums">{i.activeThisWeek}</td>
@@ -212,6 +221,62 @@ function PlatformPage() {
             <Printer className="size-4" /> {t.platform.print}
           </Button>
         </section>
+      )}
+    </section>
+  );
+}
+
+/** A night is missed when the last run is older than this (the job runs daily at 02:30 UTC). */
+const STALE_MS = 26 * 3_600_000;
+
+/**
+ * The nightly job (#228): its last run and each step's outcome, and the nights before. A failed step
+ * or a night without a run shows as a warning, so a job that stopped does not go unnoticed.
+ */
+function NightlyJob() {
+  const t = useT();
+  const query = useQuery(jobRunsQuery);
+  const runs = query.data?.runs ?? [];
+  const last = runs[0];
+  const stale = !last || Date.now() - Date.parse(last.startedAt) > STALE_MS;
+  const trouble = stale || !last?.ok;
+  if (!query.data) return null;
+  return (
+    <section
+      aria-labelledby="nightly"
+      className={`mt-6 max-w-3xl rounded-2xl border p-4 ${trouble ? 'border-danger/60' : 'border-border'} bg-surface`}
+      data-testid="nightly"
+    >
+      <h2 id="nightly" className="flex items-center gap-2 font-semibold">
+        <MoonStar className="size-4 text-accent" aria-hidden="true" /> {t.platform.nightly}
+      </h2>
+      <p className={`mt-1 text-sm ${trouble ? 'text-danger' : 'text-muted'}`} role={trouble ? 'alert' : undefined}>
+        {!last
+          ? t.platform.nightlyNever
+          : stale
+            ? t.platform.nightlyStale(formatMoment(last.startedAt))
+            : last.ok
+              ? t.platform.nightlyOk(formatMoment(last.startedAt))
+              : t.platform.nightlyFailed(formatMoment(last.startedAt))}
+      </p>
+      {last && (
+        <ul className="mt-2 grid gap-0.5 text-sm">
+          {Object.entries(last.steps).map(([step, outcome]) => (
+            <li key={step}>
+              <span className="font-medium">{t.platform.steps[step] ?? step}:</span>{' '}
+              <span className={outcome.startsWith('failed') ? 'text-danger' : 'text-muted'}>{outcome}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {runs.length > 1 && (
+        <p className="mt-2 text-xs text-muted">
+          {t.platform.nightlyBefore}{' '}
+          {runs
+            .slice(1)
+            .map((r) => `${formatMoment(r.startedAt)} ${r.ok ? '✓' : '✗'}`)
+            .join(' · ')}
+        </p>
       )}
     </section>
   );
