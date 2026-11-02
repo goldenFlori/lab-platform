@@ -1494,6 +1494,13 @@ export const en: Messages = {
     mine: 'My attendance',
     mineCount: (present: number, of: number) => `Present at ${present} of ${of} lab hours`,
   },
+  gradeResults: {
+    pass: 'In the grade: passed',
+    fail: 'In the grade: did not pass',
+    todo: 'In the grade: not written',
+    error: 'In the grade: did not run',
+    passed: (n: number, of: number) => `${n} of ${of} exercises passed in the grade`,
+  },
   edits: {
     edit: 'Edit the code',
     editLabel: (n: number) => `Edit the code of cell ${n}`,

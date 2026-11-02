@@ -98,7 +98,7 @@ export const help: HelpText = {
           text: 'If the internet drops, your work stays on the device and is saved by itself when it is back. Keep the page open: handing in is tried again by itself.',
         },
         {
-          text: 'When your pedagog releases the grades, yours and its comment show above the notebook and in **My progress**, and comments on your code under the cells they are about.',
+          text: 'When your pedagog releases the grades, yours and its comment show above the notebook and in **My progress**, and comments on your code under the cells they are about. Each exercise also shows how it did in the grade: passed, did not pass, not written, or did not run.',
         },
       ],
     },

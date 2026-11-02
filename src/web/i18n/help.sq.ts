@@ -124,7 +124,7 @@ export const help = {
           text: 'Nëse bie interneti, puna mbetet në pajisje dhe ruhet vetë kur kthehet. Mbajeni faqen hapur: dorëzimi provohet sërish vetë.',
         },
         {
-          text: 'Kur pedagogu publikon notat, nota dhe komenti shfaqen sipër fletores dhe te **Progresi im**, dhe komentet për kodin tuaj nën qelizat ku i shkroi.',
+          text: 'Kur pedagogu publikon notat, nota dhe komenti shfaqen sipër fletores dhe te **Progresi im**, dhe komentet për kodin tuaj nën qelizat ku i shkroi. Te çdo ushtrim shihni edhe si doli në notë: kaloi, nuk kaloi, pa shkruar ose nuk u ekzekutua.',
         },
       ],
     },
