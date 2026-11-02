@@ -26,6 +26,8 @@ export type OrganizationData = {
     correct: boolean;
     day: string;
   }[];
+  /** Their marks in lab hours' registers (#222). */
+  attendance: { group: string; day: string; label: string; status: string }[];
   /** Hints written by staff that the user revealed (#215). */
   hintsRevealed: { notebook: string; cell: number; hint: number; day: string }[];
   submissions: {

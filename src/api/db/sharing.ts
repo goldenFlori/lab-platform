@@ -1,6 +1,6 @@
 import { and, asc, eq, isNotNull, ne, sql } from 'drizzle-orm';
 import type { SharePreview } from '../../shared/sharing';
-import { uuidv7 } from './ids';
+import { sqlUuidv7, uuidv7 } from './ids';
 import { batchRaw, type Db } from './index';
 import { courseShares, courses, labs, memberships, notebooks, organizations } from './schema';
 
@@ -115,10 +115,7 @@ export async function copyCourse(
   const src = share.orgId;
   const dst = into.orgId;
   const courseId = uuidv7();
-  // A UUIDv7 per row: this moment's milliseconds, then random bits with the version and variant.
-  const prefix = uuidv7().slice(0, 14);
-  const newId = sql`lower(${prefix} || '7' || substr(hex(randomblob(2)), 2) || '-'
-    || substr('89AB', 1 + abs(random() % 4), 1) || substr(hex(randomblob(2)), 2) || '-' || hex(randomblob(6)))`;
+  const newId = sqlUuidv7();
   const mapOf = (json: string) =>
     sql`(SELECT json_extract(value, '$.o') AS o, json_extract(value, '$.n') AS n FROM json_each(${json}))`;
   const lm = mapOf(labMap);

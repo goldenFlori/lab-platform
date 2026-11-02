@@ -5,7 +5,7 @@ import { forTenant } from '../../src/api/db/tenant';
 
 /**
  * An organization with one of everything: a pedagog, a template, a course, a group, a lab with its
- * access rule, a ready notebook with one embed, the course's share link, and a saved comment.
+ * access rule, a ready notebook with one embed, the course's share link, a saved comment, and a lab hour's register.
  */
 export async function seedOrganization(slug: string) {
   const db = createDb(env.DB);
@@ -37,6 +37,11 @@ export async function seedOrganization(slug: string) {
 
   const courseShare = await tenant.shares.set(course.id, false);
   const savedComment = await tenant.savedComments.create({ notebookId: notebook.id, cell: 2, text: 'Mirë.' });
+  const attendanceSession = await tenant.attendance.create({
+    groupId: group.id,
+    day: '2026-10-05',
+    label: '1. Grafet',
+  });
 
   return {
     db,
@@ -52,6 +57,7 @@ export async function seedOrganization(slug: string) {
     notebook,
     courseShare,
     savedComment,
+    attendanceSession,
   };
 }
 

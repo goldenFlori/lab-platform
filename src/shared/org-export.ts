@@ -25,6 +25,8 @@ export const EXPORT_PARTS = [
   'predictionResults',
   'hintReveals',
   'savedComments',
+  'attendanceSessions',
+  'attendanceMarks',
   'kolokiumStarts',
   'labActivity',
   'aiUsage',
