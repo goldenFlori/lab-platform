@@ -1521,6 +1521,17 @@ export const en: Messages = {
     bannerText: 'You are editing cells: choose “Edit this cell” under a cell.',
     done: 'Done',
   },
+  arrange: {
+    open: 'Order and rename notebooks',
+    title: "The lab's notebooks",
+    help: "Change the notebooks' names, kinds and order. Students' work, grades and versions stay. A solution shows to students only after the solutions date.",
+    titleOf: (n: number) => `Title of notebook ${n}`,
+    kindOf: (n: number) => `Kind of notebook ${n}`,
+    up: (title: string) => `Move up: ${title}`,
+    down: (title: string) => `Move down: ${title}`,
+    save: 'Save',
+    failed: 'The changes were not saved. Please try again.',
+  },
   edits: {
     edit: 'Edit the code',
     editLabel: (n: number) => `Edit the code of cell ${n}`,
