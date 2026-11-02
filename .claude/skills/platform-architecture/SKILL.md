@@ -673,8 +673,9 @@ Built in #8: `src/api/auth/`, data access in `src/api/db/auth.ts`, routes in
   - **Re-running** (#209): it plans first, only reading, then writes.
     - A lab is matched by its number and its imported notebooks by file name.
     - A notebook whose original differs gets a new version in place (#208): same id, students' work
-      moved with its cells. A new one is uploaded after the rest. Title, kind and order changes in
-      the course repo are not carried over (no in-place rename yet).
+      moved with its cells. A new one is uploaded after the rest. Its title and kind follow the
+      course repo in place, and the lab's notebooks its order, with those added in the app after
+      them (#234); a rename made in the app is put back to the repo's.
     - If a new version would remove a cell where students have work, `ImportBlocked` stops it
       before any write and lists lab, file, cell and how many students; `--allow-loss` goes ahead.
     - Embeds are written when they differ, keeping a variant's pinned `seedCell`.
