@@ -92,6 +92,20 @@ query's rows, to find the costly ones. `test/api/meter.test.ts` keeps a save at 
 
 Before #182 and #177: requests 50% and 62%, rows read 142% and 183%, rows written 39% and 59%.
 
+Again on 2026-11-02 (#226), with everything since: hints on the lab page and revealed, the hand-in
+bar's comments, the hour's attendance register (opened once, ten marks changed, looked at five times):
+
+| | requests | rows read | rows written | classes a day |
+|---|---|---|---|---|
+| lab hour (60 min) | 17,296 (17.3%) | 0.38M (7.6%) | 20,654 (20.7%) | 4.8 |
+| kolokium (90 min) | 18,960 (19.0%) | 0.82M (16.4%) | 33,120 (33.1%) | 3.0 |
+| the demo rebuilt (nightly, #216) | 1 | 3,145 (0.1%) | 3,405 (3.4%) | |
+
+Opening a lab page is now 15 requests and about 290 rows read (12 and 220 before; the hints and the
+hand-in's comments). A register opens with one row per student (364 rows written for 120, with the
+indexes), and a changed mark read 372 rows, the whole group, until it looked up the one membership.
+The script also runs the demo's reset as the platform's owner, on a shared copy of the course.
+
 - **Reads were 142% and 183% before #182.** Every request read about 140 rows before its work: 123
   were the user's memberships, scanned by organization because the indexes that start with the user
   are partial. `memberships_user_idx` (user_id, org_id) makes it a lookup of about 5 rows, whatever
