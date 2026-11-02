@@ -71,6 +71,9 @@
   --success-foreground: oklch(0.99 0 0);
   --warning: oklch(0.52 0.12 60);
   --warning-foreground: oklch(0.99 0 0);
+  /* Danger too (#228): HeroUI's red gave 3.6:1 as text on white, so error messages failed AA. */
+  --danger: oklch(0.52 0.19 25);
+  --danger-foreground: oklch(0.99 0 0);
   --surface-shadow:
     0 1px 0 0 oklch(1 0 0 / 0.7) inset, 0 1px 2px 0 rgb(16 24 48 / 0.05), 0 8px 24px -10px rgb(16 24 64 / 0.12);
 
@@ -125,6 +128,9 @@
   --accent-foreground: oklch(0.16 0.03 262);
   --default: oklch(0.27 0.024 262);
   --default-foreground: oklch(0.94 0.006 255);
+  /* Red light enough to read on ink (HeroUI's gave 4.1:1), with dark text on it, like the accent. */
+  --danger: oklch(0.72 0.16 25);
+  --danger-foreground: oklch(0.16 0.03 262);
   --border: oklch(0.3 0.026 262);
   --separator: oklch(0.265 0.024 262);
   --surface-shadow: 0 1px 0 0 oklch(1 0 0 / 0.04) inset, 0 0 0 1px oklch(1 0 0 / 0.02);
