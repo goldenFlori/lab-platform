@@ -179,6 +179,9 @@ export const help: HelpText = {
           text: '**Print the slips**: ten to an A4 page, with the username and password. The passwords are kept nowhere else, so print them before leaving the page.',
         },
         { text: 'For a forgotten password: **New password** on the student, and print their slip.' },
+        {
+          text: 'In **Attendance**, **Open the register** for the lab hour: those who opened the lab that day are marked present. Change any mark; **Download attendance (CSV)** gives the whole term.',
+        },
       ],
     },
     {

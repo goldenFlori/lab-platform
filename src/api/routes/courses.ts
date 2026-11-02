@@ -1,5 +1,6 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
+import { attendanceMarkInput, attendanceSessionInput, type GroupAttendance } from '../../shared/attendance';
 import {
   type CourseDetail,
   createCourseInput,
@@ -256,6 +257,56 @@ export const courseRoutes = new Hono<TenantEnv>()
       return c.body(null, 204);
     },
   )
+
+  // Attendance for a lab hour (#222): the group's registers, for staff who manage its students.
+  .get('/:courseId/groups/:groupId/attendance', async (c) => {
+    const { course, groups } = await visibleCourse(c);
+    const group = groupOf(c, groups);
+    if (!c.var.access.can('student.manage', { courseId: course.id, groupId: group.id })) return forbidden(c);
+    return c.json((await c.var.tenant.attendance.ofGroup(group.id)) satisfies GroupAttendance);
+  })
+
+  .post(
+    '/:courseId/groups/:groupId/attendance',
+    zValidator('json', attendanceSessionInput, invalidRequest),
+    async (c) => {
+      const { course, groups } = await visibleCourse(c);
+      const group = groupOf(c, groups);
+      if (!c.var.access.can('student.manage', { courseId: course.id, groupId: group.id })) return forbidden(c);
+      const { day, labId } = c.req.valid('json');
+      const lab = await c.var.tenant.labs.get(labId);
+      if (!lab || lab.courseId !== course.id) throw new NotFoundError();
+      const id = await c.var.tenant.attendance.open(group.id, { day, labId, label: `${lab.n}. ${lab.title}` });
+      return c.json({ id }, 201);
+    },
+  )
+
+  .put(
+    '/:courseId/groups/:groupId/attendance/:sessionId/marks/:userId',
+    zValidator('json', attendanceMarkInput, invalidRequest),
+    async (c) => {
+      const { course, groups } = await visibleCourse(c);
+      const group = groupOf(c, groups);
+      if (!c.var.access.can('student.manage', { courseId: course.id, groupId: group.id })) return forbidden(c);
+      const session = await c.var.tenant.attendance.get(c.req.param('sessionId'));
+      if (!session || session.groupId !== group.id) throw new NotFoundError();
+      const userId = c.req.param('userId');
+      const students = await c.var.tenant.students.ofGroup(group.id);
+      if (!students.some((s) => s.id === userId)) throw new NotFoundError();
+      await c.var.tenant.attendance.mark(session.id, userId, c.req.valid('json').status);
+      return c.body(null, 204);
+    },
+  )
+
+  .delete('/:courseId/groups/:groupId/attendance/:sessionId', async (c) => {
+    const { course, groups } = await visibleCourse(c);
+    const group = groupOf(c, groups);
+    if (!c.var.access.can('student.manage', { courseId: course.id, groupId: group.id })) return forbidden(c);
+    const session = await c.var.tenant.attendance.get(c.req.param('sessionId'));
+    if (!session || session.groupId !== group.id) throw new NotFoundError();
+    await c.var.tenant.attendance.remove(session.id);
+    return c.body(null, 204);
+  })
 
   // A new code (the old one stops working at once), or none: joining is switched off.
   .post('/:courseId/groups/:groupId/join-code', zValidator('json', joinCodeSwitchInput, invalidRequest), async (c) => {

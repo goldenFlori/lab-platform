@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   BrainCircuit,
   CircleCheck,
+  ClipboardList,
   Clock,
   Lightbulb,
   MessageSquare,
@@ -11,6 +12,7 @@ import {
   Send,
   Star,
 } from 'lucide-react';
+import type { MyAttendance } from '../../../../../../../shared/attendance-status';
 import type { TopicResult } from '../../../../../../../shared/predictions';
 import type { LabProgress, NotebookProgress } from '../../../../../../../shared/progress';
 import { RichText } from '../../../../../../../viz/kit/RichText';
@@ -89,6 +91,7 @@ function ProgressPage() {
       )}
 
       <Understanding org={org} courseId={courseId} topics={data.topics} />
+      <MyAttendanceCard attendance={data.attendance} />
 
       {data.labs.length === 0 ? (
         <p className="mt-8 text-sm text-muted">{t.progress.noLabs}</p>
@@ -156,6 +159,35 @@ function Understanding({ org, courseId, topics }: { org: string; courseId: strin
           </Link>
         </>
       )}
+    </section>
+  );
+}
+
+/** Their own marks in the lab hours' registers (#222). */
+function MyAttendanceCard({ attendance }: { attendance: MyAttendance }) {
+  const t = useT();
+  if (attendance.length === 0) return null;
+  const present = attendance.filter((a) => a.status === 'present').length;
+  return (
+    <section className="mt-6 rounded-2xl border border-border bg-surface p-4 sm:p-5" data-testid="my-attendance">
+      <h2 className="flex items-center gap-2 font-semibold">
+        <ClipboardList className="size-4 text-accent" aria-hidden="true" /> {t.attendance.mine}
+      </h2>
+      <p className="mt-1 text-sm text-muted">{t.attendance.mineCount(present, attendance.length)}</p>
+      <ul className="mt-3 grid gap-1 text-sm sm:grid-cols-2">
+        {attendance.map((a) => (
+          <li key={`${a.day}-${a.label}`} className="flex justify-between gap-3">
+            <span className="truncate">
+              {a.day} · {a.label}
+            </span>
+            <span
+              className={a.status === 'absent' ? 'text-danger' : a.status === 'present' ? 'text-success' : 'text-muted'}
+            >
+              {t.attendance.statuses[a.status]}
+            </span>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

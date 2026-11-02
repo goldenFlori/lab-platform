@@ -204,6 +204,7 @@ Tiranës [ose siç parashikon marrëveshja e shërbimit].
 | Llogaria | Emri i plotë, emri i përdoruesit, email-i (jo i detyrueshëm), gjuha e zgjedhur e ndërfaqes. Fjalëkalimi ruhet vetëm si hash. |
 | Rolet | Institucionet, kurset dhe grupet ku bën pjesë një person, dhe roli i tij. |
 | Puna mësimore | Kodi që studenti ndryshon në fletore (e sheh vetëm ai derisa ta dorëzojë), ushtrimet e zgjidhura, puna e dorëzuar, notat dhe komentet. |
+| Prezenca | Shënimi i studentit në regjistrin e çdo ore laboratori të grupit të tij: i pranishëm, mungon ose i justifikuar, i plotësuar nga aktiviteti i ditës dhe i ndryshuar nga stafi i grupit. |
 | Aktiviteti | Të shumtën një shënim për student, laborator, lloj dhe ditë: e hapi, e shkarkoi, provoi një vizualizim, zgjidhi një ushtrim, ekzekutoi kod, mori pjesë në një Live Lab. |
 | Përgjigjet e para | Përgjigjja e parë e studentit te çdo vendim i një vizualizimi të përfshirë ose rresht i një tabele gjurmimi: nëse ishte e saktë, çfarë u përgjigj, pyetja dhe dita. Ushtrim, kurrë notë; stafi i sheh vetëm si numra, nga pesë studentë e lart. |
 | Udhëzimet e shfaqura | Cilat nga udhëzimet që stafi shkroi për një ushtrim shfaqi studenti, dhe dita. Stafi i sheh vetëm si numra, nga pesë studentë e lart. |
@@ -232,7 +233,7 @@ Administratori shkarkon në çdo kohë të dhënat e Institucionit si një skeda
 - njerëzit (pa hash-e fjalëkalimesh) dhe anëtarësimet;
 - strukturën e kurseve;
 - fletoret me skedarët origjinalë;
-- ushtrimet, dorëzimet (me orët e nisjes së kolokiumeve) dhe notat;
+- ushtrimet, dorëzimet (me orët e nisjes së kolokiumeve), notat dhe prezencën;
 - aktivitetin, përgjigjet e para, udhëzimet e shfaqura, të dhënat e AI-së, historinë e Live Lab, anketat, kërkesat për fshirje dhe
   fshirjet.
 

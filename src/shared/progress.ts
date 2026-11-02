@@ -1,3 +1,4 @@
+import type { MyAttendance } from './attendance-status';
 import type { MyGrade } from './grading';
 import type { TopicResult } from './predictions';
 
@@ -18,4 +19,9 @@ export type NotebookProgress = {
 export type LabProgress = { id: string; n: number; title: string; opened: boolean; notebooks: NotebookProgress[] };
 
 /** With the first-try results of predictions and trace tables per topic (#151). */
-export type MyProgress = { labs: LabProgress[]; topics: TopicResult[] };
+export type MyProgress = {
+  labs: LabProgress[];
+  topics: TopicResult[];
+  /** Their marks in the lab hours' registers (#222). */
+  attendance: MyAttendance;
+};

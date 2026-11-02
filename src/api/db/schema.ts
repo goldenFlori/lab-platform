@@ -621,6 +621,56 @@ export const traceAnswers = sqliteTable(
  * Practice, not grading: staff read it only as counts. Gone with the notebook or the user.
  */
 /**
+ * A lab hour's register (#222): a group on a day, for one lab. Named by the lab's title as it was, so
+ * the register stays if the lab goes; the lab's id only fills it in, from who opened that lab that day.
+ * Kept as long as the group, like the rest of a course's records.
+ */
+export const attendanceSessions = sqliteTable(
+  'attendance_sessions',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    groupId: text('group_id').notNull(),
+    /** YYYY-MM-DD in the institution's time zone. */
+    day: text('day').notNull(),
+    labId: text('lab_id'),
+    label: text('label').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    unique('attendance_sessions_id_org_unique').on(t.id, t.orgId),
+    foreignKey({
+      name: 'attendance_sessions_group_fk',
+      columns: [t.groupId, t.orgId],
+      foreignColumns: [groups.id, groups.orgId],
+    }).onDelete('cascade'),
+    index('attendance_sessions_group_idx').on(t.orgId, t.groupId),
+  ],
+);
+
+/** A student's mark in a lab hour's register (#222). */
+export const attendanceMarks = sqliteTable(
+  'attendance_marks',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    sessionId: text('session_id').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    status: text('status', { enum: ['present', 'absent', 'excused'] }).notNull(),
+  },
+  (t) => [
+    foreignKey({
+      name: 'attendance_marks_session_fk',
+      columns: [t.sessionId, t.orgId],
+      foreignColumns: [attendanceSessions.id, attendanceSessions.orgId],
+    }).onDelete('cascade'),
+    uniqueIndex('attendance_marks_unique').on(t.orgId, t.sessionId, t.userId),
+  ],
+);
+
+/**
  * A comment staff saved to give again (#221): at a cell of a notebook, for any student's hand-in, in
  * one click. The notebook's, like its grading; each student's copy is their own once given.
  */

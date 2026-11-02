@@ -609,6 +609,12 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   the same cell in one click, then adjusted for each; saved comments belong to the notebook and go with
   a copied course only with its solutions. Feedback for a whole group takes minutes. Next: #222,
   attendance for a lab hour.
+- **2026-11-02:** #222 done, and with it Phase 16. On the group page, staff open a register for a lab
+  hour: students who opened that lab that day (or joined its Live Lab) are marked present, the rest
+  absent, and any mark changes to present, absent or excused. The term downloads as CSV for the
+  institution's records; students see their own in My progress. The privacy page and the agreement
+  list attendance. Phase 16 leaves feedback where the mistake is, quick to give a whole group, and the
+  weekly register off paper. Next: plan Phase 17.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and

@@ -202,6 +202,7 @@ fulfilled.
 | Account | Full name, username, optional email, chosen interface language. The password is kept only as a hash. |
 | Roles | The institutions, courses and groups a person belongs to, and their role. |
 | Learning work | Code a student changes in notebooks (seen only by them until handed in), exercises solved, work handed in, grades and feedback. |
+| Attendance | A student's mark in each lab hour's register of their group: present, absent or excused, filled in from the day's activity and changed by the group's staff. |
 | Activity | At most one record per student, lab, kind and day: opened, downloaded, tried a visualisation, solved an exercise, ran code, took part in a Live Lab. |
 | First-try results | A student's first answer to each decision of an embedded visualisation or row of a trace table: whether it was right, what they answered, the question and the day. Practice, never a grade; staff see it only as counts from five students up. |
 | Hints revealed | Which of the hints staff wrote for an exercise a student revealed, and the day. Staff see them only as counts from five students up. |
@@ -230,7 +231,7 @@ The administrator downloads the Institution's data at any time as one JSON file.
 - people (without password hashes) and memberships;
 - course structure;
 - notebooks with their original files;
-- exercises, submissions (with the start times of timed tests) and grades;
+- exercises, submissions (with the start times of timed tests), grades and attendance;
 - activity, first-try results, hints revealed, AI records, Live Lab history, surveys, deletion requests and erasures.
 
 Students' unsubmitted code stays private to them and is not in it.

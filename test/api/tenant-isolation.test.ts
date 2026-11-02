@@ -28,6 +28,7 @@ const resources: Resource[] = [
   { name: 'courses', repo: (t) => t.courses, row: (s) => s.course, changes: { title: 'X' } },
   { name: 'course shares', repo: (t) => t.shares, row: (s) => s.courseShare, changes: { solutions: true } },
   { name: 'saved comments', repo: (t) => t.savedComments, row: (s) => s.savedComment, changes: { text: 'X' } },
+  { name: 'attendance registers', repo: (t) => t.attendance, row: (s) => s.attendanceSession, changes: { label: 'X' } },
   { name: 'groups', repo: (t) => t.groups, row: (s) => s.group, changes: { name: 'X' } },
   { name: 'labs', repo: (t) => t.labs, row: (s) => s.lab, changes: { title: 'X' } },
   { name: 'lab access', repo: (t) => t.labAccess, row: (s) => s.labAccess, changes: { visibleFrom: new Date() } },
