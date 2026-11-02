@@ -343,6 +343,10 @@ id, so students' work stays. Deleting and uploading again would delete it all (c
   replaces that cell's source (`withSource`; a code cell's outputs go), converts it again here and
   publishes it as a new version with every cell mapped to itself and that one changed; converting
   takes a few seconds.
+- **Names, kinds and order (#233):** `PATCH …/notebooks/:id` changes a title or kind in place, and
+  `PUT …/notebooks/order` sets every notebook's position at once (each one of the lab, once), for
+  staff with `course.manage`; the lab's menu has a panel for both. A kind change applies its rules at
+  once: a notebook made a solution is hidden from students until the solutions date.
 
 ## A notebook with one's own code (#214)
 
