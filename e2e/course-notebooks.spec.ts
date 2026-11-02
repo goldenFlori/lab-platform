@@ -222,3 +222,32 @@ test('importing a changed notebook keeps students’ work, and stops before dele
   expect(await edits()).toEqual([]);
   await student.context().close();
 });
+
+// #234: a notebook's title and the lab's order changed in the course repo reach the platform in place.
+test('importing again carries a renamed notebook and a new order', async () => {
+  const plan = planned.find((lab) => lab.n !== 10 && lab.notebooks.length >= 2);
+  const imported = report.labs.find(({ lab }) => lab.n === plan?.n);
+  if (!plan || !imported) throw new Error('No lab with two notebooks');
+  const [first, second, ...rest] = plan.notebooks;
+  if (!first || !second) throw new Error('No lab with two notebooks');
+  const changed = { ...plan, notebooks: [{ ...second, title: `${second.title} (ri)` }, first, ...rest] };
+  const again = await importCourse(pageApi(staff), {
+    org: 'e2e',
+    title: report.course.title,
+    academicYear: '2026/27',
+    labs: planned.map((lab) => (lab === plan ? changed : lab)),
+  });
+  const lab = again.labs.find((l) => l.lab.n === plan.n);
+  expect(lab).toMatchObject({ change: 'updated', renamed: [second.originalName], reordered: true, versions: [] });
+  const { notebooks } = await apiCall<{ notebooks: NotebookSummary[] }>(
+    staff,
+    'GET',
+    `/orgs/e2e/courses/${report.course.id}/labs/${imported.lab.id}/notebooks`,
+  );
+  // Same notebooks, in the course repo's order, the second with its new title.
+  expect(notebooks.slice(0, 2).map((n) => [n.originalName, n.title])).toEqual([
+    [second.originalName, `${second.title} (ri)`],
+    [first.originalName, first.title],
+  ]);
+  expect(notebooks.map((n) => n.id).sort()).toEqual(imported.notebooks.map((n) => n.id).sort());
+});
