@@ -1,12 +1,13 @@
 import { Alert, AlertDialog, Button } from '@heroui/react';
-import { Gauge, Megaphone, MessageSquare, Play } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { Gauge, Megaphone, MessageSquare, Play, X } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import type { StoredNotebook } from '../../../notebook/stored';
 import { MAX_TEST } from '../../../shared/exercise-limits';
 import type { Exercise } from '../../../shared/exercises';
 import type { ExerciseGrading, StaffGrade } from '../../../shared/grading';
 import { useT } from '../../i18n';
-import { gradeGroup, useGradingChanges } from '../../lib/grading';
+import { gradeGroup, savedCommentsQuery, useGradingChanges, useSavedComments } from '../../lib/grading';
 import type { NotebookRef } from '../../lib/notebooks';
 
 // Grading on the pedagog's machine (#53): points and hidden tests per exercise, the batch run over
@@ -322,18 +323,26 @@ export function CellCommentEditor({
 }) {
   const t = useT();
   const changes = useGradingChanges(notebookRef, group);
+  const saved = useSavedComments(notebookRef);
+  const atCell = (useQuery(savedCommentsQuery(notebookRef)).data?.comments ?? []).filter((c) => c.cell === cell);
   const current = grade.comments.find((c) => c.cell === cell)?.text ?? '';
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(current);
+  const [keep, setKeep] = useState(false);
   const [failed, setFailed] = useState(false);
 
-  async function save(next: string) {
+  async function save(next: string, keepIt = false) {
     setFailed(false);
     const others = grade.comments.filter((c) => c.cell !== cell);
     const comments = next.trim() ? [...others, { cell, text: next.trim() }].sort((a, b) => a.cell - b.cell) : others;
     try {
       await changes.review.mutateAsync({ userId: grade.userId, comments });
+      // Kept for the next students too (#221), unless it is already.
+      if (keepIt && next.trim() && !atCell.some((c) => c.text === next.trim())) {
+        await saved.save.mutateAsync({ cell, text: next.trim() });
+      }
       setEditing(false);
+      setKeep(false);
     } catch {
       setFailed(true);
     }
@@ -358,6 +367,25 @@ export function CellCommentEditor({
         >
           {current ? t.comments.edit : t.comments.add}
         </Button>
+        {/* Saved comments (#221): given to this student in one click. */}
+        {!current &&
+          atCell.map((c) => (
+            <Button
+              key={c.id}
+              size="sm"
+              variant="secondary"
+              aria-label={t.comments.give(c.text)}
+              isPending={changes.review.isPending}
+              onPress={() => void save(c.text)}
+            >
+              <span className="max-w-56 truncate">{c.text}</span>
+            </Button>
+          ))}
+        {failed && (
+          <span role="alert" className="text-xs text-danger">
+            {t.comments.failed}
+          </span>
+        )}
       </div>
     );
   }
@@ -366,7 +394,7 @@ export function CellCommentEditor({
       className="grid gap-2 border-t border-[var(--code-border)] px-3 py-2"
       onSubmit={(e) => {
         e.preventDefault();
-        void save(text);
+        void save(text, keep);
       }}
     >
       <textarea
@@ -377,6 +405,33 @@ export function CellCommentEditor({
         onChange={(e) => setText(e.target.value)}
         className="rounded-xl border border-border bg-surface px-3 py-2 text-sm"
       />
+      <label className="flex items-center gap-2 text-xs">
+        <input type="checkbox" checked={keep} onChange={(e) => setKeep(e.target.checked)} />
+        {t.comments.keep}
+      </label>
+      {atCell.length > 0 && (
+        <ul className="grid gap-1 text-xs" aria-label={t.comments.savedList}>
+          {atCell.map((c) => (
+            <li key={c.id} className="flex items-center gap-2">
+              <button
+                type="button"
+                className="min-w-0 flex-1 truncate text-left text-accent"
+                onClick={() => setText(c.text)}
+              >
+                {c.text}
+              </button>
+              <button
+                type="button"
+                aria-label={t.comments.forget(c.text)}
+                className="rounded p-1 text-muted hover:bg-default"
+                onClick={() => saved.remove.mutate(c.id)}
+              >
+                <X className="size-3.5" aria-hidden="true" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
       <div className="flex flex-wrap items-center gap-2">
         <Button type="submit" size="sm" variant="primary" isPending={changes.review.isPending}>
           {t.comments.save}

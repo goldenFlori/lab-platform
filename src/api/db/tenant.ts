@@ -57,6 +57,7 @@ import {
   notebooks,
   organizations,
   predictionResults,
+  savedComments,
   searchSections,
   sessions,
   submissions,
@@ -97,6 +98,7 @@ type TenantTable =
   | typeof courseTemplates
   | typeof courses
   | typeof courseShares
+  | typeof savedComments
   | typeof groups
   | typeof labs
   | typeof labAccess
@@ -320,6 +322,18 @@ function tenantCourses(db: Db, orgId: string) {
   };
 }
 
+/** Comments staff saved to give again (#221), per notebook and cell. */
+function tenantSavedComments(db: Db, orgId: string) {
+  const base = tenantTable(db, orgId, savedComments);
+  return {
+    ...base,
+    async ofNotebook(notebookId: string) {
+      const rows = await base.list(eq(savedComments.notebookId, notebookId));
+      return rows.sort((a, b) => a.cell - b.cell || a.createdAt.getTime() - b.createdAt.getTime());
+    },
+  };
+}
+
 /** A course's share with other institutions (#203): at most one per course. */
 function tenantShares(db: Db, orgId: string) {
   const base = tenantTable(db, orgId, courseShares);
@@ -418,6 +432,7 @@ const CELL_TABLES = [
   'prediction_results',
   'exercise_grading',
   'hint_reveals',
+  'saved_comments',
 ] as const;
 
 /** Bytes per stored chunk: well under D1's 2 MB per value. */
@@ -2319,6 +2334,7 @@ const EXPORTABLE: Record<Exclude<ExportPart, 'people'>, Exportable> = {
   exerciseCompletions: { table: exerciseCompletions, orgId: exerciseCompletions.orgId, id: exerciseCompletions.id },
   predictionResults: { table: predictionResults, orgId: predictionResults.orgId, id: predictionResults.id },
   hintReveals: { table: hintReveals, orgId: hintReveals.orgId, id: hintReveals.id },
+  savedComments: { table: savedComments, orgId: savedComments.orgId, id: savedComments.id },
   kolokiumStarts: { table: kolokiumStarts, orgId: kolokiumStarts.orgId, id: kolokiumStarts.id },
   labActivity: { table: labActivity, orgId: labActivity.orgId, id: labActivity.id },
   aiUsage: { table: aiUsage, orgId: aiUsage.orgId },
@@ -2526,6 +2542,7 @@ export function forTenant(db: Db, orgId: string) {
     courseTemplates: tenantTable(db, orgId, courseTemplates),
     courses: tenantCourses(db, orgId),
     shares: tenantShares(db, orgId),
+    savedComments: tenantSavedComments(db, orgId),
     groups: tenantGroups(db, orgId),
     labs: tenantLabs(db, orgId),
     labAccess: tenantLabAccess(db, orgId),

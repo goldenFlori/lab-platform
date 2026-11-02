@@ -34,6 +34,14 @@ export const gradeRunInput = z.object({
 /** A comment beside a cell of the student's code (#220). */
 export type CellComment = { cell: number; text: string };
 
+/** A comment saved to give again at that cell (#221). */
+export type SavedComment = CellComment & { id: string };
+
+export const savedCommentInput = z.object({
+  cell: z.number().int().min(0).max(10_000),
+  text: z.string().trim().min(1).max(2000),
+});
+
 /**
  * The pedagog's adjustment: a score in place of the run's (null for the run's), feedback, and comments
  * by cell (#220). Each part is changed only when sent.

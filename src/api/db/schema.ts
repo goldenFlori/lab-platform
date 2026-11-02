@@ -621,6 +621,31 @@ export const traceAnswers = sqliteTable(
  * Practice, not grading: staff read it only as counts. Gone with the notebook or the user.
  */
 /**
+ * A comment staff saved to give again (#221): at a cell of a notebook, for any student's hand-in, in
+ * one click. The notebook's, like its grading; each student's copy is their own once given.
+ */
+export const savedComments = sqliteTable(
+  'saved_comments',
+  {
+    id: text('id').primaryKey(),
+    orgId: orgId(),
+    notebookId: text('notebook_id').notNull(),
+    cell: integer('cell').notNull(),
+    text: text('text').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    unique('saved_comments_id_org_unique').on(t.id, t.orgId),
+    foreignKey({
+      name: 'saved_comments_notebook_fk',
+      columns: [t.notebookId, t.orgId],
+      foreignColumns: [notebooks.id, notebooks.orgId],
+    }).onDelete('cascade'),
+    index('saved_comments_notebook_idx').on(t.orgId, t.notebookId),
+  ],
+);
+
+/**
  * A hint a student revealed (#215): once per student, exercise and hint, on the day they did. Shown to
  * them again on every visit, and to staff only as counts. Kept as long as activity, like first tries.
  */

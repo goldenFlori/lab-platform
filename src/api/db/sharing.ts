@@ -187,6 +187,11 @@ export async function copyCourse(
     INSERT INTO exercise_grading (id, org_id, notebook_id, cell, points, hidden_test)
     SELECT ${newId}, ${dst}, m.n, g.cell, g.points, g.hidden_test
     FROM ${nm} m CROSS JOIN exercise_grading g ON g.org_id = ${src} AND g.notebook_id = m.o`,
+      // Saved comments can say what the answer is, so they go with the grading (#221).
+      sql`
+    INSERT INTO saved_comments (id, org_id, notebook_id, cell, text)
+    SELECT ${newId}, ${dst}, m.n, s.cell, s.text
+    FROM ${nm} m CROSS JOIN saved_comments s ON s.org_id = ${src} AND s.notebook_id = m.o`,
     );
   await batchRaw(db, statements);
   return courseId;

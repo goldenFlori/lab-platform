@@ -370,6 +370,10 @@ submissions page (`CellCommentEditor`), saved with `PATCH …/grades/:userId`, w
 parts sent (score, feedback, comments). Released with the grade: the student reads them under those
 cells on the lab page (`GradeCommentsProvider`, from the hand-in bar's request) and their count in My
 progress. A new version renumbers them (#208); they are in My data and the export with the grade.
+Saved comments (#221): `saved_comments` per notebook and cell, for staff who grade one of its groups
+(`…/saved-comments`), given to a student in one click from the cell's editor ("Ruaje për ta dhënë…"
+keeps one). They go with a course copy only with its solutions, since a comment can give an answer
+away; renumbered with a new version; in the institution's export.
 
 ## Courses, groups and joining
 

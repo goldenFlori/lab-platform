@@ -605,6 +605,10 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-11-02:** #220 done. When grading, the pedagog writes a comment beside a cell of a student's
   handed-in code. Released with the grade, the student reads it under that cell on the lab page, with
   the count in My progress; feedback where the mistake is. Next: #221, saved comments.
+- **2026-11-02:** #221 done. A comment written for one student can be kept and given to the others at
+  the same cell in one click, then adjusted for each; saved comments belong to the notebook and go with
+  a copied course only with its solutions. Feedback for a whole group takes minutes. Next: #222,
+  attendance for a lab hour.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
