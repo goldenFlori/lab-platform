@@ -645,6 +645,11 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   and reordered in place, from "Rendit dhe riemërto fletoret" in the lab's menu; their students' work,
   grades and versions stay, and a notebook made a solution hides from students until its date.
   Next: #234, the course import carrying them.
+- **2026-11-02:** #234 done, and with it Phase 18. Re-importing the course carries a notebook's title
+  and kind and the lab's order from the course repo, in place (notebooks added in the app come after),
+  and the report says what was renamed or reordered. Phase 18 leaves a lab fixable in class without
+  Jupyter or lost work, and its notebooks named and ordered in place, from the app or the course repo.
+  Next: plan Phase 19.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and

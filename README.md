@@ -101,7 +101,7 @@ npm run course:import -- --from ~/Desktop/discrete-structures-algorithms-course 
   so students keep their code, answers, hand-ins and grades, moved with their cell. If a cell where
   students have work is gone from the new version, it stops before changing anything and lists those
   cells: keep them in the course repo (editing them is fine), or add `--allow-loss` to delete that
-  work. A notebook's title or kind changed in the course repo stays as it is on the platform.
+  work. A notebook's title, kind and order follow the course repo too.
 - Visualizations only the platform has (the trace tables, the recursion tree, Kruskal & Prim) come
   from `site/content/platform.mjs` when the course repo has one, by notebook and cell like the site's:
   `export const embeds = { 'laborator-05.ipynb': [{ cell: 15, viz: 'tabela-gjurmimit', props: { preset: 'lab05-kruskal' } }] };`
