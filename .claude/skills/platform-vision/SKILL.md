@@ -627,6 +627,13 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 - **2026-11-02:** #227 done. With a released grade, students see under each exercise how their hand-in
   did in the pedagog's re-run (passed, did not pass, not written, did not run), and in My progress how
   many passed; the hidden tests stay hidden. Next: #228, the nightly job in the owner's console.
+- **2026-11-02:** #228 done, and with it Phase 17. The nightly job records each run and what each
+  step did (expired sign-ins, rows past retention, the demo's reset), each step on its own; the
+  owner's console shows the last run, warns when a step failed or a night was missed, and lists each
+  institution's labs and ready notebooks beside its courses. Fixing the console's warning for
+  accessibility found that error texts were too pale everywhere: the red now reads at WCAG AA in both
+  themes. Phase 17 leaves the class measured with everything in it, the course import working, results
+  per exercise, and the nightly job in sight. Next: plan Phase 18; the owner's steps before January.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and

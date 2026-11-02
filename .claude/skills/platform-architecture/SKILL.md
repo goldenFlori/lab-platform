@@ -358,6 +358,15 @@ hand-in's code ("Shkarko si .ipynb"). No server work, and no new data leaves the
   erased with the person, in "My data" and the institution's export, deleted after two years; the
   privacy page and the agreement list them. A copied course keeps its hints.
 
+## The nightly job (#228)
+
+`src/api/nightly.ts`, from the cron (02:30 UTC): expired sign-ins, the retention schedule (which now
+returns how many rows it deleted) and the demo's reset, each step on its own so one failing does not
+stop the others. Each run is a row in `job_runs` (the platform's own, in no organization): start,
+end, ok, and each step's outcome as words; the last 30 stay. The owner's console shows the last run,
+a warning when a step failed or no run came for 26 hours, the nights before, and per institution its
+labs and ready notebooks beside its courses.
+
 ## The demo institution (#216)
 
 - It exists when an institution with the slug `demo` does (`src/shared/demo.ts`); only the owner makes
@@ -853,7 +862,9 @@ Target: WCAG 2.2 level AA, which public institutions are asked for and which eve
 - **Rules the first audit taught (2026-10-29):**
   - Contrast 4.5:1 for text (1.4.3). HeroUI's success and warning are fills, too pale as text (2.2
     and 2.0): `--success` and `--warning` are darker in the light theme, and `--accent-soft` is an
-    opaque 10% tint so accent text on it reaches 4.7. GitHub's light code colours below 4.5 on the
+    opaque 10% tint so accent text on it reaches 4.7. `--danger` too, found only in #228 because error
+    texts rarely show during the audit (3.6:1 on white, 4.1 on ink): darker in the light theme,
+    lighter in the dark one with dark text on danger buttons, like the accent. GitHub's light code colours below 4.5 on the
     code background (red, orange, green, comments) are a shade darker in the same hue, in Shiki's
     output (by their inline colour) and in the editor alike.
   - A control's name contains its visible text, first (2.5.3, for voice control): the logo is
