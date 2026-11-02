@@ -388,6 +388,9 @@ Saved comments (#221): `saved_comments` per notebook and cell, for staff who gra
 (`…/saved-comments`), given to a student in one click from the cell's editor ("Ruaje për ta dhënë…"
 keeps one). They go with a course copy only with its solutions, since a comment can give an answer
 away; renumbered with a new version; in the institution's export.
+Results per exercise (#227): a released `MyGrade` also carries the re-run's `results` (cell and
+status, never the hidden tests), shown under each exercise on the student's lab page ("Në notë: …")
+and counted in My progress.
 
 ## Attendance for a lab hour (#222)
 

@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import type { GradeResult } from '../../shared/grading';
 import { PREDICTION_TOPICS, type PredictionTopic } from '../../shared/predictions';
 import type { MyProgress } from '../../shared/progress';
 import { type ReviewPlan, type ReviewTopic, topicsOfEmbed } from '../../shared/review';
@@ -56,6 +57,7 @@ export const progressRoutes = new Hono<TenantEnv>().get('/', async (c) => {
                   maxScore: grade.maxScore,
                   feedback: grade.feedback,
                   comments: grade.comments ?? [],
+                  results: grade.results as GradeResult[],
                 }
               : null,
           };

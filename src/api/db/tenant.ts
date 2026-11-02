@@ -2091,6 +2091,7 @@ function tenantProgress(db: Db, orgId: string) {
             score: grades.score,
             feedback: grades.feedback,
             comments: grades.comments,
+            results: grades.results,
           })
           .from(grades)
           .where(

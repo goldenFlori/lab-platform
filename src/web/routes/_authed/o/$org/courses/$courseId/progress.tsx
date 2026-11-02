@@ -271,6 +271,12 @@ function NotebookRow({ nb }: { nb: NotebookProgress }) {
           </span>
         )}
         {nb.grade?.feedback && <span className="text-muted sm:max-w-64">{nb.grade.feedback}</span>}
+        {/* Each exercise in the grade (#227): the outcome of the pedagog's re-run. */}
+        {nb.grade && nb.grade.results.length > 0 && (
+          <span className="text-muted" data-testid="progress-results">
+            {t.gradeResults.passed(nb.grade.results.filter((r) => r.status === 'pass').length, nb.grade.results.length)}
+          </span>
+        )}
         {/* Comments beside the code (#220): read under their cells on the lab page. */}
         {nb.grade && nb.grade.comments.length > 0 && (
           <span className="text-accent" data-testid="progress-comments">

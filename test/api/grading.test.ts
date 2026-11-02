@@ -96,6 +96,8 @@ describe('grades', () => {
       maxScore: 3,
       feedback: 'Shumë mirë.',
       comments: [{ cell: 3, text: 'Kujdes me rastin bosh.' }],
+      // Each exercise's outcome from the last run (#227); hidden tests stay hidden.
+      results: [{ cell: 4, status: 'pass' }],
     });
     expect(await grade(besa)).toBeNull();
     const list = (await (await pedagog.call(`${nbPath}/grades?group=${seed.group.id}`)).json()) as {

@@ -1501,6 +1501,13 @@ export const sq = {
     mine: 'Prezenca ime',
     mineCount: (present: number, of: number) => `I pranishëm ${present} nga ${of} orë laboratori`,
   },
+  gradeResults: {
+    pass: 'Në notë: kaloi',
+    fail: 'Në notë: nuk kaloi',
+    todo: 'Në notë: pa shkruar',
+    error: 'Në notë: nuk u ekzekutua',
+    passed: (n: number, of: number) => `${n} nga ${of} ushtrime kaluan në notë`,
+  },
   edits: {
     edit: 'Ndrysho kodin',
     editLabel: (n: number) => `Ndrysho kodin e qelizës ${n}`,

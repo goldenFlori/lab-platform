@@ -74,7 +74,14 @@ export type StaffGrade = {
 };
 
 /** A released grade as its student sees it. */
-export type MyGrade = { score: number; maxScore: number; feedback: string | null; comments: CellComment[] };
+export type MyGrade = {
+  score: number;
+  maxScore: number;
+  feedback: string | null;
+  comments: CellComment[];
+  /** How each exercise did in the pedagog's re-run (#227): the outcome only, never the hidden tests. */
+  results: GradeResult[];
+};
 
 /**
  * A course's released grades (#114) for the groups the user grades, so the pedagog can take them to

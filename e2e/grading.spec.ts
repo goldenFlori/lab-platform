@@ -97,6 +97,7 @@ test('a pedagog grades a group in one batch, releases, and the student sees the 
   await student.goto(pageUrl);
   await expect(student.getByTestId('my-grade')).toContainText('Nota juaj: 2/2');
   await expect(student.getByTestId('grade-comment')).toContainText('provoje edhe me numra negativë');
+  await expect(student.getByTestId('graded-result')).toHaveText('Në notë: kaloi');
   await student.context().close();
   await staff.context().close();
 });

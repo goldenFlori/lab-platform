@@ -11,6 +11,7 @@ import {
   MonitorSmartphone,
   Pencil,
   RotateCcw,
+  Star,
   Trophy,
   Users,
 } from 'lucide-react';
@@ -19,7 +20,7 @@ import type { CodeCell as Cell } from '../../../notebook/types';
 import { useT } from '../../i18n';
 import { useCodeEdits } from '../../lib/code-edits';
 import { useExercises } from '../../lib/exercises';
-import { useGradeComment } from '../../lib/grade-comments';
+import { useGradeComment, useGradeResult } from '../../lib/grade-comments';
 import { useLive } from '../../lib/live-context';
 import { sanitize } from '../../lib/sanitize';
 import { usePython } from '../../python/PythonProvider';
@@ -224,6 +225,8 @@ function ExerciseStrip({ cell }: { cell: Cell }) {
   const t = useT();
   const exercises = useExercises();
   const live = useLive();
+  // In the student's released grade (#227).
+  const graded = useGradeResult(cell.srcIndex);
   const exercise = exercises?.of(cell);
   if (!exercises || !exercise) return null;
   const progress = exercises.progress(cell);
@@ -250,6 +253,14 @@ function ExerciseStrip({ cell }: { cell: Cell }) {
       {exercises.solved(cell) && (
         <span className="flex items-center gap-1 font-medium text-success">
           <CircleCheck className="size-3.5" aria-hidden="true" /> {t.exercises.solved}
+        </span>
+      )}
+      {graded && (
+        <span
+          className={`flex items-center gap-1 font-medium ${graded === 'pass' ? 'text-success' : 'text-danger'}`}
+          data-testid="graded-result"
+        >
+          <Star className="size-3.5" aria-hidden="true" /> {t.gradeResults[graded]}
         </span>
       )}
       {progress && (

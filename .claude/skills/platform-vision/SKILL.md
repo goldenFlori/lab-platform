@@ -624,6 +624,9 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   attendance mark no longer reads the whole group. Measuring found that `npm run course:import` had
   stopped starting after #209 (Node runs scripts without compiling, and one class needed compiling);
   fixed, with a test that every script runs in Node as it is. Next: #227, results per exercise.
+- **2026-11-02:** #227 done. With a released grade, students see under each exercise how their hand-in
+  did in the pedagog's re-run (passed, did not pass, not written, did not run), and in My progress how
+  many passed; the hidden tests stay hidden. Next: #228, the nightly job in the owner's console.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
