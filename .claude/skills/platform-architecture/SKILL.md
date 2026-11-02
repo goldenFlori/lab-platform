@@ -375,6 +375,16 @@ Saved comments (#221): `saved_comments` per notebook and cell, for staff who gra
 keeps one). They go with a course copy only with its solutions, since a comment can give an answer
 away; renumbered with a new version; in the institution's export.
 
+## Attendance for a lab hour (#222)
+
+`attendance_sessions` (a group, a day, the lab's title as it was) and `attendance_marks` (present,
+absent, excused). Opening a register (`POST …/groups/:groupId/attendance`, `student.manage` in the
+group) marks present the group's students with lab activity for that lab that day (opening a
+notebook, joining its Live Lab), and absent the rest, in one batch. Staff change any mark and
+download the term as CSV from the group page; a student gets only their own in My progress. Kept as
+long as the group; erased with the person, in My data and the export; the privacy page and the
+agreement list it.
+
 ## Courses, groups and joining
 
 - **Staff** (#64, `src/api/routes/staff.ts`): staff with `course.manage` for the whole course list
