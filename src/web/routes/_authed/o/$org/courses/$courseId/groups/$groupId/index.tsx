@@ -3,6 +3,7 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { ArrowLeft, KeyRound, Printer, Upload, Users } from 'lucide-react';
 import type { GroupStudent } from '../../../../../../../../../shared/students';
+import { GroupAttendance } from '../../../../../../../../components/Attendance';
 import { CredentialSlips } from '../../../../../../../../components/CredentialSlips';
 import { t as messages, useT } from '../../../../../../../../i18n';
 import { ApiError } from '../../../../../../../../lib/api';
@@ -111,6 +112,10 @@ function GroupStudentsPage() {
             </li>
           ))}
         </ul>
+      )}
+
+      {students.length > 0 && (
+        <GroupAttendance org={org} courseId={courseId} groupId={groupId} groupName={groupName} students={students} />
       )}
     </section>
   );

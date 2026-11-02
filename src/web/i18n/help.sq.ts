@@ -213,6 +213,9 @@ export const help = {
         {
           text: 'Për një fjalëkalim të harruar: **Fjalëkalim i ri** te studenti, dhe printoni fletën e tij.',
         },
+        {
+          text: 'Te **Prezenca**, **Hap regjistrin** për orën e laboratorit: të pranishëm shënohen ata që e hapën laboratorin atë ditë. Ndryshoni çdo shënim; **Shkarko prezencën (CSV)** jep gjithë semestrin.',
+        },
       ],
     },
     {
