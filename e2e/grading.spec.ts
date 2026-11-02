@@ -72,7 +72,14 @@ test('a pedagog grades a group in one batch, releases, and the student sees the 
   await row.getByRole('button', { name: `Shiko dorëzimin e ${E2E_ACCOUNT.fullName}` }).click();
   await row.getByRole('button', { name: 'Shto koment' }).click();
   await row.getByLabel('Komenti për këtë qelizë').fill('Shumë mirë; provoje edhe me numra negativë.');
+  await row.getByText('Ruaje për ta dhënë edhe te studentët e tjerë').click();
   await row.getByRole('button', { name: 'Ruaj komentin' }).click();
+  await expect(row.getByTestId('cell-comment')).toContainText('provoje edhe me numra negativë');
+  // Saved (#221): taken away, then given again in one click.
+  await row.getByRole('button', { name: 'Ndrysho komentin' }).click();
+  await row.getByRole('button', { name: 'Hiq komentin' }).click();
+  await expect(row.getByTestId('cell-comment')).toHaveCount(0);
+  await row.getByRole('button', { name: /^Jepi këtë koment: Shumë mirë/ }).click();
   await expect(row.getByTestId('cell-comment')).toContainText('provoje edhe me numra negativë');
 
   await staff.getByRole('button', { name: 'Publiko notat' }).click();
