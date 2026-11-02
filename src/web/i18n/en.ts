@@ -1510,6 +1510,17 @@ export const en: Messages = {
     error: 'In the grade: did not run',
     passed: (n: number, of: number) => `${n} of ${of} exercises passed in the grade`,
   },
+  cellEdit: {
+    open: 'Edit cells',
+    edit: 'Edit this cell',
+    label: "The cell's source",
+    help: "Saved as a new version of the notebook: students' work stays with its cell, and those who had edited this cell see that the original changed.",
+    save: 'Save the cell',
+    saving: 'Saving the new version…',
+    failed: 'The cell was not saved. Please try again.',
+    bannerText: 'You are editing cells: choose “Edit this cell” under a cell.',
+    done: 'Done',
+  },
   edits: {
     edit: 'Edit the code',
     editLabel: (n: number) => `Edit the code of cell ${n}`,
