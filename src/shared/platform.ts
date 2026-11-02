@@ -23,8 +23,14 @@ export type Institution = {
   slug: string;
   createdAt: string;
   courses: number;
+  /** What is imported (#228): labs, and notebooks ready to read. */
+  labs: number;
+  notebooks: number;
   staff: number;
   students: number;
   /** Students with any activity in the last seven days. */
   activeThisWeek: number;
 };
+
+/** A run of the nightly job (#228): each step's outcome, as words. */
+export type JobRun = { startedAt: string; finishedAt: string; ok: boolean; steps: Record<string, string> };

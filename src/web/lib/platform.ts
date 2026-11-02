@@ -1,6 +1,6 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
 import { hashPassword } from '../../shared/password';
-import type { Institution } from '../../shared/platform';
+import type { Institution, JobRun } from '../../shared/platform';
 import { generateStudentPassword } from '../../shared/student-names';
 import { api } from './api';
 import type { Slip } from './students';
@@ -51,3 +51,9 @@ export function useResetDemo() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: institutionsQuery.queryKey }),
   });
 }
+
+/** The nightly job's last runs (#228), newest first. */
+export const jobRunsQuery = queryOptions({
+  queryKey: ['platform', 'jobs'],
+  queryFn: () => api<{ runs: JobRun[] }>('/platform/jobs'),
+});
