@@ -12,7 +12,9 @@ import {
   gradeReviewInput,
   gradeRunInput,
   gradingInput,
+  type SavedComment,
   type StaffGrade,
+  savedCommentInput,
 } from '../../shared/grading';
 import { scoreTrace, type TraceScore, tracePoints, traceProblemFor } from '../../shared/trace-grading';
 import { variantIssue } from '../../shared/trace-problem';
@@ -152,6 +154,33 @@ export const gradingRoutes = new Hono<TenantEnv>()
     if (!(await c.var.tenant.grading.review(nb.id, userId, c.req.valid('json')))) throw new NotFoundError();
     const row = await c.var.tenant.grading.of(nb.id, userId);
     return c.json(row ? staffGrade(row) : null);
+  })
+
+  // Comments saved to give again (#221): the notebook's, for staff who grade one of its groups.
+  .get('/saved-comments', async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    if (!gradingGroups(c, ctx).length) return forbidden(c);
+    const rows = await c.var.tenant.savedComments.ofNotebook(nb.id);
+    return c.json({
+      comments: rows.map(({ id, cell, text }) => ({ id, cell, text })),
+    } satisfies { comments: SavedComment[] });
+  })
+
+  .post('/saved-comments', zValidator('json', savedCommentInput, invalidRequest), async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    if (!gradingGroups(c, ctx).length) return forbidden(c);
+    const { cell, text } = c.req.valid('json');
+    const row = await c.var.tenant.savedComments.create({ notebookId: nb.id, cell, text });
+    return c.json({ id: row.id, cell: row.cell, text: row.text } satisfies SavedComment, 201);
+  })
+
+  .delete('/saved-comments/:commentId', async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    if (!gradingGroups(c, ctx).length) return forbidden(c);
+    const row = await c.var.tenant.savedComments.get(c.req.param('commentId'));
+    if (!row || row.notebookId !== nb.id) throw new NotFoundError();
+    await c.var.tenant.savedComments.remove(row.id);
+    return c.body(null, 204);
   })
 
   // The assessment report (#170): how a group, or all the user reviews, did on each exercise and

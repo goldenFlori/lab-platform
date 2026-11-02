@@ -24,6 +24,7 @@ export const EXPORT_PARTS = [
   'exerciseCompletions',
   'predictionResults',
   'hintReveals',
+  'savedComments',
   'kolokiumStarts',
   'labActivity',
   'aiUsage',
