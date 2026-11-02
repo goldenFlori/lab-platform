@@ -280,7 +280,7 @@ export const help = {
           text: 'Shtypni **Vlerëso** për grupin: çdo dorëzim ekzekutohet në kompjuterin tuaj, dhe serveri vlerëson tabelat e gjurmimit.',
         },
         {
-          text: 'Ndryshoni një notë ose shtoni koment; te kodi i dorëzuar, **Shto koment** shkruan pranë një qelize. Pastaj **Publiko notat**. **Shkarko notat (CSV)** i jep për regjistrin.',
+          text: 'Ndryshoni një notë ose shtoni koment; te kodi i dorëzuar, **Shto koment** shkruan pranë një qelize, dhe një koment i ruajtur u jepet studentëve të tjerë me një klik. Pastaj **Publiko notat**. **Shkarko notat (CSV)** i jep për regjistrin.',
         },
       ],
     },

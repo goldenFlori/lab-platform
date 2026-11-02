@@ -2,7 +2,7 @@ import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query
 import type { StoredNotebook } from '../../notebook/stored';
 import type { AssessmentReport } from '../../shared/assessment-report';
 import type { Exercise } from '../../shared/exercises';
-import type { CellComment, ExerciseGrading, StaffGrade } from '../../shared/grading';
+import type { CellComment, ExerciseGrading, SavedComment, StaffGrade } from '../../shared/grading';
 import { api } from './api';
 import { type NotebookRef, notebookQuery, notebooksPath } from './notebooks';
 
@@ -86,4 +86,29 @@ export async function gradeGroup(
     await api(`${base(ref)}/grades/${encodeURIComponent(submission.userId)}`, { method: 'PUT', body: outcome });
     onProgress(i + 1, submissions.length);
   }
+}
+
+/** Comments saved to give again at a cell (#221), the notebook's. */
+export const savedCommentsQuery = (ref: NotebookRef) =>
+  queryOptions({
+    queryKey: [...notebookQuery(ref).queryKey, 'saved-comments'],
+    queryFn: () => api<{ comments: SavedComment[] }>(`${base(ref)}/saved-comments`),
+  });
+
+export function useSavedComments(ref: NotebookRef) {
+  const queryClient = useQueryClient();
+  const { queryKey } = savedCommentsQuery(ref);
+  const refresh = () => queryClient.invalidateQueries({ queryKey });
+  return {
+    save: useMutation({
+      mutationFn: (comment: CellComment) =>
+        api<SavedComment>(`${base(ref)}/saved-comments`, { method: 'POST', body: comment }),
+      onSuccess: refresh,
+    }),
+    remove: useMutation({
+      mutationFn: (id: string) =>
+        api<void>(`${base(ref)}/saved-comments/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+      onSuccess: refresh,
+    }),
+  };
 }
