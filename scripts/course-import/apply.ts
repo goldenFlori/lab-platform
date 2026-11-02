@@ -104,6 +104,10 @@ export type ImportReport = {
     notebooks: NotebookSummary[];
     /** Notebooks that got a new version, with how their cells changed. */
     versions: { originalName: string; changed: number; added: number; removed: number }[];
+    /** Notebooks whose title or kind changed in place to the course repo's (#234). */
+    renamed: string[];
+    /** Whether the lab's notebooks were put in the course repo's order (#234). */
+    reordered: boolean;
   }[];
 };
 
@@ -122,7 +126,8 @@ export class ImportBlocked extends Error {
 /**
  * Imports `labs` into the organization's current course with this title and year, creating it if
  * needed. A lab is found by its number; its imported notebooks by their file names. A notebook that
- * changed gets a new version in place; a new one is uploaded after the rest. Notebooks added in the
+ * changed gets a new version in place; a new one is uploaded after the rest; titles, kinds and the
+ * order follow the course repo (#234). Notebooks added in the
  * app stay as they are. With `allowLoss`, a cell with students' work may go.
  */
 export async function importCourse(
@@ -197,6 +202,7 @@ export async function importCourse(
     const labPath = `${base}/labs/${lab.id}`;
     const notebooks: NotebookSummary[] = [];
     const versions: ImportReport['labs'][number]['versions'] = [];
+    const renamed: string[] = [];
     for (const step of steps) {
       const { want } = step;
       let nb: NotebookSummary;
@@ -231,9 +237,24 @@ export async function importCourse(
         await call(api, 'PUT', `${path}/embeds`, { embeds });
         if (change === 'unchanged') change = 'updated';
       }
+      // Its title and kind as the course repo has them (#234), in place.
+      if (current.title !== want.title || current.kind !== want.kind) {
+        nb = await call<NotebookDetail>(api, 'PATCH', path, { title: want.title, kind: want.kind });
+        renamed.push(want.originalName);
+        if (change === 'unchanged') change = 'updated';
+      }
       notebooks.push(nb);
     }
-    report.labs.push({ lab, change, notebooks, versions });
+    // The course repo's order, with notebooks added in the app after them, as they were (#234).
+    const { notebooks: present } = await call<{ notebooks: NotebookSummary[] }>(api, 'GET', `${labPath}/notebooks`);
+    const ours = new Set(notebooks.map((n) => n.id));
+    const order = [...notebooks.map((n) => n.id), ...present.filter((n) => !ours.has(n.id)).map((n) => n.id)];
+    const reordered = order.join() !== present.map((n) => n.id).join();
+    if (reordered) {
+      await call(api, 'PUT', `${labPath}/notebooks/order`, { ids: order });
+      if (change === 'unchanged') change = 'updated';
+    }
+    report.labs.push({ lab, change, notebooks, versions, renamed, reordered });
   }
   return report;
 }

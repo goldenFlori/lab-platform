@@ -107,8 +107,10 @@ const api: Api = (method, path, body, headers = {}) => {
 try {
   const report = await importCourse(api, { org, title, academicYear: year, labs, allowLoss: args['allow-loss'] });
   console.log(`\n${report.created ? 'Created' : 'Found'} the course "${title}" ${year}.`);
-  for (const { lab, change, notebooks, versions } of report.labs) {
+  for (const { lab, change, notebooks, versions, renamed, reordered } of report.labs) {
     console.log(`✔ Laboratori ${lab.n}: ${change}, ${notebooks.length} notebook${notebooks.length === 1 ? '' : 's'}`);
+    for (const name of renamed) console.log(`    title or kind of ${name} changed`);
+    if (reordered) console.log('    notebooks put in the course order');
     for (const v of versions) {
       console.log(
         `    new version of ${v.originalName}: ${v.changed} cells changed, ${v.added} added, ${v.removed} removed`,
