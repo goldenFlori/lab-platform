@@ -109,10 +109,13 @@ export type ImportReport = {
 
 /** The import stopped before changing anything: these cells hold students' work and would be gone. */
 export class ImportBlocked extends Error {
-  constructor(readonly losses: Loss[]) {
+  // A plain field, not a parameter property: Node runs these scripts by stripping types only.
+  readonly losses: Loss[];
+  constructor(losses: Loss[]) {
     super(
       `Stopped before changing anything: ${losses.length} cell${losses.length === 1 ? '' : 's'} with students' work would be gone`,
     );
+    this.losses = losses;
   }
 }
 
