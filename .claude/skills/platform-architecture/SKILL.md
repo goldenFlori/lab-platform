@@ -336,6 +336,13 @@ id, so students' work stays. Deleting and uploading again would delete it all (c
   changed sees a note (`versionAt`, `changedCells`).
 - **Left as they are:** live actions in flight on a page showing the old version (a check passed, a
   first try) are recorded under the old cell number.
+- **A cell edited in the browser (#232):** "Ndrysho qelizat" in the lab's menu turns on an edit mode
+  (`CellEditProvider`, on the lab page above the notebook section, so it stays on while the new
+  version loads). Each .ipynb cell gets "Ndrysho këtë qelizë" after the last piece rendered from it
+  (a title cell becomes the page's heading and has none). Saving takes the original by its version,
+  replaces that cell's source (`withSource`; a code cell's outputs go), converts it again here and
+  publishes it as a new version with every cell mapped to itself and that one changed; converting
+  takes a few seconds.
 
 ## A notebook with one's own code (#214)
 

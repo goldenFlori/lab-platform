@@ -634,6 +634,13 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   accessibility found that error texts were too pale everywhere: the red now reads at WCAG AA in both
   themes. Phase 17 leaves the class measured with everything in it, the course import working, results
   per exercise, and the nightly job in sight. Next: plan Phase 18; the owner's steps before January.
+- **2026-11-02:** Phase 18 planned as the "Phase 18: Fix it in class" milestone, issues #232–#234:
+  editing a cell in the browser, renaming, changing the kind of and reordering a notebook in place,
+  and the course import carrying those.
+- **2026-11-02:** #232 done. Staff fix a typo or a wrong line on the lab page itself: "Ndrysho
+  qelizat" in the lab's menu, then "Ndrysho këtë qelizë" under the cell. The notebook is converted
+  again in the browser and put in place as a new version, so students keep their work, and those who
+  had edited that cell are told it changed. No Jupyter, no re-upload. Next: #233.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
@@ -695,6 +702,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-11-01 | The demo is a real institution rebuilt nightly from a template course, entered through two shared password-less accounts limited to an allowlist of actions, rather than a separate fake app or per-visitor accounts: it shows the actual product, costs a few hundred rows a night, and no visitor can bring a real person's data in or break it for the next | Decided |
 | 2026-11-02 | Phase 16 is "Feedback that teaches": a grade with one note says little; a comment beside the line that went wrong teaches, and saved comments make it quick enough to give thirty students. Attendance joins it because the pilot's lab teachers keep it on paper every week | Decided |
 | 2026-11-02 | Phase 17 is "Before January": five phases of features since the class was last measured, a nightly job nobody would notice failing, and students seeing only a grade's total. The pilot must not fail on a limit or a silent job, and the grade must teach | Decided |
+| 2026-11-02 | Phase 18 is "Fix it in class": a lab is corrected most often in front of the class, so a cell is fixed on the lab page as a new version (no Jupyter, no lost work), and a notebook's title, kind and order change in place, which the course import then carries | Decided |
 | 2026-10-29 | Phase 12 is "The lab room" before SaaS: the January mini-pilot and the March semester run in a real room (one shared connection, lab PCs and cheap phones, every kind of student, pedagogs new to the platform). Self-service institutions, Google login and billing come once the pilot has shown the teaching, which the grant application needs first | Decided |
 | 2026-10-27 | A backup counts only once a restore of it has been checked. The restore drill runs on the owner's machine with their key (never in CI, which must not hold the key), after schema or backup changes and once a month | Decided |
 | 2026-10-27 | A hand-in delayed by an outage counts at the time the server receives it, never a time the browser reports: a browser's clock and requests can be changed, which would give extra minutes in a kolokium. The work is kept safe on the device instead, and the pedagog can move a deadline | Decided |
