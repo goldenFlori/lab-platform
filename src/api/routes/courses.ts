@@ -291,8 +291,8 @@ export const courseRoutes = new Hono<TenantEnv>()
       const session = await c.var.tenant.attendance.get(c.req.param('sessionId'));
       if (!session || session.groupId !== group.id) throw new NotFoundError();
       const userId = c.req.param('userId');
-      const students = await c.var.tenant.students.ofGroup(group.id);
-      if (!students.some((s) => s.id === userId)) throw new NotFoundError();
+      // One membership looked up, not the whole group read (#226).
+      if (!(await c.var.tenant.submissions.isStudentOf(userId, [group.id]))) throw new NotFoundError();
       await c.var.tenant.attendance.mark(session.id, userId, c.req.valid('json').status);
       return c.body(null, 204);
     },

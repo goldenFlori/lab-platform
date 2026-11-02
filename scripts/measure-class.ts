@@ -10,8 +10,9 @@
 
 import { parseArgs } from 'node:util';
 import { chromium, type Page } from '@playwright/test';
+import { hashPassword } from '../src/shared/password.ts';
 import type { Api } from './course-import/apply.ts';
-import { call, fixtureCourse, STUDENT_PASSWORD, signIn, startLocalPlatform } from './lib/local-platform.ts';
+import { ADMIN, call, fixtureCourse, STUDENT_PASSWORD, signIn, startLocalPlatform } from './lib/local-platform.ts';
 
 const { values: args } = parseArgs({
   options: {
@@ -42,6 +43,7 @@ const MODEL = {
     'report a run': 1,
     'exercise solved': 3,
     'first answer in a visualization': 15,
+    'reveal a hint': 2,
   },
   'kolokium (90 min)': {
     'open the lab page': 1,
@@ -58,7 +60,8 @@ const MODEL = {
 
 /** What staff do once per class, not per student. */
 const STAFF_MODEL = {
-  'lab hour (60 min)': {},
+  // The register of the hour (#222): opened once, a few marks changed, looked at now and then.
+  'lab hour (60 min)': { 'open the attendance register': 1, 'change a mark': 10, 'look at the register': 5 },
   'kolokium (90 min)': { 'staff follow the kolokium (every 15 s)': 360 },
 } as const;
 
@@ -69,6 +72,9 @@ function fail(message: string): never {
   console.error(`✖ ${message}`);
   process.exit(1);
 }
+
+/** Today in the institution's time zone, as the registers keep days. */
+const today = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Tirane' });
 
 /* ------------------------------------------------------------ the meter */
 
@@ -178,7 +184,8 @@ const { stop } = await startLocalPlatform({
   port: PORT,
   state: '.wrangler/measure',
   build: !args['no-build'],
-  env: { MEASURE: '1' },
+  // The admin is also the platform's owner here, to rebuild a demo institution (#216).
+  env: { MEASURE: '1', PLATFORM_OWNERS: ADMIN.username },
 });
 process.on('exit', stop);
 process.on('SIGINT', () => process.exit(130));
@@ -186,6 +193,17 @@ process.on('SIGINT', () => process.exit(130));
 try {
   const c = await fixtureCourse(BASE, { students: STUDENTS });
   console.log(`Imported the course; ${c.usernames.length} students in Grupi A.`);
+  // Hints on the first exercise (#215), so the lab page asks for them as it would.
+  const full = await call<{ exercises: { cell: number; title: string; test: string | null }[] }>(
+    c.admin,
+    'GET',
+    c.nbPath,
+  );
+  await call(c.admin, 'PUT', `${c.nbPath}/exercises`, {
+    exercises: full.exercises.map((e, i) =>
+      i === 0 ? { ...e, hints: ['Mendo për radhën.', 'Përdor një radhë me përparësi.'] } : e,
+    ),
+  });
   const sessions: Api[] = [];
   await measure('sign in', c.usernames, async (u) => {
     sessions.push(await signIn(BASE, u, PASSWORD));
@@ -211,6 +229,23 @@ try {
     }),
   );
 
+  await measure('reveal a hint', sessions, (s) =>
+    call(s, 'POST', `${c.nbPath}/exercises/${full.exercises[0]?.cell ?? code}/hints/1`),
+  );
+
+  // The hour's register (#222), by staff of the group.
+  const groupPath = `${c.course}/groups/${c.group.id}`;
+  const labId = c.labPath.split('/').pop() as string;
+  let sessionId = '';
+  await measure('open the attendance register', [c.admin], async (a) => {
+    sessionId = (await call<{ id: string }>(a, 'POST', `${groupPath}/attendance`, { day: today(), labId })).id;
+  });
+  const register = await call<{ marks: { userId: string }[] }>(c.admin, 'GET', `${groupPath}/attendance`);
+  await measure('change a mark', register.marks.slice(0, 10), (m) =>
+    call(c.admin, 'PUT', `${groupPath}/attendance/${sessionId}/marks/${m.userId}`, { status: 'excused' }),
+  );
+  await measure('look at the register', [c.admin], (a) => call(a, 'GET', `${groupPath}/attendance`));
+
   // The kolokium: the trace tables graded, the notebook a 90-minute kolokium for the group.
   const tables = c.detail.embeds.filter((e) => e.viz === 'tabela-gjurmimit');
   await call(c.admin, 'PUT', `${c.nbPath}/embeds`, {
@@ -233,6 +268,39 @@ try {
     call(a, 'GET', `${c.nbPath}/submissions?group=${c.group.id}`),
   );
   report();
+
+  // Once a night, whatever the classes (#216): the demo institution rebuilt from its template, here
+  // a shared copy of the same course.
+  const share = await call<{ share: { token: string } }>(c.admin, 'PUT', `${c.course}/share`, { solutions: true });
+  const demoAdmin = { username: 'measure.demo', password: 'Demo-sakte-2026' };
+  await call(c.admin, 'POST', '/platform/institutions', {
+    name: 'Demo',
+    slug: 'demo',
+    admin: {
+      fullName: 'Demo Admin',
+      username: demoAdmin.username,
+      passwordHash: await hashPassword(demoAdmin.password),
+    },
+  });
+  const demo = await signIn(BASE, demoAdmin.username, demoAdmin.password);
+  await call(demo, 'POST', '/orgs/demo/courses/from-share', {
+    token: share.share.token,
+    title: 'Struktura Diskrete',
+    academicYear: '2026/27',
+  });
+  await measure('the demo rebuilt (nightly)', [c.admin], (a) => call(a, 'POST', '/platform/demo/reset'));
+  const nightly = costs.get('the demo rebuilt (nightly)') as Cost;
+  console.log('\nThe demo rebuilt, once a night');
+  table([
+    ['', 'requests', 'rows read', 'rows written'],
+    ['the reset', fmt(nightly.requests), fmt(nightly.read), fmt(nightly.written)],
+    [
+      'of the daily limit',
+      pct(nightly.requests, LIMITS.requests),
+      pct(nightly.read, LIMITS.read),
+      pct(nightly.written, LIMITS.written),
+    ],
+  ]);
 } finally {
   stop();
 }

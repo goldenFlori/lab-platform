@@ -615,6 +615,15 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   institution's records; students see their own in My progress. The privacy page and the agreement
   list attendance. Phase 16 leaves feedback where the mistake is, quick to give a whole group, and the
   weekly register off paper. Next: plan Phase 17.
+- **2026-11-02:** Phase 17 planned as the "Phase 17: Before January" milestone, issues #226–#228: a
+  class measured again, results per exercise with a released grade, and the nightly job's last run
+  in the owner's console.
+- **2026-11-02:** #226 done. A class of 120 measured again with everything since Phase 11: a lab hour
+  uses 17% of a day's requests and 21% of its writes, a kolokium 19% and 33%, so about five lab hours
+  or three kolokia still fit a day; the demo's nightly reset takes 3.4% of the writes. Changing an
+  attendance mark no longer reads the whole group. Measuring found that `npm run course:import` had
+  stopped starting after #209 (Node runs scripts without compiling, and one class needed compiling);
+  fixed, with a test that every script runs in Node as it is. Next: #227, results per exercise.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and
@@ -675,6 +684,7 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
 | 2026-11-01 | Phase 15 is "Take it home, show it": students keep their work as .ipynb (open formats out, not only in), pedagogs give hints in their own words without AI's cost, and a demo institution with made-up data lets a grant jury or another faculty try the platform without ever seeing a real student | Decided |
 | 2026-11-01 | The demo is a real institution rebuilt nightly from a template course, entered through two shared password-less accounts limited to an allowlist of actions, rather than a separate fake app or per-visitor accounts: it shows the actual product, costs a few hundred rows a night, and no visitor can bring a real person's data in or break it for the next | Decided |
 | 2026-11-02 | Phase 16 is "Feedback that teaches": a grade with one note says little; a comment beside the line that went wrong teaches, and saved comments make it quick enough to give thirty students. Attendance joins it because the pilot's lab teachers keep it on paper every week | Decided |
+| 2026-11-02 | Phase 17 is "Before January": five phases of features since the class was last measured, a nightly job nobody would notice failing, and students seeing only a grade's total. The pilot must not fail on a limit or a silent job, and the grade must teach | Decided |
 | 2026-10-29 | Phase 12 is "The lab room" before SaaS: the January mini-pilot and the March semester run in a real room (one shared connection, lab PCs and cheap phones, every kind of student, pedagogs new to the platform). Self-service institutions, Google login and billing come once the pilot has shown the teaching, which the grant application needs first | Decided |
 | 2026-10-27 | A backup counts only once a restore of it has been checked. The restore drill runs on the owner's machine with their key (never in CI, which must not hold the key), after schema or backup changes and once a month | Decided |
 | 2026-10-27 | A hand-in delayed by an outage counts at the time the server receives it, never a time the browser reports: a browser's clock and requests can be changed, which would give extra minutes in a kolokium. The work is kept safe on the device instead, and the pedagog can move a deadline | Decided |
