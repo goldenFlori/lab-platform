@@ -1,5 +1,5 @@
 import { Button, Dropdown, Label } from '@heroui/react';
-import { Ellipsis, FileDiff, FileUp, Pencil, Trash2 } from 'lucide-react';
+import { Ellipsis, FileDiff, FileUp, ListOrdered, Pencil, Trash2 } from 'lucide-react';
 import { useT } from '../i18n';
 import { openLabTool } from '../lib/lab-tools';
 
@@ -16,8 +16,8 @@ export function LabMoreMenu({ canDelete, canReplace }: { canDelete: boolean; can
       <Dropdown.Popover placement="bottom end" className="w-64">
         <Dropdown.Menu
           aria-label={t.labMenu.label}
-          disabledKeys={[...(canDelete ? [] : ['delete']), ...(canReplace ? [] : ['version', 'edit-cells'])]}
-          onAction={(key) => openLabTool(key as 'upload' | 'version' | 'edit-cells' | 'delete')}
+          disabledKeys={[...(canDelete ? [] : ['delete', 'arrange']), ...(canReplace ? [] : ['version', 'edit-cells'])]}
+          onAction={(key) => openLabTool(key as 'upload' | 'version' | 'edit-cells' | 'arrange' | 'delete')}
         >
           <Dropdown.Item id="upload" textValue={t.upload.open}>
             <FileUp className="size-4" />
@@ -30,6 +30,10 @@ export function LabMoreMenu({ canDelete, canReplace }: { canDelete: boolean; can
           <Dropdown.Item id="edit-cells" textValue={t.cellEdit.open}>
             <Pencil className="size-4" />
             <Label>{t.cellEdit.open}</Label>
+          </Dropdown.Item>
+          <Dropdown.Item id="arrange" textValue={t.arrange.open}>
+            <ListOrdered className="size-4" />
+            <Label>{t.arrange.open}</Label>
           </Dropdown.Item>
           <Dropdown.Item id="delete" textValue={t.notebook.deleteButton} variant="danger">
             <Trash2 className="size-4" />

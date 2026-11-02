@@ -1528,6 +1528,17 @@ export const sq = {
     bannerText: 'Po ndryshoni qelizat: zgjidhni «Ndrysho këtë qelizë» nën një qelizë.',
     done: 'Mbaro',
   },
+  arrange: {
+    open: 'Rendit dhe riemërto fletoret',
+    title: 'Fletoret e laboratorit',
+    help: 'Ndryshoni emrin, llojin dhe radhën e fletoreve. Puna e studentëve, notat dhe versionet mbeten. Një zgjidhje u shfaqet studentëve vetëm pas datës së zgjidhjeve.',
+    titleOf: (n: number) => `Titulli i fletores ${n}`,
+    kindOf: (n: number) => `Lloji i fletores ${n}`,
+    up: (title: string) => `Lëviz lart: ${title}`,
+    down: (title: string) => `Lëviz poshtë: ${title}`,
+    save: 'Ruaj',
+    failed: 'Ndryshimet nuk u ruajtën. Provoni përsëri.',
+  },
   edits: {
     edit: 'Ndrysho kodin',
     editLabel: (n: number) => `Ndrysho kodin e qelizës ${n}`,

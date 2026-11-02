@@ -11,3 +11,7 @@ export const MAX_FILE_BYTES = 10 * 1024 * 1024;
 
 /** Files of a new version (#208) wait under this prefix until it is put in place. */
 export const STAGED_PREFIX = 'next.';
+
+/** A notebook's kind: the lab's main one, extra material, or a solution (staff and, from a date, students). */
+export const NOTEBOOK_KINDS = ['main', 'extra', 'solution'] as const;
+export type NotebookKind = (typeof NOTEBOOK_KINDS)[number];

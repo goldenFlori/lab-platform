@@ -641,6 +641,10 @@ Apply for the grant after phase 2 or 3, with pilot data (see `platform-business`
   qelizat" in the lab's menu, then "Ndrysho këtë qelizë" under the cell. The notebook is converted
   again in the browser and put in place as a new version, so students keep their work, and those who
   had edited that cell are told it changed. No Jupyter, no re-upload. Next: #233.
+- **2026-11-02:** #233 done. A lab's notebooks are renamed, made another kind (main, extra, solution)
+  and reordered in place, from "Rendit dhe riemërto fletoret" in the lab's menu; their students' work,
+  grades and versions stay, and a notebook made a solution hides from students until its date.
+  Next: #234, the course import carrying them.
 - **Next (the owner):** have a lawyer review the agreement and fill in the operator once a company
   is registered; record the 2-minute demo video (a self-hosted MP4 in `public/`), choose the
   contact address, run a dry run with the FSHN course before March, then the January mini-pilot and

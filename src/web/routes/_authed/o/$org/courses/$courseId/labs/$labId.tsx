@@ -30,6 +30,7 @@ import { EditsBar } from '../../../../../../../components/notebook/EditsBar';
 import { EmbedsEditor } from '../../../../../../../components/notebook/EmbedsEditor';
 import { ExercisesEditor } from '../../../../../../../components/notebook/ExercisesEditor';
 import { KolokiumCard } from '../../../../../../../components/notebook/KolokiumCard';
+import { NotebooksArrange } from '../../../../../../../components/notebook/NotebooksArrange';
 import { NotebookTranslate } from '../../../../../../../components/notebook/NotebookTranslate';
 import { NotebookUpload } from '../../../../../../../components/notebook/NotebookUpload';
 import { NotebookVersion } from '../../../../../../../components/notebook/NotebookVersion';
@@ -231,6 +232,7 @@ function LabPage() {
                   await navigate({ search: { notebook: nb.id } });
                 }}
               />
+              {notebooks.length > 0 && <NotebooksArrange base={changes.base} notebooks={notebooks} />}
               {current?.ready && detail.data && (
                 <NotebookVersion
                   key={`version-${current.id}`}

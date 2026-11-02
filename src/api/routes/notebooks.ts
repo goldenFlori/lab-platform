@@ -13,9 +13,11 @@ import {
   type NotebookDetail,
   type NotebookSummary,
   newVersionInput,
+  notebookOrderInput,
   ORIGINAL_FILE,
   RENDERED_FILE,
   STAGED_PREFIX,
+  updateNotebookInput,
 } from '../../shared/notebooks';
 import { predictionInput } from '../../shared/predictions';
 import { searchSectionsInput } from '../../shared/search';
@@ -140,6 +142,29 @@ export const notebookRoutes = new Hono<TenantEnv>()
       readyAt: null,
     });
     return c.json(summary(nb), 201);
+  })
+
+  // The lab's notebooks in a new order (#233): every one of them, once.
+  .put('/order', zValidator('json', notebookOrderInput, invalidRequest), async (c) => {
+    const ctx = await labContext(c);
+    const lab = visibleLab(c, ctx);
+    if (!canManage(c, ctx)) return forbidden(c);
+    const { ids } = c.req.valid('json');
+    const present = await c.var.tenant.notebooks.ofLab(lab.id);
+    if (ids.length !== present.length || !present.every((nb) => ids.includes(nb.id))) {
+      return c.json({ error: 'invalid_request' }, 400);
+    }
+    await c.var.tenant.notebooks.reorder(ids);
+    const ordered = await c.var.tenant.notebooks.ofLab(lab.id);
+    return c.json({ notebooks: ordered.map(summary) });
+  })
+
+  // A notebook renamed, or made another kind (#233), in place: its work, grades and versions stay.
+  .patch('/:notebookId', zValidator('json', updateNotebookInput, invalidRequest), async (c) => {
+    const { ctx, nb } = await notebookInUrl(c);
+    if (!canManage(c, ctx)) return forbidden(c);
+    const updated = await c.var.tenant.notebooks.update(nb.id, c.req.valid('json'));
+    return c.json(await detail(c, updated ?? nb));
   })
 
   // The lab page asks for this whenever a notebook opens: a student opened the lab (#18).
