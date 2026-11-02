@@ -7,10 +7,16 @@ import { isVisualizerId } from './visualizers';
 // Request and response shapes for a lab's notebooks, their files and embeds (#14). The app
 // imports only types from this file.
 
-export const NOTEBOOK_KINDS = ['main', 'extra', 'solution'] as const;
-export type NotebookKind = (typeof NOTEBOOK_KINDS)[number];
+import { NOTEBOOK_KINDS, type NotebookKind } from './notebook-files';
 
-export { MAX_FILE_BYTES, ORIGINAL_FILE, RENDERED_FILE, STAGED_PREFIX } from './notebook-files';
+export {
+  MAX_FILE_BYTES,
+  NOTEBOOK_KINDS,
+  type NotebookKind,
+  ORIGINAL_FILE,
+  RENDERED_FILE,
+  STAGED_PREFIX,
+} from './notebook-files';
 
 export const FILE_NAME = /^[A-Za-z0-9][\w.-]{0,99}$/;
 
@@ -19,6 +25,21 @@ export const createNotebookInput = z.object({
   title: z.string().trim().min(1).max(160),
   originalName: z.string().trim().min(1).max(200),
   sha256: z.string().regex(/^[0-9a-f]{64}$/),
+});
+
+/** A notebook's title or kind changed in place (#233); each part only when sent. */
+export const updateNotebookInput = z.object({
+  title: z.string().trim().min(1).max(160).optional(),
+  kind: z.enum(NOTEBOOK_KINDS).optional(),
+});
+
+/** The lab's notebooks in their new order (#233): every one of them, once. */
+export const notebookOrderInput = z.object({
+  ids: z
+    .array(z.string().max(64))
+    .min(1)
+    .max(200)
+    .refine((ids) => new Set(ids).size === ids.length, 'Each notebook once'),
 });
 
 const cellNumber = z.number().int().min(0).max(10_000);

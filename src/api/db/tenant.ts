@@ -694,6 +694,17 @@ function tenantNotebooks(db: Db, orgId: string) {
       await batchRaw(db, statements);
     },
 
+    /** The lab's notebooks put in this order (#233): positions 1, 2, …, in one batch. */
+    async reorder(ids: string[]) {
+      const [first, ...rest] = ids.map((id, i) =>
+        db
+          .update(notebooks)
+          .set({ position: i + 1 })
+          .where(and(eq(notebooks.orgId, orgId), eq(notebooks.id, id))),
+      );
+      if (first) await db.batch([first, ...rest]);
+    },
+
     /** The ready and unfinished notebooks of these labs, in each lab's order. */
     async ofLabs(labIds: string[]) {
       const rows = (
