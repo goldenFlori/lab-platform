@@ -1517,6 +1517,17 @@ export const sq = {
     error: 'Në notë: nuk u ekzekutua',
     passed: (n: number, of: number) => `${n} nga ${of} ushtrime kaluan në notë`,
   },
+  cellEdit: {
+    open: 'Ndrysho qelizat',
+    edit: 'Ndrysho këtë qelizë',
+    label: 'Burimi i qelizës',
+    help: 'Ruhet si version i ri i fletores: puna e studentëve mbetet te qeliza e saj, dhe kush e kishte ndryshuar këtë qelizë sheh që origjinali ndryshoi.',
+    save: 'Ruaj qelizën',
+    saving: 'Po ruhet versioni i ri…',
+    failed: 'Qeliza nuk u ruajt. Provoni përsëri.',
+    bannerText: 'Po ndryshoni qelizat: zgjidhni «Ndrysho këtë qelizë» nën një qelizë.',
+    done: 'Mbaro',
+  },
   edits: {
     edit: 'Ndrysho kodin',
     editLabel: (n: number) => `Ndrysho kodin e qelizës ${n}`,

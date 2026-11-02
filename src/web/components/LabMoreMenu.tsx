@@ -1,5 +1,5 @@
 import { Button, Dropdown, Label } from '@heroui/react';
-import { Ellipsis, FileDiff, FileUp, Trash2 } from 'lucide-react';
+import { Ellipsis, FileDiff, FileUp, Pencil, Trash2 } from 'lucide-react';
 import { useT } from '../i18n';
 import { openLabTool } from '../lib/lab-tools';
 
@@ -16,8 +16,8 @@ export function LabMoreMenu({ canDelete, canReplace }: { canDelete: boolean; can
       <Dropdown.Popover placement="bottom end" className="w-64">
         <Dropdown.Menu
           aria-label={t.labMenu.label}
-          disabledKeys={[...(canDelete ? [] : ['delete']), ...(canReplace ? [] : ['version'])]}
-          onAction={(key) => openLabTool(key as 'upload' | 'version' | 'delete')}
+          disabledKeys={[...(canDelete ? [] : ['delete']), ...(canReplace ? [] : ['version', 'edit-cells'])]}
+          onAction={(key) => openLabTool(key as 'upload' | 'version' | 'edit-cells' | 'delete')}
         >
           <Dropdown.Item id="upload" textValue={t.upload.open}>
             <FileUp className="size-4" />
@@ -26,6 +26,10 @@ export function LabMoreMenu({ canDelete, canReplace }: { canDelete: boolean; can
           <Dropdown.Item id="version" textValue={t.notebookVersion.open}>
             <FileDiff className="size-4" />
             <Label>{t.notebookVersion.open}</Label>
+          </Dropdown.Item>
+          <Dropdown.Item id="edit-cells" textValue={t.cellEdit.open}>
+            <Pencil className="size-4" />
+            <Label>{t.cellEdit.open}</Label>
           </Dropdown.Item>
           <Dropdown.Item id="delete" textValue={t.notebook.deleteButton} variant="danger">
             <Trash2 className="size-4" />

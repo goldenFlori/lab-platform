@@ -14,6 +14,7 @@ import { LearnerProvider } from '../../lib/learner';
 import { ResultsProvider } from '../../lib/results';
 import { sanitize } from '../../lib/sanitize';
 import { VizEmbed } from '../VizEmbed';
+import { CellEditSlot } from './CellEditSlot';
 import { CodeCell } from './CodeCell';
 
 // A notebook as the course site shows it: markdown as reading text and section cards, code shown
@@ -99,6 +100,8 @@ export function NotebookView({
             <div data-at={i} data-src={cell.srcIndex} className="contents">
               {cell.type === 'markdown' ? <Markdown cell={cell} /> : <CodeCell cell={cell} fileUrl={fileUrl} />}
             </div>
+            {/* In edit mode (#232), once per cell of the .ipynb, after the last piece made from it. */}
+            {lastOfSource.get(cell.srcIndex) === i && <CellEditSlot cell={cell.srcIndex} />}
             {after && viz(embed, t.notebook.tryInBrowser)}
           </Fragment>
         );

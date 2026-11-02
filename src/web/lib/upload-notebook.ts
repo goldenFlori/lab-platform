@@ -58,7 +58,10 @@ export type PreparedNotebook = {
 
 /** Converts an .ipynb here and lists the files that go up, refusing one too large. */
 async function prepareNotebook(file: File): Promise<PreparedNotebook> {
-  const original = new Uint8Array(await file.arrayBuffer());
+  return prepareRaw(new Uint8Array(await file.arrayBuffer()), file.name);
+}
+
+async function prepareRaw(original: Uint8Array, name: string): Promise<PreparedNotebook> {
   const raw = new TextDecoder().decode(original);
   // The converter is large (Shiki, KaTeX, WebAssembly), so it loads only for an upload.
   const { renderNotebook } = await import('../../notebook');
@@ -90,7 +93,7 @@ async function prepareNotebook(file: File): Promise<PreparedNotebook> {
   if (tooBig) {
     throw new UploadError(t().upload.fileTooLarge(MAX_FILE_BYTES / 1024 / 1024, tooBig.name));
   }
-  return { name: file.name, raw, stored, sha256: await sha256(original), files };
+  return { name, raw, stored, sha256: await sha256(original), files };
 }
 
 /** Sends a prepared notebook's files, each under `prefix` + its name. */
@@ -211,4 +214,38 @@ export async function publishVersion(
   const exercises = [...updated.exercises, ...found].sort((a, b) => a.cell - b.cell);
   await api(`${path}/exercises`, { method: 'PUT', body: { exercises } });
   return { ...updated, exercises };
+}
+
+/**
+ * One cell changed in the browser (#232): the original with that cell's new source (a code cell's
+ * outputs go, as they belong to the old code), converted here and put in place as a new version, every
+ * other cell where it was. Students' work stays, and the cell's note shows to those who edited it.
+ */
+export async function editCell(
+  base: string,
+  notebook: NotebookDetail,
+  cell: number,
+  source: string,
+  onProgress: (progress: UploadProgress) => void,
+): Promise<NotebookDetail> {
+  onProgress({ phase: 'converting' });
+  const res = await fetch(
+    `/api${base}/${encodeURIComponent(notebook.id)}/files/${ORIGINAL_FILE}?v=${notebook.version}`,
+    {
+      credentials: 'same-origin',
+    },
+  );
+  if (!res.ok) throw new ApiError(res.status, 'internal');
+  const { withSource } = await import('../../notebook/with-code');
+  const raw = withSource(await res.text(), cell, source);
+  const prepared = await prepareRaw(new TextEncoder().encode(raw), notebook.originalName);
+  const count = (JSON.parse(raw) as { cells?: unknown[] }).cells?.length ?? 0;
+  const match: CellMatch = {
+    map: Array.from({ length: count }, (_, i) => [i, i] as [number, number]),
+    changed: [[cell, cell]],
+    removed: [],
+    added: [],
+    same: count - 1,
+  };
+  return publishVersion(base, notebook, { prepared, match, before: [], work: [] }, onProgress);
 }

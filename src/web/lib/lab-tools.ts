@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react';
 // (#130) the upload, a new version (#208), translation and deletion of notebooks. Each tool listens for its name, so
 // the menus need no wiring through the page.
 
-export type LabTool = 'variant' | 'translate' | 'quiz' | 'upload' | 'version' | 'delete';
+export type LabTool = 'variant' | 'translate' | 'quiz' | 'upload' | 'version' | 'edit-cells' | 'delete';
 
 const EVENT = 'lab-tool';
 

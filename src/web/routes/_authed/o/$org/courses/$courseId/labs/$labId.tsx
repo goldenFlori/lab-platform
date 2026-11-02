@@ -18,12 +18,13 @@ import type { GroupView } from '../../../../../../../../shared/courses';
 import type { Exercise } from '../../../../../../../../shared/exercises';
 import type { LabView } from '../../../../../../../../shared/labs';
 import { ORIGINAL_FILE } from '../../../../../../../../shared/notebook-files';
-import type { Embed, NotebookKind, NotebookSummary } from '../../../../../../../../shared/notebooks';
+import type { Embed, NotebookDetail, NotebookKind, NotebookSummary } from '../../../../../../../../shared/notebooks';
 import { AiTools } from '../../../../../../../components/AiTools';
 import { HelpLink } from '../../../../../../../components/HelpLink';
 import { LabMoreMenu } from '../../../../../../../components/LabMoreMenu';
 import { LiveLab } from '../../../../../../../components/LiveLab';
 import { AssignmentsEditor } from '../../../../../../../components/notebook/AssignmentsEditor';
+import { CellEditBanner } from '../../../../../../../components/notebook/CellEditSlot';
 import { DeleteNotebook } from '../../../../../../../components/notebook/DeleteNotebook';
 import { EditsBar } from '../../../../../../../components/notebook/EditsBar';
 import { EmbedsEditor } from '../../../../../../../components/notebook/EmbedsEditor';
@@ -41,6 +42,7 @@ import { t as messages, useT } from '../../../../../../../i18n';
 import { reportRun, reportVisualizationUsed } from '../../../../../../../lib/activity';
 import { ApiError } from '../../../../../../../lib/api';
 import { APP_NAME } from '../../../../../../../lib/brand';
+import { CellEditProvider } from '../../../../../../../lib/cell-edit';
 import { CodeEditsProvider, useCodeEdits } from '../../../../../../../lib/code-edits';
 import { courseQuery } from '../../../../../../../lib/courses';
 import { ExercisesProvider, useExercises } from '../../../../../../../lib/exercises';
@@ -305,43 +307,52 @@ function LabPage() {
             </Alert.Content>
           </Alert>
         ) : (
-          <NotebookSection
-            notebookRef={ref}
-            version={current.version}
-            originalName={current.originalName}
-            changed={changed}
-            embeds={detail.data?.embeds}
-            exercises={detail.data?.exercises}
-            embedsFailed={detail.isError}
-            editor={
+          // On the page, not in the section: the edit mode stays on while a new version loads (#232).
+          <MaybeCellEdit
+            cells={
               canManage
-                ? {
-                    isPending: changes.saveEmbeds.isPending,
-                    save: (embeds) => changes.saveEmbeds.mutateAsync({ notebookId: ref.notebookId, embeds }),
-                    exercisesPending: changes.saveExercises.isPending,
-                    saveExercises: (exercises) =>
-                      changes.saveExercises.mutateAsync({ notebookId: ref.notebookId, exercises }),
-                    variants: {
-                      org,
-                      courseId,
-                      base: changes.base,
-                      onSaved: async (nb) => {
-                        await changes.uploaded(nb);
-                        await navigate({ search: { notebook: nb.id } });
+                ? { base: changes.base, notebook: detail.data, onSaved: (nb) => void changes.uploaded(nb) }
+                : undefined
+            }
+          >
+            <NotebookSection
+              notebookRef={ref}
+              version={current.version}
+              originalName={current.originalName}
+              changed={changed}
+              embeds={detail.data?.embeds}
+              exercises={detail.data?.exercises}
+              embedsFailed={detail.isError}
+              editor={
+                canManage
+                  ? {
+                      isPending: changes.saveEmbeds.isPending,
+                      save: (embeds) => changes.saveEmbeds.mutateAsync({ notebookId: ref.notebookId, embeds }),
+                      exercisesPending: changes.saveExercises.isPending,
+                      saveExercises: (exercises) =>
+                        changes.saveExercises.mutateAsync({ notebookId: ref.notebookId, exercises }),
+                      variants: {
+                        org,
+                        courseId,
+                        base: changes.base,
+                        onSaved: async (nb) => {
+                          await changes.uploaded(nb);
+                          await navigate({ search: { notebook: nb.id } });
+                        },
                       },
-                    },
-                  }
-                : null
-            }
-            onVisualizationUsed={
-              labList.permissions.staff ? undefined : () => reportVisualizationUsed(org, courseId, labId)
-            }
-            submissions={
-              labList.permissions.staff
-                ? { staff: { groups: courseDetail.groups, canPublish: labList.permissions.publish } }
-                : { staff: null }
-            }
-          />
+                    }
+                  : null
+              }
+              onVisualizationUsed={
+                labList.permissions.staff ? undefined : () => reportVisualizationUsed(org, courseId, labId)
+              }
+              submissions={
+                labList.permissions.staff
+                  ? { staff: { groups: courseDetail.groups, canPublish: labList.permissions.publish } }
+                  : { staff: null }
+              }
+            />
+          </MaybeCellEdit>
         )}
         <LabNeighbours org={org} courseId={courseId} labId={labId} labs={labList.labs} />
       </section>
@@ -501,6 +512,7 @@ function NotebookSection({
                 {!submissions.staff && <SubmissionBar notebookRef={notebookRef} />}
                 <EditsBar original={original} />
                 <PythonBar />
+                <CellEditBanner />
                 <NotebookView
                   id={notebookRef.notebookId}
                   notebook={rendered.data}
@@ -618,5 +630,23 @@ function EditablePython({
     >
       {children}
     </PythonProvider>
+  );
+}
+
+/** The cell edit mode (#232), for staff who manage the lab; for anyone else, the notebook as it is. */
+function MaybeCellEdit({
+  cells,
+  children,
+}: {
+  cells:
+    | { base: string; notebook: NotebookDetail | undefined; onSaved: (notebook: NotebookDetail) => void }
+    | undefined;
+  children: ReactNode;
+}) {
+  if (!cells) return children;
+  return (
+    <CellEditProvider base={cells.base} notebook={cells.notebook} onSaved={cells.onSaved}>
+      {children}
+    </CellEditProvider>
   );
 }
