@@ -1,6 +1,6 @@
 import { zValidator } from '@hono/zod-validator';
 import { type Context, Hono } from 'hono';
-import type { MyGrade } from '../../shared/grading';
+import type { GradeResult, MyGrade } from '../../shared/grading';
 import {
   type Assignment,
   assignmentInput,
@@ -68,6 +68,7 @@ const released = (
         score: number | null;
         feedback: string | null;
         comments: { cell: number; text: string }[] | null;
+        results: { cell: number; status: string }[];
         releasedAt: Date | null;
       }
     | undefined,
@@ -78,6 +79,7 @@ const released = (
         maxScore: row.maxScore,
         feedback: row.feedback,
         comments: row.comments ?? [],
+        results: row.results as GradeResult[],
       }
     : null;
 
