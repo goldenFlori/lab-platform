@@ -11,6 +11,8 @@ test('the owner creates an institution whose admin signs in and starts a course'
   await owner.getByRole('menuitem', { name: 'Platforma' }).click();
   await expect(owner.getByRole('heading', { name: 'Institucionet', level: 1 })).toBeVisible();
   await expect(owner.getByTestId('institutions')).toContainText('/o/e2e');
+  // No night has passed on a fresh database, and the console says so (#228).
+  await expect(owner.getByTestId('nightly')).toContainText('Puna e natës nuk ka xhiruar ende.');
 
   const suffix = crypto
     .randomUUID()
